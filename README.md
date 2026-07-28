@@ -30,9 +30,13 @@ php artisan test --testsuite=Smoke
 Push to `main` → CI → production deploy via GitHub Actions.
 Push to `staging` → CI → staging deploy.
 
-See [docs/vps-setup.md](docs/vps-setup.md) for VPS provisioning.
+- VPS provisioning: [docs/vps-setup.md](docs/vps-setup.md)
+- Backups: [docs/backups-and-restore.md](docs/backups-and-restore.md)
+- Release checklist: [docs/release-runbook.md](docs/release-runbook.md)
 
 ## Super Admin (seeded)
 
 - Email: `robeir.george@outlook.com`
 - Password: set via `SUPERADMIN_PASSWORD` in `.env` (default `Spims@Dev2026!`)
+
+Sample curriculum (`DEMO-DIP` / `DEMO101`) is seeded when `SEED_SAMPLE_DATA=true` (default).

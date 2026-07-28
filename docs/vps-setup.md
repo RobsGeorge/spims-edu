@@ -142,3 +142,42 @@ In repo Settings → Secrets:
 | A `staging` | VPS IP |
 
 No hidden subdomains in v1 — only production and staging hostnames above.
+
+## 11. Production `.env` hardening
+
+```
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://spims-edu.com
+FORCE_HTTPS=true
+SEED_SAMPLE_DATA=true
+BACKUP_PATH=/var/backups/spims
+BACKUP_RETENTION_DAYS=14
+CACHE_DRIVER=redis
+QUEUE_CONNECTION=redis
+SESSION_DRIVER=redis
+```
+
+Change `SUPERADMIN_PASSWORD` before first public launch.
+
+## 12. Backups, monitoring, release
+
+- Backups & restore drill: [backups-and-restore.md](backups-and-restore.md)
+- Release checklist: [release-runbook.md](release-runbook.md)
+- Exam concurrency on box: [exam-concurrency.md](exam-concurrency.md)
+
+Uptime: probe `GET /health` every minute (UptimeRobot / Hetrix / Grafana). Alert on non-200.
+
+Nginx security extras (inside TLS `server` block):
+
+```nginx
+add_header X-Content-Type-Options nosniff always;
+add_header X-Frame-Options SAMEORIGIN always;
+add_header Referrer-Policy strict-origin-when-cross-origin always;
+```
+
+(App middleware also sets these; Nginx duplicates are fine.)
+
+## 13. Queue restart after deploy
+
+Ensure `spims-queue.service` exists (section 7). Deploy workflow restarts it after each production push.

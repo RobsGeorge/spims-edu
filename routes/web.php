@@ -36,6 +36,7 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExamAttemptController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FoundationDemoController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\LocaleController;
@@ -47,9 +48,15 @@ use App\Http\Controllers\TranscriptController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/health', HealthController::class)->name('health');
+Route::get('/up', HealthController::class)->name('up');
 Route::get('/api/branding', [BrandingController::class, 'show'])->name('api.branding');
-Route::post('/api/webhooks/payments', PaymentWebhookController::class)->name('api.webhooks.payments');
-Route::post('/api/webhooks/zoom', ZoomWebhookController::class)->name('api.webhooks.zoom');
+Route::post('/api/webhooks/payments', PaymentWebhookController::class)
+    ->middleware('throttle:webhooks')
+    ->name('api.webhooks.payments');
+Route::post('/api/webhooks/zoom', ZoomWebhookController::class)
+    ->middleware('throttle:webhooks')
+    ->name('api.webhooks.zoom');
 Route::get('/verify/{token}', CredentialVerifyController::class)->name('credentials.verify');
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
@@ -57,17 +64,19 @@ Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::clas
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('auth.register');
-    Route::post('/register', [RegisterController::class, 'store']);
+    Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:auth');
     Route::get('/login', [LoginController::class, 'create'])->name('auth.login');
-    Route::post('/login', [LoginController::class, 'store']);
+    Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:login');
     Route::get('/verify-email', [VerifyEmailController::class, 'show'])->name('auth.verify');
-    Route::post('/verify-email', [VerifyEmailController::class, 'store']);
+    Route::post('/verify-email', [VerifyEmailController::class, 'store'])->middleware('throttle:auth');
     Route::get('/set-password', [SetPasswordController::class, 'create'])->name('auth.password.create');
-    Route::post('/set-password', [SetPasswordController::class, 'store']);
+    Route::post('/set-password', [SetPasswordController::class, 'store'])->middleware('throttle:auth');
     Route::get('/forgot-password', [PasswordResetController::class, 'requestForm'])->name('auth.password.request');
-    Route::post('/forgot-password', [PasswordResetController::class, 'sendOtp']);
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendOtp'])->middleware('throttle:auth');
     Route::get('/reset-password', [PasswordResetController::class, 'resetForm'])->name('auth.password.reset.form');
-    Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('auth.password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'reset'])
+        ->middleware('throttle:auth')
+        ->name('auth.password.reset');
 });
 
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('auth.logout');
