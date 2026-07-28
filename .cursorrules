@@ -1,0 +1,8 @@
+You are working on SPIMS — a standalone Laravel SIS/LMS at spims-edu.com.
+
+- Authorization = AuthorizeService + permission keys. No role-name string comparisons.
+- Every destructive mutation → audit_logs via AuditLogWriter.
+- Money = integer minor units. Localize everything (ar RTL-first, en, fr).
+- PHP 8.2. No npm build step.
+- Write/update tests with every change; CI gate must pass.
+- Out-of-phase ideas → PARKING-LOT.md.

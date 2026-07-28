@@ -1,0 +1,99 @@
+/**
+ * SPIMS Liturgical Design System
+ * Light: parchment + gold accents
+ * Dark: navy gradient + gold titles
+ */
+
+:root {
+    --font-sans: 'Cairo', 'Segoe UI', system-ui, sans-serif;
+    --radius-md: 0.875rem;
+    --transition-base: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.theme-light {
+    --color-bg-1: #faf6ee;
+    --color-bg-2: #f3ead8;
+    --color-bg-3: #ebe0c8;
+    --gradient-bg: linear-gradient(135deg, var(--color-bg-1) 0%, var(--color-bg-2) 45%, var(--color-bg-3) 100%);
+    --color-surface: rgba(255, 252, 245, 0.92);
+    --color-surface-border: rgba(180, 140, 50, 0.2);
+    --color-title: #5c4a1f;
+    --color-title-accent: #8b6914;
+    --color-text: #3d3428;
+    --color-text-muted: #6b5d4a;
+    --color-primary: #b8860b;
+    --color-primary-hover: #9a7209;
+    --color-primary-text: #1a1408;
+    --color-nav-bg: rgba(250, 246, 238, 0.95);
+    --color-nav-border: rgba(180, 140, 50, 0.15);
+    --color-nav-text: #4a4035;
+    --color-nav-active: #8b6914;
+}
+
+body.theme-dark {
+    --color-bg-1: #070f1f;
+    --color-bg-2: #0f2744;
+    --color-bg-3: #1a3a5c;
+    --gradient-bg: linear-gradient(145deg, var(--color-bg-1) 0%, var(--color-bg-2) 42%, var(--color-bg-3) 100%);
+    --color-surface: rgba(15, 39, 68, 0.72);
+    --color-surface-border: rgba(212, 175, 55, 0.18);
+    --color-title: #d4af37;
+    --color-title-accent: #f0d875;
+    --color-text: #f8fafc;
+    --color-text-muted: #cbd5e1;
+    --color-primary: #d4af37;
+    --color-primary-hover: #c9a227;
+    --color-primary-text: #0a1628;
+    --color-nav-bg: rgba(7, 15, 31, 0.92);
+    --color-nav-border: rgba(212, 175, 55, 0.12);
+    --color-nav-text: #e2e8f0;
+    --color-nav-active: #d4af37;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--gradient-bg);
+    background-attachment: fixed;
+    color: var(--color-text);
+    min-height: 100vh;
+}
+
+.spims-nav {
+    background: var(--color-nav-bg) !important;
+    border-bottom: 1px solid var(--color-nav-border);
+    backdrop-filter: blur(12px);
+}
+
+.spims-brand {
+    color: var(--color-title-accent) !important;
+    font-weight: 700;
+}
+
+.spims-title {
+    color: var(--color-title);
+    font-weight: 700;
+}
+
+.text-muted-theme {
+    color: var(--color-text-muted) !important;
+}
+
+.spims-hero,
+.card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-border) !important;
+    border-radius: var(--radius-md);
+}
+
+.form-select {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-surface-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}

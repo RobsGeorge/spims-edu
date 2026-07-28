@@ -1,0 +1,88 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: spims-production-deploy
+  cancel-in-progress: true
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          timeout: 120s
+          command_timeout: 30m
+          script: |
+            set -e
+            cd /var/www/spims
+
+            PHP_BIN=php8.2
+            DEPLOY_USER="$(whoami)"
+            DEPLOY_START=$(date +%s)
+            step() { echo "==> $1 ($(date -Iseconds))"; }
+            fix_runtime_permissions() {
+              sudo -n chown -R "${DEPLOY_USER}:www-data" storage bootstrap/cache
+              sudo -n find storage bootstrap/cache -type d -exec chmod 2775 {} +
+              sudo -n find storage bootstrap/cache -type f -exec chmod 664 {} +
+            }
+
+            step "reclaim storage for git"
+            sudo -n chown -R "${DEPLOY_USER}:www-data" storage bootstrap/cache
+            fix_runtime_permissions
+
+            step "git sync"
+            git fetch origin main
+            git reset --hard origin/main
+
+            step "composer install"
+            COMPOSER_ALLOW_SUPERUSER=1 $PHP_BIN /usr/local/bin/composer install \
+              --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-progress --no-scripts
+            COMPOSER_ALLOW_SUPERUSER=1 $PHP_BIN /usr/local/bin/composer dump-autoload --optimize --no-dev --no-interaction
+
+            step "maintenance mode"
+            $PHP_BIN artisan down --retry=60 --refresh=15 || true
+
+            step "migrations"
+            $PHP_BIN artisan migrate --force
+
+            step "optimize"
+            $PHP_BIN artisan optimize:clear
+            mkdir -p storage/framework/cache/data
+            fix_runtime_permissions
+            $PHP_BIN artisan config:cache
+            $PHP_BIN artisan route:cache
+            $PHP_BIN artisan view:cache
+            fix_runtime_permissions
+
+            step "storage link"
+            if [ ! -L public/storage ]; then
+              $PHP_BIN artisan storage:link
+            fi
+
+            step "reload php-fpm"
+            sudo -n systemctl reload php8.2-fpm
+
+            step "ensure scheduler cron"
+            $PHP_BIN artisan scheduler:ensure-cron --php=$PHP_BIN || echo "WARN: scheduler cron"
+
+            step "live"
+            $PHP_BIN artisan up || true
+
+            DEPLOY_END=$(date +%s)
+            echo "Deployment complete in $((DEPLOY_END - DEPLOY_START))s"
