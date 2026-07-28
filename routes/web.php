@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\AssessmentAdminController;
 use App\Http\Controllers\Admin\FinanceAdminController;
 use App\Http\Controllers\Admin\ApplicationFormController;
 use App\Http\Controllers\Admin\ApplicationReviewController;
 use App\Http\Controllers\Admin\AssessmentTemplateController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EnrollmentAdminController;
+use App\Http\Controllers\Admin\GradebookController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\SemesterController;
@@ -15,6 +17,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\BrandingController;
 use App\Http\Controllers\Api\PaymentWebhookController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -24,6 +27,7 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\ExamAttemptController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FoundationDemoController;
 use App\Http\Controllers\HomeController;
@@ -94,6 +98,27 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/donate', [DonationController::class, 'store'])
         ->middleware('permission:finance.donate')
         ->name('donate.store');
+
+    Route::get('/assessments/{assessment}', [ExamAttemptController::class, 'show'])->name('assessments.show');
+    Route::post('/assessments/{assessment}/start', [ExamAttemptController::class, 'start'])
+        ->middleware('permission:assessments.take')
+        ->name('assessments.start');
+    Route::get('/attempts/{attempt}', [ExamAttemptController::class, 'runner'])->name('assessments.runner');
+    Route::post('/attempts/{attempt}/save', [ExamAttemptController::class, 'save'])
+        ->middleware('permission:assessments.take')
+        ->name('assessments.save');
+    Route::post('/attempts/{attempt}/submit', [ExamAttemptController::class, 'submit'])
+        ->middleware('permission:assessments.take')
+        ->name('assessments.submit');
+    Route::post('/attempts/{attempt}/focus-loss', [ExamAttemptController::class, 'focusLoss'])
+        ->middleware('permission:assessments.take')
+        ->name('assessments.focus-loss');
+    Route::get('/attempts/{attempt}/timer', [ExamAttemptController::class, 'timer'])->name('assessments.timer');
+
+    Route::get('/assignments/{assignment}', [AssignmentController::class, 'show'])->name('assignments.show');
+    Route::post('/assignments/{assignment}/submit', [AssignmentController::class, 'submit'])
+        ->middleware('permission:assignments.submit')
+        ->name('assignments.submit');
 
     Route::post('/foundation/demo', [FoundationDemoController::class, 'mutate'])
         ->middleware('permission:foundation.demo')
@@ -249,5 +274,58 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/finance/refunds/{refund}/approve', [FinanceAdminController::class, 'approveRefund'])
             ->middleware('permission:finance.refunds')
             ->name('finance.refunds.approve');
+
+        Route::get('/courses/{course}/banks', [AssessmentAdminController::class, 'banksIndex'])
+            ->middleware('permission:questions.manage')
+            ->name('banks.index');
+        Route::post('/courses/{course}/banks', [AssessmentAdminController::class, 'storeBank'])
+            ->middleware('permission:questions.manage')
+            ->name('banks.store');
+        Route::post('/banks/{bank}/questions', [AssessmentAdminController::class, 'storeQuestion'])
+            ->middleware('permission:questions.manage')
+            ->name('banks.questions');
+        Route::get('/offerings/{offering}/assessments/create', [AssessmentAdminController::class, 'createAssessment'])
+            ->middleware('permission:assessments.manage')
+            ->name('assessments.create');
+        Route::post('/offerings/{offering}/assessments', [AssessmentAdminController::class, 'storeAssessment'])
+            ->middleware('permission:assessments.manage')
+            ->name('assessments.store');
+        Route::get('/assessments/{assessment}', [AssessmentAdminController::class, 'show'])
+            ->middleware('permission:assessments.manage')
+            ->name('assessments.show');
+        Route::post('/assessments/{assessment}/questions', [AssessmentAdminController::class, 'attachQuestion'])
+            ->middleware('permission:assessments.manage')
+            ->name('assessments.attach');
+        Route::post('/assessments/{assessment}/release', [AssessmentAdminController::class, 'release'])
+            ->middleware('permission:assessments.manage')
+            ->name('assessments.release');
+        Route::post('/answers/{answer}/grade', [AssessmentAdminController::class, 'overrideScore'])
+            ->middleware('permission:assessments.grade')
+            ->name('answers.grade');
+
+        Route::get('/offerings/{offering}/gradebook', [GradebookController::class, 'show'])
+            ->middleware('permission:gradebook.configure')
+            ->name('gradebook.show');
+        Route::post('/offerings/{offering}/gradebook/components', [GradebookController::class, 'addComponent'])
+            ->middleware('permission:gradebook.configure')
+            ->name('gradebook.components');
+        Route::post('/offerings/{offering}/gradebook/seed', [GradebookController::class, 'seedTemplate'])
+            ->middleware('permission:gradebook.configure')
+            ->name('gradebook.seed');
+        Route::post('/offerings/{offering}/gradebook/submit', [GradebookController::class, 'submit'])
+            ->middleware('permission:gradebook.lock')
+            ->name('gradebook.submit');
+        Route::post('/offerings/{offering}/gradebook/lock', [GradebookController::class, 'lock'])
+            ->middleware('permission:gradebook.lock')
+            ->name('gradebook.lock');
+        Route::post('/offerings/{offering}/gradebook/reopen', [GradebookController::class, 'reopen'])
+            ->middleware('permission:gradebook.reopen')
+            ->name('gradebook.reopen');
+        Route::post('/content-items/{item}/assignments', [GradebookController::class, 'storeAssignment'])
+            ->middleware('permission:assignments.manage')
+            ->name('assignments.store');
+        Route::post('/submissions/{submission}/grade', [GradebookController::class, 'gradeSubmission'])
+            ->middleware('permission:assignments.grade')
+            ->name('submissions.grade');
     });
 });

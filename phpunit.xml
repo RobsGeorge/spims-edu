@@ -21,6 +21,7 @@
             <exclude>tests/Feature/Admissions</exclude>
             <exclude>tests/Feature/Enrollment</exclude>
             <exclude>tests/Feature/Finance</exclude>
+            <exclude>tests/Feature/Assessment</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -54,6 +55,9 @@
         </testsuite>
         <testsuite name="Finance">
             <directory>tests/Feature/Finance</directory>
+        </testsuite>
+        <testsuite name="Assessment">
+            <directory>tests/Feature/Assessment</directory>
         </testsuite>
     </testsuites>
     <source>

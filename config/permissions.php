@@ -142,4 +142,46 @@ return [
         'ADMINISTRATIVE_ADMIN' => 'O',
         'FINANCIAL_ADMIN' => 'O',
     ],
+    'questions.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'assessments.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'assessments.take' => [
+        'STUDENT' => 'O',
+    ],
+    'assessments.grade' => [
+        'ACADEMIC_ADMIN' => 'R',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'assignments.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'assignments.submit' => [
+        'STUDENT' => 'O',
+    ],
+    'assignments.grade' => [
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'ACADEMIC_ADMIN' => 'R',
+    ],
+    'gradebook.configure' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'R',
+    ],
+    'gradebook.lock' => [
+        'INSTRUCTOR' => 'lock',
+    ],
+    'gradebook.reopen' => [
+        'ACADEMIC_ADMIN' => 'reopen',
+    ],
 ];
