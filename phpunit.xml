@@ -15,6 +15,7 @@
             <exclude>tests/Feature/Auth</exclude>
             <exclude>tests/Feature/Audit</exclude>
             <exclude>tests/Feature/Database</exclude>
+            <exclude>tests/Feature/Admin</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -27,6 +28,12 @@
         </testsuite>
         <testsuite name="Database">
             <directory>tests/Feature/Database</directory>
+        </testsuite>
+        <testsuite name="Api">
+            <directory>tests/Feature/Api</directory>
+        </testsuite>
+        <testsuite name="Admin">
+            <directory>tests/Feature/Admin</directory>
         </testsuite>
     </testsuites>
     <source>

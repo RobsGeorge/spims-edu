@@ -12,6 +12,7 @@
     @else
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     @endif
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <link href="{{ asset('css/spims-theme.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
@@ -22,6 +23,28 @@
                 {{ $activeTheme?->site_name ?? 'SPIMS' }}
             </a>
             <div class="d-flex align-items-center gap-2 ms-auto">
+                @auth
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                            {{ auth()->user()->first_name }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            @foreach(\App\Support\Navigation::linksFor(auth()->user()) as $link)
+                                <li><a class="dropdown-item" href="{{ route($link['route']) }}">{{ $link['label'] }}</a></li>
+                            @endforeach
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ route('auth.logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">{{ __('ui.logout') }}</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @else
+                    <a href="{{ route('auth.login') }}" class="btn btn-sm btn-outline-primary">{{ __('ui.login') }}</a>
+                    <a href="{{ route('auth.register') }}" class="btn btn-sm btn-primary">{{ __('ui.register') }}</a>
+                @endauth
                 <form method="POST" action="{{ route('locale.update') }}" class="d-inline">
                     @csrf
                     <select name="locale" class="form-select form-select-sm" onchange="this.form.submit()">

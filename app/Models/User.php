@@ -48,7 +48,6 @@ class User extends Authenticatable
         'status' => UserStatus::class,
         'is_reviewer' => 'boolean',
         'last_reviewed_at' => 'datetime',
-        'password_hash' => 'hashed',
         'deleted_at' => 'datetime',
     ];
 
