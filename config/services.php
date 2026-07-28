@@ -35,4 +35,20 @@ return [
         'key' => env('GOOGLE_API_KEY'),
     ],
 
+    'paypal' => [
+        'webhook_id' => env('PAYPAL_WEBHOOK_ID', 'paypal-test'),
+    ],
+
+    'paymob' => [
+        'hmac' => env('PAYMOB_HMAC', 'paymob-test'),
+    ],
+
+    'cashier' => [
+        'secret' => env('CASHIER_SECRET', 'cashier-test'),
+    ],
+
+    'payments' => [
+        'mock_auto_complete' => env('PAYMENTS_MOCK_AUTO_COMPLETE', true),
+    ],
+
 ];

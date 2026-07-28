@@ -118,4 +118,28 @@ return [
     'enrollment.override' => [
         'ADMINISTRATIVE_ADMIN' => 'F',
     ],
+    'finance.invoices' => [
+        'FINANCIAL_ADMIN' => 'F',
+        'ADMINISTRATIVE_ADMIN' => 'R',
+    ],
+    'finance.pay' => [
+        'STUDENT' => 'O',
+    ],
+    'finance.manual' => [
+        'FINANCIAL_ADMIN' => 'F',
+    ],
+    'finance.refunds' => [
+        'FINANCIAL_ADMIN' => 'F',
+    ],
+    'finance.wallet' => [
+        'FINANCIAL_ADMIN' => 'F',
+    ],
+    'finance.donate' => [
+        'STUDENT' => 'O',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'ACADEMIC_ADMIN' => 'O',
+        'ADMINISTRATIVE_ADMIN' => 'O',
+        'FINANCIAL_ADMIN' => 'O',
+    ],
 ];

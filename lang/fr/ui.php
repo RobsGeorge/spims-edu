@@ -6,5 +6,7 @@ return [
     'home_subheading' => 'École copte orthodoxe en ligne — plateforme SIS + LMS.',
     'theme_light' => 'Clair',
     'theme_dark' => 'Sombre',
-    'theme_system' => 'Système',
+    'nav_enrollments' => 'Mes inscriptions',
+    'nav_finance' => 'Mes finances',
+    'nav_finance_admin' => 'Admin finance',
 ];

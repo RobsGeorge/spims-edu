@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\FinanceAdminController;
 use App\Http\Controllers\Admin\ApplicationFormController;
 use App\Http\Controllers\Admin\ApplicationReviewController;
 use App\Http\Controllers\Admin\AssessmentTemplateController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Admin\ThemeEditorController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\BrandingController;
+use App\Http\Controllers\Api\PaymentWebhookController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
@@ -20,7 +22,9 @@ use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DonationController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FoundationDemoController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
@@ -31,6 +35,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/api/branding', [BrandingController::class, 'show'])->name('api.branding');
+Route::post('/api/webhooks/payments', PaymentWebhookController::class)->name('api.webhooks.payments');
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
@@ -77,6 +82,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/enrollments/{enrollment}/drop', [EnrollmentController::class, 'drop'])->name('enrollments.drop');
     Route::post('/enrollments/{enrollment}/withdraw', [EnrollmentController::class, 'withdraw'])->name('enrollments.withdraw');
     Route::get('/degree-audit/{studentProgram}', [EnrollmentController::class, 'audit'])->name('enrollments.audit');
+
+    Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
+    Route::get('/finance/invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');
+    Route::post('/finance/invoices/{invoice}/checkout', [FinanceController::class, 'checkout'])
+        ->middleware('permission:finance.pay')
+        ->name('finance.checkout');
+    Route::get('/donate', [DonationController::class, 'create'])
+        ->middleware('permission:finance.donate')
+        ->name('donate.create');
+    Route::post('/donate', [DonationController::class, 'store'])
+        ->middleware('permission:finance.donate')
+        ->name('donate.store');
 
     Route::post('/foundation/demo', [FoundationDemoController::class, 'mutate'])
         ->middleware('permission:foundation.demo')
@@ -210,5 +227,27 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/offerings/{offering}/waitlist', [EnrollmentAdminController::class, 'waitlist'])
             ->middleware('permission:enrollment.override')
             ->name('enrollments.waitlist');
+
+        Route::get('/finance', [FinanceAdminController::class, 'index'])
+            ->middleware('permission:finance.invoices')
+            ->name('finance.index');
+        Route::post('/finance/invoices', [FinanceAdminController::class, 'storeInvoice'])
+            ->middleware('permission:finance.invoices')
+            ->name('finance.invoices.store');
+        Route::post('/finance/invoices/{invoice}/manual', [FinanceAdminController::class, 'recordManual'])
+            ->middleware('permission:finance.manual')
+            ->name('finance.manual');
+        Route::post('/finance/payments/{payment}/verify', [FinanceAdminController::class, 'verifyManual'])
+            ->middleware('permission:finance.manual')
+            ->name('finance.verify');
+        Route::post('/finance/points', [FinanceAdminController::class, 'grantPoints'])
+            ->middleware('permission:finance.wallet')
+            ->name('finance.points');
+        Route::post('/finance/top-up', [FinanceAdminController::class, 'topUp'])
+            ->middleware('permission:finance.wallet')
+            ->name('finance.top-up');
+        Route::post('/finance/refunds/{refund}/approve', [FinanceAdminController::class, 'approveRefund'])
+            ->middleware('permission:finance.refunds')
+            ->name('finance.refunds.approve');
     });
 });

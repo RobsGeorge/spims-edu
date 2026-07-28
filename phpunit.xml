@@ -20,6 +20,7 @@
             <exclude>tests/Feature/Offerings</exclude>
             <exclude>tests/Feature/Admissions</exclude>
             <exclude>tests/Feature/Enrollment</exclude>
+            <exclude>tests/Feature/Finance</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -50,6 +51,9 @@
         </testsuite>
         <testsuite name="Enrollment">
             <directory>tests/Feature/Enrollment</directory>
+        </testsuite>
+        <testsuite name="Finance">
+            <directory>tests/Feature/Finance</directory>
         </testsuite>
     </testsuites>
     <source>

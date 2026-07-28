@@ -34,6 +34,11 @@ class Navigation
         $links[] = ['label' => __('ui.nav_catalog'), 'route' => 'catalog.index'];
         $links[] = ['label' => __('ui.nav_my_applications'), 'route' => 'applications.index'];
         $links[] = ['label' => __('ui.nav_enrollments'), 'route' => 'enrollments.index'];
+        $links[] = ['label' => __('ui.nav_finance'), 'route' => 'finance.index'];
+
+        if ($user->isSuperAdmin() || $user->hasRole(RoleType::FinancialAdmin)) {
+            $links[] = ['label' => __('ui.nav_finance_admin'), 'route' => 'admin.finance.index'];
+        }
 
         return $links;
     }

@@ -75,6 +75,9 @@ jobs:
       - name: Enrollment pipeline
         run: php artisan test --testsuite=Enrollment --compact
 
+      - name: Finance pipeline
+        run: php artisan test --testsuite=Finance --compact
+
   pgsql-migrate-fresh:
     name: PostgreSQL migrate:fresh --seed
     runs-on: ubuntu-latest

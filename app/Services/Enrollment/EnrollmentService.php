@@ -4,16 +4,20 @@ namespace App\Services\Enrollment;
 
 use App\Enums\EnrollmentStatus;
 use App\Enums\GradeType;
+use App\Enums\InvoiceStatus;
 use App\Enums\OfferingMode;
 use App\Enums\RequirementType;
 use App\Enums\StudentProgramStatus;
 use App\Models\AcademicRecord;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
+use App\Models\Invoice;
 use App\Models\ProgramCourse;
 use App\Models\Setting;
 use App\Models\StudentProgram;
 use App\Models\User;
+use App\Services\Finance\InvoiceService;
+use App\Services\Finance\PaymentService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +28,8 @@ class EnrollmentService
     public function __construct(
         private readonly AuthorizeService $authorize,
         private readonly AuditLogWriter $audit,
+        private readonly InvoiceService $invoices,
+        private readonly PaymentService $payments,
     ) {}
 
     public function register(User $student, CourseOffering $offering, ?string $studentProgramId = null, bool $adminOverride = false, ?User $actor = null): Enrollment
@@ -66,6 +72,10 @@ class EnrollmentService
                 'status' => $status->value,
                 'student_id' => $student->id,
             ]);
+
+            if ($status === EnrollmentStatus::Enrolled) {
+                $this->invoices->createForEnrollment($actor, $enrollment->fresh(['offering.course', 'student']));
+            }
 
             return $enrollment->fresh();
         });
@@ -167,15 +177,18 @@ class EnrollmentService
             throw ValidationException::withMessages(['enrollment' => [__('enrollment.add_drop_closed')]]);
         }
 
-        $enrollment->update([
-            'status' => EnrollmentStatus::Dropped,
-            'dropped_at' => now(),
-        ]);
+        return DB::transaction(function () use ($actor, $enrollment, $offering) {
+            $enrollment->update([
+                'status' => EnrollmentStatus::Dropped,
+                'dropped_at' => now(),
+            ]);
 
-        $this->promoteWaitlist($offering);
-        $this->audit->write($actor, 'enrollment.drop', 'Enrollment', $enrollment->id);
+            $this->payments->refundEnrollment($actor, $enrollment, 100, 'drop');
+            $this->promoteWaitlist($offering);
+            $this->audit->write($actor, 'enrollment.drop', 'Enrollment', $enrollment->id);
 
-        return $enrollment->fresh();
+            return $enrollment->fresh();
+        });
     }
 
     public function withdraw(User $actor, Enrollment $enrollment): Enrollment
@@ -187,24 +200,29 @@ class EnrollmentService
         $enrollment->load('offering.semester');
         $offering = $enrollment->offering;
 
+        $refundPercent = 0;
         if ($offering->mode === OfferingMode::Cohort && $offering->semester) {
             $weekNumber = $this->currentSemesterWeek($offering);
             if ($weekNumber > $offering->semester->last_withdrawal_week) {
                 throw ValidationException::withMessages(['enrollment' => [__('enrollment.withdrawal_closed')]]);
             }
+            $refundPercent = (int) $offering->semester->withdrawal_refund_percent;
         }
 
-        $enrollment->update([
-            'status' => EnrollmentStatus::Withdrawn,
-            'dropped_at' => now(),
-            'grade_type' => GradeType::Withdrawal,
-            'final_letter' => 'W',
-        ]);
+        return DB::transaction(function () use ($actor, $enrollment, $offering, $refundPercent) {
+            $enrollment->update([
+                'status' => EnrollmentStatus::Withdrawn,
+                'dropped_at' => now(),
+                'grade_type' => GradeType::Withdrawal,
+                'final_letter' => 'W',
+            ]);
 
-        $this->promoteWaitlist($offering);
-        $this->audit->write($actor, 'enrollment.withdraw', 'Enrollment', $enrollment->id);
+            $this->payments->refundEnrollment($actor, $enrollment, $refundPercent, 'withdraw');
+            $this->promoteWaitlist($offering);
+            $this->audit->write($actor, 'enrollment.withdraw', 'Enrollment', $enrollment->id);
 
-        return $enrollment->fresh();
+            return $enrollment->fresh();
+        });
     }
 
     public function promoteWaitlist(CourseOffering $offering): void
@@ -230,6 +248,11 @@ class EnrollmentService
 
         if ($next) {
             $next->update(['status' => EnrollmentStatus::Enrolled]);
+            $student = User::query()->findOrFail($next->student_id);
+            $this->invoices->createForEnrollment(
+                $student,
+                $next->fresh(['offering.course', 'student'])
+            );
             $this->audit->write(null, 'enrollment.waitlist_promote', 'Enrollment', $next->id);
         }
     }
@@ -239,7 +262,14 @@ class EnrollmentService
         $setting = Setting::query()->find('enrollment.financial_holds');
         $holds = $setting?->value['user_ids'] ?? [];
 
-        return in_array($student->id, $holds, true);
+        if (in_array($student->id, $holds, true)) {
+            return true;
+        }
+
+        return Invoice::query()
+            ->where('student_id', $student->id)
+            ->whereIn('status', [InvoiceStatus::Open, InvoiceStatus::Partial])
+            ->exists();
     }
 
     public function setFinancialHold(User $actor, User $student, bool $held): void
