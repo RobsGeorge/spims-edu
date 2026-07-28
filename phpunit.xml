@@ -18,6 +18,8 @@
             <exclude>tests/Feature/Admin</exclude>
             <exclude>tests/Feature/Academics</exclude>
             <exclude>tests/Feature/Offerings</exclude>
+            <exclude>tests/Feature/Admissions</exclude>
+            <exclude>tests/Feature/Enrollment</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -42,6 +44,12 @@
         </testsuite>
         <testsuite name="Offerings">
             <directory>tests/Feature/Offerings</directory>
+        </testsuite>
+        <testsuite name="Admissions">
+            <directory>tests/Feature/Admissions</directory>
+        </testsuite>
+        <testsuite name="Enrollment">
+            <directory>tests/Feature/Enrollment</directory>
         </testsuite>
     </testsuites>
     <source>

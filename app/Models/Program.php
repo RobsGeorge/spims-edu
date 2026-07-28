@@ -48,4 +48,9 @@ class Program extends Model
     {
         return $this->hasMany(ProgramCourse::class);
     }
+
+    public function applicationForms(): HasMany
+    {
+        return $this->hasMany(ApplicationForm::class);
+    }
 }

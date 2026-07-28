@@ -100,4 +100,22 @@ return [
     'offerings.pricing' => [
         'FINANCIAL_ADMIN' => 'F',
     ],
+    'admissions.forms' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'admissions.apply' => [
+        'STUDENT' => 'O',
+    ],
+    'admissions.decide' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'admissions.review' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'enrollment.register' => [
+        'STUDENT' => 'O',
+    ],
+    'enrollment.override' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
 ];

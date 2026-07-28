@@ -46,4 +46,8 @@ return [
     'nav_catalog' => 'Course catalog',
     'nav_offerings' => 'Offerings',
     'nav_semesters' => 'Semesters',
+    'nav_app_forms' => 'Application forms',
+    'nav_applications' => 'Applications queue',
+    'nav_my_applications' => 'My applications',
+    'nav_enrollments' => 'My enrollments',
 ];

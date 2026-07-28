@@ -19,6 +19,9 @@ class Navigation
         if ($user->isSuperAdmin() || $user->hasRole(RoleType::AdministrativeAdmin)) {
             $links[] = ['label' => __('ui.nav_users'), 'route' => 'admin.users.index', 'permission' => 'users.manage'];
             $links[] = ['label' => __('ui.nav_theme'), 'route' => 'admin.theme.edit', 'permission' => 'theme.manage'];
+            $links[] = ['label' => __('ui.nav_semesters'), 'route' => 'admin.semesters.index'];
+            $links[] = ['label' => __('ui.nav_app_forms'), 'route' => 'admin.application-forms.index'];
+            $links[] = ['label' => __('ui.nav_applications'), 'route' => 'admin.applications.index'];
         }
 
         if ($user->isSuperAdmin() || $user->hasRole(RoleType::AcademicAdmin)) {
@@ -28,11 +31,9 @@ class Navigation
             $links[] = ['label' => __('ui.nav_offerings'), 'route' => 'admin.offerings.index'];
         }
 
-        if ($user->isSuperAdmin() || $user->hasRole(RoleType::AdministrativeAdmin)) {
-            $links[] = ['label' => __('ui.nav_semesters'), 'route' => 'admin.semesters.index'];
-        }
-
         $links[] = ['label' => __('ui.nav_catalog'), 'route' => 'catalog.index'];
+        $links[] = ['label' => __('ui.nav_my_applications'), 'route' => 'applications.index'];
+        $links[] = ['label' => __('ui.nav_enrollments'), 'route' => 'enrollments.index'];
 
         return $links;
     }

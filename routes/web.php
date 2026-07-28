@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\ApplicationFormController;
+use App\Http\Controllers\Admin\ApplicationReviewController;
 use App\Http\Controllers\Admin\AssessmentTemplateController;
 use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\EnrollmentAdminController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\SemesterController;
@@ -9,6 +12,7 @@ use App\Http\Controllers\Admin\ThemeEditorController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\BrandingController;
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -16,6 +20,7 @@ use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\FoundationDemoController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
@@ -56,6 +61,22 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/catalog/{course}/interest', [CatalogController::class, 'flagInterest'])
         ->middleware('permission:courses.flag_interest')
         ->name('catalog.interest');
+
+    Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
+    Route::get('/applications/forms/{form}', [ApplicationController::class, 'create'])
+        ->middleware('permission:admissions.apply')
+        ->name('applications.create');
+    Route::post('/applications/{application}', [ApplicationController::class, 'store'])
+        ->middleware('permission:admissions.apply')
+        ->name('applications.store');
+
+    Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
+    Route::post('/enrollments', [EnrollmentController::class, 'store'])
+        ->middleware('permission:enrollment.register')
+        ->name('enrollments.store');
+    Route::post('/enrollments/{enrollment}/drop', [EnrollmentController::class, 'drop'])->name('enrollments.drop');
+    Route::post('/enrollments/{enrollment}/withdraw', [EnrollmentController::class, 'withdraw'])->name('enrollments.withdraw');
+    Route::get('/degree-audit/{studentProgram}', [EnrollmentController::class, 'audit'])->name('enrollments.audit');
 
     Route::post('/foundation/demo', [FoundationDemoController::class, 'mutate'])
         ->middleware('permission:foundation.demo')
@@ -162,5 +183,32 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/weeks/{week}/items', [OfferingController::class, 'addContent'])
             ->middleware('permission:offerings.content')
             ->name('weeks.items');
+
+        Route::get('/application-forms', [ApplicationFormController::class, 'index'])
+            ->middleware('permission:admissions.forms')
+            ->name('application-forms.index');
+        Route::post('/application-forms', [ApplicationFormController::class, 'store'])
+            ->middleware('permission:admissions.forms')
+            ->name('application-forms.store');
+
+        Route::get('/applications', [ApplicationReviewController::class, 'index'])
+            ->middleware('permission:admissions.review')
+            ->name('applications.index');
+        Route::get('/applications/{application}', [ApplicationReviewController::class, 'show'])
+            ->middleware('permission:admissions.review')
+            ->name('applications.show');
+        Route::post('/applications/{application}/decide', [ApplicationReviewController::class, 'decide'])
+            ->middleware('permission:admissions.decide')
+            ->name('applications.decide');
+
+        Route::post('/enrollments/override', [EnrollmentAdminController::class, 'overrideRegister'])
+            ->middleware('permission:enrollment.override')
+            ->name('enrollments.override');
+        Route::post('/users/{user}/financial-hold', [EnrollmentAdminController::class, 'financialHold'])
+            ->middleware('permission:enrollment.override')
+            ->name('enrollments.financial-hold');
+        Route::get('/offerings/{offering}/waitlist', [EnrollmentAdminController::class, 'waitlist'])
+            ->middleware('permission:enrollment.override')
+            ->name('enrollments.waitlist');
     });
 });
