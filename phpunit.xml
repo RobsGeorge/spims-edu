@@ -25,6 +25,7 @@
             <exclude>tests/Feature/Live</exclude>
             <exclude>tests/Feature/Credentials</exclude>
             <exclude>tests/Feature/Hardening</exclude>
+            <exclude>tests/Feature/Portal</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -70,6 +71,9 @@
         </testsuite>
         <testsuite name="Hardening">
             <directory>tests/Feature/Hardening</directory>
+        </testsuite>
+        <testsuite name="Portal">
+            <directory>tests/Feature/Portal</directory>
         </testsuite>
     </testsuites>
     <source>
