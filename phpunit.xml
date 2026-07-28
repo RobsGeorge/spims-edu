@@ -17,6 +17,7 @@
             <exclude>tests/Feature/Database</exclude>
             <exclude>tests/Feature/Admin</exclude>
             <exclude>tests/Feature/Academics</exclude>
+            <exclude>tests/Feature/Offerings</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -38,6 +39,9 @@
         </testsuite>
         <testsuite name="Academics">
             <directory>tests/Feature/Academics</directory>
+        </testsuite>
+        <testsuite name="Offerings">
+            <directory>tests/Feature/Offerings</directory>
         </testsuite>
     </testsuites>
     <source>

@@ -44,4 +44,6 @@ return [
     'nav_courses' => 'Courses',
     'nav_templates' => 'Assessment templates',
     'nav_catalog' => 'Course catalog',
+    'nav_offerings' => 'Offerings',
+    'nav_semesters' => 'Semesters',
 ];

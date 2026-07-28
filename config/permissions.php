@@ -72,4 +72,32 @@ return [
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
     ],
+    'semesters.manage' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'semesters.view' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+        'ACADEMIC_ADMIN' => 'R',
+        'INSTRUCTOR' => 'R',
+        'TA' => 'R',
+        'STUDENT' => 'R',
+    ],
+    'offerings.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'offerings.view' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'ADMINISTRATIVE_ADMIN' => 'R',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'STUDENT' => 'R',
+    ],
+    'offerings.content' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'offerings.pricing' => [
+        'FINANCIAL_ADMIN' => 'F',
+    ],
 ];

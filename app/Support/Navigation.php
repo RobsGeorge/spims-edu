@@ -25,6 +25,11 @@ class Navigation
             $links[] = ['label' => __('ui.nav_programs'), 'route' => 'admin.programs.index'];
             $links[] = ['label' => __('ui.nav_courses'), 'route' => 'admin.courses.index'];
             $links[] = ['label' => __('ui.nav_templates'), 'route' => 'admin.assessment-templates.index'];
+            $links[] = ['label' => __('ui.nav_offerings'), 'route' => 'admin.offerings.index'];
+        }
+
+        if ($user->isSuperAdmin() || $user->hasRole(RoleType::AdministrativeAdmin)) {
+            $links[] = ['label' => __('ui.nav_semesters'), 'route' => 'admin.semesters.index'];
         }
 
         $links[] = ['label' => __('ui.nav_catalog'), 'route' => 'catalog.index'];

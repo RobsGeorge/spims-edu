@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Admin\AssessmentTemplateController;
 use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
+use App\Http\Controllers\Admin\SemesterController;
 use App\Http\Controllers\Admin\ThemeEditorController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
@@ -18,11 +20,15 @@ use App\Http\Controllers\FoundationDemoController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeController;
+use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/api/branding', [BrandingController::class, 'show'])->name('api.branding');
+Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
+Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
+Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('auth.register');
@@ -121,5 +127,40 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/translations/ai', [TranslationController::class, 'requestAi'])
             ->middleware('permission:translations.manage')
             ->name('translations.ai');
+
+        Route::get('/semesters', [SemesterController::class, 'index'])
+            ->middleware('permission:semesters.view')
+            ->name('semesters.index');
+        Route::post('/academic-years', [SemesterController::class, 'storeYear'])
+            ->middleware('permission:semesters.manage')
+            ->name('academic-years.store');
+        Route::post('/academic-years/{year}/semesters', [SemesterController::class, 'storeSemester'])
+            ->middleware('permission:semesters.manage')
+            ->name('semesters.store');
+
+        Route::get('/offerings', [OfferingController::class, 'index'])
+            ->middleware('permission:offerings.view')
+            ->name('offerings.index');
+        Route::get('/offerings/create', [OfferingController::class, 'create'])
+            ->middleware('permission:offerings.manage')
+            ->name('offerings.create');
+        Route::post('/offerings', [OfferingController::class, 'store'])
+            ->middleware('permission:offerings.manage')
+            ->name('offerings.store');
+        Route::get('/offerings/{offering}', [OfferingController::class, 'show'])
+            ->middleware('permission:offerings.view')
+            ->name('offerings.show');
+        Route::post('/offerings/{offering}/staff', [OfferingController::class, 'assignStaff'])
+            ->middleware('permission:offerings.manage')
+            ->name('offerings.staff');
+        Route::post('/offerings/{offering}/pricing', [OfferingController::class, 'setPricing'])
+            ->middleware('permission:offerings.pricing')
+            ->name('offerings.pricing');
+        Route::post('/offerings/{offering}/weeks', [OfferingController::class, 'addWeek'])
+            ->middleware('permission:offerings.content')
+            ->name('offerings.weeks');
+        Route::post('/weeks/{week}/items', [OfferingController::class, 'addContent'])
+            ->middleware('permission:offerings.content')
+            ->name('weeks.items');
     });
 });
