@@ -52,4 +52,6 @@ return [
     'nav_enrollments' => 'My enrollments',
     'nav_finance' => 'My finance',
     'nav_finance_admin' => 'Finance admin',
+    'nav_live' => 'Live sessions',
+    'nav_notifications' => 'Notifications',
 ];

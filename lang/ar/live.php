@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'scheduled' => 'تم جدولة الجلسة المباشرة.',
+    'attendance_imported' => 'تم استيراد :count سجل حضور.',
+    'attendance_overridden' => 'تم تعديل الحضور يدوياً.',
+    'join_window_closed' => 'الجلسة غير مفتوحة للانضمام بعد.',
+    'not_enrolled' => 'لست مسجلاً في هذا المقرر.',
+    'overlap_blocked' => 'هناك جلسة أخرى متداخلة — مرخّص لمضيف Zoom واحد فقط.',
+    'reminder_24h_title' => 'جلسة غداً',
+    'reminder_24h_body' => 'تذكير: ":title" تبدأ خلال نحو 24 ساعة.',
+    'reminder_15m_title' => 'الجلسة تبدأ قريباً',
+    'reminder_15m_body' => '":title" تبدأ خلال نحو 15 دقيقة.',
+    'threads_disabled' => 'لا يمكن للطلاب إنشاء مواضيع في هذا المنتدى.',
+    'thread_locked' => 'هذا الموضوع مقفل.',
+    'thread_created' => 'تم إنشاء الموضوع.',
+    'posted' => 'تم نشر المشاركة.',
+    'board_configured' => 'تم تحديث منتدى النقاش.',
+    'moderated' => 'تم تحديث إشراف الموضوع.',
+    'grade_saved' => 'تم حفظ درجة النقاش.',
+    'reply_title' => 'رد جديد',
+    'reply_body' => 'رد أحدهم في ":thread".',
+    'mention_title' => 'تم ذكرك',
+    'mention_body' => 'تم ذكرك في ":thread".',
+    'join' => 'انضمام',
+    'live_sessions' => 'الجلسات المباشرة',
+    'discussions' => 'النقاشات',
+];

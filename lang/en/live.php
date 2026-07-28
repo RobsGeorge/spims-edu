@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'scheduled' => 'Live session scheduled.',
+    'attendance_imported' => 'Imported :count attendance row(s).',
+    'attendance_overridden' => 'Attendance overridden.',
+    'join_window_closed' => 'This session is not open for joining yet.',
+    'not_enrolled' => 'You are not enrolled in this offering.',
+    'overlap_blocked' => 'Another live session overlaps — only one Zoom host is licensed.',
+    'reminder_24h_title' => 'Session tomorrow',
+    'reminder_24h_body' => 'Reminder: ":title" starts in about 24 hours.',
+    'reminder_15m_title' => 'Session starting soon',
+    'reminder_15m_body' => '":title" starts in about 15 minutes.',
+    'threads_disabled' => 'Students cannot create threads on this board.',
+    'thread_locked' => 'This thread is locked.',
+    'thread_created' => 'Thread created.',
+    'posted' => 'Post published.',
+    'board_configured' => 'Discussion board updated.',
+    'moderated' => 'Thread moderation updated.',
+    'grade_saved' => 'Discussion grade saved.',
+    'reply_title' => 'New reply',
+    'reply_body' => 'Someone replied in ":thread".',
+    'mention_title' => 'You were mentioned',
+    'mention_body' => 'You were mentioned in ":thread".',
+    'join' => 'Join',
+    'live_sessions' => 'Live sessions',
+    'discussions' => 'Discussions',
+];

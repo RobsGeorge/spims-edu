@@ -35,6 +35,13 @@ return [
         'key' => env('GOOGLE_API_KEY'),
     ],
 
+    'zoom' => [
+        'account_id' => env('ZOOM_ACCOUNT_ID'),
+        'client_id' => env('ZOOM_CLIENT_ID'),
+        'client_secret' => env('ZOOM_CLIENT_SECRET'),
+        'webhook_secret' => env('ZOOM_WEBHOOK_SECRET', 'zoom-test'),
+    ],
+
     'paypal' => [
         'webhook_id' => env('PAYPAL_WEBHOOK_ID', 'paypal-test'),
     ],

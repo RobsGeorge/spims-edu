@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('assessments:auto-submit-expired')->everyMinute();
+        $schedule->command('live:send-reminders')->everyFiveMinutes();
     }
 
     /**

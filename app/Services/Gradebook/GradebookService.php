@@ -13,6 +13,9 @@ use App\Models\AssessmentTemplate;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\CourseOffering;
+use App\Models\DiscussionBoard;
+use App\Models\DiscussionGrade;
+use App\Models\DiscussionThread;
 use App\Models\Enrollment;
 use App\Models\GradeBand;
 use App\Models\GradebookComponent;
@@ -22,6 +25,7 @@ use App\Models\ProgramRequirementFulfillment;
 use App\Models\StudentProgram;
 use App\Models\User;
 use App\Services\Assessment\AttemptService;
+use App\Services\Live\AttendanceService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +37,7 @@ class GradebookService
         private readonly AuthorizeService $authorize,
         private readonly AuditLogWriter $audit,
         private readonly AttemptService $attempts,
+        private readonly AttendanceService $attendance,
     ) {}
 
     public function seedFromTemplate(User $actor, CourseOffering $offering, ?AssessmentTemplate $template = null): void
@@ -207,6 +212,24 @@ class GradebookService
 
     private function componentPercent(GradebookComponent $component, User $student): ?float
     {
+        if ($component->kind === ComponentKind::Attendance) {
+            return $this->attendance->offeringPercent($component->offering, $student);
+        }
+
+        if ($component->kind === ComponentKind::Discussion) {
+            $board = DiscussionBoard::query()->where('offering_id', $component->offering_id)->first();
+            if ($board === null) {
+                return null;
+            }
+            $scores = DiscussionGrade::query()
+                ->whereIn('thread_id', DiscussionThread::query()->where('board_id', $board->id)->where('is_graded', true)->pluck('id'))
+                ->where('student_id', $student->id)
+                ->whereNotNull('final_score')
+                ->pluck('final_score');
+
+            return $scores->isEmpty() ? null : round((float) $scores->avg(), 2);
+        }
+
         $scores = [];
 
         foreach (Assessment::query()->where('component_id', $component->id)->get() as $assessment) {

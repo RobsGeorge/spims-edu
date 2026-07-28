@@ -184,4 +184,47 @@ return [
     'gradebook.reopen' => [
         'ACADEMIC_ADMIN' => 'reopen',
     ],
+    'live.schedule' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+        'ACADEMIC_ADMIN' => 'R',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'live.join' => [
+        'STUDENT' => 'O',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'attendance.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'discussions.configure' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'discussions.thread' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'STUDENT' => 'O',
+    ],
+    'discussions.post' => [
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'STUDENT' => 'O',
+        'ACADEMIC_ADMIN' => 'O',
+    ],
+    'discussions.moderate' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'discussions.grade' => [
+        'ACADEMIC_ADMIN' => 'R',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
 ];

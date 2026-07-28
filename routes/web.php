@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AssessmentAdminController;
+use App\Http\Controllers\Admin\DiscussionAdminController;
 use App\Http\Controllers\Admin\FinanceAdminController;
 use App\Http\Controllers\Admin\ApplicationFormController;
 use App\Http\Controllers\Admin\ApplicationReviewController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Admin\AssessmentTemplateController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EnrollmentAdminController;
 use App\Http\Controllers\Admin\GradebookController;
+use App\Http\Controllers\Admin\LiveSessionAdminController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\SemesterController;
@@ -16,6 +18,7 @@ use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\BrandingController;
 use App\Http\Controllers\Api\PaymentWebhookController;
+use App\Http\Controllers\Api\ZoomWebhookController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\Auth\LoginController;
@@ -25,14 +28,17 @@ use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExamAttemptController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FoundationDemoController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +46,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/api/branding', [BrandingController::class, 'show'])->name('api.branding');
 Route::post('/api/webhooks/payments', PaymentWebhookController::class)->name('api.webhooks.payments');
+Route::post('/api/webhooks/zoom', ZoomWebhookController::class)->name('api.webhooks.zoom');
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
@@ -119,6 +126,23 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/assignments/{assignment}/submit', [AssignmentController::class, 'submit'])
         ->middleware('permission:assignments.submit')
         ->name('assignments.submit');
+
+    Route::get('/live', [LiveSessionController::class, 'index'])->name('live.index');
+    Route::post('/live/{session}/join', [LiveSessionController::class, 'join'])
+        ->middleware('permission:live.join')
+        ->name('live.join');
+
+    Route::get('/offerings/{offering}/discussions', [DiscussionController::class, 'showBoard'])->name('discussions.board');
+    Route::post('/offerings/{offering}/discussions/threads', [DiscussionController::class, 'storeThread'])
+        ->middleware('permission:discussions.thread')
+        ->name('discussions.threads.store');
+    Route::get('/discussions/threads/{thread}', [DiscussionController::class, 'showThread'])->name('discussions.thread');
+    Route::post('/discussions/threads/{thread}/posts', [DiscussionController::class, 'storePost'])
+        ->middleware('permission:discussions.post')
+        ->name('discussions.posts.store');
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
 
     Route::post('/foundation/demo', [FoundationDemoController::class, 'mutate'])
         ->middleware('permission:foundation.demo')
@@ -327,5 +351,28 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/submissions/{submission}/grade', [GradebookController::class, 'gradeSubmission'])
             ->middleware('permission:assignments.grade')
             ->name('submissions.grade');
+
+        Route::get('/offerings/{offering}/live', [LiveSessionAdminController::class, 'index'])
+            ->middleware('permission:live.schedule')
+            ->name('live.index');
+        Route::post('/offerings/{offering}/live', [LiveSessionAdminController::class, 'store'])
+            ->middleware('permission:live.schedule')
+            ->name('live.store');
+        Route::post('/live/{session}/attendance/import', [LiveSessionAdminController::class, 'importAttendance'])
+            ->middleware('permission:attendance.manage')
+            ->name('live.attendance.import');
+        Route::post('/live/{session}/attendance/override', [LiveSessionAdminController::class, 'overrideAttendance'])
+            ->middleware('permission:attendance.manage')
+            ->name('live.attendance.override');
+
+        Route::post('/offerings/{offering}/discussions/configure', [DiscussionAdminController::class, 'configure'])
+            ->middleware('permission:discussions.configure')
+            ->name('discussions.configure');
+        Route::post('/discussions/threads/{thread}/moderate', [DiscussionAdminController::class, 'moderate'])
+            ->middleware('permission:discussions.moderate')
+            ->name('discussions.moderate');
+        Route::post('/discussions/threads/{thread}/grade', [DiscussionAdminController::class, 'grade'])
+            ->middleware('permission:discussions.grade')
+            ->name('discussions.grade');
     });
 });

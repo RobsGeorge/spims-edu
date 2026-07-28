@@ -22,6 +22,7 @@
             <exclude>tests/Feature/Enrollment</exclude>
             <exclude>tests/Feature/Finance</exclude>
             <exclude>tests/Feature/Assessment</exclude>
+            <exclude>tests/Feature/Live</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -58,6 +59,9 @@
         </testsuite>
         <testsuite name="Assessment">
             <directory>tests/Feature/Assessment</directory>
+        </testsuite>
+        <testsuite name="Live">
+            <directory>tests/Feature/Live</directory>
         </testsuite>
     </testsuites>
     <source>

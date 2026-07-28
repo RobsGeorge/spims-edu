@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'scheduled' => 'Session en direct planifiée.',
+    'attendance_imported' => ':count ligne(s) de présence importée(s).',
+    'attendance_overridden' => 'Présence modifiée manuellement.',
+    'join_window_closed' => 'Cette session n’est pas encore ouverte.',
+    'not_enrolled' => 'Vous n’êtes pas inscrit à cette offre.',
+    'overlap_blocked' => 'Chevauchement — une seule licence Zoom hôte.',
+    'reminder_24h_title' => 'Session demain',
+    'reminder_24h_body' => 'Rappel : « :title » dans environ 24 h.',
+    'reminder_15m_title' => 'Session bientôt',
+    'reminder_15m_body' => '« :title » dans environ 15 minutes.',
+    'threads_disabled' => 'Les étudiants ne peuvent pas créer de fils.',
+    'thread_locked' => 'Ce fil est verrouillé.',
+    'thread_created' => 'Fil créé.',
+    'posted' => 'Message publié.',
+    'board_configured' => 'Forum mis à jour.',
+    'moderated' => 'Modération mise à jour.',
+    'grade_saved' => 'Note de discussion enregistrée.',
+    'reply_title' => 'Nouvelle réponse',
+    'reply_body' => 'Quelqu’un a répondu dans « :thread ».',
+    'mention_title' => 'Vous avez été mentionné',
+    'mention_body' => 'Vous avez été mentionné dans « :thread ».',
+    'join' => 'Rejoindre',
+    'live_sessions' => 'Sessions en direct',
+    'discussions' => 'Discussions',
+];
