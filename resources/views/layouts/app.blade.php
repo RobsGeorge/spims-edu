@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     @if(($localeDir ?? 'ltr') === 'rtl')
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     @else
@@ -18,26 +19,93 @@
     @stack('styles')
 </head>
 <body class="theme-{{ $cookieTheme === 'system' ? 'dark' : $cookieTheme }}">
+@php
+    use App\Support\NavigationHub;
+    $navUser = auth()->user();
+    $hasAcademicNav = $navUser && count(NavigationHub::academicLinks($navUser)) > 0;
+    $hasAdminNav = $navUser && count(NavigationHub::adminLinks($navUser)) > 0;
+    $hasSuperadminNav = NavigationHub::hasSuperadmin($navUser);
+@endphp
     <a class="spims-skip-link" href="#main-content">{{ __('ui.skip_to_content') }}</a>
-    <nav class="navbar navbar-expand-lg spims-nav" aria-label="{{ __('ui.nav_dashboard') }}">
+    <nav class="navbar navbar-expand-lg app-nav spims-nav sticky-top" aria-label="{{ __('ui.nav_dashboard') }}">
         <div class="container">
-            <a class="navbar-brand spims-brand" href="{{ route('home') }}">
+            <a class="navbar-brand spims-brand d-flex align-items-center gap-2" href="{{ auth()->check() ? route('dashboard') : route('home') }}">
+                @if($hasSuperadminNav && request()->routeIs('superadmin.*'))
+                    <i class="bi bi-shield-lock-fill text-danger" aria-hidden="true"></i>
+                @endif
                 {{ $activeTheme?->site_name ?? 'SPIMS' }}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#spimsNav" aria-controls="spimsNav" aria-expanded="false" aria-label="Menu">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="spimsNav">
+                @auth
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-1">
+                        <li class="nav-item">
+                            <a class="nav-link app-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                                <i class="bi bi-house"></i> {{ __('hubs.nav_home') }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link app-nav-link {{ request()->routeIs('hubs.learning') ? 'active' : '' }}" href="{{ route('hubs.learning') }}">
+                                <i class="bi bi-book-half"></i> {{ __('hubs.nav_learning') }}
+                            </a>
+                        </li>
+                        @if($hasAcademicNav)
+                            <li class="nav-item">
+                                <a class="nav-link app-nav-link {{ request()->routeIs('hubs.academic') ? 'active' : '' }}" href="{{ route('hubs.academic') }}">
+                                    <i class="bi bi-mortarboard"></i> {{ __('hubs.nav_academic') }}
+                                </a>
+                            </li>
+                        @endif
+                        @if($hasAdminNav)
+                            <li class="nav-item">
+                                <a class="nav-link app-nav-link {{ request()->routeIs('hubs.admin') ? 'active' : '' }}" href="{{ route('hubs.admin') }}">
+                                    <i class="bi bi-gear"></i> {{ __('hubs.nav_admin') }}
+                                </a>
+                            </li>
+                        @endif
+                        <li class="nav-item">
+                            <a class="nav-link app-nav-link {{ request()->routeIs('hubs.finance') ? 'active' : '' }}" href="{{ route('hubs.finance') }}">
+                                <i class="bi bi-wallet2"></i> {{ __('hubs.nav_finance') }}
+                            </a>
+                        </li>
+                        @if($hasSuperadminNav)
+                            <li class="nav-item dropdown">
+                                <a class="nav-link app-nav-link dropdown-toggle {{ request()->routeIs('superadmin.*') ? 'active' : '' }}"
+                                   href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    @include('partials.superadmin-entry-tag', ['class' => 'me-1'])
+                                    {{ __('hubs.nav_superadmin') }}
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('superadmin.index') }}">
+                                            @include('partials.superadmin-entry-tag', ['class' => 'me-1'])
+                                            {{ __('superadmin.title') }}
+                                        </a>
+                                    </li>
+                                    <li><a class="dropdown-item" href="{{ route('superadmin.security') }}">{{ __('superadmin.tile_security') }}</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('superadmin.audit.index') }}">{{ __('superadmin.tile_audit') }}</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('superadmin.observability.index') }}">{{ __('superadmin.tile_observability') }}</a></li>
+                                </ul>
+                            </li>
+                        @endif
+                    </ul>
+                @endauth
+
                 <div class="d-flex flex-wrap align-items-center gap-2 ms-auto">
                     @auth
+                        <a href="{{ route('notifications.index') }}" class="btn btn-sm btn-outline-secondary" title="{{ __('ui.nav_notifications') }}">
+                            <i class="bi bi-bell"></i>
+                        </a>
                         <div class="dropdown">
                             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ auth()->user()->first_name }}
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                @foreach(\App\Support\Navigation::linksFor(auth()->user()) as $link)
-                                    <li><a class="dropdown-item" href="{{ route($link['route']) }}">{{ $link['label'] }}</a></li>
-                                @endforeach
+                                <li><a class="dropdown-item" href="{{ route('dashboard') }}">{{ __('ui.nav_dashboard') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ route('catalog.index') }}">{{ __('ui.nav_catalog') }}</a></li>
+                                <li><a class="dropdown-item" href="{{ route('transcript.show') }}">{{ __('ui.nav_transcript') }}</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('auth.logout') }}">

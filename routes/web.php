@@ -38,11 +38,13 @@ use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FoundationDemoController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\HubController;
 use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfferingPreviewController;
+use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
 use Illuminate\Support\Facades\Route;
@@ -85,6 +87,21 @@ Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/hubs/learning', [HubController::class, 'learning'])->name('hubs.learning');
+    Route::get('/hubs/academic', [HubController::class, 'academic'])->name('hubs.academic');
+    Route::get('/hubs/admin', [HubController::class, 'admin'])->name('hubs.admin');
+    Route::get('/hubs/finance', [HubController::class, 'finance'])->name('hubs.finance');
+
+    Route::middleware('superadmin')->prefix('superadmin')->name('superadmin.')->group(function () {
+        Route::get('/', [SuperAdminController::class, 'index'])->name('index');
+        Route::get('/security', [SuperAdminController::class, 'security'])->name('security');
+        Route::post('/sessions/flush', [SuperAdminController::class, 'flushSessions'])->name('sessions.flush');
+        Route::get('/audit', [SuperAdminController::class, 'audit'])->name('audit.index');
+        Route::get('/observability', [SuperAdminController::class, 'observability'])->name('observability.index');
+        Route::get('/scheduled-tasks', [SuperAdminController::class, 'scheduledTasks'])->name('scheduled-tasks.index');
+        Route::get('/system-tests', [SuperAdminController::class, 'systemTests'])->name('system-tests.index');
+    });
+
     Route::get('/api/me', [MeController::class, 'show'])->name('api.me');
     Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
     Route::post('/catalog/{course}/interest', [CatalogController::class, 'flagInterest'])

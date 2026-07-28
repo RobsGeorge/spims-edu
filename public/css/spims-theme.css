@@ -151,3 +151,81 @@ button:focus-visible,
     background-color: var(--color-primary-hover) !important;
     border-color: var(--color-primary-hover) !important;
 }
+
+.app-nav {
+    backdrop-filter: blur(14px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.app-nav-link {
+    color: var(--color-nav-text) !important;
+    border-radius: 999px;
+    padding-inline: 0.85rem !important;
+    font-weight: 600;
+}
+
+.app-nav-link:hover,
+.app-nav-link.active {
+    color: var(--color-nav-active) !important;
+    background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+
+.page-title {
+    color: var(--color-title);
+    font-weight: 700;
+}
+
+.app-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-border) !important;
+    border-radius: var(--radius-md);
+}
+
+.app-tile {
+    padding: 1.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    color: inherit;
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.app-tile h3 {
+    color: var(--color-title);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.app-tile:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+    border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-surface-border));
+}
+
+.hub-tile-superadmin {
+    border-color: rgba(220, 38, 38, 0.28) !important;
+}
+
+.superadmin-entry-tag {
+    font-size: 0.95em;
+    vertical-align: -0.1em;
+}
+
+.animate-in {
+    animation: spims-fade-up 420ms ease both;
+}
+
+@keyframes spims-fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-in,
+    .app-tile:hover {
+        animation: none !important;
+        transform: none !important;
+    }
+}
