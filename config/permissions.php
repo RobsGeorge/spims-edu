@@ -34,4 +34,42 @@ return [
     'foundation.demo' => [
         'ACADEMIC_ADMIN' => 'F',
     ],
+    'programs.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'programs.view' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'ADMINISTRATIVE_ADMIN' => 'R',
+        'INSTRUCTOR' => 'R',
+        'TA' => 'R',
+        'STUDENT' => 'R',
+    ],
+    'courses.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'courses.view' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'ADMINISTRATIVE_ADMIN' => 'R',
+        'INSTRUCTOR' => 'R',
+        'TA' => 'R',
+        'STUDENT' => 'R',
+    ],
+    'courses.flag_interest' => [
+        'STUDENT' => 'O',
+    ],
+    'courses.interest_counts' => [
+        'ACADEMIC_ADMIN' => 'R',
+        'ADMINISTRATIVE_ADMIN' => 'R',
+    ],
+    'assessment_templates.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'grading_schemes.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'translations.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
 ];

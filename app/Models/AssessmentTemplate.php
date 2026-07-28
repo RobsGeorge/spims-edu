@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class AssessmentTemplate extends Model
+{
+    use HasUlids;
+
+    public const UPDATED_AT = null;
+
+    protected $fillable = [
+        'name',
+        'is_default',
+    ];
+
+    protected $casts = [
+        'is_default' => 'boolean',
+        'created_at' => 'datetime',
+    ];
+
+    public function components(): HasMany
+    {
+        return $this->hasMany(AssessmentTemplateComponent::class, 'template_id');
+    }
+}

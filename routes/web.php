@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\AssessmentTemplateController;
+use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\ThemeEditorController;
+use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\BrandingController;
 use App\Http\Controllers\Auth\LoginController;
@@ -8,6 +12,7 @@ use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FoundationDemoController;
 use App\Http\Controllers\HomeController;
@@ -41,6 +46,10 @@ Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/api/me', [MeController::class, 'show'])->name('api.me');
+    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    Route::post('/catalog/{course}/interest', [CatalogController::class, 'flagInterest'])
+        ->middleware('permission:courses.flag_interest')
+        ->name('catalog.interest');
 
     Route::post('/foundation/demo', [FoundationDemoController::class, 'mutate'])
         ->middleware('permission:foundation.demo')
@@ -63,5 +72,54 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/theme/{theme}', [ThemeEditorController::class, 'update'])
             ->middleware('permission:theme.manage')
             ->name('theme.update');
+
+        Route::get('/programs', [ProgramController::class, 'index'])
+            ->middleware('permission:programs.view')
+            ->name('programs.index');
+        Route::get('/programs/create', [ProgramController::class, 'create'])
+            ->middleware('permission:programs.manage')
+            ->name('programs.create');
+        Route::post('/programs', [ProgramController::class, 'store'])
+            ->middleware('permission:programs.manage')
+            ->name('programs.store');
+        Route::get('/programs/{program}', [ProgramController::class, 'show'])
+            ->middleware('permission:programs.view')
+            ->name('programs.show');
+        Route::post('/programs/{program}/courses', [ProgramController::class, 'attachCourse'])
+            ->middleware('permission:programs.manage')
+            ->name('programs.attach-course');
+
+        Route::get('/courses', [CourseController::class, 'index'])
+            ->middleware('permission:courses.view')
+            ->name('courses.index');
+        Route::get('/courses/create', [CourseController::class, 'create'])
+            ->middleware('permission:courses.manage')
+            ->name('courses.create');
+        Route::post('/courses', [CourseController::class, 'store'])
+            ->middleware('permission:courses.manage')
+            ->name('courses.store');
+        Route::get('/courses/{course}', [CourseController::class, 'show'])
+            ->middleware('permission:courses.view')
+            ->name('courses.show');
+        Route::post('/courses/{course}/prerequisites', [CourseController::class, 'addPrerequisite'])
+            ->middleware('permission:courses.manage')
+            ->name('courses.prerequisites');
+
+        Route::get('/assessment-templates', [AssessmentTemplateController::class, 'index'])
+            ->middleware('permission:assessment_templates.manage')
+            ->name('assessment-templates.index');
+        Route::post('/assessment-templates', [AssessmentTemplateController::class, 'store'])
+            ->middleware('permission:assessment_templates.manage')
+            ->name('assessment-templates.store');
+
+        Route::post('/translations', [TranslationController::class, 'store'])
+            ->middleware('permission:translations.manage')
+            ->name('translations.store');
+        Route::post('/translations/{translation}/verify', [TranslationController::class, 'verify'])
+            ->middleware('permission:translations.manage')
+            ->name('translations.verify');
+        Route::post('/translations/ai', [TranslationController::class, 'requestAi'])
+            ->middleware('permission:translations.manage')
+            ->name('translations.ai');
     });
 });

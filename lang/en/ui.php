@@ -40,4 +40,8 @@ return [
     'site_name' => 'Site name',
     'theme_active' => 'Active theme',
     'theme_saved' => 'Theme saved.',
+    'nav_programs' => 'Programs',
+    'nav_courses' => 'Courses',
+    'nav_templates' => 'Assessment templates',
+    'nav_catalog' => 'Course catalog',
 ];

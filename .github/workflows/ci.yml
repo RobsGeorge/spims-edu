@@ -63,6 +63,9 @@ jobs:
       - name: Api pipeline
         run: php artisan test --testsuite=Api --compact
 
+      - name: Academics pipeline
+        run: php artisan test --testsuite=Academics --compact
+
   pgsql-migrate-fresh:
     name: PostgreSQL migrate:fresh --seed
     runs-on: ubuntu-latest
