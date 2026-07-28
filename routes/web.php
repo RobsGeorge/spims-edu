@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CredentialAdminController;
 use App\Http\Controllers\Admin\AssessmentAdminController;
 use App\Http\Controllers\Admin\DiscussionAdminController;
 use App\Http\Controllers\Admin\FinanceAdminController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\DonationController;
@@ -41,12 +43,14 @@ use App\Http\Controllers\MeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\ThemeController;
+use App\Http\Controllers\TranscriptController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/api/branding', [BrandingController::class, 'show'])->name('api.branding');
 Route::post('/api/webhooks/payments', PaymentWebhookController::class)->name('api.webhooks.payments');
 Route::post('/api/webhooks/zoom', ZoomWebhookController::class)->name('api.webhooks.zoom');
+Route::get('/verify/{token}', CredentialVerifyController::class)->name('credentials.verify');
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
@@ -143,6 +147,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+
+    Route::get('/transcript', TranscriptController::class)
+        ->middleware('permission:transcript.view')
+        ->name('transcript.show');
 
     Route::post('/foundation/demo', [FoundationDemoController::class, 'mutate'])
         ->middleware('permission:foundation.demo')
@@ -374,5 +382,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/discussions/threads/{thread}/grade', [DiscussionAdminController::class, 'grade'])
             ->middleware('permission:discussions.grade')
             ->name('discussions.grade');
+
+        Route::get('/credentials', [CredentialAdminController::class, 'index'])
+            ->middleware('permission:credentials.issue')
+            ->name('credentials.index');
+        Route::post('/credentials', [CredentialAdminController::class, 'store'])
+            ->middleware('permission:credentials.issue')
+            ->name('credentials.store');
+        Route::post('/credentials/{credential}/regenerate', [CredentialAdminController::class, 'regenerate'])
+            ->middleware('permission:credentials.issue')
+            ->name('credentials.regenerate');
     });
 });

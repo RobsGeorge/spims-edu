@@ -18,55 +18,63 @@
     @stack('styles')
 </head>
 <body class="theme-{{ $cookieTheme === 'system' ? 'dark' : $cookieTheme }}">
-    <nav class="navbar navbar-expand-lg spims-nav">
+    <a class="spims-skip-link" href="#main-content">{{ __('ui.skip_to_content') }}</a>
+    <nav class="navbar navbar-expand-lg spims-nav" aria-label="{{ __('ui.nav_dashboard') }}">
         <div class="container">
             <a class="navbar-brand spims-brand" href="{{ route('home') }}">
                 {{ $activeTheme?->site_name ?? 'SPIMS' }}
             </a>
-            <div class="d-flex align-items-center gap-2 ms-auto">
-                @auth
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                            {{ auth()->user()->first_name }}
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            @foreach(\App\Support\Navigation::linksFor(auth()->user()) as $link)
-                                <li><a class="dropdown-item" href="{{ route($link['route']) }}">{{ $link['label'] }}</a></li>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#spimsNav" aria-controls="spimsNav" aria-expanded="false" aria-label="Menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="spimsNav">
+                <div class="d-flex flex-wrap align-items-center gap-2 ms-auto">
+                    @auth
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ auth()->user()->first_name }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                @foreach(\App\Support\Navigation::linksFor(auth()->user()) as $link)
+                                    <li><a class="dropdown-item" href="{{ route($link['route']) }}">{{ $link['label'] }}</a></li>
+                                @endforeach
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('auth.logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item">{{ __('ui.logout') }}</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    @else
+                        <a href="{{ route('auth.login') }}" class="btn btn-sm btn-outline-primary">{{ __('ui.login') }}</a>
+                        <a href="{{ route('auth.register') }}" class="btn btn-sm btn-primary">{{ __('ui.register') }}</a>
+                    @endauth
+                    <form method="POST" action="{{ route('locale.update') }}" class="d-inline">
+                        @csrf
+                        <label class="visually-hidden" for="locale-select">Locale</label>
+                        <select id="locale-select" name="locale" class="form-select form-select-sm" onchange="this.form.submit()">
+                            @foreach(['ar' => 'العربية', 'en' => 'English', 'fr' => 'Français'] as $code => $label)
+                                <option value="{{ $code }}" @selected(app()->getLocale() === $code)>{{ $label }}</option>
                             @endforeach
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="POST" action="{{ route('auth.logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">{{ __('ui.logout') }}</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                @else
-                    <a href="{{ route('auth.login') }}" class="btn btn-sm btn-outline-primary">{{ __('ui.login') }}</a>
-                    <a href="{{ route('auth.register') }}" class="btn btn-sm btn-primary">{{ __('ui.register') }}</a>
-                @endauth
-                <form method="POST" action="{{ route('locale.update') }}" class="d-inline">
-                    @csrf
-                    <select name="locale" class="form-select form-select-sm" onchange="this.form.submit()">
-                        @foreach(['ar' => 'العربية', 'en' => 'English', 'fr' => 'Français'] as $code => $label)
-                            <option value="{{ $code }}" @selected(app()->getLocale() === $code)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </form>
-                <form method="POST" action="{{ route('theme.update') }}" class="d-inline">
-                    @csrf
-                    <select name="theme" class="form-select form-select-sm" onchange="this.form.submit()">
-                        <option value="light" @selected(($cookieTheme ?? 'dark') === 'light')>{{ __('ui.theme_light') }}</option>
-                        <option value="dark" @selected(($cookieTheme ?? 'dark') === 'dark')>{{ __('ui.theme_dark') }}</option>
-                        <option value="system" @selected(($cookieTheme ?? 'dark') === 'system')>{{ __('ui.theme_system') }}</option>
-                    </select>
-                </form>
+                        </select>
+                    </form>
+                    <form method="POST" action="{{ route('theme.update') }}" class="d-inline">
+                        @csrf
+                        <label class="visually-hidden" for="theme-select">Theme</label>
+                        <select id="theme-select" name="theme" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="light" @selected(($cookieTheme ?? 'dark') === 'light')>{{ __('ui.theme_light') }}</option>
+                            <option value="dark" @selected(($cookieTheme ?? 'dark') === 'dark')>{{ __('ui.theme_dark') }}</option>
+                            <option value="system" @selected(($cookieTheme ?? 'dark') === 'system')>{{ __('ui.theme_system') }}</option>
+                        </select>
+                    </form>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="container py-4">
+    <main id="main-content" class="container py-4" tabindex="-1">
         @yield('content')
     </main>
 

@@ -97,3 +97,57 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
+
+.spims-skip-link {
+    position: absolute;
+    inset-inline-start: 0.75rem;
+    top: -3rem;
+    z-index: 1080;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-primary);
+    color: var(--color-primary-text);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: top var(--transition-base);
+}
+
+.spims-skip-link:focus {
+    top: 0.75rem;
+    outline: 3px solid var(--color-title-accent);
+    outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible,
+.btn:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.spims-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 767.98px) {
+    .spims-table-wrap table {
+        min-width: 36rem;
+    }
+
+    .exam-runner .card {
+        margin-inline: 0;
+    }
+}
+
+.btn-primary {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary-text) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-hover) !important;
+    border-color: var(--color-primary-hover) !important;
+}

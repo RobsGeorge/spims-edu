@@ -1,0 +1,19 @@
+<?php
+
+return [
+    'form_created' => 'Formulaire créé.',
+    'form_name' => 'Nom du formulaire',
+    'field_label' => 'Libellé du champ',
+    'required' => 'Obligatoire',
+    'review' => 'Examiner',
+    'decision_note' => 'Note de décision',
+    'decision_saved' => 'Décision enregistrée.',
+    'start_application' => 'Commencer une candidature',
+    'submit' => 'Soumettre',
+    'application_saved' => 'Candidature enregistrée.',
+    'not_owner' => 'Cette candidature ne vous appartient pas.',
+    'not_editable' => 'Cette candidature n\'est plus modifiable.',
+    'field_required' => 'Le champ « :field » est obligatoire.',
+    'invalid_decision' => 'Décision invalide.',
+    'not_assigned_reviewer' => 'Vous n\'êtes pas le rapporteur assigné.',
+];

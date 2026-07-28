@@ -54,4 +54,7 @@ return [
     'nav_finance_admin' => 'Finance admin',
     'nav_live' => 'Live sessions',
     'nav_notifications' => 'Notifications',
+    'nav_transcript' => 'Transcript',
+    'nav_credentials' => 'Credentials',
+    'skip_to_content' => 'Skip to content',
 ];

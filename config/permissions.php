@@ -227,4 +227,14 @@ return [
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
     ],
+    'credentials.issue' => [
+        'ADMINISTRATIVE_ADMIN' => 'issue',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'transcript.view' => [
+        'ADMINISTRATIVE_ADMIN' => 'R',
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'STUDENT' => 'O',
+    ],
 ];

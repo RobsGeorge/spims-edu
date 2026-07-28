@@ -37,9 +37,16 @@ class Navigation
         $links[] = ['label' => __('ui.nav_finance'), 'route' => 'finance.index'];
         $links[] = ['label' => __('ui.nav_live'), 'route' => 'live.index'];
         $links[] = ['label' => __('ui.nav_notifications'), 'route' => 'notifications.index'];
+        $links[] = ['label' => __('ui.nav_transcript'), 'route' => 'transcript.show'];
 
         if ($user->isSuperAdmin() || $user->hasRole(RoleType::FinancialAdmin)) {
             $links[] = ['label' => __('ui.nav_finance_admin'), 'route' => 'admin.finance.index'];
+        }
+
+        if ($user->isSuperAdmin()
+            || $user->hasRole(RoleType::AdministrativeAdmin)
+            || $user->hasRole(RoleType::AcademicAdmin)) {
+            $links[] = ['label' => __('ui.nav_credentials'), 'route' => 'admin.credentials.index'];
         }
 
         return $links;

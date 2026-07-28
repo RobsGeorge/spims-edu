@@ -23,6 +23,7 @@
             <exclude>tests/Feature/Finance</exclude>
             <exclude>tests/Feature/Assessment</exclude>
             <exclude>tests/Feature/Live</exclude>
+            <exclude>tests/Feature/Credentials</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -62,6 +63,9 @@
         </testsuite>
         <testsuite name="Live">
             <directory>tests/Feature/Live</directory>
+        </testsuite>
+        <testsuite name="Credentials">
+            <directory>tests/Feature/Credentials</directory>
         </testsuite>
     </testsuites>
     <source>
