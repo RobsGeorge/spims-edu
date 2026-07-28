@@ -136,7 +136,7 @@ class NavigationHub
             ],
             [
                 'label' => __('superadmin.tile_roles'),
-                'url' => route('admin.users.index'),
+                'url' => route('roles.hub'),
                 'icon' => 'bi-shield-check',
                 'description' => __('superadmin.tile_roles_desc'),
                 'superadmin_only' => true,

@@ -95,7 +95,7 @@ class SuperAdminController extends Controller
         $suites = [
             'Unit', 'Database', 'Auth', 'Audit', 'Smoke', 'Admin', 'Api',
             'Academics', 'Offerings', 'Admissions', 'Enrollment', 'Finance',
-            'Assessment', 'Live', 'Credentials', 'Hardening', 'Portal',
+            'Assessment', 'Live', 'Credentials', 'Hardening', 'Portal', 'Rbac',
         ];
 
         return view('superadmin.system-tests', compact('suites'));

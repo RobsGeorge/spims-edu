@@ -14,7 +14,9 @@ class DatabaseSeeder extends Seeder
             ThemeSeeder::class,
             SettingsSeeder::class,
             SuperAdminSeeder::class,
+            RolePermissionSeeder::class,
             SampleDataSeeder::class,
+            DemoDataSeeder::class,
         ]);
     }
 }

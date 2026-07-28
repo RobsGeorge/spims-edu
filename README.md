@@ -40,3 +40,4 @@ Push to `staging` → CI → staging deploy.
 - Password: set via `SUPERADMIN_PASSWORD` in `.env` (default `Spims@Dev2026!`)
 
 Sample curriculum (`DEMO-DIP` / `DEMO101`) is seeded when `SEED_SAMPLE_DATA=true` (default).
+Rich demo users/curriculum when `SEED_DEMO_DATA=true` — see [docs/demo-accounts.md](docs/demo-accounts.md).

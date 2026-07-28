@@ -12,6 +12,7 @@ return [
         'ADMINISTRATIVE_ADMIN' => 'F',
     ],
     'roles.assign_admin' => [],
+    'roles.manage_matrix' => [],
     'profile.edit_own' => [
         'ADMINISTRATIVE_ADMIN' => 'O',
         'ACADEMIC_ADMIN' => 'O',

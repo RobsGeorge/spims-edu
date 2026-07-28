@@ -44,6 +44,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfferingPreviewController;
+use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
@@ -100,6 +101,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/observability', [SuperAdminController::class, 'observability'])->name('observability.index');
         Route::get('/scheduled-tasks', [SuperAdminController::class, 'scheduledTasks'])->name('scheduled-tasks.index');
         Route::get('/system-tests', [SuperAdminController::class, 'systemTests'])->name('system-tests.index');
+    });
+
+    Route::middleware('superadmin')->prefix('roles-hub')->group(function () {
+        Route::get('/', [RolesHubController::class, 'index'])->name('roles.hub');
+        Route::put('/roles/{role}', [RolesHubController::class, 'updateRole'])->name('roles.hub.role.update');
     });
 
     Route::get('/api/me', [MeController::class, 'show'])->name('api.me');

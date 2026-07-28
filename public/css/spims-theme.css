@@ -229,3 +229,33 @@ button:focus-visible,
         transform: none !important;
     }
 }
+
+.roles-hub-accordion .accordion-button {
+    background: var(--color-surface);
+    color: var(--color-title);
+    font-weight: 700;
+}
+
+.roles-hub-accordion .accordion-button:not(.collapsed) {
+    box-shadow: none;
+    color: var(--color-nav-active);
+}
+
+.roles-hub-panel,
+.roles-hub-subpanel {
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+}
+
+.roles-hub-summary,
+.roles-hub-subsummary {
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    list-style: none;
+}
+
+.roles-hub-summary::-webkit-details-marker,
+.roles-hub-subsummary::-webkit-details-marker {
+    display: none;
+}

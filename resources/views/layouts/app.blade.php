@@ -84,6 +84,7 @@
                                             {{ __('superadmin.title') }}
                                         </a>
                                     </li>
+                                    <li><a class="dropdown-item" href="{{ route('roles.hub') }}">{{ __('roles_hub.title') }}</a></li>
                                     <li><a class="dropdown-item" href="{{ route('superadmin.security') }}">{{ __('superadmin.tile_security') }}</a></li>
                                     <li><a class="dropdown-item" href="{{ route('superadmin.audit.index') }}">{{ __('superadmin.tile_audit') }}</a></li>
                                     <li><a class="dropdown-item" href="{{ route('superadmin.observability.index') }}">{{ __('superadmin.tile_observability') }}</a></li>
