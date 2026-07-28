@@ -87,6 +87,9 @@ jobs:
       - name: Credentials pipeline
         run: php artisan test --testsuite=Credentials --compact
 
+      - name: Hardening pipeline
+        run: php artisan test --testsuite=Hardening --compact
+
   pgsql-migrate-fresh:
     name: PostgreSQL migrate:fresh --seed
     runs-on: ubuntu-latest

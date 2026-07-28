@@ -78,6 +78,9 @@ jobs:
             step "reload php-fpm"
             sudo -n systemctl reload php8.2-fpm
 
+            step "restart queue"
+            sudo -n systemctl restart spims-queue || echo "WARN: spims-queue restart"
+
             step "ensure scheduler cron"
             $PHP_BIN artisan scheduler:ensure-cron --php=$PHP_BIN || echo "WARN: scheduler cron"
 

@@ -53,4 +53,6 @@ jobs:
             $PHP_BIN artisan optimize:clear
             fix_runtime_permissions
             sudo -n systemctl reload php8.2-fpm
+            sudo -n systemctl restart spims-queue-staging || sudo -n systemctl restart spims-queue || echo "WARN: queue restart"
             $PHP_BIN artisan up || true
+            $PHP_BIN artisan scheduler:ensure-cron --php=$PHP_BIN || true
