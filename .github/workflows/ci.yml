@@ -93,6 +93,9 @@ jobs:
       - name: Portal pipeline
         run: php artisan test --testsuite=Portal --compact
 
+      - name: Rbac pipeline
+        run: php artisan test --testsuite=Rbac --compact
+
   pgsql-migrate-fresh:
     name: PostgreSQL migrate:fresh --seed
     runs-on: ubuntu-latest

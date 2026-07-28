@@ -11,7 +11,7 @@ return [
     'tile_academics' => 'Academics & offerings',
     'tile_academics_desc' => 'Programs, courses, semesters, offerings.',
     'tile_roles' => 'Roles & permissions',
-    'tile_roles_desc' => 'Role assignment via user administration.',
+    'tile_roles_desc' => 'Static roles matrix — Superadmin grants permission keys.',
     'tile_security' => 'Security tools',
     'tile_security_desc' => 'Session control and force-logout tools.',
     'tile_audit' => 'Audit log',
