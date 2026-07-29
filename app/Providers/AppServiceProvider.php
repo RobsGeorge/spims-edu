@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Theme;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use App\Support\ThemeTokens;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('layouts.app', function ($view): void {
             $cookieTheme = request()->cookie('theme', 'system');
+            if (! in_array($cookieTheme, ['light', 'dark', 'system'], true)) {
+                $cookieTheme = 'system';
+            }
+
             $activeTheme = Theme::query()->where('is_active', true)->first();
             $locale = app()->getLocale();
             $isRtl = $locale === 'ar';
@@ -27,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with([
                 'activeTheme' => $activeTheme,
                 'cookieTheme' => $cookieTheme,
+                'themeCssBlock' => ThemeTokens::inlineStyleBlock($activeTheme?->tokens),
                 'isRtl' => $isRtl,
                 'localeDir' => $isRtl ? 'rtl' : 'ltr',
             ]);

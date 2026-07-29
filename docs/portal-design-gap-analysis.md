@@ -151,7 +151,9 @@ WhatsApp, hard proctoring, multi-host Zoom → [PARKING-LOT.md](../PARKING-LOT.m
 Keep Laravel stack (no npm). Implement design as CSS variables + Blade components + Alpine.
 Treat original Next.js repo as **reference only** — do not port React.
 
-### Phase D0 — Spec restore & design-token foundation
+### Phase D0 — Spec restore & design-token foundation ✅
+
+**Status:** Implemented (2026-07-29).
 
 **Goal:** Make Sacred Academic the active design language without rewriting every page yet.
 
@@ -162,7 +164,7 @@ Treat original Next.js repo as **reference only** — do not port React.
 - Map Bootstrap primary/secondary to burgundy/gold via CSS overrides.
 - Seed default theme `tokens` JSON to match; inject CSS vars from active theme when present.
 - Fix SYSTEM theme → `prefers-color-scheme`.
-- Remove / ignore unused `welcome.blade.php`.
+- Remove unused `welcome.blade.php`.
 
 **Acceptance:** light + dark + RTL smoke; contrast spot-check AA on primary button and body text; no parchment background.
 

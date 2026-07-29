@@ -21,11 +21,13 @@ class ThemeEditorTest extends TestCase
         $theme = Theme::query()->where('is_active', true)->first();
 
         $this->actingAs($admin)->put(route('admin.theme.update', $theme), [
-            'name' => 'Liturgical Updated',
+            'name' => 'Sacred Academic Updated',
             'site_name' => 'SPIMS Academy',
             'is_active' => true,
         ])->assertRedirect();
 
-        $this->assertSame('SPIMS Academy', $theme->fresh()->site_name);
+        $fresh = $theme->fresh();
+        $this->assertSame('SPIMS Academy', $fresh->site_name);
+        $this->assertSame('Sacred Academic Updated', $fresh->name);
     }
 }

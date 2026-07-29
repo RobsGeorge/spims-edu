@@ -40,7 +40,7 @@ return [
     'users' => 'المستخدمون',
     'users_desc' => 'إنشاء الحسابات وتعيين الأدوار.',
     'theme' => 'السمة',
-    'theme_desc' => 'العلامة والألوان الليتورجية.',
+    'theme_desc' => 'العلامة ورموز Sacred Academic.',
     'app_forms' => 'نماذج التقديم',
     'app_forms_desc' => 'تهيئة نماذج القبول.',
     'applications' => 'طابور الطلبات',

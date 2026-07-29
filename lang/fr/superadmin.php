@@ -23,7 +23,7 @@ return [
     'tile_scheduled' => 'Tâches planifiées',
     'tile_scheduled_desc' => 'Jobs du scheduler à maintenir.',
     'tile_theme' => 'Thème et marque',
-    'tile_theme_desc' => 'Jetons du thème liturgique actif.',
+    'tile_theme_desc' => 'Jetons du thème Sacred Academic actif.',
     'tile_finance' => 'Ops finance',
     'tile_finance_desc' => 'Paiements manuels, remboursements, points.',
     'tile_credentials' => 'Diplômes',

@@ -40,7 +40,7 @@ return [
     'users' => 'Utilisateurs',
     'users_desc' => 'Créer des comptes et rôles.',
     'theme' => 'Thème',
-    'theme_desc' => 'Marque et jetons liturgiques.',
+    'theme_desc' => 'Marque et jetons Sacred Academic.',
     'app_forms' => 'Formulaires',
     'app_forms_desc' => 'Configurer les admissions.',
     'applications' => 'File d’admissions',

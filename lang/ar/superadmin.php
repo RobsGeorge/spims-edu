@@ -23,7 +23,7 @@ return [
     'tile_scheduled' => 'المهام المجدولة',
     'tile_scheduled_desc' => 'مهام المجدول التي يجب أن تبقى سليمة.',
     'tile_theme' => 'السمة والعلامة',
-    'tile_theme_desc' => 'رموز السمة الليتورجية النشطة.',
+    'tile_theme_desc' => 'رموز سمة Sacred Academic النشطة.',
     'tile_finance' => 'عمليات المالية',
     'tile_finance_desc' => 'مدفوعات يدوية واستردادات ونقاط.',
     'tile_credentials' => 'الشهادات',

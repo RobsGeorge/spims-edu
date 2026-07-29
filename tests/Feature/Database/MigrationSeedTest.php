@@ -31,6 +31,10 @@ class MigrationSeedTest extends TestCase
 
         $this->assertSame(3, Language::query()->count());
         $this->assertNotNull(Theme::query()->where('is_active', true)->first());
+        $this->assertSame(
+            'Sacred Academic',
+            Theme::query()->where('is_active', true)->value('name')
+        );
         $this->assertNotNull(User::query()->where('email', env('SUPERADMIN_EMAIL', 'robeir.george@outlook.com'))->first());
     }
 }

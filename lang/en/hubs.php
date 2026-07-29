@@ -40,7 +40,7 @@ return [
     'users' => 'Users',
     'users_desc' => 'Create accounts and assign roles.',
     'theme' => 'Theme',
-    'theme_desc' => 'Branding and liturgical tokens.',
+    'theme_desc' => 'Branding and Sacred Academic tokens.',
     'app_forms' => 'Application forms',
     'app_forms_desc' => 'Configure admission forms.',
     'applications' => 'Applications queue',
