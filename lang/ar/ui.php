@@ -2,8 +2,15 @@
 
 return [
     'home_title' => 'سبيمس — نظام معلومات الطلاب والتعلم',
-    'home_heading' => 'مرحباً بكم في سبيمس',
-    'home_subheading' => 'مدرسة قبطية أرثوذكسية عبر الإنترنت — منصة SIS + LMS.',
+    'home_heading' => 'سبيمس',
+    'home_subheading' => 'مكان هادئ لتعلّم العلوم القبطية الأرثوذكسية — قدّم، ادرس، واحصل على شهاداتك بوضوح.',
+    'home_cta_primary' => 'إنشاء حساب',
+    'home_cta_secondary' => 'تسجيل الدخول',
+    'home_cta_dashboard' => 'إلى لوحة التحكم',
+    'home_cta_catalog' => 'تصفح المقررات',
+    'nav_settings' => 'الإعدادات',
+    'nav_grades' => 'الدرجات',
+    'nav_learning' => 'تعلّمي',
     'locale' => 'اللغة',
     'theme' => 'السمة',
     'theme_light' => 'فاتح',

@@ -50,11 +50,13 @@ class NavigationHub
     {
         return array_values(array_filter([
             self::link('catalog.index', 'hubs.catalog', 'bi-journal-bookmark', 'hubs.catalog_desc'),
+            self::link('grades.index', 'hubs.grades', 'bi-clipboard-data', 'hubs.grades_desc'),
             self::link('applications.index', 'hubs.my_applications', 'bi-file-earmark-text', 'hubs.my_applications_desc'),
             self::link('enrollments.index', 'hubs.enrollments', 'bi-person-check', 'hubs.enrollments_desc'),
             self::link('live.index', 'hubs.live', 'bi-camera-video', 'hubs.live_desc'),
             self::link('finance.index', 'hubs.finance', 'bi-wallet2', 'hubs.finance_desc'),
             self::link('transcript.show', 'hubs.transcript', 'bi-award', 'hubs.transcript_desc'),
+            self::link('settings.edit', 'hubs.settings', 'bi-person-gear', 'hubs.settings_desc'),
             self::link('notifications.index', 'hubs.notifications', 'bi-bell', 'hubs.notifications_desc'),
         ]));
     }

@@ -5,7 +5,7 @@
 @section('content')
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 auth-card">
             <div class="card-body p-4">
                 <h1 class="h4 spims-title mb-3">{{ __('ui.forgot_password') }}</h1>
                 <form method="POST" action="{{ url('/forgot-password') }}">

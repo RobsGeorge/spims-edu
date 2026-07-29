@@ -2,8 +2,15 @@
 
 return [
     'home_title' => 'SPIMS — Système d\'information et d\'apprentissage',
-    'home_heading' => 'Bienvenue sur SPIMS',
-    'home_subheading' => 'École copte orthodoxe en ligne — plateforme SIS + LMS.',
+    'home_heading' => 'SPIMS',
+    'home_subheading' => 'Un espace calme pour apprendre les sciences coptes orthodoxes — candidater, étudier et obtenir des diplômes en toute clarté.',
+    'home_cta_primary' => 'Créer un compte',
+    'home_cta_secondary' => 'Connexion',
+    'home_cta_dashboard' => 'Aller au tableau de bord',
+    'home_cta_catalog' => 'Parcourir les cours',
+    'nav_settings' => 'Paramètres',
+    'nav_grades' => 'Notes',
+    'nav_learning' => 'Mon apprentissage',
     'locale' => 'Langue',
     'theme' => 'Thème',
     'theme_light' => 'Clair',

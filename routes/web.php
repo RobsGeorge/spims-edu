@@ -28,6 +28,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\CoursePlayerController;
 use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
@@ -36,6 +37,7 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExamAttemptController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FoundationDemoController;
+use App\Http\Controllers\GradesController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HubController;
@@ -45,6 +47,7 @@ use App\Http\Controllers\MeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
@@ -64,6 +67,7 @@ Route::get('/verify/{token}', CredentialVerifyController::class)->name('credenti
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
+Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('auth.register');
@@ -109,10 +113,22 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/api/me', [MeController::class, 'show'])->name('api.me');
-    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
     Route::post('/catalog/{course}/interest', [CatalogController::class, 'flagInterest'])
         ->middleware('permission:courses.flag_interest')
         ->name('catalog.interest');
+
+    Route::get('/courses/{offering}', [CoursePlayerController::class, 'show'])->name('courses.player');
+    Route::post('/courses/{offering}/weeks/{week}/complete', [CoursePlayerController::class, 'completeWeek'])
+        ->name('courses.weeks.complete');
+
+    Route::get('/grades', [GradesController::class, 'index'])
+        ->middleware('permission:transcript.view')
+        ->name('grades.index');
+
+    Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings', [SettingsController::class, 'update'])
+        ->middleware('permission:profile.edit_own')
+        ->name('settings.update');
 
     Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::get('/applications/forms/{form}', [ApplicationController::class, 'create'])
