@@ -182,7 +182,9 @@ Treat original Next.js repo as **reference only** — do not port React.
 
 **Acceptance:** each role lands in correct nav; Superadmin shield preserved; RTL mirrors chevrons; ≥44px touch targets on bottom-nav.
 
-### Phase D2 — Public & auth surfaces
+### Phase D2 — Public & auth surfaces ✅
+
+**Status:** Implemented (2026-07-29).
 
 **Goal:** Match design-reference for first-run trust.
 
@@ -194,7 +196,9 @@ Treat original Next.js repo as **reference only** — do not port React.
 
 **Acceptance:** visual parity checklist against design-reference screenshots for light/dark/RTL auth + catalog; guest→student path unbroken.
 
-### Phase D3 — Student learning core
+### Phase D3 — Student learning core ✅
+
+**Status:** Implemented (2026-07-29).
 
 **Goal:** Close the biggest product hole — learning delivery.
 
