@@ -20,4 +20,7 @@ return [
     'filter_status' => 'Statut',
     'filter_all_queue' => 'File (ouverte)',
     'queue_empty' => 'Aucune candidature dans cette vue.',
+    'document' => 'Document',
+    'current_document' => 'Document actuel',
+    'upload_failed' => 'Échec du téléversement du document.',
 ];

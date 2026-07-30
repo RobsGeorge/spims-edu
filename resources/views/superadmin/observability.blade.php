@@ -12,7 +12,7 @@
     <h1 class="page-title">{{ __('superadmin.observability_title') }}</h1>
     <p class="text-muted-theme mb-4">{{ __('superadmin.observability_desc') }}</p>
 
-    <div class="row g-3">
+    <div class="row g-3 mb-4">
         @foreach($stats as $key => $value)
             <div class="col-6 col-md-4">
                 <div class="app-card card shadow-sm h-100">
@@ -24,6 +24,15 @@
             </div>
         @endforeach
     </div>
+
+    <dl class="row mb-4">
+        <dt class="col-sm-4">{{ __('superadmin.queue_connection') }}</dt>
+        <dd class="col-sm-8"><code>{{ $queueConnection }}</code></dd>
+        <dt class="col-sm-4">{{ __('superadmin.backup_path') }}</dt>
+        <dd class="col-sm-8"><code>{{ $backupPath }}</code></dd>
+        <dt class="col-sm-4">{{ __('superadmin.last_backup') }}</dt>
+        <dd class="col-sm-8">{{ $lastBackupAt ?? __('superadmin.last_backup_none') }}</dd>
+    </dl>
 
     <div class="mt-4">
         <a href="{{ route('health') }}" class="btn btn-outline-primary" target="_blank" rel="noopener">

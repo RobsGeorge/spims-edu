@@ -20,4 +20,7 @@ return [
     'filter_status' => 'الحالة',
     'filter_all_queue' => 'الطابور (مفتوح)',
     'queue_empty' => 'لا توجد طلبات في هذا العرض.',
+    'document' => 'مستند',
+    'current_document' => 'المستند الحالي',
+    'upload_failed' => 'فشل رفع المستند.',
 ];

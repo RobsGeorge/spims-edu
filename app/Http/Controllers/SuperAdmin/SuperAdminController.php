@@ -68,14 +68,49 @@ class SuperAdminController extends Controller
 
     public function observability(): View
     {
+        $stats = [
+            'users' => User::query()->count(),
+            'courses' => Course::query()->count(),
+            'offerings' => CourseOffering::query()->count(),
+            'enrollments' => Enrollment::query()->count(),
+            'audit_logs' => AuditLog::query()->count(),
+        ];
+
+        if (Schema::hasTable('failed_jobs')) {
+            $stats['failed_jobs'] = DB::table('failed_jobs')->count();
+        }
+
+        if (Schema::hasTable('jobs')) {
+            $stats['jobs'] = DB::table('jobs')->count();
+        }
+
+        $backupPath = config('spims.backup.path', storage_path('app/backups'));
+        $lastBackupAt = null;
+        if (is_dir($backupPath)) {
+            $mtime = null;
+            foreach (scandir($backupPath) ?: [] as $name) {
+                if ($name === '.' || $name === '..') {
+                    continue;
+                }
+                $full = rtrim($backupPath, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$name;
+                if (! is_file($full)) {
+                    continue;
+                }
+                $fileMtime = filemtime($full);
+                if ($fileMtime !== false && ($mtime === null || $fileMtime > $mtime)) {
+                    $mtime = $fileMtime;
+                }
+            }
+            if ($mtime !== null) {
+                $lastBackupAt = date('c', $mtime);
+            }
+        }
+
         return view('superadmin.observability', [
-            'stats' => [
-                'users' => User::query()->count(),
-                'courses' => Course::query()->count(),
-                'offerings' => CourseOffering::query()->count(),
-                'enrollments' => Enrollment::query()->count(),
-                'audit_logs' => AuditLog::query()->count(),
-            ],
+            'stats' => $stats,
+            'queueConnection' => (string) config('queue.default'),
+            'backupPath' => $backupPath,
+            'lastBackupAt' => $lastBackupAt,
         ]);
     }
 

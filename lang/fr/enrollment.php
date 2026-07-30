@@ -27,4 +27,5 @@ return [
     'not_owner' => 'Ce n\'est pas votre inscription.',
     'add_drop_closed' => 'Période add/drop fermée — utilisez le retrait.',
     'withdrawal_closed' => 'Période de retrait fermée.',
+    'schedule_conflict_warning' => 'Attention : cette offre a des sessions en direct qui chevauchent un autre cours auquel vous êtes inscrit. L’inscription a été enregistrée ; ajustez votre emploi du temps si besoin.',
 ];

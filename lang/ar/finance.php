@@ -53,4 +53,9 @@ return [
     'refunds' => 'الاستردادات',
     'approve' => 'موافقة',
     'transactions' => 'دفتر حديث',
+    'reports_title' => 'تقارير المالية',
+    'reports_desc' => 'الأرصدة المستحقة والإيرادات المدفوعة حسب العملة.',
+    'outstanding_by_currency' => 'فواتير مستحقة',
+    'paid_revenue_by_currency' => 'إيرادات مدفوعة',
+    'reports_empty' => 'لا مبالغ في هذه الفئة.',
 ];

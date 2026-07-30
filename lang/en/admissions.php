@@ -20,4 +20,7 @@ return [
     'filter_status' => 'Status',
     'filter_all_queue' => 'Queue (open)',
     'queue_empty' => 'No applications in this view.',
+    'document' => 'Document',
+    'current_document' => 'Current document',
+    'upload_failed' => 'Document upload failed.',
 ];

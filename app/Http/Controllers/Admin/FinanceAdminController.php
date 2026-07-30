@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\Currency;
+use App\Enums\InvoiceStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Enums\RoleType;
 use App\Enums\WalletKind;
+use App\Exceptions\AuthorizationException;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -15,6 +18,8 @@ use App\Services\Finance\DonationService;
 use App\Services\Finance\InvoiceService;
 use App\Services\Finance\PaymentService;
 use App\Services\Finance\WalletService;
+use App\Support\AuthorizeService;
+use App\Support\Money;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -139,5 +144,66 @@ class FinanceAdminController extends Controller
         $payments->approveRefund($request->user(), $refund);
 
         return back()->with('status', __('finance.refund_approved'));
+    }
+
+    public function reports(Request $request, AuthorizeService $authorize): View
+    {
+        $this->authorizeFinanceReports($request->user(), $authorize);
+
+        $outstandingByCurrency = [];
+        $invoices = Invoice::query()
+            ->whereIn('status', [InvoiceStatus::Open, InvoiceStatus::Partial])
+            ->with('payments')
+            ->get();
+
+        foreach ($invoices as $invoice) {
+            $key = $invoice->currency->value;
+            $outstandingByCurrency[$key] = ($outstandingByCurrency[$key] ?? 0) + $invoice->amountDue();
+        }
+
+        $paidRows = Payment::query()
+            ->where('status', PaymentStatus::Completed)
+            ->selectRaw('currency, SUM(amount_minor) as total_minor')
+            ->groupBy('currency')
+            ->get();
+
+        $paidByCurrency = [];
+        foreach ($paidRows as $row) {
+            $currencyKey = $row->currency instanceof Currency
+                ? $row->currency->value
+                : (string) $row->currency;
+            $paidByCurrency[$currencyKey] = (int) $row->total_minor;
+        }
+
+        $format = static function (array $minorsByCurrency): array {
+            $out = [];
+            foreach ($minorsByCurrency as $currency => $minor) {
+                $enum = Currency::tryFrom((string) $currency);
+                if ($enum === null) {
+                    continue;
+                }
+                $out[$currency] = [
+                    'minor' => (int) $minor,
+                    'formatted' => Money::fromMinor((int) $minor, $enum)->format(),
+                ];
+            }
+            ksort($out);
+
+            return $out;
+        };
+
+        return view('admin.finance.reports', [
+            'outstanding' => $format($outstandingByCurrency),
+            'paidRevenue' => $format($paidByCurrency),
+        ]);
+    }
+
+    private function authorizeFinanceReports(User $user, AuthorizeService $authorize): void
+    {
+        try {
+            $authorize->authorize($user, 'finance.invoices');
+        } catch (AuthorizationException) {
+            $authorize->authorize($user, 'finance.wallet');
+        }
     }
 }

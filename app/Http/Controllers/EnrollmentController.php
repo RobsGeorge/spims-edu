@@ -40,13 +40,21 @@ class EnrollmentController extends Controller
         ]);
 
         $offering = CourseOffering::query()->findOrFail($data['offering_id']);
+        $conflict = $service->hasLiveSessionConflict($request->user(), $offering);
+
         $service->register(
             $request->user(),
             $offering,
             $data['student_program_id'] ?? null
         );
 
-        return back()->with('status', __('enrollment.registered'));
+        $redirect = back()->with('status', __('enrollment.registered'));
+
+        if ($conflict) {
+            $redirect->with('warning', __('enrollment.schedule_conflict_warning'));
+        }
+
+        return $redirect;
     }
 
     public function drop(Request $request, Enrollment $enrollment, EnrollmentService $service): RedirectResponse

@@ -53,4 +53,9 @@ return [
     'refunds' => 'Refunds',
     'approve' => 'Approve',
     'transactions' => 'Recent ledger',
+    'reports_title' => 'Finance reports',
+    'reports_desc' => 'Outstanding balances and paid revenue by currency.',
+    'outstanding_by_currency' => 'Outstanding invoices',
+    'paid_revenue_by_currency' => 'Paid revenue',
+    'reports_empty' => 'No amounts in this category.',
 ];

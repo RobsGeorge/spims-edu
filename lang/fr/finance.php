@@ -53,4 +53,9 @@ return [
     'refunds' => 'Remboursements',
     'approve' => 'Approuver',
     'transactions' => 'Grand livre récent',
+    'reports_title' => 'Rapports finance',
+    'reports_desc' => 'Soldes ouverts et revenus encaissés par devise.',
+    'outstanding_by_currency' => 'Factures en souffrance',
+    'paid_revenue_by_currency' => 'Revenus encaissés',
+    'reports_empty' => 'Aucun montant dans cette catégorie.',
 ];

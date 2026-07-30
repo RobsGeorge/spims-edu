@@ -56,4 +56,8 @@ return [
     'command' => 'Commande',
     'schedule' => 'Planning',
     'suite' => 'Suite',
+    'queue_connection' => 'Connexion file d’attente',
+    'backup_path' => 'Chemin des sauvegardes',
+    'last_backup' => 'Dernière sauvegarde',
+    'last_backup_none' => 'Aucun fichier de sauvegarde',
 ];

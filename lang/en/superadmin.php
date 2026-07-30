@@ -56,4 +56,8 @@ return [
     'command' => 'Command',
     'schedule' => 'Schedule',
     'suite' => 'Suite',
+    'queue_connection' => 'Queue connection',
+    'backup_path' => 'Backup path',
+    'last_backup' => 'Last backup',
+    'last_backup_none' => 'No backup file found',
 ];
