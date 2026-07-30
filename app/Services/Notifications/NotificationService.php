@@ -5,11 +5,14 @@ namespace App\Services\Notifications;
 use App\Enums\NotificationChannel;
 use App\Models\Notification;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
+use App\Services\Mail\TransactionalMailer;
 
 class NotificationService
 {
+    public function __construct(
+        private readonly TransactionalMailer $mailer,
+    ) {}
+
     /**
      * @param  array<string, mixed>|null  $metadata
      */
@@ -59,21 +62,6 @@ class NotificationService
             'metadata' => $metadata,
         ]);
 
-        // Mail is skipped/logged in v1 — never blocks.
-        Log::info('Notification email', [
-            'to' => $user->email,
-            'type' => $type,
-            'title' => $title,
-        ]);
-
-        if (config('mail.default') !== 'array' && config('mail.default') !== 'log') {
-            try {
-                Mail::raw($body, function ($message) use ($user, $title) {
-                    $message->to($user->email)->subject($title);
-                });
-            } catch (\Throwable $e) {
-                Log::warning('Notification email send failed', ['error' => $e->getMessage()]);
-            }
-        }
+        $this->mailer->send((string) $user->email, $title, $body);
     }
 }

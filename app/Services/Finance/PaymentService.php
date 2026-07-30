@@ -28,6 +28,7 @@ class PaymentService
         private readonly WalletService $wallet,
         private readonly InvoiceService $invoices,
         private readonly GatewayRouter $gateways,
+        private readonly ReceiptPdfService $receipts,
     ) {}
 
     /**
@@ -297,6 +298,12 @@ class PaymentService
                 'receipt_serial' => $this->allocateReceiptSerial(),
                 'receipt_url' => 'receipts/'.$payment->id.'.html',
             ]);
+        }
+
+        try {
+            $this->receipts->generate($payment->fresh());
+        } catch (\Throwable) {
+            // Receipt storage must never block payment completion.
         }
 
         if ($payment->invoice_id) {

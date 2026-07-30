@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Services\Finance\PaymentService;
+use App\Services\Finance\ReceiptPdfService;
 use App\Services\Finance\WalletService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -55,7 +56,7 @@ class FinanceController extends Controller
         return redirect()->route('finance.index')->with('status', __('finance.payment_success'));
     }
 
-    public function showReceipt(Request $request, Payment $payment): View
+    public function showReceipt(Request $request, Payment $payment, ReceiptPdfService $receipts): View
     {
         abort_unless(
             $payment->student_id === $request->user()->id || $request->user()->isSuperAdmin(),
@@ -63,8 +64,10 @@ class FinanceController extends Controller
         );
         abort_unless(filled($payment->receipt_serial), 404);
 
+        $receipts->ensure($payment);
+
         return view('finance.receipt', [
-            'payment' => $payment->load(['invoice']),
+            'payment' => $payment->fresh()->load(['invoice']),
         ]);
     }
 }

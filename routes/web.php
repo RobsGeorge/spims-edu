@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\BrandingController;
 use App\Http\Controllers\Api\PaymentWebhookController;
+use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\ZoomWebhookController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AssignmentController;
@@ -120,6 +121,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/api/me', [MeController::class, 'show'])->name('api.me');
+    Route::post('/api/uploads', [UploadController::class, 'store'])->name('api.uploads.store');
     Route::post('/catalog/{course}/interest', [CatalogController::class, 'flagInterest'])
         ->middleware('permission:courses.flag_interest')
         ->name('catalog.interest');
@@ -357,6 +359,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/finance', [FinanceAdminController::class, 'index'])
             ->middleware('permission:finance.invoices')
             ->name('finance.index');
+        Route::get('/finance/reports', [FinanceAdminController::class, 'reports'])
+            ->name('finance.reports');
         Route::post('/finance/invoices', [FinanceAdminController::class, 'storeInvoice'])
             ->middleware('permission:finance.invoices')
             ->name('finance.invoices.store');

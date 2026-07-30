@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Theme;
+use App\Services\Ai\AiClient;
+use App\Services\Ai\GeminiAiClient;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use App\Support\ThemeTokens;
@@ -15,6 +17,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(AuthorizeService::class);
         $this->app->singleton(AuditLogWriter::class);
+        $this->app->singleton(AiClient::class, GeminiAiClient::class);
     }
 
     public function boot(): void
