@@ -16,4 +16,8 @@ return [
     'field_required' => 'Field ":field" is required.',
     'invalid_decision' => 'Invalid decision.',
     'not_assigned_reviewer' => 'You are not the assigned reviewer.',
+    'queue_subtitle' => 'Review submitted applications and record decisions.',
+    'filter_status' => 'Status',
+    'filter_all_queue' => 'Queue (open)',
+    'queue_empty' => 'No applications in this view.',
 ];

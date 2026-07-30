@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AssessmentTemplateController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EnrollmentAdminController;
 use App\Http\Controllers\Admin\GradebookController;
+use App\Http\Controllers\Admin\GradingSchemeController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
@@ -154,6 +155,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::get('/finance/invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');
+    Route::get('/finance/receipts/{payment}', [FinanceController::class, 'showReceipt'])->name('finance.receipts.show');
     Route::post('/finance/invoices/{invoice}/checkout', [FinanceController::class, 'checkout'])
         ->middleware('permission:finance.pay')
         ->name('finance.checkout');
@@ -267,6 +269,19 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('permission:assessment_templates.manage')
             ->name('assessment-templates.store');
 
+        Route::get('/grading-schemes', [GradingSchemeController::class, 'index'])
+            ->middleware('permission:grading_schemes.manage')
+            ->name('grading-schemes.index');
+        Route::post('/grading-schemes', [GradingSchemeController::class, 'store'])
+            ->middleware('permission:grading_schemes.manage')
+            ->name('grading-schemes.store');
+        Route::put('/grading-schemes/{gradingScheme}', [GradingSchemeController::class, 'update'])
+            ->middleware('permission:grading_schemes.manage')
+            ->name('grading-schemes.update');
+
+        Route::get('/translations', [TranslationController::class, 'index'])
+            ->middleware('permission:translations.manage')
+            ->name('translations.index');
         Route::post('/translations', [TranslationController::class, 'store'])
             ->middleware('permission:translations.manage')
             ->name('translations.store');

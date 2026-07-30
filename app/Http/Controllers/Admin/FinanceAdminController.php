@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\Currency;
 use App\Enums\PaymentMethod;
+use App\Enums\RoleType;
 use App\Enums\WalletKind;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
@@ -23,7 +24,14 @@ class FinanceAdminController extends Controller
 {
     public function index(): View
     {
+        $students = User::query()
+            ->whereHas('roles', fn ($q) => $q->where('role', RoleType::Student->value))
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get(['id', 'first_name', 'last_name', 'email']);
+
         return view('admin.finance.index', [
+            'students' => $students,
             'invoices' => Invoice::query()->with('student')->latest()->limit(50)->get(),
             'pendingManual' => Payment::query()
                 ->where('status', \App\Enums\PaymentStatus::PendingVerification)

@@ -25,4 +25,12 @@ return [
     'join' => 'Join',
     'live_sessions' => 'Live sessions',
     'discussions' => 'Discussions',
+    'agenda' => 'Agenda',
+    'agenda_empty' => 'No sessions scheduled yet.',
+    'unscheduled' => 'Unscheduled',
+    'session_title' => 'Title',
+    'duration_minutes' => 'Duration (minutes)',
+    'schedule' => 'Schedule',
+    'minutes_abbr' => 'm',
+    'override' => 'Override',
 ];

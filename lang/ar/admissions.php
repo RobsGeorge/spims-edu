@@ -16,4 +16,8 @@ return [
     'field_required' => 'الحقل ":field" مطلوب.',
     'invalid_decision' => 'قرار غير صالح.',
     'not_assigned_reviewer' => 'لست المراجع المعيَّن.',
+    'queue_subtitle' => 'مراجعة الطلبات المقدّمة وتسجيل القرارات.',
+    'filter_status' => 'الحالة',
+    'filter_all_queue' => 'الطابور (مفتوح)',
+    'queue_empty' => 'لا توجد طلبات في هذا العرض.',
 ];

@@ -16,4 +16,8 @@ return [
     'field_required' => 'Le champ « :field » est obligatoire.',
     'invalid_decision' => 'Décision invalide.',
     'not_assigned_reviewer' => 'Vous n\'êtes pas le rapporteur assigné.',
+    'queue_subtitle' => 'Examiner les candidatures soumises et enregistrer les décisions.',
+    'filter_status' => 'Statut',
+    'filter_all_queue' => 'File (ouverte)',
+    'queue_empty' => 'Aucune candidature dans cette vue.',
 ];

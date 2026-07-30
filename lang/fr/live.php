@@ -25,4 +25,12 @@ return [
     'join' => 'Rejoindre',
     'live_sessions' => 'Sessions en direct',
     'discussions' => 'Discussions',
+    'agenda' => 'Agenda',
+    'agenda_empty' => 'Aucune session planifiée.',
+    'unscheduled' => 'Non planifié',
+    'session_title' => 'Titre',
+    'duration_minutes' => 'Durée (minutes)',
+    'schedule' => 'Planifier',
+    'minutes_abbr' => 'min',
+    'override' => 'Modifier',
 ];
