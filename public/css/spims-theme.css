@@ -804,3 +804,79 @@ html[dir='rtl'] .app-side-link i,
 html[dir='rtl'] .app-bottom-link i {
     transform: scaleX(-1);
 }
+
+/* —— D6: wallet balance cards —— */
+.wallet-balance-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 5.5rem;
+    padding: 1rem 1.1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+}
+
+.wallet-balance-card__label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-muted, var(--color-text));
+    opacity: 0.85;
+}
+
+.wallet-balance-card__value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-title);
+    letter-spacing: 0.01em;
+}
+
+/* —— D6: exam progress rail + near-expiry pulse —— */
+.exam-progress-rail__track {
+    height: 0.45rem;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-surface-border) 70%, transparent);
+    overflow: hidden;
+}
+
+.exam-progress-rail__fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-primary);
+    transition: width var(--transition-base);
+}
+
+.exam-timer-pulse {
+    animation: exam-timer-pulse 1s ease-in-out infinite;
+    background-color: var(--color-danger) !important;
+}
+
+@keyframes exam-timer-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.72; transform: scale(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .exam-timer-pulse {
+        animation: none !important;
+        transform: none !important;
+    }
+
+    .exam-progress-rail__fill {
+        transition: none !important;
+    }
+}
+
+.spims-error-page__code {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: var(--color-primary);
+    opacity: 0.55;
+}
+
+.spims-toast {
+    border-radius: var(--radius-md);
+}

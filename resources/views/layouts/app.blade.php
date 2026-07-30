@@ -74,6 +74,7 @@
             </div>
         </nav>
         <main id="main-content" class="container py-4" tabindex="-1">
+            @include('partials.flash')
             @yield('content')
         </main>
     @else
@@ -177,6 +178,7 @@
                 </header>
 
                 <main id="main-content" class="app-content container-fluid py-4" tabindex="-1">
+                    @include('partials.flash')
                     @yield('content')
                 </main>
             </div>
