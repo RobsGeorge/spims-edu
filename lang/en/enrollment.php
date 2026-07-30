@@ -27,4 +27,5 @@ return [
     'not_owner' => 'Not your enrollment.',
     'add_drop_closed' => 'Add/drop window has closed — withdraw instead.',
     'withdrawal_closed' => 'Withdrawal window has closed.',
+    'schedule_conflict_warning' => 'Warning: this offering has live sessions that overlap with another course you are enrolled in. Registration was saved; consider adjusting your schedule.',
 ];

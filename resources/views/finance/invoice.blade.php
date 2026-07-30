@@ -32,9 +32,15 @@
 @endif
 
 @if($invoice->payments->isNotEmpty())
-<ul class="mt-3">
+<ul class="mt-3 list-unstyled">
 @foreach($invoice->payments as $payment)
-    <li>{{ $payment->status->value }} · {{ $payment->amount_minor }} · {{ $payment->receipt_serial }}</li>
+    <li class="mb-1">
+        {{ $payment->status->value }} · {{ $payment->amount_minor }}
+        @if($payment->receipt_serial)
+            · {{ $payment->receipt_serial }}
+            <a href="{{ route('finance.receipts.show', $payment) }}" class="ms-1">{{ __('finance.view_receipt') }}</a>
+        @endif
+    </li>
 @endforeach
 </ul>
 @endif

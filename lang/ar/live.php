@@ -25,4 +25,12 @@ return [
     'join' => 'انضمام',
     'live_sessions' => 'الجلسات المباشرة',
     'discussions' => 'النقاشات',
+    'agenda' => 'الأجندة',
+    'agenda_empty' => 'لا توجد جلسات مجدولة بعد.',
+    'unscheduled' => 'غير مجدولة',
+    'session_title' => 'العنوان',
+    'duration_minutes' => 'المدة (دقائق)',
+    'schedule' => 'جدولة',
+    'minutes_abbr' => 'د',
+    'override' => 'تعديل',
 ];

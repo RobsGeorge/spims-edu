@@ -56,4 +56,8 @@ return [
     'command' => 'الأمر',
     'schedule' => 'الجدول',
     'suite' => 'المجموعة',
+    'queue_connection' => 'اتصال قائمة الانتظار',
+    'backup_path' => 'مسار النسخ الاحتياطي',
+    'last_backup' => 'آخر نسخة احتياطية',
+    'last_backup_none' => 'لا يوجد ملف نسخ احتياطي',
 ];

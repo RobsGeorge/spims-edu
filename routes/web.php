@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AssessmentTemplateController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EnrollmentAdminController;
 use App\Http\Controllers\Admin\GradebookController;
+use App\Http\Controllers\Admin\GradingSchemeController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\BrandingController;
 use App\Http\Controllers\Api\PaymentWebhookController;
+use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\ZoomWebhookController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AssignmentController;
@@ -49,6 +51,7 @@ use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
 use Illuminate\Support\Facades\Route;
@@ -97,6 +100,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/hubs/admin', [HubController::class, 'admin'])->name('hubs.admin');
     Route::get('/hubs/finance', [HubController::class, 'finance'])->name('hubs.finance');
 
+    Route::get('/teach', [TeachController::class, 'index'])->name('teach.index');
+    Route::get('/teach/{offering}', [TeachController::class, 'show'])->name('teach.show');
+    Route::post('/teach/{offering}/announcements', [TeachController::class, 'storeAnnouncement'])
+        ->name('teach.announcements.store');
+
     Route::middleware('superadmin')->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/', [SuperAdminController::class, 'index'])->name('index');
         Route::get('/security', [SuperAdminController::class, 'security'])->name('security');
@@ -113,6 +121,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/api/me', [MeController::class, 'show'])->name('api.me');
+    Route::post('/api/uploads', [UploadController::class, 'store'])->name('api.uploads.store');
     Route::post('/catalog/{course}/interest', [CatalogController::class, 'flagInterest'])
         ->middleware('permission:courses.flag_interest')
         ->name('catalog.interest');
@@ -148,6 +157,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::get('/finance/invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');
+    Route::get('/finance/receipts/{payment}', [FinanceController::class, 'showReceipt'])->name('finance.receipts.show');
     Route::post('/finance/invoices/{invoice}/checkout', [FinanceController::class, 'checkout'])
         ->middleware('permission:finance.pay')
         ->name('finance.checkout');
@@ -261,6 +271,19 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('permission:assessment_templates.manage')
             ->name('assessment-templates.store');
 
+        Route::get('/grading-schemes', [GradingSchemeController::class, 'index'])
+            ->middleware('permission:grading_schemes.manage')
+            ->name('grading-schemes.index');
+        Route::post('/grading-schemes', [GradingSchemeController::class, 'store'])
+            ->middleware('permission:grading_schemes.manage')
+            ->name('grading-schemes.store');
+        Route::put('/grading-schemes/{gradingScheme}', [GradingSchemeController::class, 'update'])
+            ->middleware('permission:grading_schemes.manage')
+            ->name('grading-schemes.update');
+
+        Route::get('/translations', [TranslationController::class, 'index'])
+            ->middleware('permission:translations.manage')
+            ->name('translations.index');
         Route::post('/translations', [TranslationController::class, 'store'])
             ->middleware('permission:translations.manage')
             ->name('translations.store');
@@ -336,6 +359,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/finance', [FinanceAdminController::class, 'index'])
             ->middleware('permission:finance.invoices')
             ->name('finance.index');
+        Route::get('/finance/reports', [FinanceAdminController::class, 'reports'])
+            ->name('finance.reports');
         Route::post('/finance/invoices', [FinanceAdminController::class, 'storeInvoice'])
             ->middleware('permission:finance.invoices')
             ->name('finance.invoices.store');

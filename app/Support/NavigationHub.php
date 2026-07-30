@@ -3,7 +3,9 @@
 namespace App\Support;
 
 use App\Enums\RoleType;
+use App\Models\Notification;
 use App\Models\User;
+use App\Services\Teach\TeachAccessService;
 use Illuminate\Support\Facades\Route;
 
 class NavigationHub
@@ -43,6 +45,124 @@ class NavigationHub
             || $user->hasRole(RoleType::FinancialAdmin);
     }
 
+    public static function hasTeach(?User $user): bool
+    {
+        return app(TeachAccessService::class)->canTeach($user);
+    }
+
+    public static function unreadNotificationCount(?User $user): int
+    {
+        if ($user === null) {
+            return 0;
+        }
+
+        return Notification::query()
+            ->where('user_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
+    }
+
+    /**
+     * Primary sidebar / drawer destinations.
+     *
+     * @return list<array{label: string, route: string, icon: string, active: bool}>
+     */
+    public static function primaryNav(?User $user): array
+    {
+        if ($user === null) {
+            return [];
+        }
+
+        $items = [
+            [
+                'label' => __('hubs.nav_home'),
+                'route' => 'dashboard',
+                'icon' => 'bi-house',
+                'active' => request()->routeIs('dashboard'),
+            ],
+            [
+                'label' => __('hubs.nav_learning'),
+                'route' => 'hubs.learning',
+                'icon' => 'bi-book-half',
+                'active' => request()->routeIs('hubs.learning')
+                    || request()->routeIs('courses.*')
+                    || request()->routeIs('grades.*')
+                    || request()->routeIs('enrollments.*'),
+            ],
+        ];
+
+        if (self::hasTeach($user) && Route::has('teach.index')) {
+            $items[] = [
+                'label' => __('hubs.nav_teach'),
+                'route' => 'teach.index',
+                'icon' => 'bi-easel2',
+                'active' => request()->routeIs('teach.*'),
+            ];
+        }
+
+        if (self::hasAcademicAdmin($user)) {
+            $items[] = [
+                'label' => __('hubs.nav_academic'),
+                'route' => 'hubs.academic',
+                'icon' => 'bi-mortarboard',
+                'active' => request()->routeIs('hubs.academic') || request()->routeIs('admin.programs.*') || request()->routeIs('admin.courses.*') || request()->routeIs('admin.offerings.*'),
+            ];
+        }
+
+        if (self::hasAdministrative($user)) {
+            $items[] = [
+                'label' => __('hubs.nav_admin'),
+                'route' => 'hubs.admin',
+                'icon' => 'bi-gear',
+                'active' => request()->routeIs('hubs.admin') || request()->routeIs('admin.users.*') || request()->routeIs('admin.applications.*'),
+            ];
+        }
+
+        $items[] = [
+            'label' => __('hubs.nav_finance'),
+            'route' => 'hubs.finance',
+            'icon' => 'bi-wallet2',
+            'active' => request()->routeIs('hubs.finance') || request()->routeIs('finance.*') || request()->routeIs('admin.finance.*'),
+        ];
+
+        if (self::hasSuperadmin($user)) {
+            $items[] = [
+                'label' => __('hubs.nav_superadmin'),
+                'route' => 'superadmin.index',
+                'icon' => 'bi-shield-lock',
+                'active' => request()->routeIs('superadmin.*') || request()->routeIs('roles.hub'),
+            ];
+        }
+
+        return array_values(array_filter($items, fn (array $item): bool => Route::has($item['route'])));
+    }
+
+    /**
+     * Mobile bottom-nav (max 5).
+     *
+     * @return list<array{label: string, route: string, icon: string, active: bool}>
+     */
+    public static function bottomNav(?User $user): array
+    {
+        if ($user === null) {
+            return [];
+        }
+
+        $third = self::hasTeach($user) && Route::has('teach.index')
+            ? ['label' => __('hubs.nav_teach'), 'route' => 'teach.index', 'icon' => 'bi-easel2', 'active' => request()->routeIs('teach.*')]
+            : ['label' => __('hubs.catalog'), 'route' => 'catalog.index', 'icon' => 'bi-journal-bookmark', 'active' => request()->routeIs('catalog.*')];
+
+        $items = [
+            ['label' => __('hubs.nav_home'), 'route' => 'dashboard', 'icon' => 'bi-house', 'active' => request()->routeIs('dashboard')],
+            ['label' => __('hubs.nav_learning'), 'route' => 'hubs.learning', 'icon' => 'bi-book-half', 'active' => request()->routeIs('hubs.learning') || request()->routeIs('courses.*')],
+            $third,
+            ['label' => __('hubs.nav_finance'), 'route' => 'hubs.finance', 'icon' => 'bi-wallet2', 'active' => request()->routeIs('hubs.finance') || request()->routeIs('finance.*')],
+            ['label' => __('hubs.nav_more'), 'route' => 'settings.edit', 'icon' => 'bi-grid', 'active' => request()->routeIs('settings.*') || request()->routeIs('notifications.*')],
+        ];
+
+        return array_values(array_filter($items, fn (array $item): bool => Route::has($item['route'])));
+    }
+
     /**
      * @return array<int, array{label: string, route: string, icon: string, description?: string}>
      */
@@ -77,6 +197,8 @@ class NavigationHub
             self::link('admin.assessment-templates.index', 'hubs.templates', 'bi-ui-checks-grid', 'hubs.templates_desc'),
             self::link('admin.semesters.index', 'hubs.semesters', 'bi-calendar-range', 'hubs.semesters_desc'),
             self::link('admin.credentials.index', 'hubs.credentials', 'bi-patch-check', 'hubs.credentials_desc'),
+            self::link('admin.grading-schemes.index', 'hubs.grading_schemes', 'bi-bar-chart-steps', 'hubs.grading_schemes_desc'),
+            self::link('admin.translations.index', 'hubs.translations', 'bi-translate', 'hubs.translations_desc'),
         ]));
     }
 
@@ -109,6 +231,7 @@ class NavigationHub
 
         if (self::hasFinanceAdmin($user)) {
             $links[] = self::link('admin.finance.index', 'hubs.finance_admin', 'bi-cash-stack', 'hubs.finance_admin_desc');
+            $links[] = self::link('admin.finance.reports', 'hubs.finance_reports', 'bi-graph-up', 'hubs.finance_reports_desc');
         }
 
         return array_values(array_filter($links));

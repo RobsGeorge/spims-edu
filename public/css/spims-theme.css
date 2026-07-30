@@ -583,3 +583,300 @@ html[dir='rtl'] .spims-landing-brand {
 .progress-bar {
     border-radius: var(--radius-full);
 }
+
+/* —— D1 App shell —— */
+:root {
+    --sidebar-width: 280px;
+    --topbar-height: 64px;
+    --bottom-nav-height: 64px;
+}
+
+.app-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 992px) {
+    .app-shell {
+        grid-template-columns: var(--sidebar-width) 1fr;
+    }
+}
+
+.app-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem 1rem;
+    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+    border-inline-end: 1px solid var(--color-nav-border);
+    backdrop-filter: blur(12px);
+}
+
+.app-sidebar-brand {
+    padding-inline: 0.75rem;
+    text-decoration: none;
+}
+
+.app-sidebar-nav {
+    overflow-y: auto;
+}
+
+.app-side-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 44px;
+    padding: 0.55rem 0.85rem;
+    margin-block: 0.15rem;
+    border-radius: var(--radius-full);
+    color: var(--color-nav-text);
+    text-decoration: none;
+    transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+.app-side-link:hover {
+    background: var(--color-surface-low);
+    color: var(--color-nav-active);
+}
+
+.app-side-link.active {
+    background: var(--color-nav-active-bg);
+    color: var(--color-nav-active);
+    font-weight: 600;
+}
+
+.app-main-column {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-bottom: calc(var(--bottom-nav-height) + 0.5rem);
+}
+
+@media (min-width: 992px) {
+    .app-main-column {
+        padding-bottom: 0;
+    }
+}
+
+.app-topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: var(--topbar-height);
+    padding: 0.65rem 1rem;
+    background: var(--color-nav-bg);
+    border-bottom: 1px solid var(--color-nav-border);
+    backdrop-filter: blur(12px);
+    z-index: 1020;
+}
+
+.app-topbar-spacer {
+    flex: 1;
+}
+
+.app-menu-btn {
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: var(--radius-md) !important;
+}
+
+.app-icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.app-unread-dot {
+    position: absolute;
+    inset-block-start: 0.35rem;
+    inset-inline-end: 0.35rem;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--color-danger);
+}
+
+.app-content {
+    max-width: 1200px;
+    margin-inline: auto;
+}
+
+.app-bottom-nav {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 1030;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    min-height: var(--bottom-nav-height);
+    background: var(--color-nav-bg);
+    border-top: 1px solid var(--color-nav-border);
+    backdrop-filter: blur(12px);
+}
+
+.app-bottom-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    min-height: 44px;
+    padding: 0.35rem 0.25rem;
+    font-size: 0.7rem;
+    color: var(--color-nav-text);
+    text-decoration: none;
+}
+
+.app-bottom-link i {
+    font-size: 1.15rem;
+}
+
+.app-bottom-link.active {
+    color: var(--color-nav-active);
+    font-weight: 600;
+}
+
+.app-drawer {
+    --bs-offcanvas-width: min(280px, 88vw);
+    background: var(--color-surface);
+}
+
+.spims-page-eyebrow {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.spims-empty-state .spims-empty-icon {
+    font-size: 2rem;
+    color: var(--color-primary);
+}
+
+.spims-status-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+    padding: 0.15rem 0.65rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--color-surface-low);
+    color: var(--color-text);
+    border: 1px solid var(--color-surface-border);
+}
+
+.spims-status-success { background: color-mix(in srgb, var(--color-success) 18%, transparent); color: var(--color-success); border-color: transparent; }
+.spims-status-warning { background: color-mix(in srgb, var(--color-warning) 18%, transparent); color: #92400e; border-color: transparent; }
+.spims-status-danger { background: color-mix(in srgb, var(--color-danger) 18%, transparent); color: var(--color-danger); border-color: transparent; }
+.spims-status-info { background: color-mix(in srgb, #3b82f6 18%, transparent); color: #1d4ed8; border-color: transparent; }
+
+.offering-workspace-tabs .nav-link {
+    white-space: nowrap;
+    min-height: 44px;
+    border-radius: var(--radius-full);
+    color: var(--color-text);
+}
+
+.offering-workspace-tabs .nav-link.active {
+    background: var(--color-primary);
+    color: var(--color-primary-text);
+}
+
+.teach-offering-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.teach-offering-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-floating);
+}
+
+html[dir='rtl'] .app-side-link i,
+html[dir='rtl'] .app-bottom-link i {
+    transform: scaleX(-1);
+}
+
+/* —— D6: wallet balance cards —— */
+.wallet-balance-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 5.5rem;
+    padding: 1rem 1.1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+}
+
+.wallet-balance-card__label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-muted, var(--color-text));
+    opacity: 0.85;
+}
+
+.wallet-balance-card__value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-title);
+    letter-spacing: 0.01em;
+}
+
+/* —— D6: exam progress rail + near-expiry pulse —— */
+.exam-progress-rail__track {
+    height: 0.45rem;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-surface-border) 70%, transparent);
+    overflow: hidden;
+}
+
+.exam-progress-rail__fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-primary);
+    transition: width var(--transition-base);
+}
+
+.exam-timer-pulse {
+    animation: exam-timer-pulse 1s ease-in-out infinite;
+    background-color: var(--color-danger) !important;
+}
+
+@keyframes exam-timer-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.72; transform: scale(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .exam-timer-pulse {
+        animation: none !important;
+        transform: none !important;
+    }
+
+    .exam-progress-rail__fill {
+        transition: none !important;
+    }
+}
+
+.spims-error-page__code {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: var(--color-primary);
+    opacity: 0.55;
+}
+
+.spims-toast {
+    border-radius: var(--radius-md);
+}

@@ -3,14 +3,17 @@
 namespace App\Services\Admissions;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\FormFieldType;
 use App\Enums\StudentProgramStatus;
 use App\Models\Application;
 use App\Models\ApplicationFieldValue;
 use App\Models\ApplicationForm;
+use App\Models\ApplicationFormField;
 use App\Models\StudentProgram;
 use App\Models\User;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -37,7 +40,11 @@ class ApplicationService
         );
     }
 
-    public function saveAnswers(User $applicant, Application $application, array $answers): void
+    /**
+     * @param  array<string, mixed>  $answers
+     * @param  array<string, UploadedFile|null>  $files
+     */
+    public function saveAnswers(User $applicant, Application $application, array $answers, array $files = []): void
     {
         if ($application->applicant_id !== $applicant->id) {
             throw ValidationException::withMessages(['application' => [__('admissions.not_owner')]]);
@@ -47,9 +54,15 @@ class ApplicationService
             throw ValidationException::withMessages(['application' => [__('admissions.not_editable')]]);
         }
 
-        $application->load('form.fields');
+        $application->load('form.fields', 'values');
 
         foreach ($application->form->fields as $field) {
+            if ($field->type === FormFieldType::File) {
+                $this->saveFileAnswer($applicant, $application, $field, $files[$field->id] ?? null);
+
+                continue;
+            }
+
             $answer = $answers[$field->id] ?? null;
             if ($field->required && ($answer === null || $answer === '')) {
                 throw ValidationException::withMessages([
@@ -69,6 +82,67 @@ class ApplicationService
                 ]
             );
         }
+    }
+
+    private function saveFileAnswer(
+        User $applicant,
+        Application $application,
+        ApplicationFormField $field,
+        mixed $uploaded,
+    ): void {
+        $existing = $application->values->firstWhere('field_id', $field->id);
+
+        if (! $uploaded instanceof UploadedFile) {
+            if ($field->required && $existing === null) {
+                throw ValidationException::withMessages([
+                    "files.{$field->id}" => [__('admissions.field_required', ['field' => $field->label])],
+                ]);
+            }
+
+            return;
+        }
+
+        $path = $this->storeApplicationDocument($uploaded, $application);
+
+        ApplicationFieldValue::query()->updateOrCreate(
+            ['application_id' => $application->id, 'field_id' => $field->id],
+            [
+                'value' => $path,
+                'file_url' => $path,
+            ]
+        );
+
+        $this->audit->write($applicant, 'admissions.document_upload', 'Application', $application->id, null, [
+            'field_id' => $field->id,
+            'path' => $path,
+        ]);
+    }
+
+    private function storeApplicationDocument(UploadedFile $file, Application $application): string
+    {
+        if (class_exists(\App\Services\Storage\ObjectStorageService::class)) {
+            /** @var \App\Services\Storage\ObjectStorageService $storage */
+            $storage = app(\App\Services\Storage\ObjectStorageService::class);
+            $extension = $file->getClientOriginalExtension() ?: $file->extension() ?: 'bin';
+            $path = $storage->signedUploadPath('application-docs', $application->id, $extension);
+            $contents = file_get_contents($file->getRealPath() ?: $file->getPathname());
+            if ($contents === false) {
+                throw ValidationException::withMessages([
+                    'files' => [__('admissions.upload_failed')],
+                ]);
+            }
+
+            return $storage->store($path, $contents);
+        }
+
+        $stored = $file->store('applications/'.$application->id, 'local');
+        if ($stored === false) {
+            throw ValidationException::withMessages([
+                'files' => [__('admissions.upload_failed')],
+            ]);
+        }
+
+        return $stored;
     }
 
     public function submit(User $applicant, Application $application): Application

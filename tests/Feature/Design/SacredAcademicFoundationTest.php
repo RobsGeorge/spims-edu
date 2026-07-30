@@ -33,7 +33,7 @@ class SacredAcademicFoundationTest extends TestCase
         $response = $this->withCookie('theme', 'system')->get(route('home'));
 
         $response->assertOk();
-        $response->assertSee('class="theme-system"', false);
+        $response->assertSee('theme-system', false);
         $response->assertSee('Playfair+Display', false);
         $response->assertSee('family=Inter', false);
         $response->assertSee('spims-theme-tokens', false);

@@ -43,10 +43,13 @@ return [
     ],
 
     'paypal' => [
+        'client_id' => env('PAYPAL_CLIENT_ID'),
+        'secret' => env('PAYPAL_SECRET'),
         'webhook_id' => env('PAYPAL_WEBHOOK_ID', 'paypal-test'),
     ],
 
     'paymob' => [
+        'api_key' => env('PAYMOB_API_KEY'),
         'hmac' => env('PAYMOB_HMAC', 'paymob-test'),
     ],
 
@@ -56,6 +59,10 @@ return [
 
     'payments' => [
         'mock_auto_complete' => env('PAYMENTS_MOCK_AUTO_COMPLETE', true),
+    ],
+
+    'vimeo' => [
+        'token' => env('VIMEO_TOKEN'),
     ],
 
 ];

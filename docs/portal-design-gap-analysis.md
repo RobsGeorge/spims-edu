@@ -168,7 +168,9 @@ Treat original Next.js repo as **reference only** — do not port React.
 
 **Acceptance:** light + dark + RTL smoke; contrast spot-check AA on primary button and body text; no parchment background.
 
-### Phase D1 — App shell & navigation IA
+### Phase D1 — App shell & navigation IA ✅
+
+**Status:** Implemented (2026-07-30).
 
 **Goal:** Role-aware shell matching frontend-architecture.
 
@@ -211,7 +213,9 @@ Treat original Next.js repo as **reference only** — do not port React.
 
 **Acceptance:** enrolled student completes Week 1 video → assignment → quiz path in UI; ungated users cannot open cohort weeks; RTL player usable on mobile.
 
-### Phase D4 — Instructor / TA Teach hub
+### Phase D4 — Instructor / TA Teach hub ✅
+
+**Status:** Implemented (2026-07-30).
 
 **Goal:** Density without intimidation for domain experts.
 
@@ -223,7 +227,9 @@ Treat original Next.js repo as **reference only** — do not port React.
 
 **Acceptance:** Instructor builds Week 2 item, creates MCQ assessment, grades, locks; TA cannot lock; Academic Admin reopens.
 
-### Phase D5 — Operator consoles (ADM / ACA / FIN)
+### Phase D5 — Operator consoles (ADM / ACA / FIN) ✅
+
+**Status:** Implemented (2026-07-30).
 
 **Goal:** Throughput UIs for queues and money.
 
@@ -239,7 +245,9 @@ Treat original Next.js repo as **reference only** — do not port React.
 
 **Acceptance:** each admin role completes primary job without knowing ULIDs; theme logos appear in shell; FIN can grant points + verify manual payment with confirmation copy.
 
-### Phase D6 — High-stakes polish & a11y
+### Phase D6 — High-stakes polish & a11y ✅
+
+**Status:** Implemented (2026-07-30).
 
 **Goal:** Phase 8 design acceptance that was deferred.
 
@@ -252,9 +260,13 @@ Treat original Next.js repo as **reference only** — do not port React.
 - WCAG AA pass on shell + exam + checkout; full keyboard paths; reduce-motion already partial — extend.
 - Sweep remaining hard-coded English strings.
 
+**Shipped in this pass:** exam progress rail + submit modal + timer pulse + mobile one-at-a-time; student wallet BalanceCards; `finance.receipts.show`; custom 403/404/500; `partials.flash` in app shell; CSS tokens for rail/pulse/cards; `PortalD6PolishTest`.
+
 **Acceptance:** RTL + mobile + a11y checklist on shell, catalog, player, exam, checkout; reduced-motion safe.
 
-### Phase I1 — Integrations completion
+### Phase I1 — Integrations completion ✅
+
+**Status:** Implemented (2026-07-30).
 
 **Goal:** Replace mocks where production requires them.
 
@@ -266,9 +278,13 @@ Treat original Next.js repo as **reference only** — do not port React.
 - Gemini behind `App\Services\Ai` interface (translate + essay); missing key still no-ops.
 - Production mailer path for OTP / decisions / receipts.
 
+**Shipped in this pass:** `ObjectStorageService` + `POST /api/uploads`; `AiClient`/`GeminiAiClient` (no-op without key) wired into TranslationService + EssayAiGrader; GatewayRouter mock/live degrade; `ReceiptPdfService` HTML receipts in object storage; `VimeoEmbed`; `TransactionalMailer`; `IntegrationsI1Test`.
+
 **Acceptance:** with secrets set, end-to-end pay → receipt PDF; without secrets, mock path still green in CI.
 
-### Phase I2 — Residual product + ops
+### Phase I2 — Residual product + ops ✅
+
+**Status:** Implemented (2026-07-30).
 
 **Goal:** Spec leftovers + production confidence.
 
@@ -279,6 +295,8 @@ Treat original Next.js repo as **reference only** — do not port React.
 - Superadmin live observability (queue depth, failed jobs, last backup).
 - Re-run exam concurrency on target VPS; restore drill.
 - Optional: vendor selected `design-reference` PNGs into repo for agent/human QA.
+
+**Shipped in this pass:** FILE-field application uploads (local disk / ObjectStorageService when present) with audit; non-blocking enrollment schedule-conflict flash; `admin.finance.reports`; live superadmin observability (failed_jobs, jobs, queue driver, last backup mtime); `PortalI2ResidualTest`.
 
 **Acceptance:** release-runbook checklist green on staging with real or mock integrations explicitly documented.
 

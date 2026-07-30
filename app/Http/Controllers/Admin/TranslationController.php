@@ -7,9 +7,20 @@ use App\Models\Translation;
 use App\Services\Academics\TranslationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class TranslationController extends Controller
 {
+    public function index(): View
+    {
+        return view('admin.translations.index', [
+            'pending' => Translation::query()
+                ->where('verified', false)
+                ->orderByDesc('updated_at')
+                ->paginate(30),
+        ]);
+    }
+
     public function store(Request $request, TranslationService $service): RedirectResponse
     {
         $data = $request->validate([

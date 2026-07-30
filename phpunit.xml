@@ -27,6 +27,7 @@
             <exclude>tests/Feature/Hardening</exclude>
             <exclude>tests/Feature/Portal</exclude>
             <exclude>tests/Feature/Rbac</exclude>
+            <exclude>tests/Feature/Integrations</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -78,6 +79,9 @@
         </testsuite>
         <testsuite name="Rbac">
             <directory>tests/Feature/Rbac</directory>
+        </testsuite>
+        <testsuite name="Integrations">
+            <directory>tests/Feature/Integrations</directory>
         </testsuite>
     </testsuites>
     <source>

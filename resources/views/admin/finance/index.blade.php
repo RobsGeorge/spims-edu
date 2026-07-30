@@ -4,13 +4,22 @@
 <h1 class="spims-title mb-3">{{ __('finance.admin_title') }}</h1>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
+@php
+    $studentOptions = $students ?? collect();
+@endphp
+
 <div class="row g-3 mb-4">
     <div class="col-lg-4">
         <form method="POST" action="{{ route('admin.finance.invoices.store') }}" class="card border-0 shadow-sm">
             @csrf
             <div class="card-body">
                 <h2 class="h6">{{ __('finance.create_invoice') }}</h2>
-                <input name="student_id" class="form-control mb-2" placeholder="student ULID" required>
+                <select name="student_id" class="form-select mb-2" required>
+                    <option value="">{{ __('finance.select_student') }}</option>
+                    @foreach($studentOptions as $student)
+                        <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }} — {{ $student->email }}</option>
+                    @endforeach
+                </select>
                 <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
                 <input type="number" name="total_minor" class="form-control mb-2" min="1" required>
                 <input name="description" class="form-control mb-2" required>
@@ -23,7 +32,12 @@
             @csrf
             <div class="card-body">
                 <h2 class="h6">{{ __('finance.grant_points') }}</h2>
-                <input name="student_id" class="form-control mb-2" required>
+                <select name="student_id" class="form-select mb-2" required>
+                    <option value="">{{ __('finance.select_student') }}</option>
+                    @foreach($studentOptions as $student)
+                        <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }} — {{ $student->email }}</option>
+                    @endforeach
+                </select>
                 <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
                 <input type="number" name="amount_minor" class="form-control mb-2" min="1" required>
                 <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>
@@ -35,7 +49,12 @@
             @csrf
             <div class="card-body">
                 <h2 class="h6">{{ __('finance.top_up') }}</h2>
-                <input name="student_id" class="form-control mb-2" required>
+                <select name="student_id" class="form-select mb-2" required>
+                    <option value="">{{ __('finance.select_student') }}</option>
+                    @foreach($studentOptions as $student)
+                        <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }} — {{ $student->email }}</option>
+                    @endforeach
+                </select>
                 <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
                 <input type="number" name="amount_minor" class="form-control mb-2" min="1" required>
                 <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>

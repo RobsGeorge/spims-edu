@@ -5,6 +5,7 @@ namespace App\Services\Academics;
 use App\Enums\TranslationSource;
 use App\Models\Translation;
 use App\Models\User;
+use App\Services\Ai\AiClient;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +15,7 @@ class TranslationService
     public function __construct(
         private readonly AuthorizeService $authorize,
         private readonly AuditLogWriter $audit,
+        private readonly AiClient $ai,
     ) {}
 
     public function upsert(User $actor, string $entityType, string $entityId, string $field, string $locale, string $value, bool $verified = false): Translation
@@ -41,14 +43,15 @@ class TranslationService
     }
 
     /**
-     * AI translation stub — degrades gracefully when GOOGLE_API_KEY is missing.
+     * AI translation via AiClient — degrades gracefully when GOOGLE_API_KEY is missing.
      */
     public function requestAiTranslation(User $actor, string $entityType, string $entityId, string $field, string $sourceLocale, string $targetLocale, string $sourceText): ?Translation
     {
         $this->authorize->authorize($actor, 'translations.manage');
 
-        if (empty(config('services.gemini.key'))) {
-            Log::info('AI translation skipped — GOOGLE_API_KEY not configured', [
+        $translated = $this->ai->translate($sourceText, $sourceLocale, $targetLocale);
+        if ($translated === null) {
+            Log::info('AI translation skipped — AiClient returned null', [
                 'entity_type' => $entityType,
                 'entity_id' => $entityId,
                 'field' => $field,
@@ -57,9 +60,6 @@ class TranslationService
 
             return null;
         }
-
-        // Placeholder: real Gemini call lands in a later hardening pass.
-        $translated = "[AI:{$targetLocale}] ".$sourceText;
 
         return Translation::query()->updateOrCreate(
             [

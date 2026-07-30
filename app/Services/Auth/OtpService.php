@@ -5,12 +5,16 @@ namespace App\Services\Auth;
 use App\Enums\OtpPurpose;
 use App\Models\OtpToken;
 use App\Models\User;
+use App\Services\Mail\TransactionalMailer;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class OtpService
 {
+    public function __construct(
+        private readonly TransactionalMailer $mailer,
+    ) {}
+
     public function issue(User $user, OtpPurpose $purpose): string
     {
         OtpToken::query()
@@ -28,11 +32,18 @@ class OtpService
             'expires_at' => now()->addMinutes(15),
         ]);
 
-        Log::info('SPIMS OTP issued (mail skipped)', [
+        // Always log OTP in log/array mail environments (dev + CI); never block.
+        Log::info('SPIMS OTP issued', [
             'email' => $user->email,
             'purpose' => $purpose->value,
             'code' => $plain,
         ]);
+
+        $this->mailer->send(
+            (string) $user->email,
+            'SPIMS OTP',
+            'Your verification code is: '.$plain
+        );
 
         return $plain;
     }

@@ -15,14 +15,27 @@ class ApplicationReviewController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
+        $queueStatuses = [
+            ApplicationStatus::Submitted,
+            ApplicationStatus::UnderReview,
+            ApplicationStatus::Waitlisted,
+        ];
+
+        $statusFilter = $request->query('status');
+        $resolvedStatus = null;
+        if (is_string($statusFilter) && $statusFilter !== '') {
+            $resolvedStatus = ApplicationStatus::tryFrom($statusFilter);
+        }
+
         $query = Application::query()
             ->with(['applicant', 'program', 'reviewer'])
-            ->whereIn('status', [
-                ApplicationStatus::Submitted,
-                ApplicationStatus::UnderReview,
-                ApplicationStatus::Waitlisted,
-            ])
             ->latest('submitted_at');
+
+        if ($resolvedStatus !== null) {
+            $query->where('status', $resolvedStatus);
+        } else {
+            $query->whereIn('status', $queueStatuses);
+        }
 
         if (! $user->isSuperAdmin() && ! $user->hasRole(\App\Enums\RoleType::AdministrativeAdmin)) {
             $query->where('reviewer_id', $user->id);
@@ -30,6 +43,8 @@ class ApplicationReviewController extends Controller
 
         return view('admin.applications.index', [
             'applications' => $query->paginate(20),
+            'statusOptions' => ApplicationStatus::cases(),
+            'currentStatus' => $resolvedStatus?->value,
         ]);
     }
 
