@@ -37,11 +37,17 @@ class TeachController extends Controller
 
         $offering->load(['course', 'semester', 'weeks.contentItems', 'staff.user']);
         $tab = $request->query('tab', 'content');
+        $roster = Enrollment::query()
+            ->where('offering_id', $offering->id)
+            ->with('student')
+            ->orderBy('enrolled_at')
+            ->get();
 
         return view('teach.show', [
             'offering' => $offering,
             'tab' => $tab,
-            'rosterCount' => Enrollment::query()->where('offering_id', $offering->id)->count(),
+            'roster' => $roster,
+            'rosterCount' => $roster->count(),
             'announcements' => Announcement::query()
                 ->where('offering_id', $offering->id)
                 ->orderByDesc('created_at')

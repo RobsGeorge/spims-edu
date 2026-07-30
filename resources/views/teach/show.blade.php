@@ -52,13 +52,26 @@
         @endforelse
     @elseif($tab === 'roster')
         <x-page-header :title="__('teach.tab_roster')" :subtitle="__('teach.roster_count', ['count' => $rosterCount])" />
-        <ul class="list-unstyled mb-0">
+        <h3 class="h6">{{ __('teach.staff') }}</h3>
+        <ul class="list-unstyled mb-4">
             @foreach($offering->staff as $staff)
                 <li class="mb-2">{{ $staff->user->first_name }} {{ $staff->user->last_name }}
                     <x-status-badge :status="'info'" :label="$staff->role->value" />
                 </li>
             @endforeach
         </ul>
+        <h3 class="h6">{{ __('teach.students') }}</h3>
+        @forelse($roster as $enrollment)
+            <div class="d-flex justify-content-between align-items-center border rounded-3 p-2 mb-2">
+                <div>
+                    <strong>{{ $enrollment->student->first_name }} {{ $enrollment->student->last_name }}</strong>
+                    <div class="small text-muted-theme">{{ $enrollment->student->email }}</div>
+                </div>
+                <x-status-badge :status="$enrollment->status->value" :label="$enrollment->status->value" />
+            </div>
+        @empty
+            <x-empty-state :title="__('teach.empty_roster')" icon="bi-people" />
+        @endforelse
     @else
         <x-page-header :title="__('teach.tab_content')" :subtitle="__('teach.tab_content_help')" />
         <a class="btn btn-primary mb-3" href="{{ route('admin.offerings.show', $offering) }}">{{ __('teach.edit_content') }}</a>
