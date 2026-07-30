@@ -52,16 +52,26 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
         });
 
+        // PostgreSQL rejects an inline self-referential ULID FK during CREATE TABLE
+        // ("no unique constraint matching given keys"). Create the column first,
+        // then attach the FK after the primary key exists.
         Schema::create('discussion_posts', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignUlid('thread_id')->constrained('discussion_threads')->cascadeOnDelete();
             $table->foreignUlid('author_id')->constrained('users');
-            $table->foreignUlid('parent_post_id')->nullable()->constrained('discussion_posts')->nullOnDelete();
+            $table->ulid('parent_post_id')->nullable()->index();
             $table->text('body');
             $table->json('attachments')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('edited_at')->nullable();
             $table->softDeletes();
+        });
+
+        Schema::table('discussion_posts', function (Blueprint $table) {
+            $table->foreign('parent_post_id')
+                ->references('id')
+                ->on('discussion_posts')
+                ->nullOnDelete();
         });
 
         Schema::create('discussion_grades', function (Blueprint $table) {

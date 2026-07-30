@@ -23,7 +23,7 @@ return [
     'tile_scheduled' => 'Scheduled tasks',
     'tile_scheduled_desc' => 'Scheduler jobs that must stay healthy.',
     'tile_theme' => 'Theme & branding',
-    'tile_theme_desc' => 'Active liturgical theme tokens.',
+    'tile_theme_desc' => 'Active Sacred Academic theme tokens.',
     'tile_finance' => 'Finance ops',
     'tile_finance_desc' => 'Manual payments, refunds, points.',
     'tile_credentials' => 'Credentials',

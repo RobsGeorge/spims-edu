@@ -12,8 +12,10 @@ use Illuminate\View\View;
 
 class ExamAttemptController extends Controller
 {
-    public function show(Assessment $assessment, AttemptService $attempts): View
+    public function show(Assessment $assessment, AttemptService $attempts, \App\Services\Learning\OfferingAccessService $access): View
     {
+        $access->assertCanAccessAssessment(auth()->user(), $assessment);
+
         return view('assessments.show', [
             'assessment' => $assessment->load('offering.course'),
             'attempts' => AssessmentAttempt::query()

@@ -190,6 +190,6 @@ class CredentialsI18nTest extends TestCase
             ->assertOk()
             ->assertSee('dir="rtl"', false)
             ->assertSee('spims-skip-link', false)
-            ->assertSee('Cairo', false);
+            ->assertSee('IBM+Plex+Sans+Arabic', false);
     }
 }

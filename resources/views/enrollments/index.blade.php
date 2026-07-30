@@ -41,8 +41,9 @@
         <tr>
             <td>{{ $enrollment->offering->course->code }}</td>
             <td>{{ $enrollment->status->value }}</td>
-            <td class="d-flex gap-1">
+            <td class="d-flex gap-1 flex-wrap">
                 @if($enrollment->status->value === 'ENROLLED')
+                <a class="btn btn-sm btn-outline-primary" href="{{ route('courses.player', $enrollment->offering) }}">{{ __('learning.open_player') }}</a>
                 <form method="POST" action="{{ route('enrollments.drop', $enrollment) }}">@csrf<button class="btn btn-sm btn-outline-danger">{{ __('enrollment.drop') }}</button></form>
                 <form method="POST" action="{{ route('enrollments.withdraw', $enrollment) }}">@csrf<button class="btn btn-sm btn-outline-warning">{{ __('enrollment.withdraw') }}</button></form>
                 @endif
