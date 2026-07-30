@@ -66,4 +66,13 @@ return [
     'nav_transcript' => 'Relevé',
     'nav_credentials' => 'Diplômes',
     'skip_to_content' => 'Aller au contenu',
+    'close' => 'Fermer',
+    'cancel' => 'Annuler',
+    'confirm' => 'Confirmer',
+    'open_menu' => 'Ouvrir le menu',
+    'unread_count' => ':count notifications non lues',
+    'empty' => 'Rien pour le moment',
+    'loading' => 'Chargement…',
+    'error_generic' => 'Une erreur est survenue. Réessayez.',
+    'save_changes' => 'Enregistrer',
 ];

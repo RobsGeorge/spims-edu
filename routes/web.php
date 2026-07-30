@@ -49,6 +49,7 @@ use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
 use Illuminate\Support\Facades\Route;
@@ -96,6 +97,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/hubs/academic', [HubController::class, 'academic'])->name('hubs.academic');
     Route::get('/hubs/admin', [HubController::class, 'admin'])->name('hubs.admin');
     Route::get('/hubs/finance', [HubController::class, 'finance'])->name('hubs.finance');
+
+    Route::get('/teach', [TeachController::class, 'index'])->name('teach.index');
+    Route::get('/teach/{offering}', [TeachController::class, 'show'])->name('teach.show');
+    Route::post('/teach/{offering}/announcements', [TeachController::class, 'storeAnnouncement'])
+        ->name('teach.announcements.store');
 
     Route::middleware('superadmin')->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/', [SuperAdminController::class, 'index'])->name('index');

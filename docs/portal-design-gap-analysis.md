@@ -168,7 +168,9 @@ Treat original Next.js repo as **reference only** — do not port React.
 
 **Acceptance:** light + dark + RTL smoke; contrast spot-check AA on primary button and body text; no parchment background.
 
-### Phase D1 — App shell & navigation IA
+### Phase D1 — App shell & navigation IA ✅
+
+**Status:** Implemented (2026-07-30).
 
 **Goal:** Role-aware shell matching frontend-architecture.
 

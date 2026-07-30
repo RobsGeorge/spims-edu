@@ -66,4 +66,13 @@ return [
     'nav_transcript' => 'Transcript',
     'nav_credentials' => 'Credentials',
     'skip_to_content' => 'Skip to content',
+    'close' => 'Close',
+    'cancel' => 'Cancel',
+    'confirm' => 'Confirm',
+    'open_menu' => 'Open menu',
+    'unread_count' => ':count unread notifications',
+    'empty' => 'Nothing here yet',
+    'loading' => 'Loading…',
+    'error_generic' => 'Something went wrong. Please try again.',
+    'save_changes' => 'Save changes',
 ];

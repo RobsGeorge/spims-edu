@@ -66,4 +66,13 @@ return [
     'nav_transcript' => 'السجل الأكاديمي',
     'nav_credentials' => 'الشهادات',
     'skip_to_content' => 'تخطى إلى المحتوى',
+    'close' => 'إغلاق',
+    'cancel' => 'إلغاء',
+    'confirm' => 'تأكيد',
+    'open_menu' => 'فتح القائمة',
+    'unread_count' => ':count إشعارات غير مقروءة',
+    'empty' => 'لا يوجد شيء بعد',
+    'loading' => 'جارٍ التحميل…',
+    'error_generic' => 'حدث خطأ. حاول مرة أخرى.',
+    'save_changes' => 'حفظ التغييرات',
 ];
