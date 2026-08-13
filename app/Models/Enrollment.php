@@ -8,6 +8,7 @@ use App\Enums\GradeType;
 use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Enrollment extends Model
 {
@@ -59,5 +60,15 @@ class Enrollment extends Model
     public function studentProgram(): BelongsTo
     {
         return $this->belongsTo(StudentProgram::class);
+    }
+
+    public function itemCompletions(): HasMany
+    {
+        return $this->hasMany(EnrollmentItemCompletion::class);
+    }
+
+    public function weekCompletions(): HasMany
+    {
+        return $this->hasMany(EnrollmentWeekCompletion::class);
     }
 }

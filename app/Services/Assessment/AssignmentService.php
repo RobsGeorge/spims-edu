@@ -12,6 +12,7 @@ use App\Enums\EnrollmentStatus;
 use App\Enums\SubmissionType;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use App\Services\Offerings\LearningProgressService;
 use Illuminate\Validation\ValidationException;
 
 class AssignmentService
@@ -19,6 +20,7 @@ class AssignmentService
     public function __construct(
         private readonly AuthorizeService $authorize,
         private readonly AuditLogWriter $audit,
+        private readonly LearningProgressService $progress,
     ) {}
 
     /**
@@ -54,7 +56,7 @@ class AssignmentService
             $enrolled = Enrollment::query()
                 ->where('student_id', $student->id)
                 ->where('offering_id', $offeringId)
-                ->where('status', EnrollmentStatus::Enrolled)
+                ->whereIn('status', [EnrollmentStatus::Enrolled, EnrollmentStatus::Completed])
                 ->exists();
             if (! $enrolled) {
                 throw ValidationException::withMessages(['assignment' => [__('assessment.not_enrolled')]]);
@@ -75,6 +77,10 @@ class AssignmentService
         );
 
         $this->audit->write($student, 'assignments.submit', 'AssignmentSubmission', $submission->id);
+
+        if ($item) {
+            $this->progress->recordLinkedItemComplete($student, $item);
+        }
 
         return $submission;
     }

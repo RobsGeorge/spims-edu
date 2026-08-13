@@ -39,6 +39,7 @@ use App\Http\Controllers\FoundationDemoController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HubController;
+use App\Http\Controllers\LearnController;
 use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeController;
@@ -121,6 +122,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/applications/{application}', [ApplicationController::class, 'store'])
         ->middleware('permission:admissions.apply')
         ->name('applications.store');
+
+    Route::get('/learn/{offering}', [LearnController::class, 'offering'])
+        ->middleware('permission:offerings.view')
+        ->name('learn.offering');
+    Route::get('/learn/{offering}/weeks/{week}', [LearnController::class, 'week'])
+        ->middleware('permission:offerings.view')
+        ->name('learn.week');
+    Route::get('/learn/{offering}/items/{item}', [LearnController::class, 'item'])
+        ->middleware('permission:offerings.view')
+        ->name('learn.item');
+    Route::post('/learn/{offering}/items/{item}/complete', [LearnController::class, 'complete'])
+        ->middleware('permission:offerings.view')
+        ->name('learn.item.complete');
 
     Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
     Route::post('/enrollments', [EnrollmentController::class, 'store'])

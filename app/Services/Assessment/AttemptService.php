@@ -15,6 +15,7 @@ use App\Models\Question;
 use App\Models\User;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use App\Services\Offerings\LearningProgressService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -26,6 +27,7 @@ class AttemptService
         private readonly AssessmentService $assessments,
         private readonly ObjectiveGrader $objective,
         private readonly EssayAiGrader $essayAi,
+        private readonly LearningProgressService $progress,
     ) {}
 
     public function start(User $student, Assessment $assessment): AssessmentAttempt
@@ -35,7 +37,7 @@ class AttemptService
         $enrolled = Enrollment::query()
             ->where('student_id', $student->id)
             ->where('offering_id', $assessment->offering_id)
-            ->where('status', EnrollmentStatus::Enrolled)
+            ->whereIn('status', [EnrollmentStatus::Enrolled, EnrollmentStatus::Completed])
             ->exists();
 
         if (! $enrolled) {
@@ -249,6 +251,13 @@ class AttemptService
             }
 
             $this->audit->write($actor, $auto ? 'assessments.auto_submit' : 'assessments.submit', 'AssessmentAttempt', $attempt->id);
+
+            if ($assessment->content_item_id) {
+                $item = $assessment->contentItem()->first();
+                if ($item) {
+                    $this->progress->recordLinkedItemComplete($actor, $item);
+                }
+            }
 
             return $attempt->fresh('answers');
         });

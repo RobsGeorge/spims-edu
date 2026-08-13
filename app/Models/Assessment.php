@@ -67,6 +67,11 @@ class Assessment extends Model
         return $this->belongsTo(CourseOffering::class, 'offering_id');
     }
 
+    public function contentItem(): BelongsTo
+    {
+        return $this->belongsTo(ContentItem::class);
+    }
+
     public function component(): BelongsTo
     {
         return $this->belongsTo(GradebookComponent::class, 'component_id');
