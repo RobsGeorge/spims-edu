@@ -30,6 +30,9 @@ php artisan test --testsuite=Smoke
 Push to `main` → CI → production deploy via GitHub Actions.
 Push to `staging` → CI → staging deploy.
 
+- Spec summary: [docs/spims-spec-summary.md](docs/spims-spec-summary.md)
+- Design gap analysis & next phases: [docs/portal-design-gap-analysis.md](docs/portal-design-gap-analysis.md)
+- Parking lot (out-of-phase): [PARKING-LOT.md](PARKING-LOT.md)
 - VPS provisioning: [docs/vps-setup.md](docs/vps-setup.md)
 - Backups: [docs/backups-and-restore.md](docs/backups-and-restore.md)
 - Release checklist: [docs/release-runbook.md](docs/release-runbook.md)

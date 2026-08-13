@@ -5,7 +5,7 @@
 @section('content')
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
+        <div class="card border-0 auth-card">
             <div class="card-body p-4">
                 <h1 class="h4 spims-title mb-3">{{ __('ui.reset_password') }}</h1>
                 @if(!empty($devOtp))
@@ -20,7 +20,8 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('ui.password') }}</label>
-                        <input type="password" name="password" class="form-control" required>
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
+                        @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('ui.password_confirm') }}</label>

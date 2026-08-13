@@ -58,10 +58,18 @@ class ApplicationController extends Controller
     {
         $data = $request->validate([
             'answers' => 'array',
+            'answers.*' => 'nullable',
+            'files' => 'array',
+            'files.*' => 'nullable|file|max:10240',
             'submit' => 'nullable|boolean',
         ]);
 
-        $service->saveAnswers($request->user(), $application, $data['answers'] ?? []);
+        $service->saveAnswers(
+            $request->user(),
+            $application,
+            $data['answers'] ?? [],
+            $request->file('files', []) ?? []
+        );
 
         if ($request->boolean('submit')) {
             // Reload values after save

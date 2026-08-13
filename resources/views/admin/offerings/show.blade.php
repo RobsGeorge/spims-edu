@@ -1,11 +1,17 @@
 @extends('layouts.app')
 @section('title', $offering->course->code)
 @section('content')
-<h1 class="spims-title">{{ $offering->course->code }} — {{ $offering->course->title }}</h1>
-<p class="text-muted-theme">{{ $offering->mode->value }} · {{ $offering->status->value }} ·
-    <a href="{{ route('offerings.preview', $offering) }}">{{ __('offerings.public_preview') }}</a>
-</p>
-@if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
+<x-page-header
+    :title="$offering->course->code.' — '.$offering->course->title"
+    :subtitle="$offering->mode->value.' · '.$offering->status->value"
+>
+    <x-slot:actions>
+        <a href="{{ route('offerings.preview', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('offerings.public_preview') }}</a>
+        <a href="{{ route('teach.show', $offering) }}" class="btn btn-outline-primary btn-sm">{{ __('teach.workspace') }}</a>
+    </x-slot:actions>
+</x-page-header>
+@include('partials.offering-workspace-tabs', ['offering' => $offering, 'active' => 'content', 'prefix' => 'admin'])
+@if(session('status'))<div class="alert alert-success mt-3">{{ session('status') }}</div>@endif
 
 <div class="row g-3">
     <div class="col-md-6">

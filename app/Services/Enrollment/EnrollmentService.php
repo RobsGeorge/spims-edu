@@ -12,6 +12,7 @@ use App\Models\AcademicRecord;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\Invoice;
+use App\Models\LiveSession;
 use App\Models\ProgramCourse;
 use App\Models\Setting;
 use App\Models\StudentProgram;
@@ -270,6 +271,48 @@ class EnrollmentService
             ->where('student_id', $student->id)
             ->whereIn('status', [InvoiceStatus::Open, InvoiceStatus::Partial])
             ->exists();
+    }
+
+    /**
+     * Non-blocking warning helper: true when the target offering's live sessions
+     * overlap any live session on offerings the student is already enrolled in.
+     */
+    public function hasLiveSessionConflict(User $student, CourseOffering $target): bool
+    {
+        $targetSessions = LiveSession::query()
+            ->where('offering_id', $target->id)
+            ->get();
+
+        if ($targetSessions->isEmpty()) {
+            return false;
+        }
+
+        $enrolledOfferingIds = Enrollment::query()
+            ->where('student_id', $student->id)
+            ->where('status', EnrollmentStatus::Enrolled)
+            ->where('offering_id', '!=', $target->id)
+            ->pluck('offering_id');
+
+        if ($enrolledOfferingIds->isEmpty()) {
+            return false;
+        }
+
+        $existingSessions = LiveSession::query()
+            ->whereIn('offering_id', $enrolledOfferingIds)
+            ->get();
+
+        foreach ($targetSessions as $targetSession) {
+            $start = $targetSession->scheduled_start;
+            $end = $targetSession->endsAt();
+
+            foreach ($existingSessions as $existing) {
+                if ($start->lt($existing->endsAt()) && $end->gt($existing->scheduled_start)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public function setFinancialHold(User $actor, User $student, bool $held): void

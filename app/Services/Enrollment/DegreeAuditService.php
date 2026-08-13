@@ -12,7 +12,7 @@ use App\Models\User;
 class DegreeAuditService
 {
     /**
-     * @return array{required_met: int, required_total: int, elective_credits_met: int, elective_credits_required: int, remaining: array<int, array{code: string, title: string, requirement: string}>}
+     * @return array{program: string, status: string, required_met: int, required_total: int, elective_credits_met: int, elective_credits_required: int, remaining: array<int, array{code: string, title: string, requirement: string}>, met: array<int, array{code: string, title: string, requirement: string, letter: ?string, percent: ?float}>, overall_percent: float}
      */
     public function audit(User $student, StudentProgram $studentProgram): array
     {
@@ -38,6 +38,16 @@ class DegreeAuditService
         $electiveMet = $electives->filter(fn (ProgramCourse $pc) => in_array($pc->course_id, $fulfilledCourseIds, true));
         $electiveCredits = $electiveMet->sum(fn (ProgramCourse $pc) => $pc->course->credit_hours);
 
+        $met = $fulfillments->map(function (ProgramRequirementFulfillment $f) {
+            return [
+                'code' => $f->programCourse?->course?->code ?? '',
+                'title' => $f->programCourse?->course?->title ?? '',
+                'requirement' => $f->programCourse?->requirement?->value ?? '',
+                'letter' => $f->academicRecord?->letter_grade,
+                'percent' => $f->academicRecord?->percent,
+            ];
+        })->values()->all();
+
         $remaining = $requirements
             ->filter(fn (ProgramCourse $pc) => ! in_array($pc->course_id, $fulfilledCourseIds, true))
             ->map(fn (ProgramCourse $pc) => [
@@ -48,6 +58,9 @@ class DegreeAuditService
             ->values()
             ->all();
 
+        $totalReqs = max(1, $requirements->count());
+        $metCount = count($fulfilledCourseIds);
+
         return [
             'program' => $program->code,
             'status' => $studentProgram->status->value,
@@ -56,6 +69,8 @@ class DegreeAuditService
             'elective_credits_met' => $electiveCredits,
             'elective_credits_required' => $program->elective_credits_required,
             'remaining' => $remaining,
+            'met' => $met,
+            'overall_percent' => round(($metCount / $totalReqs) * 100, 1),
         ];
     }
 

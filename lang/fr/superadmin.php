@@ -23,7 +23,7 @@ return [
     'tile_scheduled' => 'Tâches planifiées',
     'tile_scheduled_desc' => 'Jobs du scheduler à maintenir.',
     'tile_theme' => 'Thème et marque',
-    'tile_theme_desc' => 'Jetons du thème liturgique actif.',
+    'tile_theme_desc' => 'Jetons du thème Sacred Academic actif.',
     'tile_finance' => 'Ops finance',
     'tile_finance_desc' => 'Paiements manuels, remboursements, points.',
     'tile_credentials' => 'Diplômes',
@@ -56,4 +56,8 @@ return [
     'command' => 'Commande',
     'schedule' => 'Planning',
     'suite' => 'Suite',
+    'queue_connection' => 'Connexion file d’attente',
+    'backup_path' => 'Chemin des sauvegardes',
+    'last_backup' => 'Dernière sauvegarde',
+    'last_backup_none' => 'Aucun fichier de sauvegarde',
 ];

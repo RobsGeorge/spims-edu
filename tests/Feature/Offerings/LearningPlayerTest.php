@@ -324,7 +324,7 @@ class LearningPlayerTest extends TestCase
         $this->actingAs($bundle['student'])
             ->get(route('enrollments.index'))
             ->assertOk()
-            ->assertSee(__('learn.open_course'))
-            ->assertSee(route('learn.offering', $bundle['offering']), false);
+            ->assertSee(__('learning.open_player'))
+            ->assertSee(route('courses.player', $bundle['offering']), false);
     }
 }

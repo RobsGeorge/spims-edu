@@ -32,6 +32,7 @@ class User extends Authenticatable
         'email_verified',
         'preferred_locale',
         'theme_preference',
+        'notify_email',
         'country_code',
         'status',
         'is_reviewer',
@@ -45,6 +46,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified' => 'boolean',
         'theme_preference' => ThemePreference::class,
+        'notify_email' => 'boolean',
         'status' => UserStatus::class,
         'is_reviewer' => 'boolean',
         'last_reviewed_at' => 'datetime',

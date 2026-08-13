@@ -5,7 +5,14 @@
 <p class="text-muted-theme">{{ $application->status->value }}</p>
 <ul>
 @foreach($application->values as $value)
-    <li><strong>{{ $value->field->label }}:</strong> {{ $value->value }}</li>
+    <li>
+        <strong>{{ $value->field->label }}:</strong>
+        @if($value->file_url)
+            <span class="text-muted-theme">{{ __('admissions.document') }}:</span> {{ $value->file_url }}
+        @else
+            {{ $value->value }}
+        @endif
+    </li>
 @endforeach
 </ul>
 <form method="POST" action="{{ route('admin.applications.decide', $application) }}" class="card border-0 shadow-sm mt-3">

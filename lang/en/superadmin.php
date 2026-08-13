@@ -23,7 +23,7 @@ return [
     'tile_scheduled' => 'Scheduled tasks',
     'tile_scheduled_desc' => 'Scheduler jobs that must stay healthy.',
     'tile_theme' => 'Theme & branding',
-    'tile_theme_desc' => 'Active liturgical theme tokens.',
+    'tile_theme_desc' => 'Active Sacred Academic theme tokens.',
     'tile_finance' => 'Finance ops',
     'tile_finance_desc' => 'Manual payments, refunds, points.',
     'tile_credentials' => 'Credentials',
@@ -56,4 +56,8 @@ return [
     'command' => 'Command',
     'schedule' => 'Schedule',
     'suite' => 'Suite',
+    'queue_connection' => 'Queue connection',
+    'backup_path' => 'Backup path',
+    'last_backup' => 'Last backup',
+    'last_backup_none' => 'No backup file found',
 ];

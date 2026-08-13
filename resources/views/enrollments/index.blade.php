@@ -2,7 +2,6 @@
 @section('title', __('ui.nav_enrollments'))
 @section('content')
 <h1 class="spims-title mb-3">{{ __('ui.nav_enrollments') }}</h1>
-@if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
@@ -44,7 +43,7 @@
             <td>{{ number_format($enrollment->progress_percent, 0) }}%</td>
             <td class="d-flex gap-1 flex-wrap">
                 @if(in_array($enrollment->status->value, ['ENROLLED', 'COMPLETED'], true))
-                <a class="btn btn-sm btn-primary" href="{{ route('learn.offering', $enrollment->offering) }}">{{ __('learn.open_course') }}</a>
+                <a class="btn btn-sm btn-primary" href="{{ route('courses.player', $enrollment->offering) }}">{{ __('learning.open_player') }}</a>
                 @endif
                 @if($enrollment->status->value === 'ENROLLED')
                 <form method="POST" action="{{ route('enrollments.drop', $enrollment) }}">@csrf<button class="btn btn-sm btn-outline-danger">{{ __('enrollment.drop') }}</button></form>

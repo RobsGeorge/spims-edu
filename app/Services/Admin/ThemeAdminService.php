@@ -25,9 +25,15 @@ class ThemeAdminService
         $theme->update([
             'name' => $data['name'] ?? $theme->name,
             'site_name' => $data['site_name'] ?? $theme->site_name,
-            'logo_light_url' => $data['logo_light_url'] ?? $theme->logo_light_url,
-            'logo_dark_url' => $data['logo_dark_url'] ?? $theme->logo_dark_url,
-            'favicon_url' => $data['favicon_url'] ?? $theme->favicon_url,
+            'logo_light_url' => array_key_exists('logo_light_url', $data)
+                ? ($data['logo_light_url'] ?: null)
+                : $theme->logo_light_url,
+            'logo_dark_url' => array_key_exists('logo_dark_url', $data)
+                ? ($data['logo_dark_url'] ?: null)
+                : $theme->logo_dark_url,
+            'favicon_url' => array_key_exists('favicon_url', $data)
+                ? ($data['favicon_url'] ?: null)
+                : $theme->favicon_url,
             'tokens' => $data['tokens'] ?? $theme->tokens,
             'is_active' => $data['is_active'] ?? $theme->is_active,
             'updated_by_id' => $actor->id,

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AssessmentTemplateController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EnrollmentAdminController;
 use App\Http\Controllers\Admin\GradebookController;
+use App\Http\Controllers\Admin\GradingSchemeController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\BrandingController;
 use App\Http\Controllers\Api\PaymentWebhookController;
+use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\ZoomWebhookController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AssignmentController;
@@ -28,6 +30,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\CoursePlayerController;
 use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
@@ -36,6 +39,7 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExamAttemptController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FoundationDemoController;
+use App\Http\Controllers\GradesController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HubController;
@@ -46,7 +50,9 @@ use App\Http\Controllers\MeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
 use Illuminate\Support\Facades\Route;
@@ -65,6 +71,7 @@ Route::get('/verify/{token}', CredentialVerifyController::class)->name('credenti
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
+Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('auth.register');
@@ -94,6 +101,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/hubs/admin', [HubController::class, 'admin'])->name('hubs.admin');
     Route::get('/hubs/finance', [HubController::class, 'finance'])->name('hubs.finance');
 
+    Route::get('/teach', [TeachController::class, 'index'])->name('teach.index');
+    Route::get('/teach/{offering}', [TeachController::class, 'show'])->name('teach.show');
+    Route::post('/teach/{offering}/announcements', [TeachController::class, 'storeAnnouncement'])
+        ->name('teach.announcements.store');
+
     Route::middleware('superadmin')->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/', [SuperAdminController::class, 'index'])->name('index');
         Route::get('/security', [SuperAdminController::class, 'security'])->name('security');
@@ -110,10 +122,23 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/api/me', [MeController::class, 'show'])->name('api.me');
-    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    Route::post('/api/uploads', [UploadController::class, 'store'])->name('api.uploads.store');
     Route::post('/catalog/{course}/interest', [CatalogController::class, 'flagInterest'])
         ->middleware('permission:courses.flag_interest')
         ->name('catalog.interest');
+
+    Route::get('/courses/{offering}', [CoursePlayerController::class, 'show'])->name('courses.player');
+    Route::post('/courses/{offering}/weeks/{week}/complete', [CoursePlayerController::class, 'completeWeek'])
+        ->name('courses.weeks.complete');
+
+    Route::get('/grades', [GradesController::class, 'index'])
+        ->middleware('permission:transcript.view')
+        ->name('grades.index');
+
+    Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings', [SettingsController::class, 'update'])
+        ->middleware('permission:profile.edit_own')
+        ->name('settings.update');
 
     Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::get('/applications/forms/{form}', [ApplicationController::class, 'create'])
@@ -146,6 +171,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::get('/finance/invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');
+    Route::get('/finance/receipts/{payment}', [FinanceController::class, 'showReceipt'])->name('finance.receipts.show');
     Route::post('/finance/invoices/{invoice}/checkout', [FinanceController::class, 'checkout'])
         ->middleware('permission:finance.pay')
         ->name('finance.checkout');
@@ -259,6 +285,19 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('permission:assessment_templates.manage')
             ->name('assessment-templates.store');
 
+        Route::get('/grading-schemes', [GradingSchemeController::class, 'index'])
+            ->middleware('permission:grading_schemes.manage')
+            ->name('grading-schemes.index');
+        Route::post('/grading-schemes', [GradingSchemeController::class, 'store'])
+            ->middleware('permission:grading_schemes.manage')
+            ->name('grading-schemes.store');
+        Route::put('/grading-schemes/{gradingScheme}', [GradingSchemeController::class, 'update'])
+            ->middleware('permission:grading_schemes.manage')
+            ->name('grading-schemes.update');
+
+        Route::get('/translations', [TranslationController::class, 'index'])
+            ->middleware('permission:translations.manage')
+            ->name('translations.index');
         Route::post('/translations', [TranslationController::class, 'store'])
             ->middleware('permission:translations.manage')
             ->name('translations.store');
@@ -334,6 +373,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/finance', [FinanceAdminController::class, 'index'])
             ->middleware('permission:finance.invoices')
             ->name('finance.index');
+        Route::get('/finance/reports', [FinanceAdminController::class, 'reports'])
+            ->name('finance.reports');
         Route::post('/finance/invoices', [FinanceAdminController::class, 'storeInvoice'])
             ->middleware('permission:finance.invoices')
             ->name('finance.invoices.store');

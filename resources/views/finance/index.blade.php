@@ -1,25 +1,46 @@
 @extends('layouts.app')
 @section('title', __('finance.my_finance'))
 @section('content')
+@php
+    use App\Enums\Currency;
+    use App\Enums\WalletKind;
+    use App\Support\Money;
+@endphp
 <h1 class="spims-title mb-3">{{ __('finance.my_finance') }}</h1>
-@if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
-<div class="row g-3 mb-4">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <h2 class="h6">{{ __('finance.wallet') }}</h2>
-                <ul class="mb-0">
-                    <li>EGP money: {{ $wallet->egp_money_minor }}</li>
-                    <li>USD money: {{ $wallet->usd_money_minor }}</li>
-                    <li>EGP points: {{ $wallet->egp_points_minor }}</li>
-                    <li>USD points: {{ $wallet->usd_points_minor }}</li>
-                </ul>
-                <a class="btn btn-sm btn-outline-primary mt-2" href="{{ route('donate.create') }}">{{ __('finance.donate') }}</a>
-            </div>
+<div class="row g-3 mb-4 wallet-balance-cards">
+    <div class="col-6 col-md-3">
+        <div class="wallet-balance-card">
+            <span class="wallet-balance-card__label">{{ __('learning.usd_money') }}</span>
+            <strong class="wallet-balance-card__value">{{ Money::fromMinor($wallet->balance(Currency::Usd, WalletKind::Money), Currency::Usd)->format() }}</strong>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-6 col-md-3">
+        <div class="wallet-balance-card">
+            <span class="wallet-balance-card__label">{{ __('learning.egp_money') }}</span>
+            <strong class="wallet-balance-card__value">{{ Money::fromMinor($wallet->balance(Currency::Egp, WalletKind::Money), Currency::Egp)->format() }}</strong>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="wallet-balance-card">
+            <span class="wallet-balance-card__label">{{ __('learning.usd_points') }}</span>
+            <strong class="wallet-balance-card__value">{{ Money::fromMinor($wallet->balance(Currency::Usd, WalletKind::Points), Currency::Usd)->format() }}</strong>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="wallet-balance-card">
+            <span class="wallet-balance-card__label">{{ __('learning.egp_points') }}</span>
+            <strong class="wallet-balance-card__value">{{ Money::fromMinor($wallet->balance(Currency::Egp, WalletKind::Points), Currency::Egp)->format() }}</strong>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <a class="btn btn-sm btn-outline-primary" href="{{ route('donate.create') }}">{{ __('finance.donate') }}</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12">
         <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <h2 class="h6">{{ __('finance.transactions') }}</h2>
@@ -27,7 +48,7 @@
                     @forelse($transactions as $tx)
                         <li>{{ $tx->direction->value }} {{ $tx->amount_minor }} {{ $tx->currency->value }} ({{ $tx->kind->value }} / {{ $tx->reason->value }})</li>
                     @empty
-                        <li>—</li>
+                        <li>{{ __('ui.empty') }}</li>
                     @endforelse
                 </ul>
             </div>
@@ -36,6 +57,7 @@
 </div>
 
 <h2 class="h5">{{ __('finance.invoices') }}</h2>
+<div class="spims-table-wrap">
 <table class="table">
     <thead><tr><th>ID</th><th>{{ __('finance.total') }}</th><th>{{ __('ui.status') }}</th><th>{{ __('finance.due') }}</th><th></th></tr></thead>
     <tbody>
@@ -50,4 +72,5 @@
     @endforeach
     </tbody>
 </table>
+</div>
 @endsection
