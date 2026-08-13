@@ -30,6 +30,7 @@ php artisan test --testsuite=Smoke
 Push to `main` → CI → production deploy via GitHub Actions.
 Push to `staging` → CI → staging deploy.
 
+- Client system overview (for school leadership): [docs/client-system-overview.md](docs/client-system-overview.md)
 - Spec summary: [docs/spims-spec-summary.md](docs/spims-spec-summary.md)
 - Design gap analysis & next phases: [docs/portal-design-gap-analysis.md](docs/portal-design-gap-analysis.md)
 - Parking lot (out-of-phase): [PARKING-LOT.md](PARKING-LOT.md)
