@@ -19,7 +19,7 @@ class OfferingAccessService
     {
         return Enrollment::query()
             ->where('student_id', $user->id)
-            ->where('status', EnrollmentStatus::Enrolled)
+            ->whereIn('status', [EnrollmentStatus::Enrolled, EnrollmentStatus::Completed])
             ->pluck('offering_id')
             ->all();
     }
@@ -29,7 +29,7 @@ class OfferingAccessService
         return Enrollment::query()
             ->where('student_id', $user->id)
             ->where('offering_id', $offering->id)
-            ->where('status', EnrollmentStatus::Enrolled)
+            ->whereIn('status', [EnrollmentStatus::Enrolled, EnrollmentStatus::Completed])
             ->first();
     }
 

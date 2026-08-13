@@ -6,6 +6,7 @@ use App\Enums\ContentItemType;
 use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ContentItem extends Model
 {
@@ -29,5 +30,15 @@ class ContentItem extends Model
     public function week(): BelongsTo
     {
         return $this->belongsTo(Week::class);
+    }
+
+    public function assignment(): HasOne
+    {
+        return $this->hasOne(Assignment::class);
+    }
+
+    public function assessment(): HasOne
+    {
+        return $this->hasOne(Assessment::class);
     }
 }

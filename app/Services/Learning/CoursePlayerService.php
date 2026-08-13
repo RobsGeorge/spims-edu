@@ -159,11 +159,13 @@ class CoursePlayerService
         }
 
         if (in_array($item->type, [ContentItemType::Quiz, ContentItemType::Exam], true)) {
-            $assessment = Assessment::query()
-                ->where('offering_id', $offering->id)
-                ->where('title', $item->title)
-                ->first();
-            // Prefer released assessments linked loosely by title; fallback to any open on offering.
+            $assessment = Assessment::query()->where('content_item_id', $item->id)->first();
+            if ($assessment === null) {
+                $assessment = Assessment::query()
+                    ->where('offering_id', $offering->id)
+                    ->where('title', $item->title)
+                    ->first();
+            }
             if ($assessment === null) {
                 $assessment = Assessment::query()
                     ->where('offering_id', $offering->id)

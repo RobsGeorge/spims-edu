@@ -34,15 +34,18 @@
 @endforeach
 
 <table class="table">
-    <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('ui.status') }}</th><th></th></tr></thead>
+    <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('ui.status') }}</th><th>{{ __('learn.progress') }}</th><th></th></tr></thead>
     <tbody>
     @foreach($enrollments as $enrollment)
         <tr>
             <td>{{ $enrollment->offering->course->code }}</td>
             <td>{{ $enrollment->status->value }}</td>
+            <td>{{ number_format($enrollment->progress_percent, 0) }}%</td>
             <td class="d-flex gap-1 flex-wrap">
+                @if(in_array($enrollment->status->value, ['ENROLLED', 'COMPLETED'], true))
+                <a class="btn btn-sm btn-primary" href="{{ route('courses.player', $enrollment->offering) }}">{{ __('learning.open_player') }}</a>
+                @endif
                 @if($enrollment->status->value === 'ENROLLED')
-                <a class="btn btn-sm btn-outline-primary" href="{{ route('courses.player', $enrollment->offering) }}">{{ __('learning.open_player') }}</a>
                 <form method="POST" action="{{ route('enrollments.drop', $enrollment) }}">@csrf<button class="btn btn-sm btn-outline-danger">{{ __('enrollment.drop') }}</button></form>
                 <form method="POST" action="{{ route('enrollments.withdraw', $enrollment) }}">@csrf<button class="btn btn-sm btn-outline-warning">{{ __('enrollment.withdraw') }}</button></form>
                 @endif

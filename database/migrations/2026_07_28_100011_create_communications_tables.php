@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -52,14 +53,13 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
         });
 
-        // PostgreSQL rejects an inline self-referential ULID FK during CREATE TABLE
-        // ("no unique constraint matching given keys"). Create the column first,
-        // then attach the FK after the primary key exists.
+        // PostgreSQL: ULID PKs are added as a post-CREATE ALTER. Self-referential FKs
+        // fail with "no unique constraint matching given keys" unless a unique index
+        // on id is visible before the self-FK is attached.
         Schema::create('discussion_posts', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignUlid('thread_id')->constrained('discussion_threads')->cascadeOnDelete();
             $table->foreignUlid('author_id')->constrained('users');
-            $table->ulid('parent_post_id')->nullable()->index();
             $table->text('body');
             $table->json('attachments')->nullable();
             $table->timestamp('created_at')->useCurrent();
@@ -67,10 +67,14 @@ return new class extends Migration
             $table->softDeletes();
         });
 
+        if (Schema::getConnection()->getDriverName() === 'pgsql') {
+            DB::statement('CREATE UNIQUE INDEX IF NOT EXISTS discussion_posts_id_unique ON discussion_posts (id)');
+        }
+
         Schema::table('discussion_posts', function (Blueprint $table) {
-            $table->foreign('parent_post_id')
-                ->references('id')
-                ->on('discussion_posts')
+            $table->foreignUlid('parent_post_id')
+                ->nullable()
+                ->constrained('discussion_posts')
                 ->nullOnDelete();
         });
 
