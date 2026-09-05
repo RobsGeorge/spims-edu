@@ -40,6 +40,14 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Bearer-token auth for /api/v1 (mobile clients). Sanctum ships this driver;
+        // without the guard entry, `auth:sanctum` fails with "guard [sanctum] is not
+        // defined" for every request.
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
     ],
 
     /*

@@ -73,19 +73,7 @@ class AuthService
 
     public function login(string $email, string $password): User
     {
-        $user = User::query()->where('email', strtolower($email))->first();
-
-        if ($user === null || $user->password_hash === null || ! Hash::check($password, $user->password_hash)) {
-            throw ValidationException::withMessages(['email' => [__('auth.failed')]]);
-        }
-
-        if ($user->status === UserStatus::Suspended) {
-            throw ValidationException::withMessages(['email' => [__('auth.suspended')]]);
-        }
-
-        if ($user->status !== UserStatus::Active) {
-            throw ValidationException::withMessages(['email' => [__('auth.not_active')]]);
-        }
+        $user = $this->verifyCredentials($email, $password);
 
         Auth::login($user, false);
         $this->audit->write($user, 'auth.login', 'User', $user->id);
@@ -100,6 +88,62 @@ class AuthService
             $this->audit->write($user, 'auth.logout', 'User', $user->id);
         }
         Auth::logout();
+    }
+
+    /**
+     * Bearer-token login for the /api/v1 mobile clients. Shares the same credential
+     * and account-status checks as the web session login via `verifyCredentials()`,
+     * but never touches the session guard — `Auth::login()` requires a started
+     * session, which the stateless `api` middleware group does not provide.
+     *
+     * @return array{user: User, token: string}
+     */
+    public function issueApiToken(string $email, string $password, ?string $deviceName = null): array
+    {
+        $user = $this->verifyCredentials($email, $password);
+
+        $abilities = $user->roleTypes()
+            ->map(fn ($role) => "role:{$role->value}")
+            ->unique()
+            ->values()
+            ->all();
+
+        $token = $user->createToken($deviceName ?: 'mobile', $abilities);
+
+        $this->audit->write($user, 'auth.api_login', 'User', $user->id);
+
+        return ['user' => $user, 'token' => $token->plainTextToken];
+    }
+
+    public function revokeApiToken(User $user): void
+    {
+        $token = $user->currentAccessToken();
+
+        if ($token instanceof \Laravel\Sanctum\PersonalAccessToken) {
+            $token->delete();
+        }
+
+        $this->audit->write($user, 'auth.api_logout', 'User', $user->id);
+    }
+
+    /** @throws ValidationException */
+    private function verifyCredentials(string $email, string $password): User
+    {
+        $user = User::query()->where('email', strtolower($email))->first();
+
+        if ($user === null || $user->password_hash === null || ! Hash::check($password, $user->password_hash)) {
+            throw ValidationException::withMessages(['email' => [__('auth.failed')]]);
+        }
+
+        if ($user->status === UserStatus::Suspended) {
+            throw ValidationException::withMessages(['email' => [__('auth.suspended')]]);
+        }
+
+        if ($user->status !== UserStatus::Active) {
+            throw ValidationException::withMessages(['email' => [__('auth.not_active')]]);
+        }
+
+        return $user;
     }
 
     public function requestPasswordReset(string $email): string
