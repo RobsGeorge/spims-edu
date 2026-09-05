@@ -17,6 +17,7 @@ return array (
   'assignment_submitted' => 'تم تسليم الواجب.',
   'bank_too_small' => 'بنك الأسئلة لا يحتوي على أسئلة كافية.',
   'not_enrolled' => 'يجب أن تكون مسجلاً في هذا المقرر.',
+  'resubmission_not_allowed' => 'لقد سلّمت هذا الواجب بالفعل، وإعادة التسليم مغلقة.',
   'window_closed' => 'التقييم غير مفتوح.',
   'no_attempts' => 'لا توجد محاولات متبقية.',
   'not_in_progress' => 'المحاولة ليست قيد التنفيذ.',

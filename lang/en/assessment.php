@@ -17,6 +17,7 @@ return array (
   'assignment_submitted' => 'Assignment submitted.',
   'bank_too_small' => 'Question bank does not have enough questions to draw.',
   'not_enrolled' => 'You must be enrolled in this offering.',
+  'resubmission_not_allowed' => 'You have already submitted this assignment and resubmission is closed.',
   'window_closed' => 'This assessment is not open.',
   'no_attempts' => 'No attempts remaining.',
   'not_in_progress' => 'Attempt is not in progress.',

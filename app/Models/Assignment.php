@@ -25,6 +25,7 @@ class Assignment extends Model
         'released',
         'due_date',
         'late_penalty_override',
+        'allow_resubmission',
     ];
 
     protected $casts = [
@@ -35,6 +36,7 @@ class Assignment extends Model
         'released' => 'boolean',
         'due_date' => 'datetime',
         'late_penalty_override' => 'float',
+        'allow_resubmission' => 'boolean',
     ];
 
     public function contentItem(): BelongsTo
