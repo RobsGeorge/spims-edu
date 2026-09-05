@@ -1,0 +1,63 @@
+# Academic roadmap
+
+The plan for taking this app from "backend domain phases 0–9 complete" to a full SIS + LMS with a
+mobile API, phased S0 → S9. Four documents that cross-reference each other heavily, which is why
+they live in a directory rather than loose in `docs/`.
+
+Read them in this order:
+
+| Document | What it is |
+|---|---|
+| [`gap-analysis.md`](gap-analysis.md) | The evidence. What this app has, what the Khedma academic hub has, and the 21-entry gap register (G-01 … G-21) every phase traces back to. Written against `main` @ `d764d1e`, before S0 and S1 landed, and kept as the baseline record. |
+| [`implementation-plan.md`](implementation-plan.md) | The work. Schema, services, permissions, tests and acceptance criteria per phase, plus the corrections found while building S0 and S1. |
+| [`execution-order.md`](execution-order.md) | The sequence. Which phase may start when, how each is proved, and the four invariants that must stay green on every PR from now on. |
+| [`mobile-api-spec.md`](mobile-api-spec.md) | The wire contract for `/api/v1`, so the mobile client can be written against a fixed shape before every endpoint exists. |
+
+## Status
+
+**S0 and S1 are done. S2 is next.**
+
+Landed on branch
+[`feat/authz-scope-and-api-foundation`](https://github.com/RobsGeorge/spims-edu/compare/main...feat/authz-scope-and-api-foundation):
+
+| Commit | Phase | What |
+|---|---|---|
+| [`cdcc89b`](https://github.com/RobsGeorge/spims-edu/commit/cdcc89b) | G-12 defect | `NotificationService` never read `users.notify_email`, so the Settings toggle was inert |
+| [`1b02276`](https://github.com/RobsGeorge/spims-edu/commit/1b02276) | G-17 defect | `AssignmentService::submit()` overwrote the previous submission in place and left the old grade attached to unseen content |
+| [`a3019f9`](https://github.com/RobsGeorge/spims-edu/commit/a3019f9) | **S0** | `AuthorizeService` accepted a `$resource` and never read it, so any Instructor could lock grades for any offering in the school |
+| [`40bb283`](https://github.com/RobsGeorge/spims-edu/commit/40bb283) | **S1** | `/api/v1` foundation: `login`, `logout`, `me`, `branding`, one error envelope, `Accept-Language`, OpenAPI coverage test |
+| [`27400aa`](https://github.com/RobsGeorge/spims-edu/commit/27400aa) | **S1** | `login` returned a 500 on PostgreSQL: `personal_access_tokens.tokenable_id` was a bigint against a ULID `users.id` |
+
+The full suite went from 124 to 178 passing.
+
+**S2 — communications spine** is next: one delivery path and one delivery log behind announcements,
+reminders, graduation notices and project deadlines, before per-feature notification code makes
+delivery reporting impossible. Detail in
+[`implementation-plan.md`](implementation-plan.md), sequencing rationale in
+[`execution-order.md`](execution-order.md).
+
+## Two things S0 changed for every phase after it
+
+1. A new **offering-owned permission key** must be registered in `config/permission_scopes.php`, or
+   it is enforced at role level only — the exact bug S0 fixed.
+2. A new **offering-owned model** must be registered in `ResourceScopeResolver::offeringIdsFor()`,
+   or it resolves to no offering and is treated as out of scope. That fails safe, but presents as an
+   unexplained 403.
+
+Scoped actions also fail closed: authorizing a scoped key without passing the resource throws.
+
+## Not vendored here
+
+The sibling repository this plan was drafted in also holds `access-and-setup.md`, the `.patch`
+files, `verify-gap-claims.sh`, and an `evidence/` log directory. None are carried over:
+`access-and-setup.md` concerns agent access to that repository, the patches are redundant once
+merged into git history, `verify-gap-claims.sh` asserts the **pre**-S0/S1 conditions and would now
+report failures for code that is correct, and the evidence logs reference absolute paths from
+another machine. The pre-fix failing output each patch recorded lives in its commit message instead.
+
+## Related
+
+- [`../spims-spec-summary.md`](../spims-spec-summary.md) — the product contract this plan extends
+- [`../portal-design-gap-analysis.md`](../portal-design-gap-analysis.md) — the design/UX roadmap (phases D0–D6, I1–I2), which runs alongside this one
+- [`../../PARKING-LOT.md`](../../PARKING-LOT.md) — what stays deferred, and what this roadmap promotes out
+- `docs/api/openapi.yaml` — the machine-checkable `/api/v1` contract, guarded by `OpenApiCoverageTest` (added by S1)
