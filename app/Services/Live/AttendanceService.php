@@ -26,7 +26,7 @@ class AttendanceService
      */
     public function importFromZoom(User $actor, LiveSession $session, array $participants): int
     {
-        $this->authorize->authorize($actor, 'attendance.manage');
+        $this->authorize->authorize($actor, 'attendance.manage', $session);
 
         $threshold = $this->thresholdPercent($session->offering);
         $requiredMinutes = max(1, (int) ceil($session->duration_minutes * ($threshold / 100)));
@@ -66,7 +66,7 @@ class AttendanceService
 
     public function override(User $actor, LiveSession $session, User $student, AttendanceStatus $status, ?int $minutes = null): AttendanceRecord
     {
-        $this->authorize->authorize($actor, 'attendance.manage');
+        $this->authorize->authorize($actor, 'attendance.manage', $session);
 
         $record = AttendanceRecord::query()->updateOrCreate(
             [

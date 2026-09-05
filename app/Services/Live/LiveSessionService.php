@@ -30,7 +30,7 @@ class LiveSessionService
      */
     public function schedule(User $actor, CourseOffering $offering, array $data): LiveSession
     {
-        $this->authorize->authorize($actor, 'live.schedule');
+        $this->authorize->authorize($actor, 'live.schedule', $offering);
 
         $start = Carbon::parse($data['scheduled_start']);
         $duration = (int) $data['duration_minutes'];
@@ -63,7 +63,7 @@ class LiveSessionService
      */
     public function scheduleRecurrence(User $actor, CourseOffering $offering, array $data): array
     {
-        $this->authorize->authorize($actor, 'live.schedule');
+        $this->authorize->authorize($actor, 'live.schedule', $offering);
 
         $recurrence = SessionRecurrence::query()->create([
             'offering_id' => $offering->id,

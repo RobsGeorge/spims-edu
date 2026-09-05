@@ -30,7 +30,7 @@ class AssignmentService
      */
     public function create(User $actor, ContentItem $item, array $data): Assignment
     {
-        $this->authorize->authorize($actor, 'assignments.manage');
+        $this->authorize->authorize($actor, 'assignments.manage', $item);
 
         return $this->audit->withAudit($actor, 'assignments.create', function () use ($item, $data) {
             return Assignment::query()->create([
@@ -147,7 +147,7 @@ class AssignmentService
 
     public function grade(User $grader, AssignmentSubmission $submission, float $rawScore, ?string $feedback = null): AssignmentSubmission
     {
-        $this->authorize->authorize($grader, 'assignments.grade');
+        $this->authorize->authorize($grader, 'assignments.grade', $submission);
 
         $assignment = $submission->assignment;
         $final = $this->applyLatePenalty($assignment, $submission, $rawScore);

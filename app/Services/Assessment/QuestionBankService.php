@@ -22,7 +22,7 @@ class QuestionBankService
 
     public function createBank(User $actor, Course $course, string $name): QuestionBank
     {
-        $this->authorize->authorize($actor, 'questions.manage');
+        $this->authorize->authorize($actor, 'questions.manage', $course);
 
         return $this->audit->withAudit($actor, 'questions.bank_create', function () use ($course, $name) {
             return QuestionBank::query()->create([
@@ -37,7 +37,7 @@ class QuestionBankService
      */
     public function addQuestion(User $actor, QuestionBank $bank, array $data): Question
     {
-        $this->authorize->authorize($actor, 'questions.manage');
+        $this->authorize->authorize($actor, 'questions.manage', $bank);
 
         return DB::transaction(function () use ($actor, $bank, $data) {
             $question = Question::query()->create([

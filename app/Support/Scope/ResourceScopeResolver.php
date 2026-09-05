@@ -1,0 +1,110 @@
+<?php
+
+namespace App\Support\Scope;
+
+use App\Models\Assessment;
+use App\Models\AssessmentAttempt;
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
+use App\Models\AttemptAnswer;
+use App\Models\ContentItem;
+use App\Models\Course;
+use App\Models\CourseOffering;
+use App\Models\DiscussionBoard;
+use App\Models\DiscussionPost;
+use App\Models\DiscussionThread;
+use App\Models\Enrollment;
+use App\Models\GradebookComponent;
+use App\Models\LiveSession;
+use App\Models\OfferingStaff;
+use App\Models\QuestionBank;
+use App\Models\User;
+use App\Models\Week;
+
+/**
+ * Answers "is this actor staffed on the offering behind this resource?".
+ *
+ * Resolution is deliberately explicit rather than reflective: a model that is not
+ * listed here resolves to null, and `AuthorizeService` treats an unresolvable
+ * resource as out of scope. Adding a new offering-owned model therefore requires
+ * opting it in, instead of silently inheriting access.
+ */
+class ResourceScopeResolver
+{
+    public function scopedTo(User $user, mixed $resource): bool
+    {
+        $offeringIds = $this->offeringIdsFor($resource);
+
+        if ($offeringIds === []) {
+            return false;
+        }
+
+        return OfferingStaff::query()
+            ->where('user_id', $user->id)
+            ->whereIn('offering_id', $offeringIds)
+            ->exists();
+    }
+
+    /** Offerings this actor is staffed on. */
+    public function staffedOfferingIds(User $user): array
+    {
+        return OfferingStaff::query()
+            ->where('user_id', $user->id)
+            ->pluck('offering_id')
+            ->all();
+    }
+
+    /**
+     * A resource may map to more than one offering — a question bank belongs to a
+     * course, and a course may be offered several times.
+     *
+     * @return array<int, string>
+     */
+    public function offeringIdsFor(mixed $resource): array
+    {
+        if ($resource instanceof CourseOffering) {
+            return [$resource->id];
+        }
+
+        if (is_string($resource) && $resource !== '') {
+            return CourseOffering::query()->whereKey($resource)->exists() ? [$resource] : [];
+        }
+
+        $single = match (true) {
+            $resource instanceof Week => $resource->offering_id,
+            $resource instanceof Enrollment => $resource->offering_id,
+            $resource instanceof LiveSession => $resource->offering_id,
+            $resource instanceof GradebookComponent => $resource->offering_id,
+            $resource instanceof DiscussionBoard => $resource->offering_id,
+            $resource instanceof Assessment => $resource->offering_id,
+            $resource instanceof ContentItem => $resource->week?->offering_id,
+            $resource instanceof Assignment => $resource->contentItem?->week?->offering_id,
+            $resource instanceof AssignmentSubmission => $resource->assignment?->contentItem?->week?->offering_id,
+            $resource instanceof AssessmentAttempt => $resource->assessment?->offering_id,
+            $resource instanceof AttemptAnswer => $resource->attempt?->assessment?->offering_id,
+            $resource instanceof DiscussionThread => $resource->board?->offering_id,
+            $resource instanceof DiscussionPost => $resource->thread?->board?->offering_id,
+            default => null,
+        };
+
+        if ($single !== null) {
+            return [$single];
+        }
+
+        // Question banks are course-level, so staffing any offering of that course counts.
+        $courseId = match (true) {
+            $resource instanceof QuestionBank => $resource->course_id,
+            $resource instanceof Course => $resource->id,
+            default => null,
+        };
+
+        if ($courseId !== null) {
+            return CourseOffering::query()
+                ->where('course_id', $courseId)
+                ->pluck('id')
+                ->all();
+        }
+
+        return [];
+    }
+}

@@ -101,6 +101,7 @@ class LiveCommsTest extends TestCase
         $ins = User::factory()->withRole(RoleType::Instructor)->create();
         $student = User::factory()->withRole(RoleType::Student)->create(['email' => 'stu@example.com']);
         $offering = $this->offeringWithStudent($student);
+        $this->staffOffering($ins, $offering);
 
         $session = app(LiveSessionService::class)->schedule(
             User::factory()->withRole(RoleType::AdministrativeAdmin)->create(),
@@ -140,6 +141,7 @@ class LiveCommsTest extends TestCase
         $student = User::factory()->withRole(RoleType::Student)->create();
         $peer = User::factory()->withRole(RoleType::Student)->create(['email' => 'peer@spims.test']);
         $offering = $this->offeringWithStudent($student);
+        $this->staffOffering($ins, $offering);
         Enrollment::query()->create([
             'student_id' => $peer->id,
             'offering_id' => $offering->id,

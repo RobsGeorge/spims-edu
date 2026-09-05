@@ -6,6 +6,7 @@ use App\Enums\RoleType;
 use App\Exceptions\AuthorizationException;
 use App\Models\RolePermission;
 use App\Models\User;
+use App\Support\Scope\ResourceScopeResolver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 
@@ -15,6 +16,10 @@ class AuthorizeService
     private static ?array $dbMatrix = null;
 
     private static bool $dbChecked = false;
+
+    public function __construct(
+        private readonly ResourceScopeResolver $scope = new ResourceScopeResolver,
+    ) {}
 
     public function authorize(?User $user, string $action, mixed $resource = null): void
     {
@@ -26,29 +31,58 @@ class AuthorizeService
             return;
         }
 
-        $allowed = false;
+        $scopedGrant = false;
+        $granted = false;
 
         foreach ($user->roleTypes() as $role) {
             $level = $this->levelFor($role, $action);
 
-            if ($level === null || $level === '') {
+            if ($level === null || $level === '' || ! $this->levelGrants($level)) {
                 continue;
             }
 
-            if ($level === 'F' || $level === 'R' || str_contains($level, 'O')) {
-                $allowed = true;
-                break;
+            $granted = true;
+
+            // An unscoped grant from any one role wins outright: an Academic Admin who
+            // also teaches is not confined to the offerings they teach.
+            if (! $this->isScopedRole($role)) {
+                return;
             }
 
-            if (in_array($level, ['submit', 'lock', 'reopen', 'issue'], true)) {
-                $allowed = true;
-                break;
-            }
+            $scopedGrant = true;
         }
 
-        if (! $allowed) {
+        if (! $granted) {
             throw new AuthorizationException(__('auth.forbidden'));
         }
+
+        if (! $scopedGrant || ! $this->isOfferingScoped($action)) {
+            return;
+        }
+
+        // Fail closed. A scoped action reached without a resource is a missing argument
+        // at the call site, not a permission the actor happens to hold everywhere.
+        if ($resource === null || ! $this->scope->scopedTo($user, $resource)) {
+            throw new AuthorizationException(__('auth.forbidden'));
+        }
+    }
+
+    private function levelGrants(string $level): bool
+    {
+        return $level === 'F'
+            || $level === 'R'
+            || str_contains($level, 'O')
+            || in_array($level, ['submit', 'lock', 'reopen', 'issue'], true);
+    }
+
+    private function isScopedRole(RoleType $role): bool
+    {
+        return in_array($role->value, (array) config('permission_scopes.scoped_roles', []), true);
+    }
+
+    private function isOfferingScoped(string $action): bool
+    {
+        return in_array($action, (array) config('permission_scopes.offering_scoped', []), true);
     }
 
     public function canAssignRole(User $actor, RoleType $roleToAssign): bool

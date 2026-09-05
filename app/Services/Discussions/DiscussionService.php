@@ -37,7 +37,7 @@ class DiscussionService
 
     public function configureBoard(User $actor, CourseOffering $offering, bool $allowStudentThreads): DiscussionBoard
     {
-        $this->authorize->authorize($actor, 'discussions.configure');
+        $this->authorize->authorize($actor, 'discussions.configure', $offering);
 
         $board = $this->ensureBoard($offering);
         $board->update(['allow_student_threads' => $allowStudentThreads]);
@@ -145,7 +145,7 @@ class DiscussionService
 
     public function moderate(User $actor, DiscussionThread $thread, array $flags): DiscussionThread
     {
-        $this->authorize->authorize($actor, 'discussions.moderate');
+        $this->authorize->authorize($actor, 'discussions.moderate', $thread);
 
         $thread->update(array_intersect_key($flags, array_flip(['locked', 'pinned'])));
         $this->audit->write($actor, 'discussions.moderate', 'DiscussionThread', $thread->id, null, $flags);
@@ -203,7 +203,7 @@ class DiscussionService
 
     public function overrideGrade(User $actor, DiscussionThread $thread, User $student, float $score, ?string $feedback = null): DiscussionGrade
     {
-        $this->authorize->authorize($actor, 'discussions.grade');
+        $this->authorize->authorize($actor, 'discussions.grade', $thread);
 
         $grade = DiscussionGrade::query()->updateOrCreate(
             ['thread_id' => $thread->id, 'student_id' => $student->id],

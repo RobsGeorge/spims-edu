@@ -109,7 +109,7 @@ class OfferingService
 
     public function addWeek(User $actor, CourseOffering $offering, array $data): Week
     {
-        $this->authorize->authorize($actor, 'offerings.content');
+        $this->authorize->authorize($actor, 'offerings.content', $offering);
 
         return $this->audit->withAudit($actor, 'offerings.add_week', fn () => Week::query()->create([
             'offering_id' => $offering->id,
@@ -122,7 +122,7 @@ class OfferingService
 
     public function addContentItem(User $actor, Week $week, array $data): ContentItem
     {
-        $this->authorize->authorize($actor, 'offerings.content');
+        $this->authorize->authorize($actor, 'offerings.content', $week);
 
         return $this->audit->withAudit($actor, 'offerings.add_content', fn () => ContentItem::query()->create([
             'week_id' => $week->id,

@@ -29,7 +29,7 @@ class AssignmentResubmissionIntegrityTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @return array{student: User, assignment: Assignment} */
+    /** @return array{student: User, assignment: Assignment, offering: CourseOffering} */
     private function bundle(bool $allowResubmission = true): array
     {
         $this->seed(\Database\Seeders\SettingsSeeder::class);
@@ -79,7 +79,7 @@ class AssignmentResubmissionIntegrityTest extends TestCase
             'allow_resubmission' => $allowResubmission,
         ]);
 
-        return ['student' => $student, 'assignment' => $assignment];
+        return ['student' => $student, 'assignment' => $assignment, 'offering' => $offering];
     }
 
     #[Test]
@@ -113,8 +113,9 @@ class AssignmentResubmissionIntegrityTest extends TestCase
     #[Test]
     public function resubmission_clears_the_stale_grade_and_preserves_it_on_the_archived_attempt(): void
     {
-        ['student' => $student, 'assignment' => $assignment] = $this->bundle();
+        ['student' => $student, 'assignment' => $assignment, 'offering' => $offering] = $this->bundle();
         $instructor = User::factory()->withRole(RoleType::Instructor)->create();
+        $this->staffOffering($instructor, $offering);
         $service = app(AssignmentService::class);
 
         $submission = $service->submit($student, $assignment, textBody: 'first draft');

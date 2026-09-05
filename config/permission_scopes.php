@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * Which permission grants are limited to a resource, and for whom.
+ *
+ * `config/permissions.php` records an `O` ("own") level against several roles, but a
+ * level alone cannot say what "own" means: for a student it means "acting on my own
+ * behalf", while for an instructor it means "an offering I am staffed on". This file
+ * makes that distinction explicit so `AuthorizeService` can enforce it.
+ */
+return [
+
+    /*
+     * Permission keys where a grant held by a scoped role applies only to offerings the
+     * actor is staffed on. Calling one of these without a resource fails closed.
+     *
+     * Keys deliberately absent are self-scoped: `assessments.take`, `assignments.submit`,
+     * `discussions.post`, `discussions.thread`, `live.join`, `finance.pay`, `finance.donate`,
+     * `admissions.apply`, `enrollment.register`, `courses.flag_interest`, `profile.edit_own`
+     * and `transcript.view` all describe acting on your own behalf, and their membership
+     * checks live in the services that own the data.
+     */
+    'offering_scoped' => [
+        'offerings.view',
+        'offerings.content',
+        'questions.manage',
+        'assessments.manage',
+        'assessments.grade',
+        'assignments.manage',
+        'assignments.grade',
+        'gradebook.configure',
+        'gradebook.lock',
+        'live.schedule',
+        'attendance.manage',
+        'discussions.configure',
+        'discussions.moderate',
+        'discussions.grade',
+    ],
+
+    /*
+     * Roles whose grants on the keys above are confined to their own offerings. Every
+     * other role (the admin tier) holds those grants school-wide, which is what the `F`
+     * and `R` levels in the matrix already intend.
+     */
+    'scoped_roles' => [
+        'INSTRUCTOR',
+        'TA',
+    ],
+
+];

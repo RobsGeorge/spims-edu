@@ -42,7 +42,7 @@ class GradebookService
 
     public function seedFromTemplate(User $actor, CourseOffering $offering, ?AssessmentTemplate $template = null): void
     {
-        $this->authorize->authorize($actor, 'gradebook.configure');
+        $this->authorize->authorize($actor, 'gradebook.configure', $offering);
 
         $template ??= AssessmentTemplate::query()->where('is_default', true)->first()
             ?? AssessmentTemplate::query()->first();
@@ -72,7 +72,7 @@ class GradebookService
      */
     public function addComponent(User $actor, CourseOffering $offering, array $data): GradebookComponent
     {
-        $this->authorize->authorize($actor, 'gradebook.configure');
+        $this->authorize->authorize($actor, 'gradebook.configure', $offering);
 
         return $this->audit->withAudit($actor, 'gradebook.component_create', function () use ($offering, $data) {
             return GradebookComponent::query()->create([
@@ -120,7 +120,7 @@ class GradebookService
 
     public function submitGrades(User $actor, CourseOffering $offering): void
     {
-        $this->authorize->authorize($actor, 'gradebook.lock');
+        $this->authorize->authorize($actor, 'gradebook.lock', $offering);
 
         $enrollments = Enrollment::query()
             ->where('offering_id', $offering->id)
@@ -152,7 +152,7 @@ class GradebookService
 
     public function lockGrades(User $actor, CourseOffering $offering): void
     {
-        $this->authorize->authorize($actor, 'gradebook.lock');
+        $this->authorize->authorize($actor, 'gradebook.lock', $offering);
 
         DB::transaction(function () use ($actor, $offering) {
             $enrollments = Enrollment::query()
