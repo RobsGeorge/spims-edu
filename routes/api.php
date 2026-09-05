@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 | Bearer-token auth via Sanctum. Controllers are thin: validate, delegate to
 | the same App\Services\* used by the web app, return a Resource or a plain
 | `data`-wrapped array. See docs/api/openapi.yaml for the contract and
-| docs/plans/spims/mobile-api-spec.md (companion repo) for the full design.
+| docs/academic-roadmap/mobile-api-spec.md for the full design.
 |
 */
 Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(function () {
