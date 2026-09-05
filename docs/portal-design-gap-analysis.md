@@ -102,8 +102,8 @@ From `docs/frontend-architecture.md` route map → Laravel reality:
 
 ### 3.3 Access / polish defects found in scan
 
-- Assignment detail and discussion board/thread readable by any authenticated user who knows an ID (membership not enforced).
-- Discussion board `GET` can create a board (`ensureBoard`) without an audited mutation path.
+- ~~Assignment detail and discussion board/thread readable by any authenticated user who knows an ID (membership not enforced).~~ **Fixed in D3** — `OfferingAccessService::assertCanAccessAssignment()` / `assertCanAccessDiscussion()`.
+- Discussion board `GET` can create a board (`ensureBoard`) without an audited mutation path. Still open — not an access-control hole, but a mutation off the audited path.
 - Hard-coded English on assignments, live admin, discussions, gradebook, assessment admin.
 - `welcome.blade.php` leftover Laravel scaffold (unused by `/`).
 
@@ -118,14 +118,29 @@ These are product/integration gaps still open after Phase 9:
 3. **Storage** — no signed uploads for application docs, assignment files, readings, logos.
 4. **Vimeo** — IDs stored; no player / privacy / upload flow.
 5. **Gemini** — translation stub; essay grader heuristic.
-6. **Email delivery** — OTP/notifications degrade to log (acceptable in dev; production mail still optional).
+6. **Email delivery** — OTP/notifications degrade to log (acceptable in dev; production mail still optional). The `users.notify_email` toggle was inert until S0/S1's defect fixes; a per-event, per-channel preference model is S2.
 7. **Schedule conflict** — staff overlap blocked for live sessions; student schedule-conflict warn on enrollment not clearly surfaced in UI.
 8. **Cashier** — enum option present; no distinct integration path beyond mock.
 9. **Lifetime preference SYSTEM** — incorrectly maps to dark.
 10. **Theme tokens / logos / favicon** — schema ready; editor + layout unused.
 11. **Missing planning docs in-repo** — `docs/spims-spec-summary.md` was referenced by CLAUDE.md but absent (restored by this work).
 
-WhatsApp, hard proctoring, multi-host Zoom → [PARKING-LOT.md](../PARKING-LOT.md).
+### Closed since this document was written
+
+- ~~**Full REST JSON API surface deferred**~~ — no longer a residual gap. **S1** built the `/api/v1`
+  foundation (`login`, `logout`, `me`, `branding`) with one error envelope, `Accept-Language`
+  resolution and an OpenAPI document guarded by a coverage test. The endpoint surfaces remain
+  outstanding as **S6** (student) and **S8** (instructor).
+- ~~**Authorization ignored resource scope**~~ — **S0** made the `O` ("own") permission level
+  enforceable. This was never listed here as a residual gap, but it belongs in the record: any
+  Instructor could previously lock grades for any offering in the school.
+
+Both are tracked in [docs/academic-roadmap/](academic-roadmap/), which carries the S0–S9 sequence
+this document's D0–D6 / I1–I2 phases now run alongside.
+
+WhatsApp and multi-host Zoom stay parked → [PARKING-LOT.md](../PARKING-LOT.md). Hard proctoring is
+partially promoted into S5 (proctor event log and attempt termination; no lockdown-browser
+enforcement), and the attendance "excused" state is promoted into S3 — both accepted, neither built.
 
 ---
 

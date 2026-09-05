@@ -32,6 +32,7 @@ Push to `staging` → CI → staging deploy.
 
 - Spec summary: [docs/spims-spec-summary.md](docs/spims-spec-summary.md)
 - Design gap analysis & next phases: [docs/portal-design-gap-analysis.md](docs/portal-design-gap-analysis.md)
+- Academic roadmap (S0–S9: SIS gaps, mobile API): [docs/academic-roadmap/](docs/academic-roadmap/)
 - Parking lot (out-of-phase): [PARKING-LOT.md](PARKING-LOT.md)
 - VPS provisioning: [docs/vps-setup.md](docs/vps-setup.md)
 - Backups: [docs/backups-and-restore.md](docs/backups-and-restore.md)
