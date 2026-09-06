@@ -3,34 +3,66 @@
 namespace Database\Seeders;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\AssessmentMode;
+use App\Enums\AttendanceStatus;
+use App\Enums\ClassSessionMode;
+use App\Enums\ComponentKind;
+use App\Enums\ContentItemType;
+use App\Enums\Currency;
 use App\Enums\EnrollmentStatus;
 use App\Enums\FormFieldType;
 use App\Enums\GradeStatus;
 use App\Enums\GradeType;
+use App\Enums\LedgerReason;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStaffRole;
 use App\Enums\OfferingStatus;
+use App\Enums\PaymentMethod;
 use App\Enums\ProgramType;
+use App\Enums\QuestionType;
 use App\Enums\RequirementType;
 use App\Enums\RoleType;
 use App\Enums\StudentProgramStatus;
 use App\Enums\UserStatus;
+use App\Enums\WalletKind;
 use App\Models\AcademicYear;
+use App\Models\Announcement;
 use App\Models\Application;
+use App\Models\ApplicationFieldValue;
 use App\Models\ApplicationForm;
 use App\Models\ApplicationFormField;
+use App\Models\Assessment;
+use App\Models\ClassSession;
+use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
+use App\Models\DiscussionPost;
 use App\Models\Enrollment;
+use App\Models\GradebookComponent;
 use App\Models\GradingScheme;
+use App\Models\Invoice;
+use App\Models\LiveSession;
 use App\Models\OfferingStaff;
 use App\Models\Program;
 use App\Models\ProgramCourse;
+use App\Models\QuestionBank;
 use App\Models\Semester;
 use App\Models\StudentProgram;
 use App\Models\User;
 use App\Models\UserRole;
 use App\Models\Week;
+use App\Services\Assessment\AssessmentService;
+use App\Services\Assessment\QuestionBankService;
+use App\Services\Communications\AnnouncementService;
+use App\Services\Discussions\DiscussionService;
+use App\Services\Enrollment\EnrollmentService;
+use App\Services\Finance\InvoiceService;
+use App\Services\Finance\PaymentService;
+use App\Services\Finance\WalletService;
+use App\Services\Gradebook\GradebookService;
+use App\Services\Live\AttendanceService;
+use App\Services\Live\LiveSessionService;
+use App\Services\Offerings\OfferingService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -55,6 +87,7 @@ class DemoDataSeeder extends Seeder
         $offerings = $this->seedOfferings($courses, $fall, $spring, $users);
         $forms = $this->seedApplicationForms($programs);
         $this->seedApplicationsAndEnrollments($users, $programs, $forms, $offerings);
+        $this->seedClassroomAndMoney($users, $offerings);
 
         $this->command?->info('Demo accounts password: '.self::PASSWORD);
         $this->command?->info('See docs/demo-accounts.md for the full account list.');
@@ -520,5 +553,389 @@ class DemoDataSeeder extends Seeder
                 }
             }
         }
+    }
+
+    /**
+     * Classroom + money rows so a client walkthrough is not empty after seed.
+     *
+     * @param  array<string, User>  $users
+     * @param  list<CourseOffering>  $offerings
+     */
+    private function seedClassroomAndMoney(array $users, array $offerings): void
+    {
+        foreach ($offerings as $offering) {
+            $offering->loadMissing(['course', 'weeks']);
+        }
+
+        $ins1 = $users['ins1@spims.test'];
+        $ins2 = $users['ins2@spims.test'];
+        $fin = $users['fin@spims.test'];
+        $aca = $users['aca@spims.test'];
+        $student1 = $users['student1@spims.test'];
+        $student3 = $users['student3@spims.test'];
+        $student6 = $users['student6@spims.test'];
+        $student7 = $users['student7@spims.test'];
+        $student9 = $users['student9@spims.test'];
+        $dual = $users['dual@spims.test'];
+
+        $th101 = $this->offeringByCourseCode($offerings, 'TH101', OfferingMode::Cohort);
+        $bi101 = $this->offeringByCourseCode($offerings, 'BI101', OfferingMode::Cohort);
+        $free1 = $this->offeringByCourseCode($offerings, 'FREE1', OfferingMode::Cohort);
+        $et101SelfPaced = $this->offeringByCourseCode($offerings, 'ET101', OfferingMode::SelfPaced);
+
+        $offeringsService = app(OfferingService::class);
+        $th101Items = $this->seedWeekOneContent($offeringsService, $ins1, $th101, [
+            [ContentItemType::Text->value, 'Welcome to Introduction to Theology', 'A short orientation for Week 1. Read this note, then the assigned reading.'],
+            [ContentItemType::Reading->value, 'Week 1 reading — course overview', 'Skim the course outline and note the weekly rhythm: reading, live session, and a short check.'],
+            [ContentItemType::Text->value, 'How this course is organized', 'Each week unlocks on its date. Complete the reading before the live session.'],
+        ]);
+        $this->seedWeekOneContent($offeringsService, $ins2, $bi101, [
+            [ContentItemType::Text->value, 'Welcome to Old Testament Survey', 'Week 1 introduces the survey map for this course.'],
+            [ContentItemType::Reading->value, 'Week 1 reading — survey map', 'Read the unit map and list the books covered in the first half of the term.'],
+            [ContentItemType::Text->value, 'Study notes for Week 1', 'Bring one question from the reading to the live session.'],
+        ]);
+
+        $this->seedTh101AssessmentAndGradebook($ins1, $th101, $th101Items[0] ?? null);
+        $this->seedInvoicesPaymentsAndWallet($fin, $student1, $student9);
+        $this->seedTh101Attendance($ins1, $th101, $student1, $student6, $student7);
+        $this->seedTh101Announcement($ins1, $th101);
+        $this->seedTh101LiveSession($ins1, $th101);
+        $this->seedTh101Discussion($ins1, $student1, $th101);
+        $this->seedApplicationAnswers($student1, $student3);
+        $this->seedDualRoleAccess($aca, $dual, $free1, $et101SelfPaced);
+    }
+
+    /**
+     * @param  list<CourseOffering>  $offerings
+     */
+    private function offeringByCourseCode(array $offerings, string $code, OfferingMode $mode): CourseOffering
+    {
+        foreach ($offerings as $offering) {
+            $offering->loadMissing('course');
+            if ($offering->course?->code === $code && $offering->mode === $mode) {
+                return $offering;
+            }
+        }
+
+        throw new \RuntimeException("Demo offering {$code} ({$mode->value}) is missing.");
+    }
+
+    /**
+     * @param  list<array{0: string, 1: string, 2: string}>  $items
+     * @return list<ContentItem>
+     */
+    private function seedWeekOneContent(OfferingService $offerings, User $actor, CourseOffering $offering, array $items): array
+    {
+        $week = Week::query()
+            ->where('offering_id', $offering->id)
+            ->where('number', 1)
+            ->first();
+
+        if ($week === null) {
+            return [];
+        }
+
+        $created = [];
+        foreach ($items as $i => [$type, $title, $body]) {
+            $existing = ContentItem::query()
+                ->where('week_id', $week->id)
+                ->where('title', $title)
+                ->first();
+
+            if ($existing !== null) {
+                $created[] = $existing;
+
+                continue;
+            }
+
+            $created[] = $offerings->addContentItem($actor, $week, [
+                'type' => $type,
+                'title' => $title,
+                'body' => $body,
+                'order' => $i + 1,
+            ]);
+        }
+
+        return $created;
+    }
+
+    private function seedTh101AssessmentAndGradebook(User $ins1, CourseOffering $th101, ?ContentItem $hostItem): void
+    {
+        $th101->loadMissing('course');
+        $banks = app(QuestionBankService::class);
+        $assessments = app(AssessmentService::class);
+        $gradebook = app(GradebookService::class);
+
+        $bank = QuestionBank::query()
+            ->where('course_id', $th101->course_id)
+            ->where('name', 'TH101 Week 1')
+            ->first();
+
+        if ($bank === null) {
+            $bank = $banks->createBank($ins1, $th101->course, 'TH101 Week 1');
+        }
+
+        if ($bank->questions()->count() === 0) {
+            $banks->addQuestion($ins1, $bank, [
+                'type' => QuestionType::McqSingle->value,
+                'prompt' => 'What is the catalog code for Introduction to Theology?',
+                'points' => 1,
+                'options' => [
+                    ['text' => 'TH101', 'is_correct' => true],
+                    ['text' => 'BI101', 'is_correct' => false],
+                    ['text' => 'ET101', 'is_correct' => false],
+                    ['text' => 'FREE1', 'is_correct' => false],
+                ],
+            ]);
+            $banks->addQuestion($ins1, $bank, [
+                'type' => QuestionType::TrueFalse->value,
+                'prompt' => 'TH101 is listed as a three-credit course.',
+                'points' => 1,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => true],
+                    ['text' => 'False', 'is_correct' => false],
+                ],
+            ]);
+            $banks->addQuestion($ins1, $bank, [
+                'type' => QuestionType::ShortAnswer->value,
+                'prompt' => 'Write the course code for Introduction to Theology.',
+                'points' => 1,
+                'config' => ['accepted_answers' => ['TH101', 'th101']],
+            ]);
+            $banks->addQuestion($ins1, $bank, [
+                'type' => QuestionType::Numeric->value,
+                'prompt' => 'How many credit hours does TH101 carry?',
+                'points' => 1,
+                'config' => ['correct_value' => 3, 'tolerance' => 0],
+            ]);
+        }
+
+        $assessment = Assessment::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Week 1 check')
+            ->first();
+
+        if ($assessment === null) {
+            $assessment = $assessments->create($ins1, $th101, [
+                'title' => 'TH101 Week 1 check',
+                'mode' => AssessmentMode::Quiz->value,
+                'content_item_id' => $hostItem?->id,
+                'language' => 'en',
+                'time_limit_minutes' => 15,
+                'opens_at' => now()->subHour(),
+                'closes_at' => now()->addWeeks(2),
+                'attempts_allowed' => 2,
+                'shuffle_questions' => false,
+                'shuffle_options' => false,
+                'max_points' => 4,
+                'released' => false,
+            ]);
+
+            foreach ($bank->questions()->orderBy('id')->get() as $i => $question) {
+                $assessments->attachQuestion($ins1, $assessment, $question, null, $i + 1);
+            }
+
+            $assessments->release($ins1, $assessment);
+        }
+
+        if (GradebookComponent::query()->where('offering_id', $th101->id)->doesntExist()) {
+            $gradebook->addComponent($ins1, $th101, [
+                'name' => 'Exam',
+                'weight_percent' => 70,
+                'kind' => ComponentKind::Exam->value,
+            ]);
+            $gradebook->addComponent($ins1, $th101, [
+                'name' => 'Attendance',
+                'weight_percent' => 30,
+                'kind' => ComponentKind::Attendance->value,
+            ]);
+        }
+    }
+
+    private function seedInvoicesPaymentsAndWallet(User $fin, User $student1, User $student9): void
+    {
+        $invoices = app(InvoiceService::class);
+        $payments = app(PaymentService::class);
+        $wallets = app(WalletService::class);
+
+        $enrollments = Enrollment::query()
+            ->with(['offering.course', 'student'])
+            ->where('status', EnrollmentStatus::Enrolled)
+            ->get();
+
+        foreach ($enrollments as $enrollment) {
+            $course = $enrollment->offering?->course;
+            if ($course === null || $course->is_free) {
+                continue;
+            }
+
+            $invoices->createForEnrollment($fin, $enrollment);
+        }
+
+        $student9Invoice = Invoice::query()
+            ->where('student_id', $student9->id)
+            ->where('total_minor', '>', 0)
+            ->orderBy('created_at')
+            ->first();
+
+        if ($student9Invoice !== null && $student9Invoice->payments()->doesntExist()) {
+            $payment = $payments->recordManual(
+                $fin,
+                $student9Invoice,
+                PaymentMethod::ManualCash,
+                $student9Invoice->total_minor,
+                null,
+                'DEMO-CASH-STUDENT9'
+            );
+            $payments->verifyManual($fin, $payment);
+        }
+
+        $wallet = $wallets->ensureWallet($student1);
+        if ($wallet->balance(Currency::Egp, WalletKind::Money) === 0) {
+            $wallets->credit(
+                $student1,
+                Currency::Egp,
+                WalletKind::Money,
+                5000,
+                LedgerReason::AdminGrant,
+                $fin,
+                note: 'Demo EGP wallet balance'
+            );
+        }
+    }
+
+    private function seedTh101Attendance(User $ins1, CourseOffering $th101, User $student1, User $student6, User $student7): void
+    {
+        $attendance = app(AttendanceService::class);
+
+        $session = ClassSession::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Week 1 class')
+            ->first();
+
+        if ($session === null) {
+            $session = $attendance->openSession($ins1, $th101, [
+                'title' => 'TH101 Week 1 class',
+                'scheduled_start' => now()->subHours(2),
+                'duration_minutes' => 60,
+                'mode' => ClassSessionMode::InPerson->value,
+                'location' => 'Demo classroom',
+            ]);
+        }
+
+        if ($session->entries()->exists()) {
+            return;
+        }
+
+        $attendance->markRoster($ins1, $session, [
+            ['student_id' => $student1->id, 'status' => AttendanceStatus::Present->value],
+            ['student_id' => $student6->id, 'status' => AttendanceStatus::Late->value],
+            ['student_id' => $student7->id, 'status' => AttendanceStatus::Absent->value],
+        ], (int) $session->lock_version);
+
+        $session = $session->fresh();
+        $attendance->excuse($ins1, $session, $student7, 'Family obligation', (int) $session->lock_version);
+    }
+
+    private function seedTh101Announcement(User $ins1, CourseOffering $th101): void
+    {
+        if (Announcement::query()->where('offering_id', $th101->id)->exists()) {
+            return;
+        }
+
+        $announcements = app(AnnouncementService::class);
+        $draft = $announcements->draft($ins1, $th101, [
+            'title' => 'Week 1 is open',
+            'body' => 'Please complete the Week 1 reading and join the live session this week.',
+            'is_banner' => true,
+        ]);
+        $announcements->publish($ins1, $draft);
+    }
+
+    private function seedTh101LiveSession(User $ins1, CourseOffering $th101): void
+    {
+        if (LiveSession::query()->where('offering_id', $th101->id)->exists()) {
+            return;
+        }
+
+        app(LiveSessionService::class)->schedule($ins1, $th101, [
+            'title' => 'TH101 Week 1 live session',
+            'scheduled_start' => now()->addHours(8),
+            'duration_minutes' => 60,
+        ]);
+    }
+
+    private function seedTh101Discussion(User $ins1, User $student1, CourseOffering $th101): void
+    {
+        $discussions = app(DiscussionService::class);
+        $board = $discussions->provisionBoard($ins1, $th101);
+
+        if (DiscussionPost::query()->whereHas('thread', fn ($q) => $q->where('board_id', $board->id))->exists()) {
+            return;
+        }
+
+        $thread = $discussions->createThread($ins1, $board, [
+            'title' => 'Week 1 introductions',
+            'body' => 'Introduce yourself in a sentence and say what you hope to learn this term.',
+        ]);
+        $discussions->post($student1, $thread, 'Looking forward to this course.');
+    }
+
+    private function seedApplicationAnswers(User $student1, User $student3): void
+    {
+        $answers = [
+            $student1->id => [
+                'Why do you want to join?' => 'I want to study theology in a structured program.',
+                'Parish name' => 'St. Mark Parish',
+            ],
+            $student3->id => [
+                'Why do you want to join?' => 'I hope to join the diploma this year.',
+                'Parish name' => 'St. Mary Parish',
+            ],
+        ];
+
+        foreach ($answers as $applicantId => $byLabel) {
+            $application = Application::query()
+                ->where('applicant_id', $applicantId)
+                ->with('form.fields')
+                ->first();
+
+            if ($application === null || $application->form === null) {
+                continue;
+            }
+
+            foreach ($application->form->fields as $field) {
+                $value = $byLabel[$field->label] ?? null;
+                if ($value === null) {
+                    continue;
+                }
+
+                ApplicationFieldValue::query()->updateOrCreate(
+                    ['application_id' => $application->id, 'field_id' => $field->id],
+                    ['value' => $value]
+                );
+            }
+        }
+    }
+
+    private function seedDualRoleAccess(User $aca, User $dual, CourseOffering $free1, CourseOffering $et101SelfPaced): void
+    {
+        app(OfferingService::class)->assignStaff(
+            $aca,
+            $free1,
+            $dual->id,
+            OfferingStaffRole::Instructor->value
+        );
+
+        $already = Enrollment::query()
+            ->where('student_id', $dual->id)
+            ->where('offering_id', $et101SelfPaced->id)
+            ->exists();
+
+        if ($already) {
+            return;
+        }
+
+        app(EnrollmentService::class)->register($dual, $et101SelfPaced);
     }
 }
