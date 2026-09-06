@@ -31,6 +31,7 @@ return [
     'item_exam' => 'امتحان',
     'item_discussion' => 'نقاش',
     'discussions' => 'النقاشات',
+    'surveys' => 'الاستبيانات',
     'announcements' => 'الإعلانات',
     'no_announcements' => 'لا إعلانات بعد.',
     'player_title' => 'مشغّل المقرر',

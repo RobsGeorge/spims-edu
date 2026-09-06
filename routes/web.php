@@ -64,6 +64,7 @@ use App\Http\Controllers\NotificationSettingsController;
 use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController;
@@ -132,6 +133,16 @@ Route::middleware(['auth'])->group(function () {
         ->name('teach.announcements.publish');
     Route::post('/teach/announcements/{announcement}/resend', [TeachController::class, 'resendAnnouncement'])
         ->name('teach.announcements.resend');
+
+    Route::get('/surveys', [SurveyController::class, 'index'])
+        ->middleware('permission:feedback.view')
+        ->name('student.surveys.index');
+    Route::get('/surveys/{survey}', [SurveyController::class, 'show'])
+        ->middleware('permission:feedback.view')
+        ->name('student.surveys.show');
+    Route::post('/surveys/{survey}', [SurveyController::class, 'submit'])
+        ->middleware('permission:feedback.view')
+        ->name('student.surveys.submit');
 
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
     Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show'])->name('announcements.show');

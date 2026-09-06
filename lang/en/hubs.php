@@ -23,6 +23,8 @@ return [
     'live_desc' => 'Upcoming Zoom classes.',
     'attendance' => 'Attendance',
     'attendance_desc' => 'Your attendance history and check-in.',
+    'surveys' => 'Surveys',
+    'surveys_desc' => 'Assigned and open feedback surveys.',
     'attendance_admin' => 'Attendance policy',
     'attendance_admin_desc' => 'Thresholds, late credit, and reports.',
     'finance' => 'My finance',

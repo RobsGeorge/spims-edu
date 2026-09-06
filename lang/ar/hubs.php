@@ -23,6 +23,8 @@ return [
     'live_desc' => 'حصص زووم القادمة.',
     'attendance' => 'الحضور',
     'attendance_desc' => 'سجل حضورك وتسجيل الدخول.',
+    'surveys' => 'الاستبيانات',
+    'surveys_desc' => 'الاستبيانات المعينة والمفتوحة.',
     'attendance_admin' => 'سياسة الحضور',
     'attendance_admin_desc' => 'الحدود ونسبة التأخر والتقارير.',
     'finance' => 'ماليتي',

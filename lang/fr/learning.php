@@ -31,6 +31,7 @@ return [
     'item_exam' => 'Examen',
     'item_discussion' => 'Discussion',
     'discussions' => 'Discussions',
+    'surveys' => 'Sondages',
     'announcements' => 'Annonces',
     'no_announcements' => 'Pas encore d’annonces.',
     'player_title' => 'Lecteur de cours',

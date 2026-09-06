@@ -16,4 +16,6 @@ return [
     'superadmin_hub_desc' => 'Sécurité, audit, observabilité et outils système.',
     'notifications' => 'Notifications',
     'notifications_desc' => 'Alertes et mentions.',
+    'surveys' => 'Sondages',
+    'surveys_desc' => 'Répondre aux sondages de cours et d’école.',
 ];

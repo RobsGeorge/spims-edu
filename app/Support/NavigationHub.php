@@ -88,7 +88,8 @@ class NavigationHub
                     || request()->routeIs('courses.*')
                     || request()->routeIs('grades.*')
                     || request()->routeIs('enrollments.*')
-                    || request()->routeIs('attendance.*'),
+                    || request()->routeIs('attendance.*')
+                    || request()->routeIs('student.surveys.*'),
             ],
         ];
 
@@ -155,7 +156,7 @@ class NavigationHub
 
         $items = [
             ['label' => __('hubs.nav_home'), 'route' => 'dashboard', 'icon' => 'bi-house', 'active' => request()->routeIs('dashboard')],
-            ['label' => __('hubs.nav_learning'), 'route' => 'hubs.learning', 'icon' => 'bi-book-half', 'active' => request()->routeIs('hubs.learning') || request()->routeIs('courses.*')],
+            ['label' => __('hubs.nav_learning'), 'route' => 'hubs.learning', 'icon' => 'bi-book-half', 'active' => request()->routeIs('hubs.learning') || request()->routeIs('courses.*') || request()->routeIs('student.surveys.*')],
             $third,
             ['label' => __('hubs.nav_finance'), 'route' => 'hubs.finance', 'icon' => 'bi-wallet2', 'active' => request()->routeIs('hubs.finance') || request()->routeIs('finance.*')],
             ['label' => __('hubs.nav_more'), 'route' => 'settings.edit', 'icon' => 'bi-grid', 'active' => request()->routeIs('settings.*') || request()->routeIs('notifications.*')],
@@ -176,6 +177,7 @@ class NavigationHub
             self::link('enrollments.index', 'hubs.enrollments', 'bi-person-check', 'hubs.enrollments_desc'),
             self::link('live.index', 'hubs.live', 'bi-camera-video', 'hubs.live_desc'),
             self::link('attendance.index', 'hubs.attendance', 'bi-calendar-check', 'hubs.attendance_desc'),
+            self::link('student.surveys.index', 'hubs.surveys', 'bi-clipboard-check', 'hubs.surveys_desc'),
             self::link('finance.index', 'hubs.finance', 'bi-wallet2', 'hubs.finance_desc'),
             self::link('transcript.show', 'hubs.transcript', 'bi-award', 'hubs.transcript_desc'),
             self::link('settings.edit', 'hubs.settings', 'bi-person-gear', 'hubs.settings_desc'),

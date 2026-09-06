@@ -23,6 +23,8 @@ return [
     'live_desc' => 'Cours Zoom à venir.',
     'attendance' => 'Présence',
     'attendance_desc' => 'Historique et pointage.',
+    'surveys' => 'Sondages',
+    'surveys_desc' => 'Sondages assignés et ouverts.',
     'attendance_admin' => 'Politique de présence',
     'attendance_admin_desc' => 'Seuils, crédit de retard et rapports.',
     'finance' => 'Ma finance',

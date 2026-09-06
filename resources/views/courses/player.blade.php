@@ -13,6 +13,7 @@
         </div>
         <div class="d-flex flex-wrap gap-2">
             <a href="{{ route('discussions.board', $offering) }}" class="btn btn-outline-secondary">{{ __('learning.discussions') }}</a>
+            <a href="{{ route('student.surveys.index') }}" class="btn btn-outline-secondary">{{ __('learning.surveys') }}</a>
             <a href="{{ route('grades.index') }}" class="btn btn-outline-secondary">{{ __('learning.grades') }}</a>
         </div>
     </div>
