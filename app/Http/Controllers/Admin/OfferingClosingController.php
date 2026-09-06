@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CourseOffering;
+use App\Models\Enrollment;
+use App\Models\OfferingClosing;
 use App\Services\Completion\CompletionService;
 use App\Services\Completion\OfferingClosingService;
 use Illuminate\Http\RedirectResponse;
@@ -16,11 +18,17 @@ class OfferingClosingController extends Controller
     public function show(Request $request, CourseOffering $offering, OfferingClosingService $closing, CompletionService $completion): View
     {
         $offering->load('course');
+        $record = OfferingClosing::query()->where('offering_id', $offering->id)->first();
 
         return view('admin.offering-closing.show', [
             'offering' => $offering,
             'status' => $closing->statusFor($offering),
             'results' => $completion->cohort($request->user(), $offering),
+            'enrollments' => Enrollment::query()
+                ->where('offering_id', $offering->id)
+                ->with('student')
+                ->get(),
+            'graceMarks' => $record?->grace_marks ?? [],
         ]);
     }
 

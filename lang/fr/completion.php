@@ -50,4 +50,8 @@ return [
     'remove' => 'Retirer',
     'closing_announcement_title' => 'Résultats annoncés : :course',
     'closing_announcement_body' => 'Les notes et résultats d’achèvement de :course sont disponibles.',
+    'content_item' => 'ULID de l’élément',
+    'met_criteria' => 'Critères',
+    'passed' => 'réussi',
+    'failed' => 'échoué',
 ];

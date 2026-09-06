@@ -186,7 +186,9 @@ class CompletionService
                 'kind' => $data['kind'],
                 'threshold' => $data['threshold'] ?? null,
                 'content_item_id' => $data['content_item_id'] ?? null,
-                'is_required' => (bool) ($data['is_required'] ?? true),
+                'is_required' => array_key_exists('is_required', $data)
+                    ? filter_var($data['is_required'], FILTER_VALIDATE_BOOLEAN)
+                    : true,
             ]);
         }, CompletionCriterion::class);
     }

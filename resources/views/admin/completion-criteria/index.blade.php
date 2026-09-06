@@ -15,6 +15,7 @@
             </select>
         </div>
         <div class="col-md-2"><input name="threshold" type="number" step="0.01" min="0" max="100" class="form-control" placeholder="{{ __('completion.threshold') }}"></div>
+        <div class="col-md-2"><input name="content_item_id" class="form-control" placeholder="{{ __('completion.content_item') }}"></div>
         <div class="col-md-3">
             <select name="offering_id" class="form-select" aria-label="{{ __('completion.scope') }}">
                 <option value="">{{ __('completion.scope_course') }}</option>

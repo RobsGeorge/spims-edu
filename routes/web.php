@@ -132,9 +132,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/announcements/{announcement}/dismiss-banner', [AnnouncementController::class, 'dismissBanner'])
         ->name('announcements.dismiss-banner');
 
-    Route::get('/teach/{offering}/completion', [TeachCompletionController::class, 'show'])->name('teach.completion.show');
-    Route::post('/teach/{offering}/students/{student}/notes', [TeachCompletionController::class, 'storeNote'])->name('teach.completion.notes.store');
-    Route::post('/teach/{offering}/weeks/{week}/students/{student}/assessment', [TeachCompletionController::class, 'rate'])->name('teach.completion.assess');
+    Route::get('/teach/{offering}/completion', [TeachCompletionController::class, 'show'])
+        ->middleware('permission:completion.view')
+        ->name('teach.completion.show');
+    Route::post('/teach/{offering}/students/{student}/notes', [TeachCompletionController::class, 'storeNote'])
+        ->middleware('permission:student_notes.manage')
+        ->name('teach.completion.notes.store');
+    Route::post('/teach/{offering}/weeks/{week}/students/{student}/assessment', [TeachCompletionController::class, 'rate'])
+        ->middleware('permission:module_assessment.manage')
+        ->name('teach.completion.assess');
 
     Route::get('/teach/{offering}/attendance', [TeachAttendanceController::class, 'index'])->name('teach.attendance.index');
     Route::post('/teach/{offering}/attendance/sessions', [TeachAttendanceController::class, 'store'])->name('teach.attendance.store');

@@ -38,6 +38,27 @@ class ClosingWorkflowTest extends TestCase
     }
 
     #[Test]
+    public function closing_with_unlocked_grades_fails(): void
+    {
+        $offering = $this->offering('CLOSE5');
+        $admin = $this->admin();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $this->enroll($student, $offering);
+        $this->setGrade($offering, $student, 90);
+
+        $service = app(CompletionService::class);
+        $service->addCriterion($admin, $offering->course, [
+            'kind' => CompletionCriterionKind::MinGrade->value,
+            'threshold' => 70,
+            'is_required' => true,
+        ]);
+        $service->evaluate($admin, $offering);
+
+        $this->expectException(ValidationException::class);
+        app(OfferingClosingService::class)->close($admin, $offering);
+    }
+
+    #[Test]
     public function lock_announce_close_advances_in_order_and_retries_are_idempotent(): void
     {
         $offering = $this->offering('CLOSE2');

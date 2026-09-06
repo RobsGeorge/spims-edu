@@ -50,4 +50,8 @@ return [
     'remove' => 'حذف',
     'closing_announcement_title' => 'أُعلنت النتائج: :course',
     'closing_announcement_body' => 'درجات ونتائج إكمال :course متاحة الآن.',
+    'content_item' => 'معرّف عنصر المحتوى',
+    'met_criteria' => 'المعايير',
+    'passed' => 'ناجح',
+    'failed' => 'راسب',
 ];
