@@ -62,4 +62,24 @@ class StudentNotesPrivacyTest extends TestCase
             ->get(route('teach.completion.show', ['offering' => $offering, 'student_id' => $student->id]))
             ->assertForbidden();
     }
+
+    #[Test]
+    public function a_student_is_forbidden_on_the_teach_notes_api(): void
+    {
+        $offering = $this->offering('NOTE4');
+        $instructor = $this->instructorOn($offering);
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $this->enroll($student, $offering);
+        app(StudentNoteService::class)->add($instructor, $offering, $student, 'Private');
+
+        $token = $student->createToken('api', ['role:STUDENT'])->plainTextToken;
+        $get = $this->withToken($token)
+            ->getJson(route('api.v1.teach.offerings.students.notes', [
+                'offering' => $offering,
+                'student' => $student,
+            ]));
+
+        $this->assertContains($get->status(), [403, 404]);
+        $this->assertNull($get->json('data.0.body'));
+    }
 }

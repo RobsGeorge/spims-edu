@@ -4,11 +4,14 @@ use App\Http\Controllers\Api\V1\AnnouncementController;
 use App\Http\Controllers\Api\V1\AttendanceController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BrandingController;
+use App\Http\Controllers\Api\V1\CompletionController;
+use App\Http\Controllers\Api\V1\CredentialController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\NotificationSettingsController;
 use App\Http\Controllers\Api\V1\TeachAnnouncementController;
 use App\Http\Controllers\Api\V1\TeachAttendanceController;
+use App\Http\Controllers\Api\V1\TeachCompletionController;
 use App\Http\Middleware\Api\SetApiLocale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -74,6 +77,12 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
         Route::get('/offerings/{offering}/attendance/mine', [AttendanceController::class, 'offeringMine'])->name('offerings.attendance.mine');
         Route::post('/sessions/{session}/check-in', [AttendanceController::class, 'checkIn'])->name('sessions.check-in');
 
+        // --- S4 completion / credentials API (owned by cursor/s4-completion-api-bcff) ---
+        Route::get('/me/credentials', [CredentialController::class, 'index'])->name('me.credentials');
+        Route::get('/credentials/{credential}/download', [CredentialController::class, 'download'])->name('credentials.download');
+        Route::get('/offerings/{offering}/completion', [CompletionController::class, 'show'])->name('offerings.completion');
+        Route::post('/offerings/{offering}/completion/evaluate', [CompletionController::class, 'evaluate'])->name('offerings.completion.evaluate');
+
         Route::prefix('teach')->name('teach.')->middleware('api.instructor')->group(function () {
             Route::get('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'sessions'])->name('offerings.sessions');
             Route::post('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'storeSession'])->name('offerings.sessions.store');
@@ -85,6 +94,14 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
             Route::get('/offerings/{offering}/attendance/report', [TeachAttendanceController::class, 'report'])->name('offerings.attendance.report');
             Route::get('/offerings/{offering}/roster', [TeachAttendanceController::class, 'offeringRoster'])->name('offerings.roster');
             Route::get('/offerings/{offering}/birthdays', [TeachAttendanceController::class, 'birthdays'])->name('offerings.birthdays');
+
+            // --- S4 completion / credentials API (owned by cursor/s4-completion-api-bcff) ---
+            Route::get('/offerings/{offering}/students/{student}/notes', [TeachCompletionController::class, 'notes'])
+                ->name('offerings.students.notes');
+            Route::post('/offerings/{offering}/students/{student}/notes', [TeachCompletionController::class, 'storeNote'])
+                ->name('offerings.students.notes.store');
+            Route::put('/offerings/{offering}/weeks/{week}/students/{student}/assessment', [TeachCompletionController::class, 'rate'])
+                ->name('offerings.weeks.students.assessment');
         });
     });
 });
