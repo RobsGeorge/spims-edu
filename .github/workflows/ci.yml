@@ -99,6 +99,9 @@ jobs:
       - name: Completion pipeline
         run: php artisan test --testsuite=Completion --compact
 
+      - name: Projects pipeline
+        run: php artisan test --testsuite=Projects --compact
+
       - name: Hardening pipeline
         run: php artisan test --testsuite=Hardening --compact
 
@@ -291,6 +294,9 @@ jobs:
 
       - name: Completion pipeline
         run: php artisan test --testsuite=Completion --compact
+
+      - name: Projects pipeline
+        run: php artisan test --testsuite=Projects --compact
 
       - name: Hardening pipeline
         run: php artisan test --testsuite=Hardening --compact

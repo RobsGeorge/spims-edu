@@ -2228,3 +2228,268 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  # S6E projects
+  /offerings/{offering}/project-assessments:
+    get:
+      operationId: listProjectAssessments
+      summary: Published project assessments for an enrolled offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not enrolled
+  /projects/{project}:
+    get:
+      operationId: showProject
+      summary: Team roster, phases, deliverable checklist, announced grade.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Other team or other offering
+  /project-assessments/{projectAssessment}/join:
+    post:
+      operationId: joinProjectAssessment
+      summary: Join a team inside the window, or auto-create one with space.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: projectAssessment
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                project_id:
+                  type: string
+                  nullable: true
+      responses:
+        '201':
+          description: Joined
+        '403':
+          description: Not enrolled
+        '409':
+          description: Outside the join window or at capacity
+  /project-assessments/{projectAssessment}/leave:
+    post:
+      operationId: leaveProjectAssessment
+      summary: Leave the current team once; the seat is freed immediately.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: projectAssessment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Left
+        '409':
+          description: Leave already used, or not a member
+  /projects/{project}/deliverables/{projectDeliverable}/submit:
+    post:
+      operationId: submitProjectDeliverable
+      summary: Submit a file, link, or text deliverable for the caller's team.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: projectDeliverable
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                link:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Submitted
+        '403':
+          description: Other team
+        '404':
+          description: Deliverable does not belong to this project
+  /projects/{project}/submission-files/{projectSubmissionFile}:
+    delete:
+      operationId: deleteProjectSubmissionFile
+      summary: Delete a file the caller's team owns.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: projectSubmissionFile
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Deleted
+        '403':
+          description: Other team
+  /projects/{project}/peer-evaluations/pending:
+    get:
+      operationId: pendingProjectPeerEvaluations
+      summary: Teammates not yet rated by the caller.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Other team
+  /projects/{project}/peer-evaluations:
+    post:
+      operationId: submitProjectPeerEvaluation
+      summary: Submit a peer evaluation. Never writes a grade.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - ratee_id
+              - score
+              properties:
+                ratee_id:
+                  type: string
+                score:
+                  type: number
+                comment:
+                  type: string
+                  nullable: true
+      responses:
+        '201':
+          description: Submitted
+        '403':
+          description: Other team
+        '409':
+          description: Window closed or already submitted
+  /teach/offerings/{offering}/project-assessments:
+    get:
+      operationId: teachListProjectAssessments
+      summary: Staff list of project assessments for an offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering
+  /teach/project-assessments/{projectAssessment}/teams:
+    get:
+      operationId: teachProjectTeams
+      summary: Team seating for a project assessment.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: projectAssessment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering
+  /teach/project-assessments/{projectAssessment}/announce:
+    post:
+      operationId: teachAnnounceProjectGrades
+      summary: Announce project grades into the gradebook. Idempotent.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: projectAssessment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not allowed to announce
+  /teach/projects/{project}/peer-evaluations:
+    get:
+      operationId: teachProjectPeerAggregates
+      summary: Anonymous peer-evaluation aggregates grouped by rater team.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering

@@ -26,10 +26,10 @@ use App\Models\StudentProgram;
 use App\Models\User;
 use App\Services\Assessment\AttemptService;
 use App\Services\Live\AttendanceService;
+use App\Services\Projects\ProjectGradingService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class GradebookService
 {
@@ -38,6 +38,7 @@ class GradebookService
         private readonly AuditLogWriter $audit,
         private readonly AttemptService $attempts,
         private readonly AttendanceService $attendance,
+        private readonly ProjectGradingService $projects,
     ) {}
 
     public function seedFromTemplate(User $actor, CourseOffering $offering, ?AssessmentTemplate $template = null): void
@@ -228,6 +229,10 @@ class GradebookService
                 ->pluck('final_score');
 
             return $scores->isEmpty() ? null : round((float) $scores->avg(), 2);
+        }
+
+        if ($component->kind === ComponentKind::Project) {
+            return $this->projects->announcedPercentForComponent($component, $student);
         }
 
         $scores = [];
