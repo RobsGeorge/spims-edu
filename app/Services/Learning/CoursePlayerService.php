@@ -5,15 +5,14 @@ namespace App\Services\Learning;
 use App\Enums\ContentItemType;
 use App\Models\Announcement;
 use App\Models\Assessment;
-use App\Models\Assignment;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
-use App\Models\EnrollmentWeekCompletion;
 use App\Models\User;
 use App\Models\Week;
 use App\Services\Offerings\ContentGatingService;
+use App\Services\Offerings\LearningProgressService;
 use App\Support\AuditLogWriter;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
 class CoursePlayerService
@@ -21,6 +20,7 @@ class CoursePlayerService
     public function __construct(
         private readonly OfferingAccessService $access,
         private readonly ContentGatingService $gating,
+        private readonly LearningProgressService $progress,
         private readonly AuditLogWriter $audit,
     ) {}
 
@@ -34,22 +34,15 @@ class CoursePlayerService
         $enrollment = $this->access->enrollmentFor($user, $offering);
         $isStaff = $this->access->isStaffOrAdmin($user, $offering);
 
-        $offering->load(['course', 'weeks.items', 'semester']);
+        $offering->load(['course', 'weeks.items.assignment', 'weeks.items.assessment', 'semester']);
+        $offeringAssessments = Assessment::query()->where('offering_id', $offering->id)->get();
 
         $completed = [];
         if ($enrollment !== null) {
-            $completed = EnrollmentWeekCompletion::query()
-                ->where('enrollment_id', $enrollment->id)
-                ->with('week:id,number')
-                ->get()
-                ->pluck('week.number')
-                ->filter()
-                ->map(fn ($n) => (int) $n)
-                ->values()
-                ->all();
+            $completed = $this->progress->completedWeekNumbers($enrollment);
         }
 
-        $weeks = $offering->weeks->sortBy('number')->values()->map(function (Week $week) use ($offering, $enrollment, $completed, $isStaff) {
+        $weeks = $offering->weeks->sortBy('number')->values()->map(function (Week $week) use ($offering, $enrollment, $completed, $isStaff, $offeringAssessments) {
             $unlocked = $isStaff || $this->gating->isWeekUnlocked(
                 $offering,
                 $week,
@@ -64,15 +57,14 @@ class CoursePlayerService
                 'unlocked' => $unlocked,
                 'completed' => in_array($week->number, $completed, true),
                 'items' => $unlocked
-                    ? $week->items->sortBy('order')->values()->map(fn ($item) => $this->mapItem($item, $offering))->all()
+                    ? $week->items->sortBy('order')->values()->map(fn ($item) => $this->mapItem($item, $offering, $offeringAssessments))->all()
                     : [],
             ];
         })->all();
 
         $progress = 0.0;
-        $totalWeeks = max(1, count($weeks));
         if ($enrollment !== null) {
-            $progress = round((count($completed) / $totalWeeks) * 100, 1);
+            $progress = (float) $enrollment->progress_percent;
         }
 
         return [
@@ -103,47 +95,25 @@ class CoursePlayerService
             throw ValidationException::withMessages(['week' => [__('auth.forbidden')]]);
         }
 
-        $completed = EnrollmentWeekCompletion::query()
-            ->where('enrollment_id', $enrollment->id)
-            ->with('week:id,number')
-            ->get()
-            ->pluck('week.number')
-            ->map(fn ($n) => (int) $n)
-            ->all();
+        $completed = $this->progress->completedWeekNumbers($enrollment);
 
         if (! $this->gating->isWeekUnlocked($offering, $week, true, $completed)) {
             throw ValidationException::withMessages(['week' => [__('learning.week_locked')]]);
         }
 
-        return DB::transaction(function () use ($user, $enrollment, $week, $offering) {
-            EnrollmentWeekCompletion::query()->firstOrCreate(
-                [
-                    'enrollment_id' => $enrollment->id,
-                    'week_id' => $week->id,
-                ],
-                ['completed_at' => now()]
-            );
-
-            $totalWeeks = max(1, $offering->weeks()->count());
-            $done = EnrollmentWeekCompletion::query()->where('enrollment_id', $enrollment->id)->count();
-            $enrollment->update([
-                'progress_percent' => round(($done / $totalWeeks) * 100, 1),
-            ]);
-
-            $this->audit->write($user, 'learning.week_complete', 'Enrollment', $enrollment->id, null, [
-                'week_id' => $week->id,
-                'week_number' => $week->number,
-            ]);
+        return $this->audit->withAudit($user, 'learning.week_complete', function () use ($user, $enrollment, $week) {
+            $this->progress->completeRemainingItems($user, $enrollment, $week);
 
             return $enrollment->fresh();
-        });
+        }, 'Enrollment');
     }
 
     /**
      * @param  \App\Models\ContentItem  $item
+     * @param  Collection<int, Assessment>  $offeringAssessments
      * @return array<string, mixed>
      */
-    private function mapItem($item, CourseOffering $offering): array
+    private function mapItem($item, CourseOffering $offering, Collection $offeringAssessments): array
     {
         $payload = [
             'id' => $item->id,
@@ -156,12 +126,12 @@ class CoursePlayerService
         ];
 
         if (in_array($item->type, [ContentItemType::Assignment], true)) {
-            $assignment = Assignment::query()->where('content_item_id', $item->id)->first();
+            $assignment = $item->assignment;
             $payload['url'] = $assignment ? route('assignments.show', $assignment) : null;
         }
 
         if (in_array($item->type, [ContentItemType::Quiz, ContentItemType::Exam], true)) {
-            $assessment = $this->resolveAssessment($item, $offering);
+            $assessment = $this->resolveAssessment($item, $offeringAssessments);
             $payload['url'] = $assessment ? route('assessments.show', $assessment) : null;
         }
 
@@ -175,18 +145,17 @@ class CoursePlayerService
     /**
      * Link a week item to its assessment only when the relationship is unambiguous.
      * Never fall back to "first released on the offering" — that deep-links the wrong exam.
+     *
+     * @param  \App\Models\ContentItem  $item
+     * @param  Collection<int, Assessment>  $offeringAssessments
      */
-    private function resolveAssessment($item, CourseOffering $offering): ?Assessment
+    private function resolveAssessment($item, Collection $offeringAssessments): ?Assessment
     {
-        $linked = Assessment::query()->where('content_item_id', $item->id)->first();
-        if ($linked !== null) {
-            return $linked;
+        if ($item->assessment !== null) {
+            return $item->assessment;
         }
 
-        $matches = Assessment::query()
-            ->where('offering_id', $offering->id)
-            ->where('title', $item->title)
-            ->get();
+        $matches = $offeringAssessments->where('title', $item->title)->values();
 
         if ($matches->count() === 1) {
             return $matches->first();

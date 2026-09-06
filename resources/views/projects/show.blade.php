@@ -7,7 +7,7 @@
 >
     <x-slot:actions>
         <a href="{{ route('student.projects.index', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('projects.back_to_list') }}</a>
-        <a href="{{ route('courses.player', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('learning.open_player') }}</a>
+        <a href="{{ route('learn.offering', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('learning.open_player') }}</a>
     </x-slot:actions>
 </x-page-header>
 

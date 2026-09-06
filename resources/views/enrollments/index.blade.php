@@ -43,7 +43,7 @@
             <td>{{ number_format($enrollment->progress_percent, 0) }}%</td>
             <td class="d-flex gap-1 flex-wrap">
                 @if(in_array($enrollment->status->value, ['ENROLLED', 'COMPLETED'], true))
-                <a class="btn btn-sm btn-primary" href="{{ route('courses.player', $enrollment->offering) }}">{{ __('learning.open_player') }}</a>
+                <a class="btn btn-sm btn-primary" href="{{ route('learn.offering', $enrollment->offering) }}">{{ __('learning.open_player') }}</a>
                 @endif
                 @if($enrollment->status->value === 'ENROLLED')
                 <form method="POST" action="{{ route('enrollments.drop', $enrollment) }}">@csrf<button class="btn btn-sm btn-outline-danger">{{ __('enrollment.drop') }}</button></form>

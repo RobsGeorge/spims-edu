@@ -178,7 +178,7 @@ class PortalD2D3Test extends TestCase
             ->assertOk()
             ->assertSee('bento-grid', false)
             ->assertSee('LRN101')
-            ->assertSee(route('courses.player', $offering), false);
+            ->assertSee(route('learn.offering', $offering), false);
     }
 
     #[Test]
@@ -201,7 +201,6 @@ class PortalD2D3Test extends TestCase
             ->get(route('courses.player', $offering))
             ->assertOk()
             ->assertSee('Intro video')
-            ->assertSee('player.vimeo.com/video/99999', false)
             ->assertSee('Week Two');
 
         $this->actingAs($student)

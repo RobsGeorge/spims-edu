@@ -324,7 +324,7 @@ class LearningPlayerTest extends TestCase
             ->get(route('enrollments.index'))
             ->assertOk()
             ->assertSee(__('learning.open_player'))
-            ->assertSee(route('courses.player', $bundle['offering']), false);
+            ->assertSee(route('learn.offering', $bundle['offering']), false);
     }
 
     #[Test]
@@ -359,5 +359,79 @@ class LearningPlayerTest extends TestCase
             ->assertSee('Unlinked week quiz')
             ->assertDontSee($otherShow, false)
             ->assertDontSee($otherStart, false);
+    }
+
+    #[Test]
+    public function progress_percent_is_item_ratio_from_learn_and_complete_week(): void
+    {
+        $studentLearn = User::factory()->withRole(RoleType::Student)->create();
+        $studentWeek = User::factory()->withRole(RoleType::Student)->create();
+        $course = Course::query()->create([
+            'code' => 'PROG',
+            'title' => 'Progress Course',
+            'credit_hours' => 1,
+            'active' => true,
+        ]);
+        $offering = CourseOffering::query()->create([
+            'course_id' => $course->id,
+            'mode' => OfferingMode::SelfPaced,
+            'status' => 'OPEN',
+        ]);
+
+        $firstItem = null;
+        $firstWeek = null;
+        for ($n = 1; $n <= 4; $n++) {
+            $week = Week::query()->create([
+                'offering_id' => $offering->id,
+                'number' => $n,
+                'title' => 'Week '.$n,
+                'order' => $n,
+            ]);
+            $item = ContentItem::query()->create([
+                'week_id' => $week->id,
+                'type' => ContentItemType::Text,
+                'title' => 'Item '.$n,
+                'order' => 1,
+                'body' => 'body',
+            ]);
+            if ($n === 1) {
+                $firstWeek = $week;
+                $firstItem = $item;
+            }
+        }
+
+        $enLearn = Enrollment::query()->create([
+            'student_id' => $studentLearn->id,
+            'offering_id' => $offering->id,
+            'status' => EnrollmentStatus::Enrolled,
+            'enrolled_at' => now(),
+            'progress_percent' => 0,
+        ]);
+        $enWeek = Enrollment::query()->create([
+            'student_id' => $studentWeek->id,
+            'offering_id' => $offering->id,
+            'status' => EnrollmentStatus::Enrolled,
+            'enrolled_at' => now(),
+            'progress_percent' => 0,
+        ]);
+
+        $this->actingAs($studentLearn)
+            ->post(route('learn.item.complete', [$offering, $firstItem]))
+            ->assertRedirect();
+        $this->assertEquals(25, (float) $enLearn->fresh()->progress_percent);
+
+        $this->actingAs($studentWeek)
+            ->post(route('courses.weeks.complete', [$offering, $firstWeek]))
+            ->assertRedirect();
+        $this->assertEquals(25, (float) $enWeek->fresh()->progress_percent);
+    }
+
+    #[Test]
+    public function guest_courses_player_redirects_to_login(): void
+    {
+        $bundle = $this->selfPacedBundle();
+
+        $this->get(route('courses.player', $bundle['offering']))
+            ->assertRedirect(route('auth.login'));
     }
 }

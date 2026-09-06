@@ -24,7 +24,7 @@ class LearnController extends Controller
     public function offering(Request $request, CourseOffering $offering): View
     {
         $enrollment = $this->access->requireEnrollment($request->user(), $offering);
-        $offering->load(['course', 'weeks.items']);
+        $offering->load(['course', 'weeks.items.assignment', 'weeks.items.assessment']);
 
         $weeks = $offering->weeks->sortBy('number')->values();
         $completedWeeks = $this->progress->completedWeekNumbers($enrollment);
@@ -49,8 +49,8 @@ class LearnController extends Controller
     {
         $enrollment = $this->access->requireEnrollment($request->user(), $offering);
         $this->access->assertWeekBelongsToOffering($week, $offering);
-        $offering->load(['course', 'weeks.items']);
-        $week->load('items');
+        $offering->load(['course', 'weeks.items.assignment', 'weeks.items.assessment']);
+        $week->load(['items.assignment', 'items.assessment']);
 
         $unlocked = $this->progress->isWeekUnlocked($enrollment, $offering, $week);
 
@@ -70,7 +70,7 @@ class LearnController extends Controller
     {
         $enrollment = $this->access->requireEnrollment($request->user(), $offering);
         $week = $this->access->assertItemBelongsToOffering($item, $offering);
-        $offering->load(['course', 'weeks.items']);
+        $offering->load(['course', 'weeks.items.assignment', 'weeks.items.assessment']);
         $item->load(['assignment', 'assessment']);
 
         if (! $this->progress->isWeekUnlocked($enrollment, $offering, $week)) {

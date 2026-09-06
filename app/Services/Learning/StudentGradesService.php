@@ -89,7 +89,7 @@ class StudentGradesService
                 'final_percent' => $enrollment->final_percent,
                 'grade_status' => $enrollment->grade_status?->value,
                 'items' => $items,
-                'player_url' => route('courses.player', $offering),
+                'player_url' => route('learn.offering', $offering),
             ];
         }
 
