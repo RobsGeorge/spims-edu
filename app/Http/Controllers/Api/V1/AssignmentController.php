@@ -91,15 +91,11 @@ class AssignmentController extends Controller
 
         $fileUrl = null;
         if ($request->hasFile('file')) {
-            /** @var \Illuminate\Http\UploadedFile $file */
-            $file = $request->file('file');
-            $path = $this->storage->signedUploadPath(
-                'submissions',
-                (string) $request->user()->id,
-                $file->getClientOriginalExtension() ?: $file->extension()
+            $fileUrl = $this->assignments->storeSubmissionFile(
+                $request->user(),
+                $assignment,
+                $request->file('file')
             );
-            $this->storage->store($path, $file->get() ?: '');
-            $fileUrl = $path;
         }
 
         $submission = $this->assignments->submit(

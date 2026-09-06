@@ -3,8 +3,7 @@
 @section('content')
 <x-page-header :title="__('completion.own_title')" :subtitle="$offering->course->code.' · '.$offering->course->title">
     <x-slot:actions>
-        <a href="{{ route('courses.player', $offering) }}" class="btn btn-outline-secondary">{{ __('learning.open_player') }}</a>
-        <a href="{{ route('learn.offering', $offering) }}" class="btn btn-outline-secondary">{{ __('learn.player_title') }}</a>
+        <a href="{{ route('learn.offering', $offering) }}" class="btn btn-outline-secondary">{{ __('learning.open_player') }}</a>
         <a href="{{ route('transcript.show') }}" class="btn btn-outline-secondary">{{ __('credentials.transcript') }}</a>
     </x-slot:actions>
 </x-page-header>

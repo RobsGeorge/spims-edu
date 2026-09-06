@@ -35,7 +35,7 @@
                                     <div class="fw-semibold">{{ $enrollment->offering->course->code }} · {{ $enrollment->offering->course->title }}</div>
                                     <div class="small text-muted-theme">{{ __('learning.progress', ['percent' => (int) $enrollment->progress_percent]) }}</div>
                                 </div>
-                                <a class="btn btn-sm btn-outline-primary" href="{{ route('courses.player', $enrollment->offering) }}">{{ __('learning.open_player') }}</a>
+                                <a class="btn btn-sm btn-outline-primary" href="{{ route('learn.offering', $enrollment->offering) }}">{{ __('learning.open_player') }}</a>
                             </div>
                         </li>
                     @endforeach

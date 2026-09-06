@@ -331,8 +331,11 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:courses.flag_interest')
         ->name('catalog.interest');
 
-    Route::get('/courses/{offering}', [CoursePlayerController::class, 'show'])->name('courses.player');
+    Route::get('/courses/{offering}', [CoursePlayerController::class, 'show'])
+        ->middleware('permission:offerings.view')
+        ->name('courses.player');
     Route::post('/courses/{offering}/weeks/{week}/complete', [CoursePlayerController::class, 'completeWeek'])
+        ->middleware('permission:offerings.view')
         ->name('courses.weeks.complete');
 
     Route::get('/grades', [GradesController::class, 'index'])

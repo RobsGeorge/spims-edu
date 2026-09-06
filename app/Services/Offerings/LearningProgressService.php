@@ -155,6 +155,23 @@ class LearningProgressService
         });
     }
 
+    /**
+     * Mark every remaining item in the week complete (item-level progress).
+     * Week completion and enrollments.progress_percent follow from those items.
+     */
+    public function completeRemainingItems(User $actor, Enrollment $enrollment, Week $week): void
+    {
+        $week->loadMissing('items');
+
+        foreach ($week->items as $item) {
+            if ($this->isItemComplete($enrollment, $item)) {
+                continue;
+            }
+
+            $this->markItemComplete($actor, $enrollment, $item, manual: false);
+        }
+    }
+
     public function maybeCompleteWeek(Enrollment $enrollment, Week $week): void
     {
         $itemIds = ContentItem::query()->where('week_id', $week->id)->pluck('id');

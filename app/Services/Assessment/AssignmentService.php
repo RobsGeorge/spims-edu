@@ -18,8 +18,10 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Services\Notifications\NotificationService;
 use App\Services\Offerings\LearningProgressService;
+use App\Services\Storage\ObjectStorageService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -31,6 +33,7 @@ class AssignmentService
         private readonly AuditLogWriter $audit,
         private readonly LearningProgressService $progress,
         private readonly NotificationService $notifications,
+        private readonly ObjectStorageService $storage,
     ) {}
 
     /**
@@ -82,6 +85,10 @@ class AssignmentService
             if (! $enrolled) {
                 throw ValidationException::withMessages(['assignment' => [__('assessment.not_enrolled')]]);
             }
+        }
+
+        if ($fileUrl !== null && $fileUrl !== '') {
+            $this->assertOwnedFilePath($student, $fileUrl);
         }
 
         $submittedAt = now();
@@ -152,6 +159,87 @@ class AssignmentService
         }
 
         return $submission;
+    }
+
+    public function storeSubmissionFile(User $student, Assignment $assignment, UploadedFile $file): string
+    {
+        $this->assertFileAllowed($assignment, $file);
+
+        $path = $this->storage->signedUploadPath(
+            'submissions',
+            (string) $student->id,
+            $file->getClientOriginalExtension() ?: $file->extension()
+        );
+
+        $this->storage->store($path, $file->get() ?: '');
+
+        return $path;
+    }
+
+    public function assertOwnedFilePath(User $student, string $path): void
+    {
+        $normalized = ltrim($path, '/');
+
+        if (str_contains($normalized, '://') || str_starts_with($normalized, '//')) {
+            throw ValidationException::withMessages([
+                'file_url' => [__('assessment.file_url_not_allowed')],
+            ]);
+        }
+
+        if (preg_match('#^(submissions|uploads)/([^/]+)/#', $normalized, $matches) === 1
+            && $matches[2] !== (string) $student->id) {
+            throw ValidationException::withMessages([
+                'file' => [__('assessment.file_not_owned')],
+            ]);
+        }
+    }
+
+    private function assertFileAllowed(Assignment $assignment, UploadedFile $file): void
+    {
+        $allowed = array_map('strtolower', $assignment->allowed_file_types ?? []);
+        $ext = strtolower((string) ($file->getClientOriginalExtension() ?: $file->extension() ?: ''));
+
+        if ($allowed === [] || $ext === '' || ! in_array($ext, $allowed, true)) {
+            throw ValidationException::withMessages([
+                'file' => [__('assessment.file_type_not_allowed')],
+            ]);
+        }
+
+        $mime = strtolower((string) $file->getMimeType());
+        $expected = $this->mimesForExtension($ext);
+        if ($expected !== []
+            && $mime !== ''
+            && $mime !== 'application/octet-stream'
+            && ! in_array($mime, $expected, true)) {
+            throw ValidationException::withMessages([
+                'file' => [__('assessment.file_type_not_allowed')],
+            ]);
+        }
+
+        if ($file->getSize() > 10 * 1024 * 1024) {
+            throw ValidationException::withMessages([
+                'file' => [__('assessment.file_too_large')],
+            ]);
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function mimesForExtension(string $ext): array
+    {
+        return match ($ext) {
+            'pdf' => ['application/pdf'],
+            'doc' => ['application/msword'],
+            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+            'zip' => ['application/zip', 'application/x-zip-compressed'],
+            'png' => ['image/png'],
+            'jpg', 'jpeg' => ['image/jpeg'],
+            'txt' => ['text/plain'],
+            'ppt' => ['application/vnd.ms-powerpoint'],
+            'pptx' => ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
+            default => [],
+        };
     }
 
     /** Snapshot the current state of a submission before it is replaced. */
