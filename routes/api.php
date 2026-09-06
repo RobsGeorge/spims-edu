@@ -31,7 +31,10 @@ use App\Http\Controllers\Api\V1\ProjectController;
 use App\Http\Controllers\Api\V1\TeachAnnouncementController;
 use App\Http\Controllers\Api\V1\TeachAttendanceController;
 use App\Http\Controllers\Api\V1\TeachCompletionController;
+use App\Http\Controllers\Api\V1\TeachContentController;
+use App\Http\Controllers\Api\V1\TeachDiscussionController;
 use App\Http\Controllers\Api\V1\TeachLiveQuizController;
+use App\Http\Controllers\Api\V1\TeachLiveSessionController;
 use App\Http\Controllers\Api\V1\TeachProjectController;
 use App\Http\Controllers\Api\V1\TranscriptController;
 use App\Http\Controllers\Api\V1\WalletController;
@@ -243,6 +246,35 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
                 ->name('project-assessments.announce');
             Route::get('/projects/{project}/peer-evaluations', [TeachProjectController::class, 'peerAggregates'])
                 ->name('projects.peer-evaluations');
+
+            // --- S8 ops (owned by cursor/s8-ops-bcff) ---
+            Route::get('/offerings/{offering}/live-sessions', [TeachLiveSessionController::class, 'index'])
+                ->name('offerings.live-sessions');
+            Route::post('/live-sessions/{liveSession}/attendance/import', [TeachLiveSessionController::class, 'importAttendance'])
+                ->name('live-sessions.attendance.import');
+
+            Route::post('/projects/{project}/members/move', [TeachProjectController::class, 'moveMember'])
+                ->name('projects.members.move');
+            Route::post('/project-submissions/{projectDeliverableSubmission}/review', [TeachProjectController::class, 'reviewSubmission'])
+                ->name('project-submissions.review');
+            Route::post('/projects/{project}/grade', [TeachProjectController::class, 'grade'])
+                ->name('projects.grade');
+
+            Route::get('/offerings/{offering}/discussions/threads', [TeachDiscussionController::class, 'threads'])
+                ->name('offerings.discussions.threads');
+            Route::post('/discussions/threads/{discussionThread}/moderate', [TeachDiscussionController::class, 'moderate'])
+                ->name('discussions.threads.moderate');
+            Route::post('/discussions/threads/{discussionThread}/grade', [TeachDiscussionController::class, 'grade'])
+                ->name('discussions.threads.grade');
+
+            Route::post('/offerings/{offering}/weeks', [TeachContentController::class, 'storeWeek'])
+                ->name('offerings.weeks.store');
+            Route::post('/weeks/{week}/items', [TeachContentController::class, 'storeItem'])
+                ->name('weeks.items.store');
+            Route::put('/items/{contentItem}', [TeachContentController::class, 'updateItem'])
+                ->name('items.update');
+            Route::delete('/items/{contentItem}', [TeachContentController::class, 'destroyItem'])
+                ->name('items.destroy');
         });
     });
 });

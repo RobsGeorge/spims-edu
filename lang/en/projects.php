@@ -28,4 +28,5 @@ return [
     'invalid_transition' => 'Cannot move this assessment from :from to :to.',
     'same_team' => 'Source and target teams must be different.',
     'file_not_on_submission' => 'That file does not belong to this team submission.',
+    'scores_required' => 'Provide a team score and/or per-student scores.',
 ];

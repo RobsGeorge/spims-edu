@@ -13,8 +13,10 @@ use App\Models\OfferingStaff;
 use App\Models\User;
 use App\Models\Week;
 use App\Services\Discussions\DiscussionService;
+use App\Services\Storage\ObjectStorageService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -25,6 +27,7 @@ class OfferingService
         private readonly AuditLogWriter $audit,
         private readonly ContentGatingService $gating,
         private readonly DiscussionService $discussions,
+        private readonly ObjectStorageService $storage,
     ) {}
 
     public function create(User $actor, array $data): CourseOffering
@@ -128,9 +131,13 @@ class OfferingService
         ]), 'Week');
     }
 
-    public function addContentItem(User $actor, Week $week, array $data): ContentItem
+    public function addContentItem(User $actor, Week $week, array $data, ?UploadedFile $file = null): ContentItem
     {
         $this->authorize->authorize($actor, 'offerings.content', $week);
+
+        if ($file !== null) {
+            $data['file_url'] = $this->storeItemFile($week, $file);
+        }
 
         return $this->audit->withAudit($actor, 'offerings.add_content', fn () => ContentItem::query()->create([
             'week_id' => $week->id,
@@ -141,6 +148,58 @@ class OfferingService
             'file_url' => $data['file_url'] ?? null,
             'body' => $data['body'] ?? null,
         ]), 'ContentItem');
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function updateContentItem(User $actor, ContentItem $item, array $data, ?UploadedFile $file = null): ContentItem
+    {
+        $item->loadMissing('week');
+        $this->authorize->authorize($actor, 'offerings.content', $item);
+
+        return $this->audit->withAudit($actor, 'offerings.update_content', function () use ($item, $data, $file) {
+            if ($file !== null && $item->week !== null) {
+                $data['file_url'] = $this->storeItemFile($item->week, $file);
+            }
+
+            if (isset($data['type'])) {
+                $data['type'] = $data['type'] instanceof ContentItemType
+                    ? $data['type']
+                    : ContentItemType::from($data['type']);
+            }
+
+            $item->fill(array_intersect_key($data, array_flip([
+                'type', 'title', 'order', 'vimeo_id', 'file_url', 'body',
+            ])));
+            $item->save();
+
+            return $item->fresh();
+        }, 'ContentItem');
+    }
+
+    public function deleteContentItem(User $actor, ContentItem $item): void
+    {
+        $this->authorize->authorize($actor, 'offerings.content', $item);
+
+        $this->audit->withAudit($actor, 'offerings.delete_content', function () use ($item) {
+            $item->delete();
+
+            return $item;
+        }, 'ContentItem');
+    }
+
+    private function storeItemFile(Week $week, UploadedFile $file): string
+    {
+        $path = $this->storage->signedUploadPath(
+            'uploads',
+            $week->id,
+            $file->getClientOriginalExtension() ?: $file->extension()
+        );
+        $contents = $file->get() ?: '';
+        $this->storage->store($path, $contents);
+
+        return $path;
     }
 
     public function previewPayload(CourseOffering $offering): array

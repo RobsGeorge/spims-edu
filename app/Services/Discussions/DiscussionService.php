@@ -243,4 +243,23 @@ class DiscussionService
             ->where('student_id', $student->id)
             ->value('final_score');
     }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, DiscussionThread>
+     */
+    public function threadsForOffering(User $actor, CourseOffering $offering)
+    {
+        $this->authorize->authorize($actor, 'discussions.moderate', $offering);
+
+        $board = $this->ensureBoard($offering);
+        if ($board === null) {
+            return collect();
+        }
+
+        return DiscussionThread::query()
+            ->where('board_id', $board->id)
+            ->orderByDesc('pinned')
+            ->latest('created_at')
+            ->get();
+    }
 }
