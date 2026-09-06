@@ -15,6 +15,8 @@ use App\Models\AttemptAnswer;
 use App\Models\AttendanceEntry;
 use App\Models\AttendancePolicy;
 use App\Models\ClassSession;
+use App\Models\CompletionCriterion;
+use App\Models\CompletionResult;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
@@ -25,9 +27,12 @@ use App\Models\EmailTemplate;
 use App\Models\Enrollment;
 use App\Models\GradebookComponent;
 use App\Models\LiveSession;
+use App\Models\ModuleStudentAssessment;
+use App\Models\OfferingClosing;
 use App\Models\OfferingStaff;
 use App\Models\ProctorEvent;
 use App\Models\QuestionBank;
+use App\Models\StudentNote;
 use App\Models\User;
 use App\Models\Week;
 
@@ -104,6 +109,11 @@ class ResourceScopeResolver
             $resource instanceof AnnouncementRevision => $resource->announcement?->offering_id,
             $resource instanceof AnnouncementDelivery => $resource->announcement?->offering_id,
             $resource instanceof EmailTemplate => $resource->scope_type === 'offering' ? $resource->scope_id : null,
+            $resource instanceof OfferingClosing => $resource->offering_id,
+            $resource instanceof CompletionResult => $resource->offering_id,
+            $resource instanceof StudentNote => $resource->offering_id,
+            $resource instanceof ModuleStudentAssessment => $resource->week?->offering_id,
+            $resource instanceof CompletionCriterion && $resource->isOfferingScoped() => $resource->offering_id,
             default => null,
         };
 
@@ -116,6 +126,7 @@ class ResourceScopeResolver
             $resource instanceof QuestionBank => $resource->course_id,
             $resource instanceof Course => $resource->id,
             $resource instanceof EmailTemplate && $resource->scope_type === 'course' => $resource->scope_id,
+            $resource instanceof CompletionCriterion && ! $resource->isOfferingScoped() => $resource->course_id,
             default => null,
         };
 

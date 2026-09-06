@@ -78,4 +78,8 @@ return [
     'communications_desc' => 'Outbound messages, filters, and export.',
     'email_templates' => 'Email templates',
     'email_templates_desc' => 'Edit and preview staff email templates.',
+    'certificate_templates' => 'Certificate templates',
+    'certificate_templates_desc' => 'Course and global certificate layouts.',
+    'completion' => 'Completion',
+    'completion_desc' => 'Criteria, closing workflow, and cohort results.',
 ];

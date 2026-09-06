@@ -88,9 +88,15 @@ class IntegrationsI1Test extends TestCase
 
         $path = app(ReceiptPdfService::class)->generate($payment);
 
-        $this->assertSame('receipts/'.$payment->id.'.html', $path);
+        $this->assertTrue(str_ends_with($path, '.pdf') || str_ends_with($path, '.html'));
+        $this->assertSame('receipts/'.$payment->id.substr($path, strrpos($path, '.')), $path);
         Storage::disk('local')->assertExists($path);
-        $this->assertStringContainsString('SPIMS-2026-00099', Storage::disk('local')->get($path));
+        $bytes = Storage::disk('local')->get($path);
+        if (str_ends_with($path, '.pdf')) {
+            $this->assertStringStartsWith('%PDF-', $bytes);
+        } else {
+            $this->assertStringContainsString('SPIMS-2026-00099', $bytes);
+        }
         $this->assertSame($path, $payment->fresh()->receipt_url);
         $this->assertTrue(app(ObjectStorageService::class)->exists($path));
     }

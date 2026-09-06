@@ -51,6 +51,13 @@ return [
         'announcements.manage',
         'announcements.publish',
         'email_templates.manage',
+        'completion.view',
+        'completion.configure',
+        'offering.close',
+        'student_notes.view',
+        'student_notes.manage',
+        'module_assessment.view',
+        'module_assessment.manage',
     ],
 
     /*

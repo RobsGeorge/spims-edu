@@ -206,6 +206,7 @@ class NavigationHub
             self::link('admin.attendance.policy', 'hubs.attendance_admin', 'bi-clipboard-check', 'hubs.attendance_admin_desc'),
             self::link('admin.communications.report', 'hubs.communications', 'bi-envelope-paper', 'hubs.communications_desc'),
             self::link('admin.email-templates.index', 'hubs.email_templates', 'bi-file-earmark-text', 'hubs.email_templates_desc'),
+            self::link('admin.certificate-templates.index', 'hubs.certificate_templates', 'bi-award', 'hubs.certificate_templates_desc'),
         ]));
     }
 

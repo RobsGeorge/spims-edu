@@ -214,6 +214,7 @@ return [
         'TA' => 'R',
     ],
     'gradebook.lock' => [
+        'ACADEMIC_ADMIN' => 'F',
         'INSTRUCTOR' => 'lock',
     ],
     'gradebook.reopen' => [
@@ -348,5 +349,45 @@ return [
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
         'STUDENT' => 'O',
+    ],
+
+    // S4 — completion criteria, offering closing, credentials.
+    'completion.view' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'STUDENT' => 'O',
+    ],
+    'completion.configure' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'offering.close' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+    ],
+    'certificate_templates.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'student_notes.view' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'student_notes.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'module_assessment.view' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'module_assessment.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
     ],
 ];

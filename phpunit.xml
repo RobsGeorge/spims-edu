@@ -30,6 +30,7 @@
             <exclude>tests/Feature/Rbac</exclude>
             <exclude>tests/Feature/Integrations</exclude>
             <exclude>tests/Feature/Communications</exclude>
+            <exclude>tests/Feature/Completion</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -90,6 +91,9 @@
         </testsuite>
         <testsuite name="Communications">
             <directory>tests/Feature/Communications</directory>
+        </testsuite>
+        <testsuite name="Completion">
+            <directory>tests/Feature/Completion</directory>
         </testsuite>
     </testsuites>
     <source>

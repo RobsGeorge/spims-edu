@@ -28,4 +28,7 @@ return [
     'requirements_incomplete' => 'Program requirements are not complete.',
     'not_standalone' => 'Offering is not a standalone course.',
     'not_passed' => 'Student has not passed this course.',
+    'download' => 'Download',
+    'certificate_default_title' => 'Certificate of completion',
+    'certificate_default_body' => 'This certifies that {{student_name}} has completed {{course_title}}.',
 ];

@@ -78,4 +78,8 @@ return [
     'communications_desc' => 'الرسائل الصادرة والتصفية والتصدير.',
     'email_templates' => 'قوالب البريد',
     'email_templates_desc' => 'تحرير ومعاينة قوالب البريد.',
+    'certificate_templates' => 'قوالب الشهادات',
+    'certificate_templates_desc' => 'تخطيطات الشهادات العامة والخاصة بالمقرر.',
+    'completion' => 'الإكمال',
+    'completion_desc' => 'المعايير وسير الإغلاق ونتائج الدفعة.',
 ];
