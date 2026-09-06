@@ -8,6 +8,7 @@ use App\Models\AnnouncementRevision;
 use App\Models\AnnouncementTarget;
 use App\Models\Assessment;
 use App\Models\AssessmentAttempt;
+use App\Models\AssessmentResultAnnouncement;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\AttemptAnswer;
@@ -25,6 +26,7 @@ use App\Models\Enrollment;
 use App\Models\GradebookComponent;
 use App\Models\LiveSession;
 use App\Models\OfferingStaff;
+use App\Models\ProctorEvent;
 use App\Models\QuestionBank;
 use App\Models\User;
 use App\Models\Week;
@@ -93,6 +95,8 @@ class ResourceScopeResolver
             $resource instanceof AssignmentSubmission => $resource->assignment?->contentItem?->week?->offering_id,
             $resource instanceof AssessmentAttempt => $resource->assessment?->offering_id,
             $resource instanceof AttemptAnswer => $resource->attempt?->assessment?->offering_id,
+            $resource instanceof ProctorEvent => $resource->attempt?->assessment?->offering_id,
+            $resource instanceof AssessmentResultAnnouncement => $resource->assessment?->offering_id,
             $resource instanceof DiscussionThread => $resource->board?->offering_id,
             $resource instanceof DiscussionPost => $resource->thread?->board?->offering_id,
             $resource instanceof Announcement => $resource->offering_id,

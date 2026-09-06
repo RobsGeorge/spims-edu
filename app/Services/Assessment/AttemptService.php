@@ -28,6 +28,7 @@ class AttemptService
         private readonly ObjectiveGrader $objective,
         private readonly EssayAiGrader $essayAi,
         private readonly LearningProgressService $progress,
+        private readonly ProctorService $proctor,
     ) {}
 
     public function start(User $student, Assessment $assessment): AssessmentAttempt
@@ -135,6 +136,10 @@ class AttemptService
         $this->authorize->authorize($student, 'assessments.take');
         $this->assertOwner($student, $attempt);
 
+        if ($attempt->terminated_for_cheating) {
+            throw ValidationException::withMessages(['attempt' => [__('assessment.terminated_for_cheating')]]);
+        }
+
         if ($attempt->status !== AttemptStatus::InProgress) {
             throw ValidationException::withMessages(['attempt' => [__('assessment.not_in_progress')]]);
         }
@@ -159,16 +164,15 @@ class AttemptService
         return $attempt->fresh('answers');
     }
 
+    /**
+     * Delegates to ProctorService so the counter finally does something: enough
+     * focus-loss events now escalate to real termination instead of just incrementing a
+     * number nobody reads. The public signature and the `focus-loss` route are
+     * unchanged, so existing callers keep working.
+     */
     public function logFocusLoss(User $student, AssessmentAttempt $attempt): AssessmentAttempt
     {
-        $this->assertOwner($student, $attempt);
-        if ($attempt->status !== AttemptStatus::InProgress) {
-            return $attempt;
-        }
-
-        $attempt->increment('focus_loss_count');
-
-        return $attempt->fresh();
+        return $this->proctor->recordEvent($student, $attempt, 'FOCUS_LOSS');
     }
 
     public function submit(User $actor, AssessmentAttempt $attempt, bool $auto = false): AssessmentAttempt
@@ -176,6 +180,10 @@ class AttemptService
         if (! $auto) {
             $this->authorize->authorize($actor, 'assessments.take');
             $this->assertOwner($actor, $attempt);
+        }
+
+        if ($attempt->terminated_for_cheating) {
+            throw ValidationException::withMessages(['attempt' => [__('assessment.terminated_for_cheating')]]);
         }
 
         if (in_array($attempt->status, [AttemptStatus::Submitted, AttemptStatus::AutoSubmitted, AttemptStatus::Graded], true)) {
@@ -266,6 +274,13 @@ class AttemptService
     public function overrideScore(User $grader, AttemptAnswer $answer, float $finalScore, ?string $feedback = null): AttemptAnswer
     {
         $this->authorize->authorize($grader, 'assessments.grade', $answer);
+
+        $ownerAttempt = $answer->attempt()->first();
+        if ($ownerAttempt?->terminated_for_cheating) {
+            throw ValidationException::withMessages([
+                'attempt' => [__('assessment.terminated_for_cheating')],
+            ]);
+        }
 
         $answer->update([
             'final_score' => $finalScore,

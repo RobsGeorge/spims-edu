@@ -6,10 +6,13 @@ use App\Enums\AssessmentMode;
 use App\Enums\ResultsVisibility;
 use App\Enums\ScoringRule;
 use App\Models\Assessment;
+use App\Models\AssessmentAttempt;
 use App\Models\AssessmentQuestion;
+use App\Models\AssessmentResultAnnouncement;
 use App\Models\CourseOffering;
 use App\Models\Question;
 use App\Models\User;
+use App\Services\Notifications\NotificationService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +23,7 @@ class AssessmentService
     public function __construct(
         private readonly AuthorizeService $authorize,
         private readonly AuditLogWriter $audit,
+        private readonly NotificationService $notifications,
     ) {}
 
     /**
@@ -80,6 +84,56 @@ class AssessmentService
         $this->audit->write($actor, 'assessments.release', 'Assessment', $assessment->id);
 
         return $assessment->fresh();
+    }
+
+    /**
+     * Announces results: flips `released` (via release(), which stays a distinct,
+     * still-usable entry point for quietly correcting scores before telling students
+     * more broadly), records/updates the one-per-assessment announcement row, and
+     * notifies every student with at least one attempt.
+     *
+     * `assessment_result_announcements.notified_student_ids` is the de-duplication
+     * guard: a student already in that list is never notified again by a later call, so
+     * re-announcing (e.g. after fixing a grading mistake) only touches up `announced_at`
+     * and reaches students who have not yet been told.
+     */
+    public function announceResults(User $actor, Assessment $assessment): AssessmentResultAnnouncement
+    {
+        $this->authorize->authorize($actor, 'assessments.announce_results', $assessment);
+
+        return $this->audit->withAudit($actor, 'assessments.announce_results', function () use ($actor, $assessment) {
+            if (! $assessment->released) {
+                $this->release($actor, $assessment);
+            }
+
+            $announcement = AssessmentResultAnnouncement::query()->firstOrNew(['assessment_id' => $assessment->id]);
+            $announcement->announced_at = now();
+            $announcement->announced_by_id = $actor->id;
+
+            $alreadyNotified = collect($announcement->notified_student_ids ?? []);
+
+            $studentIds = AssessmentAttempt::query()
+                ->where('assessment_id', $assessment->id)
+                ->distinct()
+                ->pluck('student_id');
+
+            $toNotify = $studentIds->diff($alreadyNotified)->values();
+
+            foreach (User::query()->whereIn('id', $toNotify)->get() as $student) {
+                $this->notifications->notify(
+                    $student,
+                    'assessments.results_announced',
+                    __('assessment.results_announced_title'),
+                    __('assessment.results_announced_body', ['title' => $assessment->title]),
+                    ['assessment_id' => $assessment->id],
+                );
+            }
+
+            $announcement->notified_student_ids = $alreadyNotified->merge($toNotify)->unique()->values()->all();
+            $announcement->save();
+
+            return $announcement;
+        }, AssessmentResultAnnouncement::class);
     }
 
     /**

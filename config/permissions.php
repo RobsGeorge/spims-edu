@@ -161,6 +161,27 @@ return [
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
     ],
+    /*
+     * Grant for a human reviewing/acting on proctor events (e.g. viewing the log before
+     * deciding whether to ask an admin to clear a termination). Distinct from
+     * ProctorService::recordEvent(), which runs as a side effect of the student's own
+     * self-scoped `assessments.take` action and is never gated by this key.
+     */
+    'assessments.proctor' => [
+        'INSTRUCTOR' => 'O',
+    ],
+    'assessments.announce_results' => [
+        'INSTRUCTOR' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    /*
+     * Deliberately school-wide, not offering-scoped: clearing a cheating flag is an
+     * admin override, not an instructor-level action. Do not add to
+     * `permission_scopes.offering_scoped`.
+     */
+    'assessments.clear_termination' => [
+        'ACADEMIC_ADMIN' => 'F',
+    ],
     'assignments.manage' => [
         'ACADEMIC_ADMIN' => 'F',
         'INSTRUCTOR' => 'O',
@@ -173,6 +194,19 @@ return [
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
         'ACADEMIC_ADMIN' => 'R',
+    ],
+    'assignments.dashboard' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'assignments.remind' => [
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'assignments.mark_received' => [
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
     ],
     'gradebook.configure' => [
         'ACADEMIC_ADMIN' => 'F',

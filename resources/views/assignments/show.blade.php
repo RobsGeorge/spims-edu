@@ -7,10 +7,17 @@
 <p>Due: {{ $assignment->due_date }} · Max: {{ $assignment->max_points }}</p>
 @if($submission)
     <p>Submitted {{ $submission->submitted_at }} @if($submission->is_late)(late)@endif — score {{ $submission->final_score }}</p>
+    @if($submission->received_at)
+        <p class="text-success">{{ __('assessment.marked_received') }} ({{ $submission->received_at }})</p>
+    @endif
 @endif
-<form method="POST" action="{{ route('assignments.submit', $assignment) }}">@csrf
-    <textarea name="text_body" class="form-control mb-2" rows="5"></textarea>
-    <input name="file_url" class="form-control mb-2" placeholder="file url">
-    <button class="btn btn-primary">Submit</button>
-</form>
+@if($assignment->delivery_mode->value === 'OFFLINE')
+    <p class="text-muted-theme">{{ __('assessment.offline_use_mark_received') }}</p>
+@else
+    <form method="POST" action="{{ route('assignments.submit', $assignment) }}">@csrf
+        <textarea name="text_body" class="form-control mb-2" rows="5"></textarea>
+        <input name="file_url" class="form-control mb-2" placeholder="file url">
+        <button class="btn btn-primary">Submit</button>
+    </form>
+@endif
 @endsection

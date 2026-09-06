@@ -84,6 +84,8 @@ class GradebookController extends Controller
             'max_points' => 'nullable|numeric|min:1',
             'component_id' => 'nullable|exists:gradebook_components,id',
             'late_penalty_override' => 'nullable|numeric|min:0|max:100',
+            'delivery_mode' => 'nullable|in:ONLINE,OFFLINE',
+            'resubmission_deadline' => 'nullable|date',
         ]);
 
         $assignments->create($request->user(), $item, $data);
