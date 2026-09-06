@@ -4,7 +4,7 @@
 **Reviewed:** `main` @ `7cec603` (S0–S3 delivered; S4/S5 next)
 **Method:** static review of services, schema, routes, views, and tests; live `migrate:fresh --seed`; full PHPUnit gate; HTTP path crawl of every seeded role against the local server.
 
-This document is the engineering review. For school leadership, start with [client-system-overview.md](client-system-overview.md). For demo logins, see [demo-accounts.md](demo-accounts.md).
+This document is the engineering review. For school leadership, start with [client-system-overview.md](client-system-overview.md). For demo logins, see [demo-accounts.md](demo-accounts.md). For copy-paste agent prompts to implement the gaps, see [agent-implementation-prompts.md](agent-implementation-prompts.md).
 
 ---
 
