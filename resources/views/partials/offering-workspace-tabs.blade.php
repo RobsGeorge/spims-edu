@@ -36,6 +36,7 @@
                         'completion' => route('teach.completion.show', $offering),
                         'assignments' => route('teach.assignments.index', $offering),
                         'projects' => route('teach.projects.index', $offering),
+                        'live' => route('teach.live.index', $offering),
                         'live_quiz' => route('teach.live-quiz.index', $offering),
                         'surveys' => route('teach.surveys.index', $offering),
                         default => route('teach.show', ['offering' => $offering, 'tab' => $key]),

@@ -37,7 +37,7 @@
         <a class="btn btn-primary" href="{{ route('admin.gradebook.show', $offering) }}">{{ __('teach.open_gradebook') }}</a>
     @elseif($tab === 'live')
         <x-page-header :title="__('teach.tab_live')" :subtitle="__('teach.tab_live_help')" />
-        <a class="btn btn-primary" href="{{ route('admin.live.index', $offering) }}">{{ __('teach.open_live') }}</a>
+        <a class="btn btn-primary" href="{{ route('teach.live.index', $offering) }}">{{ __('teach.open_live') }}</a>
     @elseif($tab === 'attendance')
         <x-page-header :title="__('teach.tab_attendance')" :subtitle="__('teach.tab_attendance_help')" />
         <div class="d-flex flex-wrap gap-2">

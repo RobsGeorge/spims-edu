@@ -75,6 +75,7 @@ use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController
 use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController;
 use App\Http\Controllers\Teach\CompletionController as TeachCompletionController;
 use App\Http\Controllers\Teach\LiveQuizController as TeachLiveQuizController;
+use App\Http\Controllers\Teach\LiveSessionController as TeachLiveSessionController;
 use App\Http\Controllers\Teach\ProjectController as TeachProjectController;
 use App\Http\Controllers\Teach\StudentController as TeachStudentController;
 use App\Http\Controllers\Teach\SurveyController as TeachSurveyController;
@@ -244,6 +245,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/teach/{offering}/projects/{assessment}/submissions/{submission}/review', [TeachProjectController::class, 'reviewSubmission'])
         ->middleware('permission:projects.grade')
         ->name('teach.projects.submissions.review');
+
+    Route::get('/teach/{offering}/live', [TeachLiveSessionController::class, 'index'])
+        ->middleware('permission:live.schedule')
+        ->name('teach.live.index');
+    Route::post('/teach/{offering}/live/{liveSession}/attendance/import', [TeachLiveSessionController::class, 'importAttendance'])
+        ->middleware('permission:attendance.manage')
+        ->name('teach.live.attendance.import');
 
     Route::get('/teach/{offering}/live-quiz', [TeachLiveQuizController::class, 'index'])
         ->middleware('permission:live_quiz.manage')
