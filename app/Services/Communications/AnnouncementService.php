@@ -13,7 +13,6 @@ use App\Models\Announcement;
 use App\Models\AnnouncementDelivery;
 use App\Models\AnnouncementRevision;
 use App\Models\AnnouncementTarget;
-use App\Models\CommunicationLog;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\StudentProgram;
@@ -376,5 +375,4 @@ class AnnouncementService
             'error' => $log->error,
         ]);
     }
-
 }

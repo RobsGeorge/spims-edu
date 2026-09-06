@@ -26,7 +26,7 @@ class EmailTemplateAdminController extends Controller
 
         $this->authorize->authorize($request->user(), 'email_templates.manage', $offering);
 
-        return view('admin.communications.templates', {
+        return view('admin.communications.templates', [
             'templates' => EmailTemplate::query()->orderBy('key')->orderBy('locale')->get(),
             'preview' => $request->session()->get('template_preview'),
             'offering' => $offering,

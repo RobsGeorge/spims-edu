@@ -3,8 +3,8 @@
 namespace App\Services\Communications;
 
 use App\Enums\CommunicationChannel;
-use App\Models\NotificationReminder;
 use App\Models\NotificationPreference;
+use App\Models\NotificationReminder;
 use App\Models\User;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
@@ -145,6 +145,7 @@ class NotificationPreferenceService
             $user = $reminder->user;
             if ($user === null) {
                 $reminder->update(['sent_at' => $at]);
+
                 continue;
             }
 
