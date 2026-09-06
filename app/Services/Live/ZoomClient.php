@@ -2,6 +2,7 @@
 
 namespace App\Services\Live;
 
+use App\Support\WebhookSecretGuard;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -65,6 +66,7 @@ class ZoomClient
     public function verifyWebhookSecret(string $signature, string $timestamp, string $body): bool
     {
         $secret = config('services.zoom.webhook_secret', 'zoom-test');
+        WebhookSecretGuard::assertSafeToVerify(is_string($secret) ? $secret : null, 'zoom');
         $message = 'v0:'.$timestamp.':'.$body;
         $expected = 'v0='.hash_hmac('sha256', $message, $secret);
 

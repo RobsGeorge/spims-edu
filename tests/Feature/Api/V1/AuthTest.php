@@ -228,4 +228,23 @@ class AuthTest extends TestCase
             'password' => 'wrong',
         ])->assertStatus(429)->assertJsonPath('code', 'RATE_LIMITED');
     }
+
+    #[Test]
+    public function a_token_older_than_sanctum_expiration_is_unauthenticated(): void
+    {
+        $minutes = (int) config('sanctum.expiration');
+        $this->assertGreaterThan(0, $minutes);
+
+        $user = $this->activeUser();
+        $plain = $user->createToken('old-phone')->plainTextToken;
+        $user->tokens()->latest()->first()->forceFill([
+            'created_at' => now()->subMinutes($minutes + 1),
+        ])->save();
+
+        Auth::forgetGuards();
+
+        $this->withToken($plain)
+            ->getJson(route('api.v1.me'))
+            ->assertUnauthorized();
+    }
 }

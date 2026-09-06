@@ -14,6 +14,15 @@ use Throwable;
 class Handler extends ExceptionHandler
 {
     /**
+     * Expected 403s must not land in the error log.
+     *
+     * @var array<int, class-string<\Throwable>>
+     */
+    protected $dontReport = [
+        AuthorizationException::class,
+    ];
+
+    /**
      * The list of the inputs that are never flashed to the session on validation exceptions.
      *
      * @var array<int, string>
@@ -29,8 +38,8 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->reportable(function (AuthorizationException $e) {
+            return false;
         });
 
         // One error shape for every /api/v1 failure. Every branch below returns

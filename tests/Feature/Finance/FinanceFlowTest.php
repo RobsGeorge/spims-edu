@@ -223,4 +223,41 @@ class FinanceFlowTest extends TestCase
             'currency' => 'EGP',
         ]);
     }
+
+    #[Test]
+    public function checkout_stays_pending_until_verified_webhook_when_mock_is_off(): void
+    {
+        config(['services.payments.mock_auto_complete' => false]);
+
+        $student = User::factory()->withRole(RoleType::Student)->create(['country_code' => 'US']);
+        $offering = $this->pricedOffering(5000);
+
+        $this->actingAs($student)->post(route('enrollments.store'), ['offering_id' => $offering->id]);
+        $invoice = Invoice::query()->first();
+
+        $this->actingAs($student)->post(route('finance.checkout', $invoice), [
+            'wallet_money' => 0,
+            'wallet_points' => 0,
+            'gateway' => 'PAYPAL',
+        ])->assertRedirect(route('finance.index'));
+
+        $payment = Payment::query()->first();
+        $this->assertSame(PaymentStatus::Pending, $payment->status);
+        $this->assertNull($payment->receipt_serial);
+        $this->assertSame(InvoiceStatus::Open, $invoice->fresh()->status);
+        $this->assertNotNull($payment->gateway_ref);
+
+        $payload = ['id' => 'evt-mock-off'];
+        $signature = hash_hmac('sha256', json_encode($payload), config('services.paypal.webhook_id'));
+
+        $this->postJson(route('api.webhooks.payments'), [
+            'method' => 'PAYPAL',
+            'gateway_ref' => $payment->gateway_ref,
+            'signature' => $signature,
+            'payload' => $payload,
+        ])->assertOk()->assertJsonPath('status', 'COMPLETED');
+
+        $this->assertSame(PaymentStatus::Completed, $payment->fresh()->status);
+        $this->assertSame(InvoiceStatus::Paid, $invoice->fresh()->status);
+    }
 }

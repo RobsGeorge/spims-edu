@@ -4,6 +4,7 @@ namespace App\Services\Finance;
 
 use App\Enums\Currency;
 use App\Enums\PaymentMethod;
+use App\Support\WebhookSecretGuard;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -11,13 +12,14 @@ use Illuminate\Validation\ValidationException;
 /**
  * Payment gateway router (PayPal for USD, Paymob/Cashier for EGP).
  *
- * When `services.payments.mock_auto_complete` is true (default), charges are
- * simulated immediately with HMAC-ready gateway reference IDs (`METHOD-ULID`).
+ * When `services.payments.mock_auto_complete` is true (local/testing only),
+ * charges are simulated immediately with HMAC-ready gateway reference IDs
+ * (`METHOD-ULID`) and PaymentService may mark them completed.
  *
  * When mock is false, live PayPal / Paymob / Cashier SDK calls are intended.
  * Until those SDKs are wired, missing credentials (or unwired SDKs) degrade to
  * the mock charge path with a `Log::warning` — never throws — so CI and local
- * remain green. Callers and webhook HMAC verification stay unchanged.
+ * remain green. The payment stays Pending until a verified webhook arrives.
  */
 class GatewayRouter
 {
@@ -37,7 +39,7 @@ class GatewayRouter
 
     public function charge(PaymentMethod $method, int $amountMinor, Currency $currency, string $paymentId): string
     {
-        $mock = (bool) config('services.payments.mock_auto_complete', true);
+        $mock = (bool) config('services.payments.mock_auto_complete');
 
         if (! $mock) {
             $liveRef = $this->attemptLiveCharge($method, $amountMinor, $currency, $paymentId);
@@ -65,6 +67,8 @@ class GatewayRouter
             PaymentMethod::Cashier => config('services.cashier.secret', 'cashier-test'),
             default => 'test',
         };
+
+        WebhookSecretGuard::assertSafeToVerify(is_string($secret) ? $secret : null, $method->value);
 
         $expected = hash_hmac('sha256', json_encode($payload), $secret);
 
