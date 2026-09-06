@@ -15,7 +15,7 @@ Read them in this order:
 
 ## Status
 
-**S0 and S1 are done. S2 is next.**
+**S0–S3 are done. S4 and S5 are next** (they can proceed in parallel; S4 needs S3's attendance record).
 
 Landed on branch
 [`feat/authz-scope-and-api-foundation`](https://github.com/RobsGeorge/spims-edu/compare/main...feat/authz-scope-and-api-foundation):
@@ -28,12 +28,15 @@ Landed on branch
 | [`40bb283`](https://github.com/RobsGeorge/spims-edu/commit/40bb283) | **S1** | `/api/v1` foundation: `login`, `logout`, `me`, `branding`, one error envelope, `Accept-Language`, OpenAPI coverage test |
 | [`27400aa`](https://github.com/RobsGeorge/spims-edu/commit/27400aa) | **S1** | `login` returned a 500 on PostgreSQL: `personal_access_tokens.tokenable_id` was a bigint against a ULID `users.id` |
 
-The full suite went from 124 to 178 passing.
+The full suite went from 124 to 178 passing on S0/S1, then to **212** after S2 and S3 merged.
 
-**S2 — communications spine** is next: one delivery path and one delivery log behind announcements,
-reminders, graduation notices and project deadlines, before per-feature notification code makes
-delivery reporting impossible. Detail in
-[`implementation-plan.md`](implementation-plan.md), sequencing rationale in
+| Branch | Phase | What |
+|---|---|---|
+| [`cursor/s2-communications-spine-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s2-communications-spine-bcff) | **S2** | Communications spine: publish/targeting/delivery, email templates, per-event preferences, delivery log. Closes G-09…G-12. WhatsApp channel registered, driver not implemented. |
+| [`cursor/s3-attendance-roster-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s3-attendance-roster-bcff) | **S3** | Attendance as an SIS record: class sessions independent of Zoom, excuses, self check-in, roster export, `users.date_of_birth`. Closes G-03, G-04, G-15, G-21. |
+
+**S4 — completion + credentials** and **S5 — assessment completion** are next. Detail in
+[`implementation-plan.md`](implementation-plan.md), sequencing in
 [`execution-order.md`](execution-order.md).
 
 ## Two things S0 changed for every phase after it

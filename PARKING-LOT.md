@@ -22,21 +22,17 @@ Promote an item into an active phase only when the phase owner accepts it.
 
 ## Scheduled for promotion — accepted, not yet built
 
-These have been accepted into the academic roadmap and are **no longer parked**, but none is
-implemented yet. See [docs/academic-roadmap/](docs/academic-roadmap/).
-
-- **Attendance “excused” state** — S3. The spec's present/absent-only model cannot report attendance
-  credibly for an SIS; S3 makes attendance a first-class record with an excuse reason.
 - **Hard exam proctoring** — S5, *partially*: the proctor event log, warning escalation and attempt
   termination are in scope. Lockdown-browser-class enforcement remains out of scope.
 
 ## Promoted and delivered
 
+- **Attendance “excused” state** — **S3**. `attendance_entries` records `PRESENT` / `ABSENT` /
+  `LATE` / `EXCUSED` on `class_sessions` independent of Zoom.
 - **Full REST JSON API surface** matching the original `api-route-structure.md` (the app remains
   Blade-first for its own UI). **Foundation done in S1** — `/api/v1` with `login`, `logout`, `me`
-  and `branding`, a single error envelope, `Accept-Language` resolution, and an OpenAPI document
-  guarded by a coverage test. The endpoint surfaces themselves remain outstanding: **S6** (student
-  API, waves A–E) and **S8** (instructor API).
+  and `branding`. S2 added announcements/notifications/settings; S3 added attendance/roster.
+  Remaining endpoint surfaces: **S6** (student API, remaining waves) and **S8** (instructor API).
 
 ## Spec docs not yet vendored into this repo
 
