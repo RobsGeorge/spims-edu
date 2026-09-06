@@ -23,7 +23,7 @@
 @forelse($seating as $row)
     @php $project = $row['project']; @endphp
     <div class="border rounded-3 p-3 mb-2">
-        <div class="d-flex justify-content-between">
+        <div class="spims-staff-row">
             <strong>{{ $project->name }}</strong>
             <span class="small text-muted-theme">{{ $row['seats'] }}/{{ $row['capacity'] }}</span>
         </div>
@@ -95,7 +95,7 @@
 
 <h2 class="h6 mt-4">{{ __('staff.projects.submissions') }}</h2>
 @forelse($submissions as $submission)
-    <div class="d-flex justify-content-between align-items-center border rounded-3 p-2 mb-2">
+    <div class="spims-staff-row border rounded-3 p-2 mb-2">
         <div>
             <strong>{{ $submission->deliverable?->title }}</strong>
             <div class="small text-muted-theme">{{ $submission->project?->name }} · {{ $submission->review_status->value }}</div>

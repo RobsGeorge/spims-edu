@@ -8,7 +8,7 @@
 ])
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1" aria-labelledby="{{ $id }}-title" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content spims-confirm-dialog">
             <div class="modal-header border-0">
                 <h2 class="modal-title h5 spims-title" id="{{ $id }}-title">{{ $title }}</h2>

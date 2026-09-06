@@ -21,7 +21,7 @@
 
 <div class="border rounded-3 p-4 text-center mb-3 mt-3">
     <div class="small text-muted-theme">{{ __('staff.live_quiz.join_code') }}</div>
-    <div class="display-5 fw-bold" dir="ltr">{{ $session->join_code }}</div>
+    <div class="display-5 fw-bold spims-join-code" dir="ltr">{{ $session->join_code }}</div>
     <x-status-badge :status="$session->state->value" :label="__('staff.live_quiz.state_'.$session->state->value)" />
     <div class="small text-muted-theme mt-2">{{ __('staff.live_quiz.participants', ['count' => $session->participants->count()]) }}</div>
 </div>
@@ -60,7 +60,7 @@
 @if(in_array($session->state->value, ['LOBBY', 'QUESTION_CLOSED', 'RESULTS'], true))
     <h2 class="h6">{{ __('staff.live_quiz.launch') }}</h2>
     @foreach($quiz->questions as $question)
-        <form method="POST" action="{{ route('teach.live-quiz.launch', [$offering, $session]) }}" class="d-flex justify-content-between align-items-center border rounded-3 p-2 mb-2">
+        <form method="POST" action="{{ route('teach.live-quiz.launch', [$offering, $session]) }}" class="spims-live-quiz-launch border rounded-3 p-2 mb-2">
             @csrf
             <input type="hidden" name="question_id" value="{{ $question->id }}">
             <span>{{ $question->position }}. {{ $question->prompt }}</span>

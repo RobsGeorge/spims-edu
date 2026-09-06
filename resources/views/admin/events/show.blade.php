@@ -55,7 +55,7 @@
 
 <h2 class="h6">{{ __('staff.events.reservations') }}</h2>
 @forelse($reserved as $reservation)
-    <div class="d-flex justify-content-between align-items-center border rounded-3 p-2 mb-2">
+    <div class="spims-staff-row border rounded-3 p-2 mb-2">
         <div>
             <strong>{{ $reservation->student?->first_name }} {{ $reservation->student?->last_name }}</strong>
             <div class="small text-muted-theme">{{ $reservation->student?->email }}</div>
@@ -73,7 +73,7 @@
 
 <h2 class="h6 mt-4">{{ __('staff.events.waitlist_heading') }}</h2>
 @forelse($waitlist as $reservation)
-    <div class="d-flex justify-content-between align-items-center border rounded-3 p-2 mb-2">
+    <div class="spims-staff-row border rounded-3 p-2 mb-2">
         <strong>{{ $reservation->student?->first_name }} {{ $reservation->student?->last_name }}</strong>
         <x-status-badge status="warning" :label="__('staff.events.status_WAITLISTED')" />
     </div>
