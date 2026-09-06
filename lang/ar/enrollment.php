@@ -18,6 +18,7 @@ return [
     'hold_updated' => 'تم تحديث الحجز المالي.',
     'financial_hold' => 'التسجيل محظور بسبب حجز مالي.',
     'window_closed' => 'نافذة التسجيل مغلقة.',
+    'offering_not_open' => 'هذا العرض غير مفتوح للتسجيل.',
     'prerequisite_missing' => 'متطلب سابق ناقص :code.',
     'program_required' => 'اختر برنامجاً للمقررات غير المستقلة.',
     'not_matriculated' => 'لست ملتحقاً بهذا البرنامج.',

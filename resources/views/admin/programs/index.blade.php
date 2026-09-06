@@ -13,7 +13,10 @@
             <tbody>
             @foreach($programs as $program)
                 <tr>
-                    <td><a href="{{ route('admin.programs.show', $program) }}">{{ $program->code }}</a></td>
+                    <td>
+                        <a href="{{ route('admin.programs.show', $program) }}">{{ $program->code }}</a>
+                        <a href="{{ route('admin.programs.edit', $program) }}" class="btn btn-sm btn-link">{{ __('ui.edit') }}</a>
+                    </td>
                     <td>{{ $program->name }}</td>
                     <td>{{ $program->type->value }}</td>
                     <td>{{ $program->active ? __('academics.active') : __('academics.inactive') }}</td>

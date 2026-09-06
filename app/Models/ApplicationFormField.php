@@ -22,6 +22,7 @@ class ApplicationFormField extends Model
         'options',
         'allowed_file_types',
         'admin_note',
+        'active',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class ApplicationFormField extends Model
         'order' => 'integer',
         'options' => 'array',
         'allowed_file_types' => 'array',
+        'active' => 'boolean',
     ];
 
     public function form(): BelongsTo

@@ -20,7 +20,10 @@
 @foreach($years as $year)
 <div class="card border-0 shadow-sm mb-3">
     <div class="card-body">
-        <h2 class="h5">{{ $year->name }}</h2>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h5 mb-0">{{ $year->name }}</h2>
+            <a href="{{ route('admin.academic-years.edit', $year) }}" class="btn btn-sm btn-outline-primary">{{ __('ui.edit') }}</a>
+        </div>
         <form method="POST" action="{{ route('admin.semesters.store', $year) }}" class="row g-2 mb-3">
             @csrf
             <div class="col-md-2"><input name="name" class="form-control" placeholder="Fall" required></div>
@@ -35,7 +38,10 @@
         </form>
         <ul class="mb-0">
             @forelse($year->semesters as $semester)
-                <li>{{ $semester->name }} — {{ $semester->status->value }} (reg {{ $semester->registration_start->toDateString() }} → {{ $semester->registration_end->toDateString() }})</li>
+                <li class="d-flex justify-content-between align-items-center gap-2">
+                    <span>{{ $semester->name }} — {{ $semester->status->value }} (reg {{ $semester->registration_start->toDateString() }} → {{ $semester->registration_end->toDateString() }})</span>
+                    <a href="{{ route('admin.semesters.edit', $semester) }}" class="btn btn-sm btn-outline-primary">{{ __('ui.edit') }}</a>
+                </li>
             @empty
                 <li class="text-muted-theme">{{ __('offerings.no_semesters') }}</li>
             @endforelse

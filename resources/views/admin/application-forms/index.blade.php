@@ -32,7 +32,11 @@
 </div>
 <ul>
 @foreach($forms as $form)
-    <li>{{ $form->name }} — {{ $form->program->code }}</li>
+    <li>
+        <a href="{{ route('admin.application-forms.show', $form) }}">{{ $form->name }}</a>
+        — {{ $form->program->code }}
+        · {{ $form->active ? __('academics.active') : __('academics.inactive') }}
+    </li>
 @endforeach
 </ul>
 @endsection

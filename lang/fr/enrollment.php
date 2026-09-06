@@ -18,6 +18,7 @@ return [
     'hold_updated' => 'Blocage financier mis à jour.',
     'financial_hold' => 'Inscription bloquée par un hold financier.',
     'window_closed' => 'La fenêtre d\'inscription est fermée.',
+    'offering_not_open' => 'Cette offre n’est pas ouverte aux inscriptions.',
     'prerequisite_missing' => 'Prérequis manquant :code.',
     'program_required' => 'Sélectionnez un programme pour les cours non autonomes.',
     'not_matriculated' => 'Vous n\'êtes pas matriculé dans ce programme.',

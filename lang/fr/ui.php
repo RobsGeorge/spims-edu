@@ -90,4 +90,5 @@ return [
     'error_500_body' => 'Une erreur inattendue s’est produite. Réessayez plus tard.',
     'go_home' => 'Accueil',
     'save_changes' => 'Enregistrer',
+    'edit' => 'Modifier',
 ];

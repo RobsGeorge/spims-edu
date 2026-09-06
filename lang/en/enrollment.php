@@ -18,6 +18,7 @@ return [
     'hold_updated' => 'Financial hold updated.',
     'financial_hold' => 'Registration blocked by financial hold.',
     'window_closed' => 'Registration window is closed.',
+    'offering_not_open' => 'This offering is not open for registration.',
     'prerequisite_missing' => 'Missing prerequisite :code.',
     'program_required' => 'Select a program for non-standalone courses.',
     'not_matriculated' => 'You are not matriculated in that program.',

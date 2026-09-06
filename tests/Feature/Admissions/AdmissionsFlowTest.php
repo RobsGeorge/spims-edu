@@ -108,4 +108,56 @@ class AdmissionsFlowTest extends TestCase
 
         $this->assertSame($r2->id, $application->fresh()->reviewer_id);
     }
+
+    #[Test]
+    public function administrative_admin_can_update_form_and_deactivate_fields(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+        $form = $this->seedProgramAndForm($adm);
+
+        $this->actingAs($adm)->get(route('admin.application-forms.show', $form))
+            ->assertOk()
+            ->assertSee('THEO Apply')
+            ->assertSee(__('admissions.edit_form'));
+
+        $this->actingAs($adm)->put(route('admin.application-forms.update', $form), [
+            'name' => 'THEO Apply Revised',
+            'active' => 1,
+        ])->assertRedirect(route('admin.application-forms.show', $form));
+
+        $this->assertSame('THEO Apply Revised', $form->fresh()->name);
+
+        $this->actingAs($adm)->post(route('admin.application-forms.fields.store', $form), [
+            'label' => 'Parish',
+            'type' => FormFieldType::Text->value,
+            'required' => false,
+        ])->assertRedirect();
+
+        $field = $form->fields()->where('label', 'Parish')->first();
+        $this->assertNotNull($field);
+        $this->assertTrue($field->active);
+
+        $this->actingAs($adm)->post(route('admin.application-forms.fields.deactivate', [$form, $field]))
+            ->assertRedirect();
+
+        $this->assertFalse($field->fresh()->active);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'admissions.form_update']);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'admissions.form_deactivate_field']);
+    }
+
+    #[Test]
+    public function student_cannot_update_application_form(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $form = $this->seedProgramAndForm($adm);
+
+        $this->actingAs($student)->get(route('admin.application-forms.show', $form))->assertForbidden();
+        $this->actingAs($student)->put(route('admin.application-forms.update', $form), [
+            'name' => 'Hacked',
+            'active' => 0,
+        ])->assertForbidden();
+
+        $this->assertSame('THEO Apply', $form->fresh()->name);
+    }
 }

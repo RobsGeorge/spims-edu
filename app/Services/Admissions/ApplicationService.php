@@ -56,7 +56,7 @@ class ApplicationService
 
         $application->load('form.fields', 'values');
 
-        foreach ($application->form->fields as $field) {
+        foreach ($application->form->fields->where('active', true) as $field) {
             if ($field->type === FormFieldType::File) {
                 $this->saveFileAnswer($applicant, $application, $field, $files[$field->id] ?? null);
 
@@ -152,7 +152,7 @@ class ApplicationService
         }
 
         $application->load('form.fields', 'values');
-        foreach ($application->form->fields as $field) {
+        foreach ($application->form->fields->where('active', true) as $field) {
             if ($field->required && ! $application->values->firstWhere('field_id', $field->id)) {
                 throw ValidationException::withMessages([
                     'answers' => [__('admissions.field_required', ['field' => $field->label])],

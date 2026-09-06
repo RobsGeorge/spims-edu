@@ -2,7 +2,15 @@
 
 return [
     'form_created' => 'Formulaire créé.',
+    'form_updated' => 'Formulaire mis à jour.',
     'form_name' => 'Nom du formulaire',
+    'edit_form' => 'Modifier le formulaire',
+    'add_field' => 'Ajouter un champ',
+    'deactivate_field' => 'Désactiver',
+    'field_added' => 'Champ ajouté.',
+    'field_deactivated' => 'Champ désactivé.',
+    'fields' => 'Champs',
+    'no_fields' => 'Aucun champ pour le moment.',
     'field_label' => 'Libellé du champ',
     'required' => 'Obligatoire',
     'review' => 'Examiner',

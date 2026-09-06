@@ -38,10 +38,68 @@ class ApplicationFormService
                     'options' => $field['options'] ?? [],
                     'allowed_file_types' => $field['allowed_file_types'] ?? [],
                     'admin_note' => $field['admin_note'] ?? null,
+                    'active' => true,
                 ]);
             }
 
             return $form->load('fields');
         }, 'ApplicationForm');
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function update(User $actor, ApplicationForm $form, array $data): ApplicationForm
+    {
+        $this->authorize->authorize($actor, 'admissions.forms');
+        $before = $form->only(['name', 'active']);
+
+        $form->update([
+            'name' => $data['name'] ?? $form->name,
+            'active' => array_key_exists('active', $data) ? (bool) $data['active'] : $form->active,
+        ]);
+
+        $fresh = $form->fresh();
+        $this->audit->write($actor, 'admissions.form_update', 'ApplicationForm', $form->id, $before, $fresh->only(['name', 'active']));
+
+        return $fresh;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function addField(User $actor, ApplicationForm $form, array $data): ApplicationFormField
+    {
+        $this->authorize->authorize($actor, 'admissions.forms');
+
+        return $this->audit->withAudit($actor, 'admissions.form_add_field', function () use ($form, $data) {
+            return ApplicationFormField::query()->create([
+                'form_id' => $form->id,
+                'label' => $data['label'],
+                'type' => FormFieldType::from($data['type']),
+                'required' => (bool) ($data['required'] ?? false),
+                'order' => $data['order'] ?? (($form->fields()->max('order') ?? 0) + 1),
+                'options' => $data['options'] ?? [],
+                'allowed_file_types' => $data['allowed_file_types'] ?? [],
+                'admin_note' => $data['admin_note'] ?? null,
+                'active' => $data['active'] ?? true,
+            ]);
+        }, 'ApplicationFormField');
+    }
+
+    public function deactivateField(User $actor, ApplicationForm $form, ApplicationFormField $field): ApplicationFormField
+    {
+        $this->authorize->authorize($actor, 'admissions.forms');
+
+        if ($field->form_id !== $form->id) {
+            abort(404);
+        }
+
+        $before = $field->only(['active']);
+        $field->update(['active' => false]);
+        $fresh = $field->fresh();
+        $this->audit->write($actor, 'admissions.form_deactivate_field', 'ApplicationFormField', $field->id, $before, $fresh->only(['active']));
+
+        return $fresh;
     }
 }

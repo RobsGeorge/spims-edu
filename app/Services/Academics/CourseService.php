@@ -76,6 +76,21 @@ class CourseService
         ]);
     }
 
+    public function removePrerequisite(User $actor, Course $course, CoursePrerequisite $prerequisite): void
+    {
+        $this->authorize->authorize($actor, 'courses.manage');
+
+        if ($prerequisite->course_id !== $course->id) {
+            throw ValidationException::withMessages(['prerequisite_id' => [__('academics.prerequisite_not_attached')]]);
+        }
+
+        $this->audit->withAudit($actor, 'courses.remove_prerequisite', function () use ($prerequisite) {
+            $prerequisite->delete();
+
+            return $prerequisite;
+        }, 'CoursePrerequisite');
+    }
+
     public function flagInterest(User $student, Course $course): CourseInterestFlag
     {
         $this->authorize->authorize($student, 'courses.flag_interest');
