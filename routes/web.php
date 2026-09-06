@@ -298,6 +298,9 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/settings', [SettingsController::class, 'update'])
         ->middleware('permission:profile.edit_own')
         ->name('settings.update');
+    Route::post('/settings/picture', [SettingsController::class, 'storePicture'])
+        ->middleware('permission:profile.edit_own')
+        ->name('settings.picture');
     Route::get('/settings/notifications', [NotificationSettingsController::class, 'edit'])
         ->name('settings.notifications.edit');
     Route::put('/settings/notifications', [NotificationSettingsController::class, 'update'])
