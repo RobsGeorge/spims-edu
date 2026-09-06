@@ -64,6 +64,7 @@ use App\Http\Controllers\MeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationSettingsController;
 use App\Http\Controllers\OfferingPreviewController;
+use App\Http\Controllers\ProjectController as StudentProjectController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentCompletionController;
@@ -320,6 +321,31 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/applications/{application}', [ApplicationController::class, 'store'])
         ->middleware('permission:admissions.apply')
         ->name('applications.store');
+
+    Route::get('/projects', [StudentProjectController::class, 'mine'])
+        ->middleware('permission:projects.view')
+        ->name('student.projects.mine');
+    Route::get('/offerings/{offering}/projects', [StudentProjectController::class, 'index'])
+        ->middleware('permission:projects.view')
+        ->name('student.projects.index');
+    Route::post('/offerings/{offering}/projects/{assessment}/join', [StudentProjectController::class, 'join'])
+        ->middleware('permission:projects.join')
+        ->name('student.projects.join');
+    Route::post('/offerings/{offering}/projects/{assessment}/leave', [StudentProjectController::class, 'leave'])
+        ->middleware('permission:projects.join')
+        ->name('student.projects.leave');
+    Route::get('/projects/{project}', [StudentProjectController::class, 'show'])
+        ->middleware('permission:projects.view')
+        ->name('student.projects.show');
+    Route::post('/projects/{project}/deliverables/{deliverable}', [StudentProjectController::class, 'submit'])
+        ->middleware('permission:projects.join')
+        ->name('student.projects.submit');
+    Route::delete('/projects/{project}/submission-files/{file}', [StudentProjectController::class, 'destroyFile'])
+        ->middleware('permission:projects.join')
+        ->name('student.projects.files.destroy');
+    Route::post('/projects/{project}/peer-evaluations', [StudentProjectController::class, 'storePeerEvaluation'])
+        ->middleware('permission:projects.peer_eval')
+        ->name('student.projects.peer.store');
 
     Route::get('/learn/{offering}', [LearnController::class, 'offering'])
         ->middleware('permission:offerings.view')

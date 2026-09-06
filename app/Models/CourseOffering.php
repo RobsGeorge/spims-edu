@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Currency;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStatus;
+use App\Enums\ProjectAssessmentStatus;
 use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -58,6 +59,18 @@ class CourseOffering extends Model
     public function weeks(): HasMany
     {
         return $this->hasMany(Week::class, 'offering_id')->orderBy('order');
+    }
+
+    public function projectAssessments(): HasMany
+    {
+        return $this->hasMany(ProjectAssessment::class, 'offering_id');
+    }
+
+    public function hasPublishedProjectAssessments(): bool
+    {
+        return $this->projectAssessments()
+            ->where('status', ProjectAssessmentStatus::Published)
+            ->exists();
     }
 
     public function resolvedPriceUsd(): int

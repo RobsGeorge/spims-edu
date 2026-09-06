@@ -7,6 +7,9 @@
         <p class="text-muted-theme mb-0">{{ __('offerings.mode') }}: {{ $offering->mode->value }} · {{ __('learn.progress') }}: {{ number_format($enrollment->progress_percent, 0) }}%</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
+        @if(!empty($hasPublishedProjects))
+            <a href="{{ route('student.projects.index', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('projects.nav') }}</a>
+        @endif
         <a href="{{ route('offerings.completion', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('completion.nav') }}</a>
         <a href="{{ route('enrollments.index') }}" class="btn btn-outline-secondary btn-sm">{{ __('ui.nav_enrollments') }}</a>
     </div>

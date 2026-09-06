@@ -90,7 +90,9 @@ class NavigationHub
                     || request()->routeIs('enrollments.*')
                     || request()->routeIs('attendance.*')
                     || request()->routeIs('events.*')
-                    || request()->routeIs('live-quiz.*'),
+                    || request()->routeIs('live-quiz.*')
+                    || request()->routeIs('student.projects.*')
+                    || request()->routeIs('learn.*'),
             ],
         ];
 
@@ -176,6 +178,7 @@ class NavigationHub
             self::link('grades.index', 'hubs.grades', 'bi-clipboard-data', 'hubs.grades_desc'),
             self::link('applications.index', 'hubs.my_applications', 'bi-file-earmark-text', 'hubs.my_applications_desc'),
             self::link('enrollments.index', 'hubs.enrollments', 'bi-person-check', 'hubs.enrollments_desc'),
+            self::link('student.projects.mine', 'hubs.projects', 'bi-people', 'hubs.projects_desc'),
             self::link('live.index', 'hubs.live', 'bi-camera-video', 'hubs.live_desc'),
             self::link('live-quiz.join', 'hubs.live_quiz', 'bi-lightning-charge', 'hubs.live_quiz_desc'),
             self::link('events.index', 'events.hub', 'bi-calendar-event', 'events.hub_desc'),

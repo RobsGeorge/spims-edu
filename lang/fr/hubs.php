@@ -19,6 +19,8 @@ return [
     'my_applications_desc' => 'Suivre les admissions.',
     'enrollments' => 'Mes inscriptions',
     'enrollments_desc' => 'Inscriptions actives et passées.',
+    'projects' => 'Projets d’équipe',
+    'projects_desc' => 'Rejoindre une équipe et déposer les livrables.',
     'live' => 'Sessions live',
     'live_desc' => 'Cours Zoom à venir.',
     'live_quiz' => 'Quiz live',
