@@ -102,6 +102,7 @@ class PortalD6PolishTest extends TestCase
             'one_at_a_time' => true,
         ]);
         app(AssessmentService::class)->attachQuestion($ins, $assessment, $q);
+        app(AssessmentService::class)->release($ins, $assessment);
 
         $attempt = app(AttemptService::class)->start($student, $assessment);
 

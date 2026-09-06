@@ -59,12 +59,13 @@ class ResultsAnnouncementTest extends TestCase
             'time_limit_minutes' => 20,
             'max_points' => 10,
         ]);
+        app(AssessmentService::class)->release($instructor, $assessment);
 
         // Only A and B attempt; C never does and must never be notified.
         app(AttemptService::class)->start($a, $assessment);
         app(AttemptService::class)->start($b, $assessment);
 
-        $this->assertFalse($assessment->fresh()->released);
+        $this->assertTrue($assessment->fresh()->released);
 
         $announcement = app(AssessmentService::class)->announceResults($instructor, $assessment);
 
@@ -117,6 +118,7 @@ class ResultsAnnouncementTest extends TestCase
             'time_limit_minutes' => 20,
             'max_points' => 10,
         ]);
+        app(AssessmentService::class)->release($instructor, $assessment);
 
         app(AttemptService::class)->start($a, $assessment);
         app(AttemptService::class)->start($b, $assessment);
@@ -172,6 +174,7 @@ class ResultsAnnouncementTest extends TestCase
             'attempts_allowed' => 2,
             'max_points' => 10,
         ]);
+        app(AssessmentService::class)->release($instructor, $assessment);
 
         app(AttemptService::class)->start($a, $assessment);
         app(AssessmentService::class)->announceResults($instructor, $assessment);

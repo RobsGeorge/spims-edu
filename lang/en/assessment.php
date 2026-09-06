@@ -19,6 +19,7 @@ return array (
   'not_enrolled' => 'You must be enrolled in this offering.',
   'resubmission_not_allowed' => 'You have already submitted this assignment and resubmission is closed.',
   'window_closed' => 'This assessment is not open.',
+  'not_released' => 'This assessment has not been released.',
   'no_attempts' => 'No attempts remaining.',
   'not_in_progress' => 'Attempt is not in progress.',
   'not_owner' => 'This attempt is not yours.',

@@ -71,6 +71,7 @@ class ProctorEscalationTest extends TestCase
             'max_points' => 25,
         ]);
         app(AssessmentService::class)->attachQuestion($instructor, $assessment, $essay);
+        app(AssessmentService::class)->release($instructor, $assessment);
 
         $attempt = app(AttemptService::class)->start($student, $assessment);
         app(AttemptService::class)->autosave($student, $attempt, [$essay->id => ['text' => 'draft answer']]);
