@@ -127,7 +127,7 @@ class TeachOfferingController extends Controller
             ? $this->gradebook->computeEnrollment($enrollment)
             : null;
 
-        return response()->json([
+        return $this->conditional->json($request, [
             'data' => [
                 'profile' => [
                     'id' => $student->id,

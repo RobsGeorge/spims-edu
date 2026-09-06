@@ -42,7 +42,7 @@ class TeachAssignmentController extends Controller
             ->map(fn (AssignmentSubmission $submission) => $this->submissionPayload($submission))
             ->values();
 
-        return response()->json(['data' => $rows]);
+        return $this->conditional->json($request, ['data' => $rows]);
     }
 
     public function grade(Request $request, AssignmentSubmission $assignmentSubmission): JsonResponse

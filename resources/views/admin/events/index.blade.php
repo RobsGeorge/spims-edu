@@ -25,7 +25,7 @@
 </form>
 
 @forelse($events as $event)
-    <div class="d-flex justify-content-between align-items-center border rounded-3 p-3 mb-2">
+    <div class="spims-staff-row border rounded-3 p-3 mb-2">
         <div>
             <strong>{{ $event->title }}</strong>
             <div class="small text-muted-theme">

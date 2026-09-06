@@ -9,6 +9,7 @@ use App\Models\LiveQuizQuestion;
 use App\Models\LiveQuizSession;
 use App\Services\LiveQuiz\LiveQuizHostService;
 use App\Services\LiveQuiz\LiveQuizPlayService;
+use App\Support\Api\IdempotencyStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,6 +19,7 @@ class TeachLiveQuizController extends Controller
         Request $request,
         CourseOffering $offering,
         LiveQuizHostService $host,
+        IdempotencyStore $idempotency,
     ): JsonResponse {
         $data = $request->validate([
             'title' => 'required|string|max:200',
@@ -30,21 +32,31 @@ class TeachLiveQuizController extends Controller
             'questions.*.options.*.is_correct' => 'nullable|boolean',
         ]);
 
-        $quiz = $host->createQuiz(
+        $payload = $idempotency->remember(
             $request->user(),
-            $offering,
-            $data['title'],
-            $data['questions'] ?? [],
+            'teach.live-quiz.store:'.$offering->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->quizPayload($host->createQuiz(
+                $request->user(),
+                $offering,
+                $data['title'],
+                $data['questions'] ?? [],
+            )),
         );
 
-        return response()->json(['data' => $this->quizPayload($quiz)], 201);
+        return response()->json(['data' => $payload], 201);
     }
 
-    public function start(Request $request, LiveQuiz $liveQuiz, LiveQuizHostService $host): JsonResponse
+    public function start(Request $request, LiveQuiz $liveQuiz, LiveQuizHostService $host, IdempotencyStore $idempotency): JsonResponse
     {
-        $session = $host->startSession($request->user(), $liveQuiz);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.live-quiz.start:'.$liveQuiz->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->sessionPayload($host->startSession($request->user(), $liveQuiz)),
+        );
 
-        return response()->json(['data' => $this->sessionPayload($session)], 201);
+        return response()->json(['data' => $payload], 201);
     }
 
     public function launch(
@@ -52,15 +64,25 @@ class TeachLiveQuizController extends Controller
         LiveQuizSession $liveQuizSession,
         LiveQuizHostService $host,
         LiveQuizPlayService $play,
+        IdempotencyStore $idempotency,
     ): JsonResponse {
         $data = $request->validate([
             'question_id' => 'required|string',
         ]);
 
-        $question = LiveQuizQuestion::query()->findOrFail($data['question_id']);
-        $session = $host->launchQuestion($request->user(), $liveQuizSession, $question);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.live-quiz.launch:'.$liveQuizSession->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $liveQuizSession, $host, $play, $data) {
+                $question = LiveQuizQuestion::query()->findOrFail($data['question_id']);
+                $session = $host->launchQuestion($request->user(), $liveQuizSession, $question);
 
-        return response()->json(['data' => $play->snapshot($session)]);
+                return $play->snapshot($session);
+            },
+        );
+
+        return response()->json(['data' => $payload]);
     }
 
     public function close(
@@ -68,10 +90,16 @@ class TeachLiveQuizController extends Controller
         LiveQuizSession $liveQuizSession,
         LiveQuizHostService $host,
         LiveQuizPlayService $play,
+        IdempotencyStore $idempotency,
     ): JsonResponse {
-        $session = $host->closeQuestion($request->user(), $liveQuizSession);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.live-quiz.close:'.$liveQuizSession->id,
+            $request->header('Idempotency-Key'),
+            fn () => $play->snapshot($host->closeQuestion($request->user(), $liveQuizSession)),
+        );
 
-        return response()->json(['data' => $play->snapshot($session)]);
+        return response()->json(['data' => $payload]);
     }
 
     public function results(
@@ -79,10 +107,16 @@ class TeachLiveQuizController extends Controller
         LiveQuizSession $liveQuizSession,
         LiveQuizHostService $host,
         LiveQuizPlayService $play,
+        IdempotencyStore $idempotency,
     ): JsonResponse {
-        $session = $host->showResults($request->user(), $liveQuizSession);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.live-quiz.results:'.$liveQuizSession->id,
+            $request->header('Idempotency-Key'),
+            fn () => $play->snapshot($host->showResults($request->user(), $liveQuizSession)),
+        );
 
-        return response()->json(['data' => $play->snapshot($session)]);
+        return response()->json(['data' => $payload]);
     }
 
     public function end(
@@ -90,10 +124,16 @@ class TeachLiveQuizController extends Controller
         LiveQuizSession $liveQuizSession,
         LiveQuizHostService $host,
         LiveQuizPlayService $play,
+        IdempotencyStore $idempotency,
     ): JsonResponse {
-        $session = $host->endSession($request->user(), $liveQuizSession);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.live-quiz.end:'.$liveQuizSession->id,
+            $request->header('Idempotency-Key'),
+            fn () => $play->snapshot($host->endSession($request->user(), $liveQuizSession)),
+        );
 
-        return response()->json(['data' => $play->snapshot($session)]);
+        return response()->json(['data' => $payload]);
     }
 
     /**

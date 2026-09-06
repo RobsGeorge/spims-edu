@@ -880,3 +880,61 @@ html[dir='rtl'] .app-bottom-link i {
 .spims-toast {
     border-radius: var(--radius-md);
 }
+
+/* Staff Arabic + narrow viewport: stack action rows, keep join codes LTR. */
+.spims-staff-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.spims-staff-row > :first-child {
+    min-width: 0;
+    flex: 1 1 12rem;
+}
+
+.spims-live-quiz-launch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.spims-live-quiz-launch > span {
+    min-width: 0;
+    flex: 1 1 12rem;
+    overflow-wrap: anywhere;
+}
+
+.spims-join-code {
+    letter-spacing: 0.08em;
+    overflow-wrap: anywhere;
+}
+
+html[dir='rtl'] .spims-page-header .spims-title,
+html[dir='rtl'] .spims-staff-row strong {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 767.98px) {
+    .spims-staff-row .btn,
+    .spims-live-quiz-launch .btn {
+        width: 100%;
+    }
+
+    .spims-confirm-dialog .modal-footer {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .spims-confirm-dialog .modal-footer .btn {
+        width: 100%;
+    }
+
+    .modal-dialog {
+        margin-inline: 0.75rem;
+    }
+}

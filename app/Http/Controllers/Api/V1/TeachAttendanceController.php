@@ -14,6 +14,7 @@ use App\Support\Api\IdempotencyStore;
 use App\Support\AuthorizeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TeachAttendanceController extends Controller
@@ -32,7 +33,7 @@ class TeachAttendanceController extends Controller
         ]);
     }
 
-    public function storeSession(Request $request, CourseOffering $offering, AttendanceService $attendance): JsonResponse
+    public function storeSession(Request $request, CourseOffering $offering, AttendanceService $attendance, IdempotencyStore $idempotency): JsonResponse
     {
         $data = $request->validate([
             'title' => 'required|string|max:200',
@@ -43,16 +44,21 @@ class TeachAttendanceController extends Controller
             'notify_students' => 'nullable|boolean',
         ]);
 
-        $session = $attendance->openSession($request->user(), $offering, [
-            ...$data,
-            'mode' => $data['mode'] ?? ClassSessionMode::InPerson->value,
-            'notify_students' => (bool) ($data['notify_students'] ?? false),
-        ]);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.sessions.store:'.$offering->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->sessionPayload($attendance->openSession($request->user(), $offering, [
+                ...$data,
+                'mode' => $data['mode'] ?? ClassSessionMode::InPerson->value,
+                'notify_students' => (bool) ($data['notify_students'] ?? false),
+            ])),
+        );
 
-        return response()->json(['data' => $this->sessionPayload($session)], 201);
+        return response()->json(['data' => $payload], 201);
     }
 
-    public function roster(Request $request, ClassSession $session, AuthorizeService $authorize): JsonResponse
+    public function roster(Request $request, ClassSession $session, AuthorizeService $authorize, ConditionalGet $conditional): JsonResponse
     {
         $authorize->authorize($request->user(), 'attendance.view_all', $session);
 
@@ -76,7 +82,7 @@ class TeachAttendanceController extends Controller
                 ];
             });
 
-        return response()->json([
+        return $conditional->json($request, [
             'data' => [
                 'session_id' => $session->id,
                 'lock_version' => $session->lock_version,
@@ -149,25 +155,32 @@ class TeachAttendanceController extends Controller
         return response()->json(['data' => $payload]);
     }
 
-    public function issueCheckInCode(Request $request, ClassSession $session, AttendanceService $attendance): JsonResponse
+    public function issueCheckInCode(Request $request, ClassSession $session, AttendanceService $attendance, IdempotencyStore $idempotency): JsonResponse
     {
         $data = $request->validate([
             'ttl_minutes' => 'nullable|integer|min:5|max:240',
             'max_uses' => 'nullable|integer|min:1',
         ]);
 
-        $code = $attendance->issueCheckInCode($request->user(), $session, $data);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.sessions.check-in-code:'.$session->id,
+            $request->header('Idempotency-Key'),
+            function () use ($attendance, $request, $session, $data) {
+                $code = $attendance->issueCheckInCode($request->user(), $session, $data);
 
-        return response()->json([
-            'data' => [
-                'code' => $code->code,
-                'expires_at' => $code->expires_at->toIso8601String(),
-                'max_uses' => $code->max_uses,
-            ],
-        ], 201);
+                return [
+                    'code' => $code->code,
+                    'expires_at' => $code->expires_at->toIso8601String(),
+                    'max_uses' => $code->max_uses,
+                ];
+            },
+        );
+
+        return response()->json(['data' => $payload], 201);
     }
 
-    public function report(Request $request, CourseOffering $offering, AttendanceService $attendance): JsonResponse|StreamedResponse
+    public function report(Request $request, CourseOffering $offering, AttendanceService $attendance, ConditionalGet $conditional): JsonResponse|StreamedResponse
     {
         $report = $attendance->report($request->user(), $offering);
 
@@ -177,10 +190,10 @@ class TeachAttendanceController extends Controller
             ], $report['students']);
         }
 
-        return response()->json(['data' => $report]);
+        return $conditional->json($request, ['data' => $report]);
     }
 
-    public function offeringRoster(Request $request, CourseOffering $offering, RosterService $roster): JsonResponse|StreamedResponse
+    public function offeringRoster(Request $request, CourseOffering $offering, RosterService $roster, ConditionalGet $conditional): JsonResponse|StreamedResponse|Response
     {
         if ($request->query('format') === 'csv') {
             $csv = $roster->exportCsv($request->user(), $offering);
@@ -200,10 +213,10 @@ class TeachAttendanceController extends Controller
             'date_of_birth' => $enrollment->student?->date_of_birth?->toDateString(),
         ]);
 
-        return response()->json(['data' => $rows]);
+        return $conditional->json($request, ['data' => $rows]);
     }
 
-    public function birthdays(Request $request, CourseOffering $offering, RosterService $roster): JsonResponse
+    public function birthdays(Request $request, CourseOffering $offering, RosterService $roster, ConditionalGet $conditional): JsonResponse
     {
         $window = (int) $request->query('days', 14);
         $rows = $roster->birthdays($request->user(), $offering, $window)->map(fn (array $row) => [
@@ -215,7 +228,7 @@ class TeachAttendanceController extends Controller
             'days_until' => $row['days_until'],
         ]);
 
-        return response()->json(['data' => $rows]);
+        return $conditional->json($request, ['data' => $rows]);
     }
 
     /** @return array<string, mixed> */

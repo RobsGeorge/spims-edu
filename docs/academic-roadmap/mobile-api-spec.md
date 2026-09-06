@@ -141,9 +141,10 @@ questions. A client-supplied timestamp is never trusted.
 ### Idempotency
 
 Mutations that could be retried on a flaky connection (`submit`, `reserve`, `join`, `check-in`,
-`pay`, and instructor writes such as attendance mark, grade, remind, lock, close, announce, and
-publish) accept an `Idempotency-Key` header. A repeat with the same key returns the original result
-instead of acting twice.
+`pay`, and **every** instructor `POST` / `PUT` / `DELETE` under `/teach/*`) accept an
+`Idempotency-Key` header. A repeat from the same actor with the same key returns the original
+result instead of acting twice. A missing key still runs the write (backward compatible). The
+OpenAPI component is `#/components/parameters/IdempotencyKey`.
 
 ### Confirmation tokens for irreversible actions
 
@@ -163,9 +164,12 @@ returned key.
 
 ### Offline behaviour
 
-The API is read-cacheable and write-explicit. Every collection response carries an `ETag`;
-clients send `If-None-Match` and handle 304. There is no sync protocol and no server-side
-write queue — a failed mutation is the client's to retry, with `Idempotency-Key`.
+The API is read-cacheable and write-explicit. Every **safe** instructor collection `GET`
+under `/teach/*` carries an `ETag`; clients send `If-None-Match` and handle 304. Confirmation-
+issuing GETs (`offering` show, `gradebook`, assessment attempts, project teams) must not —
+their body includes a minted token. CSV `format=` variants stay streams and do not use ETags.
+There is no sync protocol and no server-side write queue — a failed mutation is the client's
+to retry, with `Idempotency-Key`.
 
 ---
 

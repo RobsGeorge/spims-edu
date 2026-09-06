@@ -34,7 +34,7 @@
         $active = $quiz->sessions->first(fn ($session) => $session->state->value !== 'ENDED');
     @endphp
     <div class="border rounded-3 p-3 mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="spims-staff-row mb-2">
             <div>
                 <strong>{{ $quiz->title }}</strong>
                 <x-status-badge :status="$quiz->status->value" :label="__('staff.live_quiz.status_'.$quiz->status->value)" />

@@ -29,9 +29,14 @@ class TeachAnnouncementController extends Controller
             'targets.*.id' => ['required_with:targets', 'string'],
         ]);
 
-        $announcement = $this->announcements->draft($request->user(), $offering, $data);
+        $payload = $this->idempotency->remember(
+            $request->user(),
+            'teach.announcements.store:'.$offering->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->payload($this->announcements->draft($request->user(), $offering, $data)),
+        );
 
-        return response()->json(['data' => $this->payload($announcement)], 201);
+        return response()->json(['data' => $payload], 201);
     }
 
     public function update(Request $request, Announcement $announcement): JsonResponse
@@ -46,9 +51,14 @@ class TeachAnnouncementController extends Controller
             'targets.*.id' => ['required_with:targets', 'string'],
         ]);
 
-        $announcement = $this->announcements->update($request->user(), $announcement, $data);
+        $payload = $this->idempotency->remember(
+            $request->user(),
+            'teach.announcements.update:'.$announcement->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->payload($this->announcements->update($request->user(), $announcement, $data)),
+        );
 
-        return response()->json(['data' => $this->payload($announcement)]);
+        return response()->json(['data' => $payload]);
     }
 
     public function publish(Request $request, Announcement $announcement): JsonResponse
