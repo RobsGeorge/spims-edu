@@ -8,32 +8,33 @@ use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class AttendanceRecord extends Model
+class AttendanceEntry extends Model
 {
     use HasUlids;
 
-    public const CREATED_AT = null;
-
     protected $fillable = [
-        'live_session_id',
         'class_session_id',
         'student_id',
         'status',
+        'excuse_reason',
         'minutes_attended',
         'source',
-        'overridden_by_id',
+        'recorded_by_id',
+        'recorded_at',
+        'lock_version',
     ];
 
     protected $casts = [
         'status' => AttendanceStatus::class,
         'source' => AttendanceSource::class,
         'minutes_attended' => 'integer',
-        'updated_at' => 'datetime',
+        'recorded_at' => 'datetime',
+        'lock_version' => 'integer',
     ];
 
     public function session(): BelongsTo
     {
-        return $this->belongsTo(LiveSession::class, 'live_session_id');
+        return $this->belongsTo(ClassSession::class, 'class_session_id');
     }
 
     public function student(): BelongsTo
@@ -41,8 +42,8 @@ class AttendanceRecord extends Model
         return $this->belongsTo(User::class, 'student_id');
     }
 
-    public function classSession(): BelongsTo
+    public function recordedBy(): BelongsTo
     {
-        return $this->belongsTo(ClassSession::class, 'class_session_id');
+        return $this->belongsTo(User::class, 'recorded_by_id');
     }
 }

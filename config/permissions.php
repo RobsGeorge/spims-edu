@@ -201,6 +201,50 @@ return [
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
     ],
+    'attendance.record' => [
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'attendance.view_all' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'attendance.view_own' => [
+        'STUDENT' => 'O',
+    ],
+    'attendance.edit' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+    ],
+    'attendance.reopen' => [
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'attendance.configure' => [
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'attendance.report' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'attendance.self_check_in' => [
+        'STUDENT' => 'O',
+    ],
+    'roster.view' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'roster.export' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'roster.announce' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+    ],
     'discussions.configure' => [
         'ACADEMIC_ADMIN' => 'F',
         'INSTRUCTOR' => 'O',
