@@ -57,6 +57,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HubController;
 use App\Http\Controllers\LearnController;
+use App\Http\Controllers\LiveQuizController;
 use App\Http\Controllers\LiveSessionController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MeController;
@@ -379,6 +380,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/live/{session}/join', [LiveSessionController::class, 'join'])
         ->middleware('permission:live.join')
         ->name('live.join');
+
+    Route::get('/live-quiz/join', [LiveQuizController::class, 'create'])
+        ->middleware('permission:live_quiz.play')
+        ->name('live-quiz.join');
+    Route::post('/live-quiz/join', [LiveQuizController::class, 'join'])
+        ->middleware('permission:live_quiz.play')
+        ->name('live-quiz.join.store');
+    Route::get('/live-quiz/sessions/{session}', [LiveQuizController::class, 'show'])
+        ->middleware('permission:live_quiz.play')
+        ->name('live-quiz.sessions.show');
+    Route::post('/live-quiz/sessions/{session}/questions/{question}/answer', [LiveQuizController::class, 'answer'])
+        ->middleware('permission:live_quiz.play')
+        ->name('live-quiz.sessions.answer');
 
     Route::get('/events', [StudentEventController::class, 'index'])
         ->middleware('permission:events.view')

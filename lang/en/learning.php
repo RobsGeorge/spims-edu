@@ -39,6 +39,7 @@ return [
     'item_exam' => 'Exam',
     'item_discussion' => 'Discussion',
     'discussions' => 'Discussions',
+    'live_quiz' => 'Live quiz',
     'announcements' => 'Announcements',
     'no_announcements' => 'No announcements yet.',
     'player_title' => 'Course player',

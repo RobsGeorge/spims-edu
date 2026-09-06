@@ -1,7 +1,10 @@
 @extends('layouts.app')
 @section('title', __('live.live_sessions'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('live.live_sessions') }}</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <h1 class="spims-title mb-0">{{ __('live.live_sessions') }}</h1>
+    <a href="{{ route('live-quiz.join') }}" class="btn btn-outline-primary">{{ __('live.live_quiz') }}</a>
+</div>
 <table class="table">
     <thead><tr><th>Title</th><th>Course</th><th>Start</th><th></th></tr></thead>
     <tbody>

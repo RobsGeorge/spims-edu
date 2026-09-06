@@ -185,6 +185,7 @@ return [
         'refresh' => 'Refresh',
         'back_list' => 'All quizzes',
         'join_code' => 'Join code',
+        'student_join_at' => 'Students join at :url',
         'participants' => ':count participants',
         'launch' => 'Launch',
         'launched' => 'Question launched.',

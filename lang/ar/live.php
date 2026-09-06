@@ -24,6 +24,7 @@ return [
     'mention_body' => 'تم ذكرك في ":thread".',
     'join' => 'انضمام',
     'live_sessions' => 'الجلسات المباشرة',
+    'live_quiz' => 'اختبار مباشر',
     'discussions' => 'النقاشات',
     'agenda' => 'الأجندة',
     'agenda_empty' => 'لا توجد جلسات مجدولة بعد.',

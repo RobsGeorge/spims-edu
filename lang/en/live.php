@@ -24,6 +24,7 @@ return [
     'mention_body' => 'You were mentioned in ":thread".',
     'join' => 'Join',
     'live_sessions' => 'Live sessions',
+    'live_quiz' => 'Live quiz',
     'discussions' => 'Discussions',
     'agenda' => 'Agenda',
     'agenda_empty' => 'No sessions scheduled yet.',

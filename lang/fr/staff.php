@@ -185,6 +185,7 @@ return [
         'refresh' => 'Actualiser',
         'back_list' => 'Tous les quiz',
         'join_code' => 'Code d’entrée',
+        'student_join_at' => 'Les étudiants rejoignent via :url',
         'participants' => ':count participants',
         'launch' => 'Lancer',
         'launched' => 'Question lancée.',

@@ -15,6 +15,7 @@
             <a href="{{ route('discussions.board', $offering) }}" class="btn btn-outline-secondary">{{ __('learning.discussions') }}</a>
             <a href="{{ route('grades.index') }}" class="btn btn-outline-secondary">{{ __('learning.grades') }}</a>
             <a href="{{ route('offerings.completion', $offering) }}" class="btn btn-outline-secondary">{{ __('completion.nav') }}</a>
+            <a href="{{ route('live-quiz.join') }}" class="btn btn-outline-secondary">{{ __('learning.live_quiz') }}</a>
         </div>
     </div>
 

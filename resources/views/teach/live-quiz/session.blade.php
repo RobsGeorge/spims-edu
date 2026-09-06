@@ -22,6 +22,7 @@
 <div class="border rounded-3 p-4 text-center mb-3 mt-3">
     <div class="small text-muted-theme">{{ __('staff.live_quiz.join_code') }}</div>
     <div class="display-5 fw-bold spims-join-code" dir="ltr">{{ $session->join_code }}</div>
+    <p class="small text-muted-theme mt-2 mb-0">{{ __('staff.live_quiz.student_join_at', ['url' => route('live-quiz.join')]) }}</p>
     <x-status-badge :status="$session->state->value" :label="__('staff.live_quiz.state_'.$session->state->value)" />
     <div class="small text-muted-theme mt-2">{{ __('staff.live_quiz.participants', ['count' => $session->participants->count()]) }}</div>
 </div>

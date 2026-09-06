@@ -21,6 +21,8 @@ return [
     'enrollments_desc' => 'التسجيلات الحالية والسابقة.',
     'live' => 'الجلسات المباشرة',
     'live_desc' => 'حصص زووم القادمة.',
+    'live_quiz' => 'اختبار مباشر',
+    'live_quiz_desc' => 'انضم إلى اختبار مباشر برمز الجلسة.',
     'attendance' => 'الحضور',
     'attendance_desc' => 'سجل حضورك وتسجيل الدخول.',
     'attendance_admin' => 'سياسة الحضور',
