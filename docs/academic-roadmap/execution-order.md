@@ -4,7 +4,7 @@ The order to build the plan in, and how each step is proved. Companion to
 [`implementation-plan.md`](implementation-plan.md), which holds the detail; this file is the
 sequence and the exit criteria.
 
-**Status:** S0–S3 are complete and verified — see [`README.md`](README.md). S4 and S5 are next.
+**Status:** S0–S5 are complete and verified — see [`README.md`](README.md). S6 and S7 are next.
 
 ---
 

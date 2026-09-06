@@ -19,9 +19,11 @@
         @foreach($tabs as $key => $label)
             @php
                 $href = $prefix === 'teach'
-                    ? ($key === 'completion'
-                        ? route('teach.completion.show', $offering)
-                        : route('teach.show', ['offering' => $offering, 'tab' => $key]))
+                    ? match ($key) {
+                        'completion' => route('teach.completion.show', $offering),
+                        'assignments' => route('teach.assignments.index', $offering),
+                        default => route('teach.show', ['offering' => $offering, 'tab' => $key]),
+                    }
                     : ($key === 'completion'
                         ? route('admin.offering-closing.show', $offering)
                         : route('admin.offerings.show', $offering).'#workspace-'.$key);

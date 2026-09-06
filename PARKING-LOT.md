@@ -22,10 +22,13 @@ Promote an item into an active phase only when the phase owner accepts it.
 
 ## Scheduled for promotion — accepted, not yet built
 
-- **Hard exam proctoring** — S5, *partially*: the proctor event log, warning escalation and attempt
-  termination are in scope. Lockdown-browser-class enforcement remains out of scope.
+- **Lockdown-browser-class exam enforcement** — remains out of scope. S5 shipped the proctor event
+  log, warning escalation, and attempt termination.
 
 ## Promoted and delivered
+
+- **Hard exam proctoring (event log + termination)** — **S5**. `proctor_events` plus
+  `assessment_attempts.terminated_for_cheating`. Lockdown-browser-class enforcement stays parked.
 
 - **Attendance “excused” state** — **S3**. `attendance_entries` records `PRESENT` / `ABSENT` /
   `LATE` / `EXCUSED` on `class_sessions` independent of Zoom.

@@ -45,6 +45,9 @@ jobs:
       - name: Unit pipeline
         run: php artisan test --testsuite=Unit --compact
 
+      - name: Feature (base) pipeline
+        run: php artisan test --testsuite=Feature --compact
+
       - name: Database pipeline
         run: php artisan test --testsuite=Database --compact
 
@@ -285,6 +288,9 @@ jobs:
 
       - name: Credentials pipeline
         run: php artisan test --testsuite=Credentials --compact
+
+      - name: Completion pipeline
+        run: php artisan test --testsuite=Completion --compact
 
       - name: Hardening pipeline
         run: php artisan test --testsuite=Hardening --compact
