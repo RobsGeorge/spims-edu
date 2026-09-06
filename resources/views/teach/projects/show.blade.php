@@ -75,6 +75,7 @@
     <div class="col-md-2"><button class="btn btn-outline-primary w-100">{{ __('staff.projects.save_student') }}</button></div>
 </form>
 
+@if($confirmToken)
 <form method="POST" action="{{ route('teach.projects.announce', [$offering, $assessment]) }}" id="announceGradesForm">
     @csrf
     <input type="hidden" name="confirmation_token" value="{{ $confirmToken }}">
@@ -90,6 +91,7 @@
         <button type="submit" form="announceGradesForm" class="btn btn-danger">{{ __('staff.projects.announce_confirm') }}</button>
     </x-slot:confirm>
 </x-confirm-dialog>
+@endif
 
 <h2 class="h6 mt-4">{{ __('staff.projects.submissions') }}</h2>
 @forelse($submissions as $submission)

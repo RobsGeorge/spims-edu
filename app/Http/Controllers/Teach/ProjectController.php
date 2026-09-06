@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teach;
 
 use App\Enums\ProjectGradingMode;
 use App\Enums\ProjectReviewStatus;
+use App\Exceptions\AuthorizationException;
 use App\Exceptions\ConflictException;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Teach\Concerns\GuardsTeachOffering;
@@ -117,6 +118,14 @@ class ProjectController extends Controller
             ->whereNull('announced_at')
             ->count();
 
+        $confirmToken = null;
+        try {
+            $this->authorize->authorize($request->user(), 'projects.announce', $assessment);
+            $confirmToken = $this->confirm->issue('projects.announce.'.$assessment->id);
+        } catch (AuthorizationException) {
+            $confirmToken = null;
+        }
+
         return view('teach.projects.show', [
             'offering' => $offering->load('course'),
             'assessment' => $assessment,
@@ -124,7 +133,7 @@ class ProjectController extends Controller
             'submissions' => $submissions,
             'peerAggregates' => $this->peers->aggregatesForStaff($request->user(), $assessment),
             'pendingGrades' => $pendingGrades,
-            'confirmToken' => $this->confirm->issue('projects.announce.'.$assessment->id),
+            'confirmToken' => $confirmToken,
         ]);
     }
 
@@ -228,6 +237,7 @@ class ProjectController extends Controller
     {
         $this->guardTeach($request, $offering);
         $this->assertOfferingAssessment($offering, $assessment);
+        $this->authorize->authorize($request->user(), 'projects.announce', $assessment);
 
         $this->confirm->consume(
             'projects.announce.'.$assessment->id,

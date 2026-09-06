@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\StaffUi;
 
+use App\Enums\OfferingStaffRole;
+use App\Enums\RoleType;
 use App\Models\ProjectGrade;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Feature\Projects\ProjectFixtures;
@@ -76,5 +79,34 @@ class StaffProjectUiTest extends TestCase
         $this->actingAs($instructorA)
             ->get(route('teach.projects.show', [$offeringA, $assessment]))
             ->assertOk();
+    }
+
+    #[Test]
+    public function ta_can_see_seating_but_is_denied_announce(): void
+    {
+        $offering = $this->offering('S8PT');
+        $instructor = $this->instructorOn($offering);
+        $ta = User::factory()->withRole(RoleType::Ta)->create();
+        $this->staffOffering($ta, $offering, OfferingStaffRole::Ta);
+        $student = $this->studentOn($offering);
+        $assessment = $this->publishedAssessment($offering);
+        $this->addCriterion($assessment);
+        $team = $this->joinTeam($student, $assessment);
+        $this->grading()->setTeamScore($instructor, $team, 70);
+
+        $this->actingAs($ta)
+            ->get(route('teach.projects.show', [$offering, $assessment]))
+            ->assertOk()
+            ->assertSee($team->name)
+            ->assertDontSee('name="confirmation_token"', false);
+
+        $this->actingAs($ta)
+            ->from(route('teach.projects.show', [$offering, $assessment]))
+            ->post(route('teach.projects.announce', [$offering, $assessment]), [
+                'confirmation_token' => 'deadbeefdeadbeefdeadbeefdeadbeef',
+            ])
+            ->assertForbidden();
+
+        $this->assertSame(0, ProjectGrade::query()->whereNotNull('announced_at')->count());
     }
 }
