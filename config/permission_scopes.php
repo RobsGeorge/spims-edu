@@ -17,9 +17,9 @@ return [
      * Keys deliberately absent are self-scoped: `assessments.take`, `assignments.submit`,
      * `discussions.post`, `discussions.thread`, `live.join`, `finance.pay`, `finance.donate`,
      * `admissions.apply`, `enrollment.register`, `courses.flag_interest`, `profile.edit_own`,
-     * `transcript.view`, `attendance.view_own` and `attendance.self_check_in` all describe
-     * acting on your own behalf, and their membership checks live in the services that own
-     * the data.
+     * `transcript.view`, `attendance.view_own`, `attendance.self_check_in` and `live_quiz.play`
+     * all describe acting on your own behalf, and their membership checks live in the
+     * services that own the data.
      */
     'offering_scoped' => [
         'offerings.view',
@@ -58,6 +58,8 @@ return [
         'student_notes.manage',
         'module_assessment.view',
         'module_assessment.manage',
+        'live_quiz.host',
+        'live_quiz.manage',
     ],
 
     /*

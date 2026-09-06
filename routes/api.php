@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\DiscussionController;
 use App\Http\Controllers\Api\V1\DonationController;
 use App\Http\Controllers\Api\V1\EnrollmentController;
 use App\Http\Controllers\Api\V1\InvoiceController;
+use App\Http\Controllers\Api\V1\LiveQuizController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\NotificationSettingsController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\TeachAnnouncementController;
 use App\Http\Controllers\Api\V1\TeachAttendanceController;
 use App\Http\Controllers\Api\V1\TeachCompletionController;
+use App\Http\Controllers\Api\V1\TeachLiveQuizController;
 use App\Http\Controllers\Api\V1\TranscriptController;
 use App\Http\Controllers\Api\V1\WalletController;
 use App\Http\Middleware\Api\SetApiLocale;
@@ -156,6 +158,13 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
         Route::get('/wallet', [WalletController::class, 'show'])->name('wallet');
         Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
 
+        // --- S6E live quiz (owned by cursor/s6e-livequiz-bcff) ---
+        Route::post('/live-quiz/join', [LiveQuizController::class, 'join'])->name('live-quiz.join');
+        Route::get('/live-quiz/sessions/{liveQuizSession}', [LiveQuizController::class, 'show'])
+            ->name('live-quiz.sessions.show');
+        Route::post('/live-quiz/sessions/{liveQuizSession}/questions/{liveQuizQuestion}/answer', [LiveQuizController::class, 'answer'])
+            ->name('live-quiz.sessions.answer');
+
         Route::prefix('teach')->name('teach.')->middleware('api.instructor')->group(function () {
             Route::get('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'sessions'])->name('offerings.sessions');
             Route::post('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'storeSession'])->name('offerings.sessions.store');
@@ -175,6 +184,20 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
                 ->name('offerings.students.notes.store');
             Route::put('/offerings/{offering}/weeks/{week}/students/{student}/assessment', [TeachCompletionController::class, 'rate'])
                 ->name('offerings.weeks.students.assessment');
+
+            // --- S6E live quiz host (owned by cursor/s6e-livequiz-bcff) ---
+            Route::post('/offerings/{offering}/live-quizzes', [TeachLiveQuizController::class, 'store'])
+                ->name('offerings.live-quizzes.store');
+            Route::post('/live-quiz/{liveQuiz}/host/start', [TeachLiveQuizController::class, 'start'])
+                ->name('live-quiz.host.start');
+            Route::post('/live-quiz/sessions/{liveQuizSession}/launch', [TeachLiveQuizController::class, 'launch'])
+                ->name('live-quiz.sessions.launch');
+            Route::post('/live-quiz/sessions/{liveQuizSession}/close', [TeachLiveQuizController::class, 'close'])
+                ->name('live-quiz.sessions.close');
+            Route::post('/live-quiz/sessions/{liveQuizSession}/results', [TeachLiveQuizController::class, 'results'])
+                ->name('live-quiz.sessions.results');
+            Route::post('/live-quiz/sessions/{liveQuizSession}/end', [TeachLiveQuizController::class, 'end'])
+                ->name('live-quiz.sessions.end');
         });
     });
 });

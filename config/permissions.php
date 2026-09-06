@@ -390,4 +390,17 @@ return [
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
     ],
+
+    // S6E live quiz
+    'live_quiz.play' => [
+        'STUDENT' => 'O',
+    ],
+    'live_quiz.host' => [
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'live_quiz.manage' => [
+        'INSTRUCTOR' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
 ];

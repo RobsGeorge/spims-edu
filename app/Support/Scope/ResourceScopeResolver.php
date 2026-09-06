@@ -26,6 +26,9 @@ use App\Models\DiscussionThread;
 use App\Models\EmailTemplate;
 use App\Models\Enrollment;
 use App\Models\GradebookComponent;
+use App\Models\LiveQuiz;
+use App\Models\LiveQuizQuestion;
+use App\Models\LiveQuizSession;
 use App\Models\LiveSession;
 use App\Models\ModuleStudentAssessment;
 use App\Models\OfferingClosing;
@@ -114,6 +117,9 @@ class ResourceScopeResolver
             $resource instanceof StudentNote => $resource->offering_id,
             $resource instanceof ModuleStudentAssessment => $resource->week?->offering_id,
             $resource instanceof CompletionCriterion && $resource->isOfferingScoped() => $resource->offering_id,
+            $resource instanceof LiveQuiz => $resource->offering_id,
+            $resource instanceof LiveQuizSession => $resource->quiz?->offering_id,
+            $resource instanceof LiveQuizQuestion => $resource->quiz?->offering_id,
             default => null,
         };
 
