@@ -8,6 +8,7 @@ use App\Enums\OfferingMode;
 use App\Enums\ProjectAssessmentStatus;
 use App\Enums\ProjectDeliverableKind;
 use App\Enums\ProjectGradingMode;
+use App\Enums\ProjectStatus;
 use App\Enums\RoleType;
 use App\Models\Course;
 use App\Models\CourseOffering;
@@ -25,6 +26,7 @@ use App\Services\Projects\ProjectChangeRequestService;
 use App\Services\Projects\ProjectDeliverableService;
 use App\Services\Projects\ProjectGradingService;
 use App\Services\Projects\ProjectTeamService;
+use Illuminate\Support\Facades\Auth;
 
 trait ProjectFixtures
 {
@@ -152,6 +154,15 @@ trait ProjectFixtures
         return app(ProjectChangeRequestService::class);
     }
 
+    protected function openTeam(ProjectAssessment $assessment, string $name): Project
+    {
+        return Project::query()->create([
+            'project_assessment_id' => $assessment->id,
+            'name' => $name,
+            'status' => ProjectStatus::Open,
+        ]);
+    }
+
     protected function joinTeam(User $student, ProjectAssessment $assessment, ?Project $project = null): Project
     {
         $membership = $this->teams()->join($student, $assessment, $project?->id);
@@ -167,5 +178,12 @@ trait ProjectFixtures
             'weight' => $weight,
             'level' => 'TEAM',
         ]);
+    }
+
+    protected function asApi(User $user, string $role = 'STUDENT')
+    {
+        Auth::forgetGuards();
+
+        return $this->withToken($user->createToken('api', ["role:{$role}"])->plainTextToken);
     }
 }

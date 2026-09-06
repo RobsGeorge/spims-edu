@@ -5,10 +5,8 @@ namespace Tests\Feature\Projects;
 use App\Enums\ProjectDeliverableKind;
 use App\Exceptions\AuthorizationException;
 use App\Models\ProjectDeliverable;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -125,12 +123,5 @@ class ProjectScopeTest extends TestCase
             ->getJson('/api/v1/offerings/'.$theirs->id.'/project-assessments')
             ->assertNotFound()
             ->assertJsonPath('code', 'NOT_FOUND');
-    }
-
-    private function asApi(User $user)
-    {
-        Auth::forgetGuards();
-
-        return $this->withToken($user->createToken('api', ['role:STUDENT'])->plainTextToken);
     }
 }

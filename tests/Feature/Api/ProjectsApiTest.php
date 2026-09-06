@@ -15,7 +15,6 @@ class ProjectsApiTest extends TestCase
 {
     use ProjectFixtures;
     use RefreshDatabase;
-    use StudentApiFixtures;
 
     #[Test]
     public function join_returns_409_outside_the_window_or_at_capacity(): void

@@ -46,8 +46,10 @@ class ProjectChangeRequestTest extends TestCase
         $student = $this->studentOn($offering);
         $host = $this->studentOn($offering);
         $assessment = $this->publishedAssessment($offering, ['team_size_max' => 2]);
-        $from = $this->joinTeam($student, $assessment);
-        $to = $this->joinTeam($host, $assessment);
+        $from = $this->openTeam($assessment, 'Alpha');
+        $to = $this->openTeam($assessment, 'Beta');
+        $this->teams()->join($student, $assessment, $from->id);
+        $this->teams()->join($host, $assessment, $to->id);
 
         $request = $this->changeRequests()->raise($student, $assessment, [
             'kind' => ProjectChangeRequestKind::Move->value,
@@ -72,9 +74,14 @@ class ProjectChangeRequestTest extends TestCase
         $student = $this->studentOn($offering);
         $host = $this->studentOn($offering);
         $filler = $this->studentOn($offering);
-        $assessment = $this->publishedAssessment($offering, ['team_size_max' => 1]);
-        $this->joinTeam($student, $assessment);
-        $full = $this->joinTeam($host, $assessment);
+        $assessment = $this->publishedAssessment($offering, ['team_size_max' => 2]);
+        $from = $this->openTeam($assessment, 'Alpha');
+        $full = $this->openTeam($assessment, 'Beta');
+        $this->teams()->join($student, $assessment, $from->id);
+        $this->teams()->join($host, $assessment, $full->id);
+        $this->teams()->join($filler, $assessment, $full->id);
+        $this->assertNotSame($from->id, $full->id);
+        $this->assertSame(2, $this->teams()->activeSeatCount($full));
 
         $request = $this->changeRequests()->raise($student, $assessment, [
             'kind' => ProjectChangeRequestKind::Move->value,
@@ -89,6 +96,8 @@ class ProjectChangeRequestTest extends TestCase
             $this->assertSame(ProjectChangeRequestStatus::Pending, $request->fresh()->status);
         }
 
-        $this->assertNull($this->teams()->activeMembership($filler, $full));
+        $this->assertNotNull($this->teams()->activeMembership($student, $from));
+        $this->assertNull($this->teams()->activeMembership($student, $full));
+        $this->assertSame(2, $this->teams()->activeSeatCount($full->fresh()));
     }
 }

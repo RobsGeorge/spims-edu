@@ -57,7 +57,7 @@ class PeerEvaluationService
     public function submit(User $rater, Project $project, array $data): ProjectPeerEvaluation
     {
         $this->authorize->authorize($rater, 'projects.peer_eval');
-        $project->loadMissing('assessment');
+        $project->load('assessment');
         $this->teams->assertEnrolled($rater, $project->assessment);
 
         if ($this->teams->activeMembership($rater, $project) === null) {

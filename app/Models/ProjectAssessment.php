@@ -85,7 +85,7 @@ class ProjectAssessment extends Model
             return false;
         }
 
-        if ($this->join_closes_at !== null && $now->gt($this->join_closes_at)) {
+        if ($this->join_closes_at !== null && $now->gte($this->join_closes_at)) {
             return false;
         }
 
@@ -100,7 +100,7 @@ class ProjectAssessment extends Model
             return false;
         }
 
-        if ($this->peer_closes_at !== null && $now->gt($this->peer_closes_at)) {
+        if ($this->peer_closes_at !== null && $now->gte($this->peer_closes_at)) {
             return false;
         }
 

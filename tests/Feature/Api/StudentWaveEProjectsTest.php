@@ -7,7 +7,6 @@ use App\Models\AuditLog;
 use App\Models\ProjectDeliverable;
 use App\Models\ProjectMembership;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Feature\Projects\ProjectFixtures;
@@ -17,7 +16,6 @@ class StudentWaveEProjectsTest extends TestCase
 {
     use ProjectFixtures;
     use RefreshDatabase;
-    use StudentApiFixtures;
 
     #[Test]
     public function student_completes_the_project_surface_end_to_end(): void
@@ -107,9 +105,7 @@ class StudentWaveEProjectsTest extends TestCase
 
         $this->assertNull($this->teams()->activeMembershipForAssessment($student, $assessment));
 
-        Auth::forgetGuards();
-        $token = $instructor->createToken('api', ['role:INSTRUCTOR'])->plainTextToken;
-        $this->withToken($token)
+        $this->asApi($instructor, 'INSTRUCTOR')
             ->getJson(route('api.v1.teach.offerings.project-assessments', $offering))
             ->assertOk()
             ->assertJsonPath('data.0.id', $assessment->id);
