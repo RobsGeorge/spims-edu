@@ -4,7 +4,9 @@ namespace App\Services\Assessment;
 
 use App\Enums\DeliveryMode;
 use App\Enums\EnrollmentStatus;
+use App\Enums\GradeStatus;
 use App\Enums\SubmissionType;
+use App\Exceptions\ResourceLockedException;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\AssignmentSubmissionVersion;
@@ -174,6 +176,7 @@ class AssignmentService
     public function grade(User $grader, AssignmentSubmission $submission, float $rawScore, ?string $feedback = null): AssignmentSubmission
     {
         $this->authorize->authorize($grader, 'assignments.grade', $submission);
+        $this->assertGradebookWritable($submission);
 
         $assignment = $submission->assignment;
         $final = $this->applyLatePenalty($assignment, $submission, $rawScore);
@@ -425,5 +428,24 @@ class AssignmentService
 
             return $graded;
         }, 'Assignment');
+    }
+
+    private function assertGradebookWritable(AssignmentSubmission $submission): void
+    {
+        $submission->loadMissing('assignment.contentItem.week');
+        $offeringId = $submission->assignment?->contentItem?->week?->offering_id;
+        if ($offeringId === null) {
+            return;
+        }
+
+        $locked = Enrollment::query()
+            ->where('offering_id', $offeringId)
+            ->where('student_id', $submission->student_id)
+            ->where('grade_status', GradeStatus::Locked)
+            ->exists();
+
+        if ($locked) {
+            throw new ResourceLockedException(__('assessment.grades_locked'));
+        }
     }
 }
