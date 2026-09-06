@@ -10,6 +10,7 @@ use App\Models\Translation;
 use App\Models\User;
 use App\Services\Academics\TranslationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -59,7 +60,7 @@ class AssessmentTemplateAndTranslationTest extends TestCase
 
         $this->actingAs($aca)->post(route('admin.translations.store'), [
             'entity_type' => 'Course',
-            'entity_id' => '01TESTENTITY000000000000000',
+            'entity_id' => (string) Str::ulid(),
             'field' => 'title',
             'locale' => 'ar',
             'value' => 'تاريخ الكنيسة',
@@ -83,7 +84,7 @@ class AssessmentTemplateAndTranslationTest extends TestCase
         $result = app(TranslationService::class)->requestAiTranslation(
             $aca,
             'Course',
-            '01TESTENTITY000000000000000',
+            (string) Str::ulid(),
             'title',
             'en',
             'ar',

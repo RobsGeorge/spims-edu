@@ -14,6 +14,7 @@ use App\Models\Theme;
 use App\Models\Translation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -42,7 +43,7 @@ class PortalD5OperatorTest extends TestCase
 
         Translation::query()->create([
             'entity_type' => 'Course',
-            'entity_id' => '01TRANSLATIONTESTENTITY000001',
+            'entity_id' => (string) Str::ulid(),
             'field' => 'title',
             'locale' => 'ar',
             'value' => 'تاريخ الكنيسة',
