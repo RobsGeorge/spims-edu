@@ -11,7 +11,8 @@ spl_autoload_register(static function (string $class) use ($root): void {
     $map = [
         'App\\' => $root.'/app/',
         'Tests\\' => $root.'/tests/',
-        'Database\\' => $root.'/database/',
+        'Database\\Seeders\\' => $root.'/database/seeders/',
+        'Database\\Factories\\' => $root.'/database/factories/',
     ];
 
     foreach ($map as $prefix => $base) {

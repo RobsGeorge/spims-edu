@@ -102,9 +102,9 @@ After `migrate:fresh --seed` with `SEED_DEMO_DATA=true`:
 | Applications | 10 | All statuses represented |
 | Student programs | 4 | The four Accepted students |
 | Enrollments | 13 | 12 from accepted students + dual on ET101 self-paced |
-| Invoices | 11+ | One per non-free **enrolled** row; student9 first invoice is paid |
+| Invoices | 12 | 11 non-free enrolled rows + dual’s free ET101 invoice; student9 first invoice is paid |
 | Payments | 1 | Manual cash, verified, on student9 |
-| Wallet accounts | 1+ | student1 has EGP 50.00 money (`5000` minor) |
+| Wallet accounts | 1 | student1 has EGP 50.00 money (`5000` minor) |
 | Announcements | 1 | Published from ins1 to TH101 |
 | Live sessions | 1 | TH101, scheduled in the next 24h (mock Zoom) |
 | Class sessions / attendance | 1 / 3 | student1 Present, student6 Late, student7 Excused |
