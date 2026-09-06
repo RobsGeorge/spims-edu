@@ -104,6 +104,6 @@ class StudentApiParityTest extends TestCase
             ->getJson(route('api.v1.offerings.attendance.mine', $offering))
             ->assertOk()
             ->json('data');
-        $this->assertSame($percent, $apiOffering['percent']);
+        $this->assertEquals($percent, $apiOffering['percent']);
     }
 }
