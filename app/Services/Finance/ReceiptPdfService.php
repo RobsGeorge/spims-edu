@@ -3,6 +3,7 @@
 namespace App\Services\Finance;
 
 use App\Models\Payment;
+use App\Services\Pdf\PdfRenderService;
 use App\Services\Storage\ObjectStorageService;
 use Illuminate\Support\Facades\App;
 
@@ -10,11 +11,16 @@ class ReceiptPdfService
 {
     public function __construct(
         private readonly ObjectStorageService $storage,
+        private readonly PdfRenderService $pdf,
     ) {}
 
     /**
-     * Render a language-aware HTML receipt into object storage.
-     * Path is keyed by payment id (no schema change): receipts/{paymentId}.html
+     * Render a language-aware receipt into object storage. Tries a real PDF via
+     * DomPDF first (path keyed by payment id: receipts/{paymentId}.pdf) and
+     * falls back to the same content as HTML (receipts/{paymentId}.html) when
+     * the renderer is unavailable — the same optional-degradation treatment S4
+     * gives CredentialService, applied here per the plan doc's note that this
+     * service has the identical shortcut.
      */
     public function generate(Payment $payment): string
     {
@@ -36,8 +42,15 @@ class ReceiptPdfService
             App::setLocale($previous);
         }
 
-        $path = 'receipts/'.$payment->id.'.html';
-        $this->storage->store($path, $html);
+        $pdfBytes = $this->pdf->renderPdf($html);
+
+        if ($pdfBytes !== null) {
+            $path = 'receipts/'.$payment->id.'.pdf';
+            $this->storage->store($path, $pdfBytes);
+        } else {
+            $path = 'receipts/'.$payment->id.'.html';
+            $this->storage->store($path, $html);
+        }
 
         if ($payment->receipt_url !== $path) {
             $payment->update(['receipt_url' => $path]);

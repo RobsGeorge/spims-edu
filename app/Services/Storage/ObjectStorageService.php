@@ -15,6 +15,7 @@ class ObjectStorageService
         'logos',
         'uploads',
         'receipts',
+        'credentials',
     ];
 
     public function disk(): Filesystem
