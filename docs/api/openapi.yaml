@@ -154,3 +154,375 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
+
+  /attendance/mine:
+    get:
+      operationId: attendanceMine
+      summary: Paginated attendance history for the authenticated student across offerings.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: per_page
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { type: object } }
+                  meta:
+                    type: object
+                    properties:
+                      current_page: { type: integer }
+                      per_page: { type: integer }
+                      total: { type: integer }
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /offerings/{offering}/attendance/mine:
+    get:
+      operationId: offeringAttendanceMine
+      summary: The student's attendance percentage and policy threshold for one offering.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: offering
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      percent: { type: number, nullable: true }
+                      threshold: { type: integer, nullable: true }
+                      policy_enabled: { type: boolean, nullable: true }
+                      meets_threshold: { type: boolean, nullable: true }
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /sessions/{session}/check-in:
+    post:
+      operationId: sessionCheckIn
+      summary: Student self check-in with a session code.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: session
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string }
+      responses:
+        "201":
+          description: Marked present
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: object }
+        "401":
+          description: Unauthenticated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "422":
+          description: Invalid, expired, exhausted, replayed, or wrong-session code
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "423":
+          description: Session closed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /teach/offerings/{offering}/sessions:
+    get:
+      operationId: teachOfferingSessions
+      summary: List class sessions for an offering (instructor/TA).
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: offering
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { type: object } }
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    post:
+      operationId: teachCreateSession
+      summary: Create a class session, including in-person.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: offering
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, scheduled_start, duration_minutes]
+              properties:
+                title: { type: string }
+                scheduled_start: { type: string, format: date-time }
+                duration_minutes: { type: integer }
+                mode: { type: string, enum: [IN_PERSON, ONLINE, HYBRID] }
+                location: { type: string, nullable: true }
+                notify_students: { type: boolean }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: object }
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /teach/sessions/{session}/roster:
+    get:
+      operationId: teachSessionRoster
+      summary: Session roster with current marks and lock_version.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: session
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: object }
+
+  /teach/sessions/{session}/attendance:
+    post:
+      operationId: teachMarkAttendance
+      summary: Bulk-mark attendance. Body carries lock_version; stale writes return 409.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: session
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lock_version, marks]
+              properties:
+                lock_version: { type: integer }
+                marks:
+                  type: array
+                  items:
+                    type: object
+                    required: [student_id, status]
+                    properties:
+                      student_id: { type: string }
+                      status: { type: string, enum: [PRESENT, ABSENT, LATE, EXCUSED] }
+                      minutes_attended: { type: integer }
+                      excuse_reason: { type: string, nullable: true }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      lock_version: { type: integer }
+        "409":
+          description: Stale lock_version
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "423":
+          description: Session closed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /teach/sessions/{session}/attendance/fill-missing:
+    post:
+      operationId: teachFillMissing
+      summary: Mark remaining enrolled students absent.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: session
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: object }
+        "423":
+          description: Session closed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /teach/sessions/{session}/close:
+    post:
+      operationId: teachCloseSession
+      summary: Close attendance. Further writes return 423 LOCKED.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: session
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: object }
+
+  /teach/sessions/{session}/check-in-code:
+    post:
+      operationId: teachIssueCheckInCode
+      summary: Issue a self check-in code for the session.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: session
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ttl_minutes: { type: integer }
+                max_uses: { type: integer, nullable: true }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: object }
+
+  /teach/offerings/{offering}/attendance/report:
+    get:
+      operationId: teachAttendanceReport
+      summary: Per-student, per-session, and aggregate attendance report. Use format=csv for a download.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: offering
+          required: true
+          schema: { type: string }
+        - in: query
+          name: format
+          schema: { type: string, enum: [csv] }
+      responses:
+        "200":
+          description: JSON report or CSV
+
+  /teach/offerings/{offering}/roster:
+    get:
+      operationId: teachOfferingRoster
+      summary: Offering roster. Use format=csv for a download.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: offering
+          required: true
+          schema: { type: string }
+        - in: query
+          name: format
+          schema: { type: string, enum: [csv] }
+      responses:
+        "200":
+          description: JSON roster or CSV
+
+  /teach/offerings/{offering}/birthdays:
+    get:
+      operationId: teachOfferingBirthdays
+      summary: Roster birthdays within a window (sparse until date_of_birth is populated).
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: offering
+          required: true
+          schema: { type: string }
+        - in: query
+          name: days
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { type: object } }
