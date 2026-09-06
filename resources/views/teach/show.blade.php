@@ -43,7 +43,10 @@
         </div>
     @elseif($tab === 'discussions')
         <x-page-header :title="__('teach.tab_discussions')" :subtitle="__('teach.tab_discussions_help')" />
-        <a class="btn btn-primary" href="{{ route('discussions.board', $offering) }}">{{ __('teach.open_discussions') }}</a>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary" href="{{ route('teach.discussions.index', $offering) }}">{{ __('teach.open_discussion_grades') }}</a>
+            <a class="btn btn-outline-primary" href="{{ route('discussions.board', $offering) }}">{{ __('teach.open_discussions') }}</a>
+        </div>
     @elseif($tab === 'announcements')
         <x-page-header :title="__('teach.tab_announcements')" :subtitle="__('teach.tab_announcements_help')" />
         <form method="POST" action="{{ route('teach.announcements.store', $offering) }}" class="row g-2 mb-4">

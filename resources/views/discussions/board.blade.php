@@ -2,6 +2,11 @@
 @section('title', __('live.discussions'))
 @section('content')
 <h1 class="spims-title mb-3">{{ __('live.discussions') }} — {{ $offering->course->code }}</h1>
+@if($canGrade ?? false)
+    <div class="mb-3">
+        <a href="{{ route('teach.discussions.index', $offering) }}" class="btn btn-outline-primary btn-sm">{{ __('teach.discussions_workspace') }}</a>
+    </div>
+@endif
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 @if($board)
 <form method="POST" action="{{ route('discussions.threads.store', $offering) }}" class="card border-0 shadow-sm mb-4">@csrf

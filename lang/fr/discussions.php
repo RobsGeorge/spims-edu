@@ -1,0 +1,18 @@
+<?php
+
+return [
+    'grade_heading' => 'Noter ce fil',
+    'grade_help' => 'Surcharge de la note de discussion par l\'équipe. Les évaluations par les pairs n\'écrivent pas cette note.',
+    'student' => 'Étudiant',
+    'student_placeholder' => 'Choisir un étudiant inscrit',
+    'score' => 'Note',
+    'feedback' => 'Commentaire',
+    'submit_grade' => 'Enregistrer la note',
+    'grade_saved' => 'Note de discussion enregistrée.',
+    'overridden' => 'Surchargée',
+    'graded_thread' => 'Noté',
+    'locked' => 'Verrouillé',
+    'pinned' => 'Épinglé',
+    'no_threads' => 'Aucun fil de discussion',
+    'no_threads_help' => 'Ouvrez le forum pour créer un fil, puis revenez ici pour noter les étudiants.',
+];

@@ -2,6 +2,7 @@
 
 namespace App\Services\Discussions;
 
+use App\Enums\EnrollmentStatus;
 use App\Enums\OfferingMode;
 use App\Enums\RoleType;
 use App\Enums\ThreadVisibility;
@@ -10,6 +11,7 @@ use App\Models\DiscussionBoard;
 use App\Models\DiscussionGrade;
 use App\Models\DiscussionPost;
 use App\Models\DiscussionThread;
+use App\Models\Enrollment;
 use App\Models\User;
 use App\Services\Notifications\NotificationService;
 use App\Support\AuditLogWriter;
@@ -261,5 +263,21 @@ class DiscussionService
             ->orderByDesc('pinned')
             ->latest('created_at')
             ->get();
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, User>
+     */
+    public function enrolledStudents(CourseOffering $offering)
+    {
+        return Enrollment::query()
+            ->where('offering_id', $offering->id)
+            ->where('status', EnrollmentStatus::Enrolled)
+            ->with('student')
+            ->orderBy('enrolled_at')
+            ->get()
+            ->pluck('student')
+            ->filter()
+            ->values();
     }
 }

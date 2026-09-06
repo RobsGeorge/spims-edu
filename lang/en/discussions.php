@@ -1,0 +1,18 @@
+<?php
+
+return [
+    'grade_heading' => 'Grade this thread',
+    'grade_help' => 'Staff override of a student’s discussion score. Peer evaluations do not write this grade.',
+    'student' => 'Student',
+    'student_placeholder' => 'Select an enrolled student',
+    'score' => 'Score',
+    'feedback' => 'Feedback',
+    'submit_grade' => 'Save grade',
+    'grade_saved' => 'Discussion grade saved.',
+    'overridden' => 'Overridden',
+    'graded_thread' => 'Graded',
+    'locked' => 'Locked',
+    'pinned' => 'Pinned',
+    'no_threads' => 'No discussion threads yet',
+    'no_threads_help' => 'Open the board to start a thread, then return here to score students.',
+];

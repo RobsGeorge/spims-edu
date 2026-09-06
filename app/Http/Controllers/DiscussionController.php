@@ -6,20 +6,26 @@ use App\Models\CourseOffering;
 use App\Models\DiscussionThread;
 use App\Services\Discussions\DiscussionService;
 use App\Services\Learning\OfferingAccessService;
+use App\Services\Teach\TeachAccessService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DiscussionController extends Controller
 {
-    public function showBoard(CourseOffering $offering, DiscussionService $discussions, OfferingAccessService $access): View
-    {
+    public function showBoard(
+        CourseOffering $offering,
+        DiscussionService $discussions,
+        OfferingAccessService $access,
+        TeachAccessService $teachAccess,
+    ): View {
         $access->assertCanAccessDiscussion(auth()->user(), $offering);
         $board = $discussions->ensureBoard($offering);
 
         return view('discussions.board', [
             'offering' => $offering->load('course'),
             'board' => $board,
+            'canGrade' => $teachAccess->canGradeDiscussions(auth()->user(), $offering),
             'threads' => $board
                 ? DiscussionThread::query()
                     ->where('board_id', $board->id)
@@ -50,12 +56,25 @@ class DiscussionController extends Controller
         return redirect()->route('discussions.thread', $thread)->with('status', __('live.thread_created'));
     }
 
-    public function showThread(DiscussionThread $thread, OfferingAccessService $access): View
-    {
+    public function showThread(
+        DiscussionThread $thread,
+        OfferingAccessService $access,
+        TeachAccessService $teachAccess,
+        DiscussionService $discussions,
+    ): View {
         $access->assertCanAccessThread(auth()->user(), $thread);
 
+        $thread->load(['board.offering.course', 'posts.author', 'grades.student']);
+        $offering = $thread->board?->offering;
+        $canGrade = $offering !== null && $teachAccess->canGradeDiscussions(auth()->user(), $thread);
+
         return view('discussions.thread', [
-            'thread' => $thread->load(['board.offering.course', 'posts.author', 'grades']),
+            'thread' => $thread,
+            'offering' => $offering,
+            'canGrade' => $canGrade,
+            'students' => $canGrade && $offering !== null
+                ? $discussions->enrolledStudents($offering)
+                : collect(),
         ]);
     }
 
