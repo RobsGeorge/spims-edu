@@ -143,6 +143,12 @@
             </a>
         </div>
         <div class="col-md-6 col-lg-4">
+            <a href="{{ route('student.surveys.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
+                <h3><i class="bi bi-clipboard-check" aria-hidden="true"></i> {{ __('dashboard.surveys') }}</h3>
+                <p class="text-muted-theme mb-0">{{ __('dashboard.surveys_desc') }}</p>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-4">
             <a href="{{ route('settings.edit') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                 <h3><i class="bi bi-person-gear" aria-hidden="true"></i> {{ __('learning.settings') }}</h3>
                 <p class="text-muted-theme mb-0">{{ __('hubs.settings_desc') }}</p>

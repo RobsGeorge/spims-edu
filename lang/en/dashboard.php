@@ -16,4 +16,6 @@ return [
     'superadmin_hub_desc' => 'Platform security, audit, observability, and system tools.',
     'notifications' => 'Notifications',
     'notifications_desc' => 'Alerts and mentions.',
+    'surveys' => 'Surveys',
+    'surveys_desc' => 'Fill assigned course and school surveys.',
 ];

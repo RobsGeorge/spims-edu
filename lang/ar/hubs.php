@@ -27,6 +27,8 @@ return [
     'live_quiz_desc' => 'انضم إلى اختبار مباشر برمز الجلسة.',
     'attendance' => 'الحضور',
     'attendance_desc' => 'سجل حضورك وتسجيل الدخول.',
+    'surveys' => 'الاستبيانات',
+    'surveys_desc' => 'الاستبيانات المعينة والمفتوحة.',
     'attendance_admin' => 'سياسة الحضور',
     'attendance_admin_desc' => 'الحدود ونسبة التأخر والتقارير.',
     'finance' => 'ماليتي',

@@ -10,6 +10,7 @@
         @if(!empty($hasPublishedProjects))
             <a href="{{ route('student.projects.index', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('projects.nav') }}</a>
         @endif
+        <a href="{{ route('student.surveys.index') }}" class="btn btn-outline-secondary btn-sm">{{ __('learning.surveys') }}</a>
         <a href="{{ route('offerings.completion', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('completion.nav') }}</a>
         <a href="{{ route('enrollments.index') }}" class="btn btn-outline-secondary btn-sm">{{ __('ui.nav_enrollments') }}</a>
     </div>

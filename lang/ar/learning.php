@@ -40,6 +40,7 @@ return [
     'item_discussion' => 'نقاش',
     'discussions' => 'النقاشات',
     'live_quiz' => 'اختبار مباشر',
+    'surveys' => 'الاستبيانات',
     'announcements' => 'الإعلانات',
     'no_announcements' => 'لا إعلانات بعد.',
     'player_title' => 'مشغّل المقرر',

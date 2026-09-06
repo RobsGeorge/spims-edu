@@ -40,6 +40,7 @@ return [
     'item_discussion' => 'Discussion',
     'discussions' => 'Discussions',
     'live_quiz' => 'Quiz live',
+    'surveys' => 'Sondages',
     'announcements' => 'Annonces',
     'no_announcements' => 'Pas encore d’annonces.',
     'player_title' => 'Lecteur de cours',

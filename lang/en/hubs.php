@@ -27,6 +27,8 @@ return [
     'live_quiz_desc' => 'Join a live quiz with a session code.',
     'attendance' => 'Attendance',
     'attendance_desc' => 'Your attendance history and check-in.',
+    'surveys' => 'Surveys',
+    'surveys_desc' => 'Assigned and open feedback surveys.',
     'attendance_admin' => 'Attendance policy',
     'attendance_admin_desc' => 'Thresholds, late credit, and reports.',
     'finance' => 'My finance',
