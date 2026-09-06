@@ -9,6 +9,7 @@ use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Assessment extends Model
 {
@@ -90,6 +91,11 @@ class Assessment extends Model
     public function attempts(): HasMany
     {
         return $this->hasMany(AssessmentAttempt::class);
+    }
+
+    public function resultAnnouncement(): HasOne
+    {
+        return $this->hasOne(AssessmentResultAnnouncement::class);
     }
 
     public function isOpen(): bool

@@ -10,6 +10,7 @@ use App\Models\AssignmentSubmission;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\User;
+use App\Services\Assessment\ResultsVisibilityService;
 use App\Services\Gradebook\GradebookService;
 
 class StudentGradesService
@@ -17,6 +18,7 @@ class StudentGradesService
     public function __construct(
         private readonly OfferingAccessService $access,
         private readonly GradebookService $gradebook,
+        private readonly ResultsVisibilityService $visibility,
     ) {}
 
     /**
@@ -38,6 +40,7 @@ class StudentGradesService
             $assessments = Assessment::query()
                 ->where('offering_id', $offering->id)
                 ->where('released', true)
+                ->with('resultAnnouncement')
                 ->orderBy('title')
                 ->get();
 
@@ -50,10 +53,12 @@ class StudentGradesService
                     ->latest('submitted_at')
                     ->first();
 
+                $scoreVisible = $this->visibility->scoresVisible($assessment, $student);
+
                 $items[] = [
                     'kind' => 'assessment',
                     'title' => $assessment->title,
-                    'score' => $attempt?->total_score,
+                    'score' => $scoreVisible ? $attempt?->total_score : null,
                     'status' => $attempt?->status?->value ?? 'NOT_STARTED',
                     'url' => route('assessments.show', $assessment),
                 ];
