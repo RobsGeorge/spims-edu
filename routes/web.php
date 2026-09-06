@@ -59,6 +59,7 @@ use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController;
 use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController;
 use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
@@ -138,6 +139,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/teach/{offering}/sessions/{session}/reopen', [TeachAttendanceController::class, 'reopen'])->name('teach.attendance.reopen');
     Route::post('/teach/{offering}/sessions/{session}/excuse', [TeachAttendanceController::class, 'excuse'])->name('teach.attendance.excuse');
     Route::post('/teach/{offering}/sessions/{session}/check-in-code', [TeachAttendanceController::class, 'issueCode'])->name('teach.attendance.code');
+
+    Route::get('/teach/{offering}/assignments', [TeachAssignmentController::class, 'index'])->name('teach.assignments.index');
+    Route::post('/teach/{offering}/assignments/{assignment}/remind', [TeachAssignmentController::class, 'remind'])->name('teach.assignments.remind');
+    Route::post('/teach/{offering}/assignments/{assignment}/mark-received', [TeachAssignmentController::class, 'markReceived'])->name('teach.assignments.mark-received');
+    Route::post('/teach/{offering}/assignments/{assignment}/bulk-grade', [TeachAssignmentController::class, 'bulkGradeOffline'])->name('teach.assignments.bulk-grade');
 
     Route::get('/attendance', [AttendanceController::class, 'index'])
         ->middleware('permission:attendance.view_own')
@@ -469,9 +475,18 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/assessments/{assessment}/release', [AssessmentAdminController::class, 'release'])
             ->middleware('permission:assessments.manage')
             ->name('assessments.release');
+        Route::post('/assessments/{assessment}/announce', [AssessmentAdminController::class, 'announceResults'])
+            ->middleware('permission:assessments.announce_results')
+            ->name('assessments.announce');
         Route::post('/answers/{answer}/grade', [AssessmentAdminController::class, 'overrideScore'])
             ->middleware('permission:assessments.grade')
             ->name('answers.grade');
+        Route::get('/attempts/{attempt}/proctor', [AssessmentAdminController::class, 'proctorEvents'])
+            ->middleware('permission:assessments.proctor')
+            ->name('attempts.proctor');
+        Route::post('/attempts/{attempt}/clear-termination', [AssessmentAdminController::class, 'clearTermination'])
+            ->middleware('permission:assessments.clear_termination')
+            ->name('attempts.clear-termination');
 
         Route::get('/offerings/{offering}/gradebook', [GradebookController::class, 'show'])
             ->middleware('permission:gradebook.configure')

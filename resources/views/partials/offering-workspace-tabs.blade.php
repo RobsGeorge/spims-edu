@@ -4,6 +4,7 @@
     $tabs = [
         'content' => __('teach.tab_content'),
         'assessments' => __('teach.tab_assessments'),
+        'assignments' => __('teach.tab_assignments'),
         'gradebook' => __('teach.tab_gradebook'),
         'live' => __('teach.tab_live'),
         'attendance' => __('teach.tab_attendance'),

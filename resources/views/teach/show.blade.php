@@ -25,6 +25,9 @@
             <a class="btn btn-primary" href="{{ route('admin.assessments.create', $offering) }}">{{ __('teach.create_assessment') }}</a>
             <a class="btn btn-outline-primary" href="{{ route('admin.banks.index', $offering->course) }}">{{ __('teach.open_banks') }}</a>
         </div>
+    @elseif($tab === 'assignments')
+        <x-page-header :title="__('teach.tab_assignments')" :subtitle="__('teach.tab_assignments_help')" />
+        <a class="btn btn-primary" href="{{ route('teach.assignments.index', $offering) }}">{{ __('teach.open_assignments') }}</a>
     @elseif($tab === 'gradebook')
         <x-page-header :title="__('teach.tab_gradebook')" :subtitle="__('teach.tab_gradebook_help')" />
         <a class="btn btn-primary" href="{{ route('admin.gradebook.show', $offering) }}">{{ __('teach.open_gradebook') }}</a>

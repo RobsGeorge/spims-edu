@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
+use App\Models\AssessmentAttempt;
 use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\QuestionBank;
 use App\Services\Assessment\AssessmentService;
 use App\Services\Assessment\AttemptService;
+use App\Services\Assessment\ProctorService;
 use App\Services\Assessment\QuestionBankService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -125,5 +127,26 @@ class AssessmentAdminController extends Controller
         $attempts->overrideScore($request->user(), $answer, (float) $data['final_score'], $data['feedback'] ?? null);
 
         return back()->with('status', __('assessment.score_saved'));
+    }
+
+    public function announceResults(Request $request, Assessment $assessment, AssessmentService $service): RedirectResponse
+    {
+        $service->announceResults($request->user(), $assessment);
+
+        return back()->with('status', __('assessment.results_announced'));
+    }
+
+    public function proctorEvents(AssessmentAttempt $attempt): View
+    {
+        return view('admin.assessments.proctor', [
+            'attempt' => $attempt->load(['assessment', 'student', 'proctorEvents']),
+        ]);
+    }
+
+    public function clearTermination(Request $request, AssessmentAttempt $attempt, ProctorService $proctor): RedirectResponse
+    {
+        $proctor->clearTermination($request->user(), $attempt);
+
+        return back()->with('status', __('assessment.termination_cleared'));
     }
 }
