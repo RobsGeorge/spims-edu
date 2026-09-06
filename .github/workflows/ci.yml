@@ -117,6 +117,9 @@ jobs:
       - name: Portal pipeline
         run: php artisan test --testsuite=Portal --compact
 
+      - name: StaffUi pipeline
+        run: php artisan test --testsuite=StaffUi --compact
+
       - name: Rbac pipeline
         run: php artisan test --testsuite=Rbac --compact
 
@@ -321,6 +324,9 @@ jobs:
 
       - name: Portal pipeline
         run: php artisan test --testsuite=Portal --compact
+
+      - name: StaffUi pipeline
+        run: php artisan test --testsuite=StaffUi --compact
 
       - name: Rbac pipeline
         run: php artisan test --testsuite=Rbac --compact

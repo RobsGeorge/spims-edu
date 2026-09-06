@@ -92,6 +92,15 @@
         @empty
             <x-empty-state :title="__('teach.no_announcements')" icon="bi-megaphone" />
         @endforelse
+    @elseif($tab === 'projects')
+        <x-page-header :title="__('teach.tab_projects')" :subtitle="__('teach.tab_projects_help')" />
+        <a class="btn btn-primary" href="{{ route('teach.projects.index', $offering) }}">{{ __('teach.open_projects') }}</a>
+    @elseif($tab === 'live_quiz')
+        <x-page-header :title="__('teach.tab_live_quiz')" :subtitle="__('teach.tab_live_quiz_help')" />
+        <a class="btn btn-primary" href="{{ route('teach.live-quiz.index', $offering) }}">{{ __('teach.open_live_quiz') }}</a>
+    @elseif($tab === 'surveys')
+        <x-page-header :title="__('teach.tab_surveys')" :subtitle="__('teach.tab_surveys_help')" />
+        <a class="btn btn-primary" href="{{ route('teach.surveys.index', $offering) }}">{{ __('teach.open_surveys') }}</a>
     @elseif($tab === 'roster')
         <x-page-header :title="__('teach.tab_roster')" :subtitle="__('teach.roster_count', ['count' => $rosterCount])" />
         <h3 class="h6">{{ __('teach.staff') }}</h3>

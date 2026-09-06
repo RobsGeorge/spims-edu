@@ -292,6 +292,79 @@ class EventService
             ->get();
     }
 
+    public function adminQuery(User $actor): Builder
+    {
+        $this->authorize->authorize($actor, 'events.admin');
+
+        return Event::query()->orderByDesc('starts_at');
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function updateDraft(User $actor, Event $event, array $data): Event
+    {
+        $this->authorize->authorize($actor, 'events.admin');
+
+        if ($event->status !== EventStatus::Draft) {
+            throw new ConflictHttpException(__('events.invalid_transition', [
+                'from' => $event->status->value,
+                'to' => EventStatus::Draft->value,
+            ]));
+        }
+
+        $validated = Validator::make($data, [
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'starts_at' => 'required|date',
+            'ends_at' => 'required|date|after:starts_at',
+            'venue' => 'nullable|string|max:255',
+            'capacity' => 'nullable|integer|min:1',
+            'waitlist_enabled' => 'sometimes|boolean',
+            'eligibility' => 'sometimes|array',
+            'eligibility.programs' => 'sometimes|array',
+            'eligibility.programs.*' => 'string',
+            'eligibility.offerings' => 'sometimes|array',
+            'eligibility.offerings.*' => 'string',
+            'eligibility.roles' => 'sometimes|array',
+            'eligibility.roles.*' => 'string',
+        ])->validate();
+
+        return $this->audit->withAudit($actor, 'events.update', function () use ($event, $validated) {
+            $event->update([
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'starts_at' => $validated['starts_at'],
+                'ends_at' => $validated['ends_at'],
+                'venue' => $validated['venue'] ?? null,
+                'capacity' => $validated['capacity'] ?? null,
+                'eligibility' => $this->normalizeEligibility($validated['eligibility'] ?? $event->eligibility ?? []),
+                'waitlist_enabled' => (bool) ($validated['waitlist_enabled'] ?? $event->waitlist_enabled),
+            ]);
+
+            return $event->fresh();
+        }, 'Event');
+    }
+
+    public function setException(
+        User $actor,
+        Event $event,
+        User $student,
+        EventReservationExceptionKind $kind,
+    ): EventReservationException {
+        $this->authorize->authorize($actor, 'events.admin');
+
+        return $this->audit->withAudit($actor, 'events.exception.set', function () use ($event, $student, $kind) {
+            return EventReservationException::query()->updateOrCreate(
+                [
+                    'event_id' => $event->id,
+                    'student_id' => $student->id,
+                ],
+                ['kind' => $kind],
+            );
+        }, 'EventReservationException');
+    }
+
     /**
      * @param  array<string, mixed>  $raw
      * @return array{programs: array<int, string>, offerings: array<int, string>, roles: array<int, string>}

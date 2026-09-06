@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', $activeTheme?->site_name ?? 'SPIMS')</title>
+    @stack('head')
     @if(!empty($activeTheme?->favicon_url))
         <link rel="icon" href="{{ $activeTheme->favicon_url }}">
     @endif

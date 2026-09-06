@@ -63,4 +63,13 @@ return array (
   'assignments_mark_received' => 'تسجيل الاستلام',
   'assignments_bulk_grade_label' => 'تصحيح جماعي حضوري (سطر لكل طالب: student_id,score,feedback)',
   'assignments_bulk_grade' => 'تصحيح الدفعة',
+  'tab_projects' => 'المشاريع',
+  'tab_live_quiz' => 'اختبار مباشر',
+  'tab_surveys' => 'الاستبيانات',
+  'tab_projects_help' => 'مشاريع الفرق والمقاعد والتسليمات والدرجات.',
+  'tab_live_quiz_help' => 'استضافة اختبار مباشر لهذا المقرر.',
+  'tab_surveys_help' => 'استبيانات المقرر والتقارير المجهولة.',
+  'open_projects' => 'فتح المشاريع',
+  'open_live_quiz' => 'فتح الاختبار المباشر',
+  'open_surveys' => 'فتح الاستبيانات',
 );
