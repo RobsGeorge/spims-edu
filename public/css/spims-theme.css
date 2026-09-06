@@ -914,6 +914,15 @@ html[dir='rtl'] .app-bottom-link i {
     overflow-wrap: anywhere;
 }
 
+.spims-event-qr {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+    color: var(--color-primary);
+}
+
 html[dir='rtl'] .spims-page-header .spims-title,
 html[dir='rtl'] .spims-staff-row strong {
     overflow-wrap: anywhere;
