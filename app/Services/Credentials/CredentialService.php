@@ -18,6 +18,7 @@ use App\Services\Pdf\PdfRenderService;
 use App\Services\Storage\ObjectStorageService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -152,6 +153,21 @@ class CredentialService
                 ),
             };
         });
+    }
+
+    /**
+     * Non-revoked credentials belonging to this student. A read — no audit.
+     * The API passes `$request->user()` so a caller only ever lists their own.
+     *
+     * @return Collection<int, Credential>
+     */
+    public function forStudent(User $student): Collection
+    {
+        return Credential::query()
+            ->where('student_id', $student->id)
+            ->whereNull('revoked_at')
+            ->latest('issued_at')
+            ->get();
     }
 
     /**
