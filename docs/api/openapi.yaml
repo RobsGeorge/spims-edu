@@ -13,6 +13,14 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+      description: Replay-safe key. A repeat from the same actor returns the original success instead of acting twice.
   schemas:
     Error:
       type: object
@@ -1015,6 +1023,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -3295,7 +3304,7 @@ paths:
   /teach/offerings/{offering}/close:
     post:
       operationId: teachCloseOffering
-      summary: Close an offering (issues credentials). Requires a confirmation token from GET /teach/offerings/{offering}. Instructors without credentials.issue receive 403.
+      summary: Close an offering (issues credentials). Requires a confirmation token from GET /teach/offerings/{offering}. Instructors without credentials.issue receive 403. Idempotency-Key returns the original success on retry.
       security:
       - bearerAuth: []
       parameters:
@@ -3304,6 +3313,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -3360,7 +3370,7 @@ paths:
   /teach/offerings/{offering}/gradebook/lock:
     post:
       operationId: teachGradebookLock
-      summary: Lock grades. Instructor only. Confirmation token required. TA is 403.
+      summary: Lock grades. Instructor only. Confirmation token required. TA is 403. Idempotency-Key returns the original success on retry.
       security:
       - bearerAuth: []
       parameters:
@@ -3369,6 +3379,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
