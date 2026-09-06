@@ -15,6 +15,7 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\Communications\AnnouncementService;
 use App\Services\Notifications\NotificationService;
+use App\Support\AuthorizeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use PHPUnit\Framework\Attributes\Test;
@@ -23,6 +24,12 @@ use Tests\TestCase;
 class CommunicationsApiTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        app(AuthorizeService::class)->forgetMatrixCache();
+    }
 
     private function token(User $user): string
     {
@@ -97,7 +104,10 @@ class CommunicationsApiTest extends TestCase
         $token = $this->token($student);
 
         app(NotificationService::class)->notify($student, 'test.event', 'Ping', 'Body');
-        $notification = Notification::query()->where('user_id', $student->id)->first();
+        $notification = Notification::query()
+            ->where('user_id', $student->id)
+            ->where('channel', \App\Enums\NotificationChannel::InApp)
+            ->first();
 
         $this->withToken($token)
             ->getJson(route('api.v1.notifications.index', ['unread' => 1]))
@@ -108,14 +118,15 @@ class CommunicationsApiTest extends TestCase
         $this->withToken($token)
             ->getJson(route('api.v1.notifications.show', $notification))
             ->assertOk()
-            ->assertNotNull($notification->fresh()->read_at);
+            ->assertJsonPath('data.title', 'Ping');
+        $this->assertNotNull($notification->fresh()->read_at);
 
         $this->withToken($token)
             ->getJson(route('api.v1.notification-settings.show'))
             ->assertOk()
             ->assertJsonPath('data.notify_email', true);
 
-        $this->withToken($token)
+        $updated = $this->withToken($token)
             ->putJson(route('api.v1.notification-settings.update'), [
                 'preferences' => [
                     ['event_key' => 'test.event', 'channel' => 'mail', 'enabled' => false],
@@ -123,13 +134,16 @@ class CommunicationsApiTest extends TestCase
                 ],
             ])
             ->assertOk()
-            ->assertJsonPath('data.preferences.test.event.mail', false)
-            ->assertJsonPath('data.preferences.test.event.in_app', true);
+            ->json('data.preferences');
+        $this->assertFalse($updated['test.event']['mail']);
+        $this->assertTrue($updated['test.event']['in_app']);
 
         Auth::forgetGuards();
-        $this->withToken($token)
+        $again = $this->withToken($token)
             ->getJson(route('api.v1.notification-settings.show'))
-            ->assertJsonPath('data.preferences.test.event.mail', false);
+            ->assertOk()
+            ->json('data.preferences');
+        $this->assertFalse($again['test.event']['mail']);
     }
 
     #[Test]

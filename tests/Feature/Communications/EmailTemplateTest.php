@@ -17,6 +17,7 @@ use Tests\TestCase;
 
 class EmailTemplateTest extends TestCase
 {
+    use RefreshAuthorization;
     use RefreshDatabase;
 
     #[Test]

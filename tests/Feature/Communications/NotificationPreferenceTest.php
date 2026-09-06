@@ -18,6 +18,7 @@ use Tests\TestCase;
 
 class NotificationPreferenceTest extends TestCase
 {
+    use RefreshAuthorization;
     use RefreshDatabase;
 
     #[Test]

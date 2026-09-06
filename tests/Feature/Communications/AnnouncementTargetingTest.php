@@ -24,6 +24,7 @@ use Tests\TestCase;
 
 class AnnouncementTargetingTest extends TestCase
 {
+    use RefreshAuthorization;
     use RefreshDatabase;
 
     private function offering(string $code, ?string $semesterId = null): CourseOffering

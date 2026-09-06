@@ -17,6 +17,7 @@ use Tests\TestCase;
 
 class AnnouncementScopeTest extends TestCase
 {
+    use RefreshAuthorization;
     use RefreshDatabase;
 
     private function offering(string $code): CourseOffering

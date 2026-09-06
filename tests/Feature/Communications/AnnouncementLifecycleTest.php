@@ -22,6 +22,7 @@ use Tests\TestCase;
 
 class AnnouncementLifecycleTest extends TestCase
 {
+    use RefreshAuthorization;
     use RefreshDatabase;
 
     private function offeringWithStudent(User $instructor, User $student): CourseOffering

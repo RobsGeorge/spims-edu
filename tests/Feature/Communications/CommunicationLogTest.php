@@ -22,6 +22,7 @@ use Tests\TestCase;
 
 class CommunicationLogTest extends TestCase
 {
+    use RefreshAuthorization;
     use RefreshDatabase;
 
     #[Test]
