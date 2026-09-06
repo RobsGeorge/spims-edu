@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\V1\TeachAnnouncementController;
 use App\Http\Controllers\Api\V1\TeachAttendanceController;
 use App\Http\Controllers\Api\V1\TeachCompletionController;
 use App\Http\Controllers\Api\V1\TeachLiveQuizController;
+use App\Http\Controllers\Api\V1\TeachOfferingController;
 use App\Http\Controllers\Api\V1\TeachProjectController;
 use App\Http\Controllers\Api\V1\TranscriptController;
 use App\Http\Controllers\Api\V1\WalletController;
@@ -201,6 +202,13 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
             ->name('projects.peer-evaluations.store');
 
         Route::prefix('teach')->name('teach.')->middleware('api.instructor')->group(function () {
+            // --- S8 core (owned by cursor/s8-core-bcff) ---
+            Route::get('/offerings', [TeachOfferingController::class, 'index'])->name('offerings.index');
+            Route::get('/offerings/{offering}', [TeachOfferingController::class, 'show'])->name('offerings.show');
+            Route::get('/offerings/{offering}/students/{student}', [TeachOfferingController::class, 'student'])
+                ->name('offerings.students.show');
+            Route::post('/offerings/{offering}/close', [TeachOfferingController::class, 'close'])->name('offerings.close');
+
             Route::get('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'sessions'])->name('offerings.sessions');
             Route::post('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'storeSession'])->name('offerings.sessions.store');
             Route::get('/sessions/{session}/roster', [TeachAttendanceController::class, 'roster'])->name('sessions.roster');

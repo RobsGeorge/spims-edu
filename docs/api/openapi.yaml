@@ -3215,3 +3215,93 @@ paths:
           description: OK
         '403':
           description: Not staffed on this offering
+  # S8 core
+  /teach/offerings:
+    get:
+      operationId: teachListOfferings
+      summary: Offerings the caller staffs, with cheap attention counts. Paginated.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: per_page
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Paginated offerings the caller staffs
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Token lacks an instructor/TA/academic-admin ability
+  /teach/offerings/{offering}:
+    get:
+      operationId: teachShowOffering
+      summary: Offering summary (roster, sessions, attendance, ungraded, lock) plus confirmation tokens for gradebook.lock and offering.close.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering
+  /teach/offerings/{offering}/students/{student}:
+    get:
+      operationId: teachShowOfferingStudent
+      summary: Staff-only student drill-down (profile, enrollment, computed grades, attendance). Does not include staff notes.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: student
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering
+        '404':
+          description: Student is not enrolled on this offering
+  /teach/offerings/{offering}/close:
+    post:
+      operationId: teachCloseOffering
+      summary: Close an offering (issues credentials). Requires a confirmation token from GET /teach/offerings/{offering}. Instructors without credentials.issue receive 403.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - confirmation
+              properties:
+                confirmation:
+                  type: string
+      responses:
+        '200':
+          description: Closed
+        '403':
+          description: Not allowed to close (not staffed, TA, or missing credentials.issue)
+        '422':
+          description: Missing, invalid, or replayed confirmation token, or invalid closing transition
