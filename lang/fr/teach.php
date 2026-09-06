@@ -20,7 +20,7 @@ return array (
   'tab_roster' => 'Liste',
   'tab_completion' => 'Achèvement',
   'tab_content_help' => 'Semaines et éléments d’apprentissage.',
-  'tab_assessments_help' => 'Créer des quiz et gérer les banques.',
+  'tab_assessments_help' => 'Créer des quiz, noter les tentatives et annoncer les résultats.',
   'tab_assignments_help' => 'Tableau de bord, rappels, remises en présentiel et notation groupée.',
   'tab_gradebook_help' => 'Saisir, verrouiller ou rouvrir les notes.',
   'tab_live_help' => 'Planifier Zoom et la présence.',
@@ -102,4 +102,7 @@ return array (
   'close_offering' => 'Clôturer l’offre',
   'close_confirm_title' => 'Clôturer cette offre ?',
   'close_confirm_body' => 'La clôture délivre les certificats d’achèvement et est irréversible. La réouverture du carnet reste réservée à l’admin académique.',
+  'open_attempts' => 'Tentatives et notation',
+  'no_assessments' => 'Aucune évaluation pour le moment',
+  'attempts_count' => ':count tentatives',
 );

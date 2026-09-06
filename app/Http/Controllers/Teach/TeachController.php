@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teach;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Teach\Concerns\IssuesOfferingCloseConfirmation;
 use App\Models\Announcement;
+use App\Models\Assessment;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Services\Communications\AnnouncementService;
@@ -57,6 +58,11 @@ class TeachController extends Controller
             'tab' => $tab,
             'roster' => $roster,
             'rosterCount' => $roster->count(),
+            'assessments' => Assessment::query()
+                ->where('offering_id', $offering->id)
+                ->withCount('attempts')
+                ->orderBy('title')
+                ->get(),
             'announcements' => Announcement::query()
                 ->where('offering_id', $offering->id)
                 ->with('targets')

@@ -25,10 +25,21 @@
 <div class="teach-workspace-panel mt-3">
     @if($tab === 'assessments')
         <x-page-header :title="__('teach.tab_assessments')" :subtitle="__('teach.tab_assessments_help')" />
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2 mb-3">
             <a class="btn btn-primary" href="{{ route('admin.assessments.create', $offering) }}">{{ __('teach.create_assessment') }}</a>
             <a class="btn btn-outline-primary" href="{{ route('admin.banks.index', $offering->course) }}">{{ __('teach.open_banks') }}</a>
         </div>
+        @forelse($assessments as $assessment)
+            <div class="spims-staff-row border rounded-3 p-2 mb-2">
+                <div>
+                    <strong>{{ $assessment->title }}</strong>
+                    <div class="small text-muted-theme">{{ $assessment->mode->value }} · {{ __('teach.attempts_count', ['count' => $assessment->attempts_count]) }}</div>
+                </div>
+                <a class="btn btn-sm btn-outline-primary" href="{{ route('teach.assessments.attempts', [$offering, $assessment]) }}">{{ __('teach.open_attempts') }}</a>
+            </div>
+        @empty
+            <x-empty-state :title="__('teach.no_assessments')" icon="bi-journal-check" />
+        @endforelse
     @elseif($tab === 'assignments')
         <x-page-header :title="__('teach.tab_assignments')" :subtitle="__('teach.tab_assignments_help')" />
         <a class="btn btn-primary" href="{{ route('teach.assignments.index', $offering) }}">{{ __('teach.open_assignments') }}</a>

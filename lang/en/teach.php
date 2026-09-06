@@ -20,7 +20,7 @@ return array (
   'tab_roster' => 'Roster',
   'tab_completion' => 'Completion',
   'tab_content_help' => 'Weeks and learning items for this offering.',
-  'tab_assessments_help' => 'Build quizzes and manage question banks.',
+  'tab_assessments_help' => 'Build quizzes, grade attempts, and announce results.',
   'tab_assignments_help' => 'Dashboard, reminders, offline hand-ins, and bulk grading.',
   'tab_gradebook_help' => 'Enter scores, lock, or reopen grades.',
   'tab_live_help' => 'Schedule Zoom sessions and attendance.',
@@ -102,4 +102,7 @@ return array (
   'close_offering' => 'Close offering',
   'close_confirm_title' => 'Close this offering?',
   'close_confirm_body' => 'Closing issues completion certificates and cannot be undone. Reopening the gradebook stays in Academic Admin.',
+  'open_attempts' => 'Attempts & grading',
+  'no_assessments' => 'No assessments yet',
+  'attempts_count' => ':count attempts',
 );
