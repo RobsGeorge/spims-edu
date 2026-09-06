@@ -12,6 +12,7 @@ use App\Models\CourseOffering;
 use App\Models\OfferingStaff;
 use App\Models\User;
 use App\Models\Week;
+use App\Services\Discussions\DiscussionService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,7 @@ class OfferingService
         private readonly AuthorizeService $authorize,
         private readonly AuditLogWriter $audit,
         private readonly ContentGatingService $gating,
+        private readonly DiscussionService $discussions,
     ) {}
 
     public function create(User $actor, array $data): CourseOffering
@@ -41,18 +43,24 @@ class OfferingService
             $data['semester_id'] = null;
         }
 
-        return $this->audit->withAudit($actor, 'offerings.create', fn () => CourseOffering::query()->create([
-            'course_id' => $data['course_id'],
-            'semester_id' => $data['semester_id'] ?? null,
-            'mode' => $mode,
-            'price_usd_override' => $data['price_usd_override'] ?? null,
-            'price_egp_override' => $data['price_egp_override'] ?? null,
-            'seat_capacity' => $data['seat_capacity'] ?? null,
-            'attendance_threshold_percent' => $data['attendance_threshold_percent'] ?? 60,
-            'status' => OfferingStatus::from($data['status'] ?? OfferingStatus::Draft->value),
-            'start_date' => $data['start_date'] ?? null,
-            'end_date' => $data['end_date'] ?? null,
-        ]), 'CourseOffering');
+        return $this->audit->withAudit($actor, 'offerings.create', function () use ($actor, $data, $mode) {
+            $offering = CourseOffering::query()->create([
+                'course_id' => $data['course_id'],
+                'semester_id' => $data['semester_id'] ?? null,
+                'mode' => $mode,
+                'price_usd_override' => $data['price_usd_override'] ?? null,
+                'price_egp_override' => $data['price_egp_override'] ?? null,
+                'seat_capacity' => $data['seat_capacity'] ?? null,
+                'attendance_threshold_percent' => $data['attendance_threshold_percent'] ?? 60,
+                'status' => OfferingStatus::from($data['status'] ?? OfferingStatus::Draft->value),
+                'start_date' => $data['start_date'] ?? null,
+                'end_date' => $data['end_date'] ?? null,
+            ]);
+
+            $this->discussions->provisionBoard($actor, $offering);
+
+            return $offering;
+        }, 'CourseOffering');
     }
 
     public function cloneFromCourse(User $actor, Course $course, array $data): CourseOffering

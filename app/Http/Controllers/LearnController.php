@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\ContentItemType;
 use App\Models\ContentItem;
 use App\Models\CourseOffering;
-use App\Models\DiscussionBoard;
 use App\Models\Week;
+use App\Services\Discussions\DiscussionService;
 use App\Services\Offerings\LearningAccessService;
 use App\Services\Offerings\LearningProgressService;
 use Illuminate\Http\RedirectResponse;
@@ -18,6 +18,7 @@ class LearnController extends Controller
     public function __construct(
         private readonly LearningAccessService $access,
         private readonly LearningProgressService $progress,
+        private readonly DiscussionService $discussions,
     ) {}
 
     public function offering(Request $request, CourseOffering $offering): View
@@ -111,10 +112,7 @@ class LearnController extends Controller
         if ($item->type === ContentItemType::Discussion) {
             $this->progress->markItemComplete($request->user(), $enrollment, $item, manual: false);
 
-            DiscussionBoard::query()->firstOrCreate(
-                ['offering_id' => $offering->id],
-                ['allow_student_threads' => true]
-            );
+            $this->discussions->provisionBoard($request->user(), $offering);
 
             return redirect()->route('discussions.board', $offering);
         }

@@ -20,12 +20,14 @@ class DiscussionController extends Controller
         return view('discussions.board', [
             'offering' => $offering->load('course'),
             'board' => $board,
-            'threads' => DiscussionThread::query()
-                ->where('board_id', $board->id)
-                ->orderByDesc('pinned')
-                ->latest('created_at')
-                ->with('author')
-                ->get(),
+            'threads' => $board
+                ? DiscussionThread::query()
+                    ->where('board_id', $board->id)
+                    ->orderByDesc('pinned')
+                    ->latest('created_at')
+                    ->with('author')
+                    ->get()
+                : collect(),
         ]);
     }
 
@@ -42,7 +44,7 @@ class DiscussionController extends Controller
             'participation_min_replies' => 'nullable|integer|min:1',
         ]);
 
-        $board = $discussions->ensureBoard($offering);
+        $board = $discussions->provisionBoard($request->user(), $offering);
         $thread = $discussions->createThread($request->user(), $board, $data);
 
         return redirect()->route('discussions.thread', $thread)->with('status', __('live.thread_created'));

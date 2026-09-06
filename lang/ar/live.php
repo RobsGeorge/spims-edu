@@ -33,4 +33,5 @@ return [
     'schedule' => 'جدولة',
     'minutes_abbr' => 'د',
     'override' => 'تعديل',
+    'board_not_yet_configured' => 'لا يوجد منتدى نقاش لهذا المقرر بعد. انشر أول موضوع لإنشائه.',
 ];

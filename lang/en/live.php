@@ -33,4 +33,5 @@ return [
     'schedule' => 'Schedule',
     'minutes_abbr' => 'm',
     'override' => 'Override',
+    'board_not_yet_configured' => 'No discussion board yet for this offering. Post the first thread to create one.',
 ];
