@@ -37,4 +37,5 @@ Out-of-phase ideas: PARKING-LOT.md.
 - `app/Support/Scope/ResourceScopeResolver.php` — maps a resource to its offering(s)
 - `public/css/spims-theme.css` — liturgical theme (light + dark)
 - `tests/Feature/` — categorized test suites
+- `docs/portal-agent-test-plan.md` — agent-run demo + full web portal test plan
 - `docs/academic-roadmap/` — S0–S9 roadmap: gap analysis, implementation plan, execution order, `/api/v1` contract

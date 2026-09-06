@@ -2,6 +2,8 @@
 
 This is the playbook for showing SPIMS to school leadership. It covers who to log in as, what is already seeded, and how to reset staging with `migrate:fresh --seed`.
 
+Agents running a full portal + demo pass: [portal-agent-test-plan.md](portal-agent-test-plan.md).
+
 Engineering review of the product itself: [system-code-review.md](system-code-review.md).
 
 ---

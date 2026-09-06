@@ -31,6 +31,7 @@ Push to `main` → CI → production deploy via GitHub Actions.
 Push to `staging` → CI → staging deploy.
 
 - Client system overview (for school leadership): [docs/client-system-overview.md](docs/client-system-overview.md)
+- Agent test plan (demo console + web portal): [docs/portal-agent-test-plan.md](docs/portal-agent-test-plan.md)
 - Spec summary: [docs/spims-spec-summary.md](docs/spims-spec-summary.md)
 - Design gap analysis & next phases: [docs/portal-design-gap-analysis.md](docs/portal-design-gap-analysis.md)
 - Academic roadmap (S0–S9: SIS gaps, mobile API): [docs/academic-roadmap/](docs/academic-roadmap/)
