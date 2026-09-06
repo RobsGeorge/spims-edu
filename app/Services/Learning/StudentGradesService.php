@@ -7,6 +7,7 @@ use App\Models\Assessment;
 use App\Models\AssessmentAttempt;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
+use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\User;
 use App\Services\Gradebook\GradebookService;
@@ -93,5 +94,21 @@ class StudentGradesService
         }
 
         return $rows;
+    }
+
+    /**
+     * Released items for one offering the student is enrolled in.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function forOffering(User $student, CourseOffering $offering): ?array
+    {
+        foreach ($this->forStudent($student) as $row) {
+            if ($row['enrollment']->offering_id === $offering->id) {
+                return $row;
+            }
+        }
+
+        return null;
     }
 }

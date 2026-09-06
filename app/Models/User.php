@@ -34,6 +34,7 @@ class User extends Authenticatable
         'preferred_locale',
         'theme_preference',
         'notify_email',
+        'avatar_path',
         'country_code',
         'status',
         'is_reviewer',

@@ -1,14 +1,30 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AnnouncementController;
+use App\Http\Controllers\Api\V1\ApplicationController;
+use App\Http\Controllers\Api\V1\AssessmentController;
+use App\Http\Controllers\Api\V1\AssignmentController;
+use App\Http\Controllers\Api\V1\AttemptController;
 use App\Http\Controllers\Api\V1\AttendanceController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BrandingController;
+use App\Http\Controllers\Api\V1\CatalogController;
+use App\Http\Controllers\Api\V1\ContentItemController;
+use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\DegreeAuditController;
+use App\Http\Controllers\Api\V1\DiscussionController;
+use App\Http\Controllers\Api\V1\DonationController;
+use App\Http\Controllers\Api\V1\EnrollmentController;
+use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\NotificationSettingsController;
+use App\Http\Controllers\Api\V1\OfferingController;
+use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\TeachAnnouncementController;
 use App\Http\Controllers\Api\V1\TeachAttendanceController;
+use App\Http\Controllers\Api\V1\TranscriptController;
+use App\Http\Controllers\Api\V1\WalletController;
 use App\Http\Middleware\Api\SetApiLocale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -46,9 +62,18 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
         ->middleware('throttle:login')
         ->name('login');
 
+    // Public catalog (matches web /catalog).
+    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    Route::get('/catalog/courses/{course}', [CatalogController::class, 'showCourse'])->name('catalog.courses.show');
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/me', [MeController::class, 'show'])->name('me');
+
+        // --- S6 Wave A (owned by cursor/s6-student-api-bcff) ---
+        Route::put('/me/preferences', [MeController::class, 'updatePreferences'])->name('me.preferences');
+        Route::post('/me/picture', [MeController::class, 'storePicture'])->name('me.picture');
+        Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
 
         Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
         Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show'])->name('announcements.show');
@@ -73,6 +98,54 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
         Route::get('/attendance/mine', [AttendanceController::class, 'mine'])->name('attendance.mine');
         Route::get('/offerings/{offering}/attendance/mine', [AttendanceController::class, 'offeringMine'])->name('offerings.attendance.mine');
         Route::post('/sessions/{session}/check-in', [AttendanceController::class, 'checkIn'])->name('sessions.check-in');
+
+        // --- S6 Wave B ---
+        Route::get('/offerings', [OfferingController::class, 'index'])->name('offerings.index');
+        Route::get('/offerings/{offering}', [OfferingController::class, 'show'])->name('offerings.show');
+        Route::get('/offerings/{offering}/weeks', [OfferingController::class, 'weeks'])->name('offerings.weeks');
+        Route::get('/offerings/{offering}/weeks/{week}/items', [OfferingController::class, 'weekItems'])->name('offerings.weeks.items');
+        Route::post('/offerings/{offering}/weeks/{week}/complete', [OfferingController::class, 'completeWeek'])->name('offerings.weeks.complete');
+        Route::get('/offerings/{offering}/grades', [OfferingController::class, 'grades'])->name('offerings.grades');
+        Route::get('/items/{item}', [ContentItemController::class, 'show'])->name('items.show');
+        Route::post('/items/{item}/complete', [ContentItemController::class, 'complete'])->name('items.complete');
+        Route::get('/transcript', [TranscriptController::class, 'show'])->name('transcript');
+        Route::get('/degree-audit/{studentProgram}', [DegreeAuditController::class, 'show'])->name('degree-audit.show');
+
+        // --- S6 Wave C ---
+        Route::get('/offerings/{offering}/assignments', [AssignmentController::class, 'index'])->name('offerings.assignments');
+        Route::get('/assignments/{assignment}', [AssignmentController::class, 'show'])->name('assignments.show');
+        Route::post('/assignments/{assignment}/submit', [AssignmentController::class, 'submit'])->name('assignments.submit');
+        Route::post('/assignments/{assignment}/resubmit', [AssignmentController::class, 'resubmit'])->name('assignments.resubmit');
+        Route::get('/offerings/{offering}/assessments', [AssessmentController::class, 'index'])->name('offerings.assessments');
+        Route::get('/assessments/{assessment}', [AssessmentController::class, 'show'])->name('assessments.show');
+        Route::post('/assessments/{assessment}/start', [AssessmentController::class, 'start'])->name('assessments.start');
+        Route::get('/attempts/{attempt}', [AttemptController::class, 'show'])->name('attempts.show');
+        Route::post('/attempts/{attempt}/save', [AttemptController::class, 'save'])->name('attempts.save');
+        Route::post('/attempts/{attempt}/submit', [AttemptController::class, 'submit'])->name('attempts.submit');
+        Route::get('/attempts/{attempt}/timer', [AttemptController::class, 'timer'])->name('attempts.timer');
+        Route::post('/attempts/{attempt}/focus-loss', [AttemptController::class, 'focusLoss'])->name('attempts.focus-loss');
+        Route::get('/offerings/{offering}/discussions', [DiscussionController::class, 'index'])->name('offerings.discussions');
+        Route::get('/discussions/threads/{thread}', [DiscussionController::class, 'showThread'])->name('discussions.threads.show');
+        Route::post('/discussions/threads/{thread}/posts', [DiscussionController::class, 'storePost'])->name('discussions.threads.posts');
+        Route::post('/offerings/{offering}/discussions/threads', [DiscussionController::class, 'storeThread'])->name('offerings.discussions.threads.store');
+
+        // --- S6 Wave D ---
+        Route::post('/catalog/courses/{course}/interest', [CatalogController::class, 'flagInterest'])->name('catalog.courses.interest');
+        Route::get('/application-forms/{applicationForm}', [ApplicationController::class, 'form'])->name('application-forms.show');
+        Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
+        Route::post('/applications', [ApplicationController::class, 'store'])->name('applications.store');
+        Route::get('/applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
+        Route::post('/applications/{application}/submit', [ApplicationController::class, 'submit'])->name('applications.submit');
+        Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
+        Route::post('/enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
+        Route::post('/enrollments/{enrollment}/drop', [EnrollmentController::class, 'drop'])->name('enrollments.drop');
+        Route::post('/enrollments/{enrollment}/withdraw', [EnrollmentController::class, 'withdraw'])->name('enrollments.withdraw');
+        Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
+        Route::post('/invoices/{invoice}/checkout', [InvoiceController::class, 'checkout'])->name('invoices.checkout');
+        Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
+        Route::get('/wallet', [WalletController::class, 'show'])->name('wallet');
+        Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
 
         Route::prefix('teach')->name('teach.')->middleware('api.instructor')->group(function () {
             Route::get('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'sessions'])->name('offerings.sessions');
