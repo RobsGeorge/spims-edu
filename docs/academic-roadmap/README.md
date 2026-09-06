@@ -15,7 +15,7 @@ Read them in this order:
 
 ## Status
 
-**S0–S7 are done, plus S6 Wave E and the S9 domain (events + live quiz on polling).** S8 (instructor API) is next. Laravel Reverb remains optional — live quiz degrades to poll.
+**S0–S8 are done, plus S6 Wave E, thin Blade staff UIs, and the S9 domain (events + live quiz on polling).** Laravel Reverb remains optional — live quiz degrades to poll.
 
 Landed on branch
 [`feat/authz-scope-and-api-foundation`](https://github.com/RobsGeorge/spims-edu/compare/main...feat/authz-scope-and-api-foundation):
@@ -45,9 +45,11 @@ The full suite went from 124 to 178 passing on S0/S1, to **212** after S2 and S3
 | [`cursor/s6e-livequiz-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6e-livequiz-bcff) | **S6E / S9** | Live quiz play + host machine; polling fallback, no Reverb. |
 | [`cursor/s6e-projects-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6e-projects-bcff) | **S7 / S6E** | Team projects: join/leave, deliverables, peer eval (never grades), announce → gradebook. |
 
-**S8 — instructor mobile API** is next. Detail in
+**S8 — instructor mobile API and thin Blade staff UIs** landed on `main`: teaching context and confirmation tokens; gradebook/assignments/assessments; live, projects, discussions, and content; plus survey, event, project, and live-quiz staff pages. Detail in
 [`implementation-plan.md`](implementation-plan.md), sequencing in
 [`execution-order.md`](execution-order.md).
+
+Still parked: Reverb (polling already works), WhatsApp driver, lockdown browser, native apps, and `gradebook.reopen` on the instructor API (Academic Admin, web only).
 
 ## Two things S0 changed for every phase after it
 

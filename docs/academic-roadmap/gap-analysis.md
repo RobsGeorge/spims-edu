@@ -101,7 +101,7 @@ endpoint. Second, [`PARKING-LOT.md`](../../PARKING-LOT.md) listed "Full REST JSO
 rather than a resumption of planned work.
 
 **Resolved for the foundation.** S1 built `/api/v1` with `login`, `logout`, `me`, and `branding`;
-the S6 and S8 endpoint surfaces remain outstanding.
+S6 (student) and S8 (instructor) endpoint surfaces are now on `main`.
 
 ### 4.2 Authorization is role-level, not resource-scoped — a live defect
 

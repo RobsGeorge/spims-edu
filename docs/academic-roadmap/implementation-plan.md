@@ -675,7 +675,7 @@ grading, announce, CSV export.
 
 ---
 
-## S8 — Instructor mobile API (G-01, part 3)
+## S8 — Instructor mobile API (G-01, part 3) ✅
 
 The instructor app is the reason S0 had to come first. Every endpoint here is a mutation on data
 belonging to an offering the actor must be staffed on.

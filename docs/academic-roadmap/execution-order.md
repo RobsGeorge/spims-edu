@@ -4,7 +4,7 @@ The order to build the plan in, and how each step is proved. Companion to
 [`implementation-plan.md`](implementation-plan.md), which holds the detail; this file is the
 sequence and the exit criteria.
 
-**Status:** S0–S7 and S6 Wave E are complete and verified — see [`README.md`](README.md). S9 domain (events + live quiz) shipped with polling; Reverb is still optional. S8 is next.
+**Status:** S0–S8 and S6 Wave E are complete and verified — see [`README.md`](README.md). S9 domain (events + live quiz) shipped with polling; Reverb is still optional.
 
 ---
 
@@ -17,7 +17,7 @@ That produces one hard prerequisite chain and a lot of parallelism after it:
 S0 authorization scope  ✅ done
       │
       ├── S1 API foundation ──┬── S6 student API (per wave)
-      │                       └── S8 instructor API
+      │                       └── S8 instructor API  ✅ done
       ├── S2 communications spine ── S5 assessment completion
       ├── S3 attendance + roster ── S4 completion + credentials
       └── S7 team projects
@@ -42,7 +42,7 @@ different agents without colliding: they touch disjoint tables and services.
 | 5 | **S4 — completion + credentials** | Needs S3 (attendance criteria) and S2 (announce) | Criteria evaluated, grace marks applied, offering closed, PDF certificate verifies publicly |
 | 6 | **S6 — student API, waves A→E** ✅ | Each wave ships only after its domain phase | A student completes the year on a phone in Arabic |
 | 7 | **S7 — team projects** ✅ | Largest new subsystem, but self-contained — can run in parallel from step 2 onward | Team formation, deliverables, grading, peer evaluation, all scoped |
-| 8 | **S8 — instructor API** | Needs S0 + S3 + S5 + S7 to have anything to expose | Instructor runs an offering from a phone; TA is refused the lock |
+| 8 | **S8 — instructor API** ✅ | Needs S0 + S3 + S5 + S7 to have anything to expose | Instructor runs an offering from a phone; TA is refused the lock |
 | 9 | **S9 — realtime, live quiz, events** ✅ domain / ⬚ Reverb | Introduces Reverb; last so nothing else depends on new infrastructure | Live quiz and events ship with polling. Reverb remains optional. |
 
 **If you can only do three things:** S1, S2, S3. They unblock the mobile API, make notifications
