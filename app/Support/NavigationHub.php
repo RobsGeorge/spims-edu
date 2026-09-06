@@ -88,7 +88,8 @@ class NavigationHub
                     || request()->routeIs('courses.*')
                     || request()->routeIs('grades.*')
                     || request()->routeIs('enrollments.*')
-                    || request()->routeIs('attendance.*'),
+                    || request()->routeIs('attendance.*')
+                    || request()->routeIs('live-quiz.*'),
             ],
         ];
 
@@ -175,6 +176,7 @@ class NavigationHub
             self::link('applications.index', 'hubs.my_applications', 'bi-file-earmark-text', 'hubs.my_applications_desc'),
             self::link('enrollments.index', 'hubs.enrollments', 'bi-person-check', 'hubs.enrollments_desc'),
             self::link('live.index', 'hubs.live', 'bi-camera-video', 'hubs.live_desc'),
+            self::link('live-quiz.join', 'hubs.live_quiz', 'bi-lightning-charge', 'hubs.live_quiz_desc'),
             self::link('attendance.index', 'hubs.attendance', 'bi-calendar-check', 'hubs.attendance_desc'),
             self::link('finance.index', 'hubs.finance', 'bi-wallet2', 'hubs.finance_desc'),
             self::link('transcript.show', 'hubs.transcript', 'bi-award', 'hubs.transcript_desc'),

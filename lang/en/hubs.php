@@ -21,6 +21,8 @@ return [
     'enrollments_desc' => 'Active and past course enrollments.',
     'live' => 'Live sessions',
     'live_desc' => 'Upcoming Zoom classes.',
+    'live_quiz' => 'Live quiz',
+    'live_quiz_desc' => 'Join a live quiz with a session code.',
     'attendance' => 'Attendance',
     'attendance_desc' => 'Your attendance history and check-in.',
     'attendance_admin' => 'Attendance policy',

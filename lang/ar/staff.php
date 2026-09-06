@@ -185,6 +185,7 @@ return [
         'refresh' => 'تحديث',
         'back_list' => 'كل الاختبارات',
         'join_code' => 'رمز الانضمام',
+        'student_join_at' => 'ينضم الطلاب عبر :url',
         'participants' => ':count مشاركين',
         'launch' => 'إطلاق',
         'launched' => 'أُطلق السؤال.',
