@@ -390,4 +390,27 @@ return [
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
     ],
+
+    // S6E surveys
+    'feedback.view' => [
+        'STUDENT' => 'O',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'feedback.manage' => [
+        'INSTRUCTOR' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'feedback.report' => [
+        'INSTRUCTOR' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'feedback.identity.request' => [
+        'INSTRUCTOR' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'feedback.identity.reveal' => [
+        // Super Admin only (empty role map is OK; Super Admin bypasses AuthorizeService)
+    ],
 ];

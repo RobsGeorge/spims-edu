@@ -2228,3 +2228,123 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  # S6E surveys
+  /feedback/surveys:
+    get:
+      operationId: listFeedbackSurveys
+      summary: Published and closed surveys visible to the authenticated student.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Paginated surveys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  meta:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /feedback/surveys/{feedbackSurvey}:
+    get:
+      operationId: showFeedbackSurvey
+      summary: One published or closed survey in the student's inbox.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: feedbackSurvey
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Draft, unpublished, or out of the student's enrollment scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /feedback/surveys/{feedbackSurvey}/submit:
+    post:
+      operationId: submitFeedbackSurvey
+      summary: Submit answers. Anonymous by default. One submission per student.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: feedbackSurvey
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - answers
+              properties:
+                answers:
+                  type: object
+                  additionalProperties: true
+                  description: 'Map of questionId to value'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Survey is not in the student's enrollment scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Already submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Closed, unpublished, or outside the submission window
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

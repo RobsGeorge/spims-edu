@@ -58,6 +58,9 @@ return [
         'student_notes.manage',
         'module_assessment.view',
         'module_assessment.manage',
+        'feedback.manage',
+        'feedback.report',
+        'feedback.identity.request',
     ],
 
     /*
