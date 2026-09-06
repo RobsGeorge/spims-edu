@@ -47,6 +47,10 @@ class AttemptService
             throw ValidationException::withMessages(['assessment' => [__('assessment.not_enrolled')]]);
         }
 
+        if (! $assessment->released) {
+            throw ValidationException::withMessages(['assessment' => [__('assessment.not_released')]]);
+        }
+
         if (! $assessment->isOpen()) {
             throw ValidationException::withMessages(['assessment' => [__('assessment.window_closed')]]);
         }

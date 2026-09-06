@@ -69,6 +69,7 @@ trait InstructorGradingFixtures
             'max_points' => 10,
         ]);
         app(AssessmentService::class)->attachQuestion($instructor, $assessment, $question);
+        app(AssessmentService::class)->release($instructor, $assessment);
 
         $attempt = app(AttemptService::class)->start($student, $assessment);
         $correct = $question->options()->where('is_correct', true)->first();

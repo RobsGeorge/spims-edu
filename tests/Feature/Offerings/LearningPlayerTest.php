@@ -15,7 +15,6 @@ use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\EnrollmentItemCompletion;
-use App\Models\EnrollmentWeekCompletion;
 use App\Models\User;
 use App\Models\Week;
 use App\Services\Assessment\AssignmentService;
@@ -326,5 +325,39 @@ class LearningPlayerTest extends TestCase
             ->assertOk()
             ->assertSee(__('learning.open_player'))
             ->assertSee(route('courses.player', $bundle['offering']), false);
+    }
+
+    #[Test]
+    public function unlinked_quiz_item_does_not_expose_another_assessment_start_url(): void
+    {
+        $bundle = $this->selfPacedBundle();
+        $offering = $bundle['offering'];
+        $student = $bundle['student'];
+
+        ContentItem::query()->create([
+            'week_id' => $bundle['week1']->id,
+            'type' => ContentItemType::Quiz,
+            'title' => 'Unlinked week quiz',
+            'order' => 3,
+        ]);
+
+        $other = Assessment::query()->create([
+            'offering_id' => $offering->id,
+            'mode' => AssessmentMode::Quiz,
+            'title' => 'A different released quiz',
+            'language' => 'en',
+            'attempts_allowed' => 1,
+            'released' => true,
+        ]);
+
+        $otherShow = route('assessments.show', $other);
+        $otherStart = route('assessments.start', $other);
+
+        $this->actingAs($student)
+            ->get(route('courses.player', $offering))
+            ->assertOk()
+            ->assertSee('Unlinked week quiz')
+            ->assertDontSee($otherShow, false)
+            ->assertDontSee($otherStart, false);
     }
 }

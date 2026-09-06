@@ -160,20 +160,7 @@ class CoursePlayerService
         }
 
         if (in_array($item->type, [ContentItemType::Quiz, ContentItemType::Exam], true)) {
-            $assessment = Assessment::query()->where('content_item_id', $item->id)->first();
-            if ($assessment === null) {
-                $assessment = Assessment::query()
-                    ->where('offering_id', $offering->id)
-                    ->where('title', $item->title)
-                    ->first();
-            }
-            if ($assessment === null) {
-                $assessment = Assessment::query()
-                    ->where('offering_id', $offering->id)
-                    ->where('released', true)
-                    ->orderBy('created_at')
-                    ->first();
-            }
+            $assessment = $this->resolveAssessment($item, $offering);
             $payload['url'] = $assessment ? route('assessments.show', $assessment) : null;
         }
 
@@ -182,5 +169,28 @@ class CoursePlayerService
         }
 
         return $payload;
+    }
+
+    /**
+     * Link a week item to its assessment only when the relationship is unambiguous.
+     * Never fall back to "first released on the offering" — that deep-links the wrong exam.
+     */
+    private function resolveAssessment($item, CourseOffering $offering): ?Assessment
+    {
+        $linked = Assessment::query()->where('content_item_id', $item->id)->first();
+        if ($linked !== null) {
+            return $linked;
+        }
+
+        $matches = Assessment::query()
+            ->where('offering_id', $offering->id)
+            ->where('title', $item->title)
+            ->get();
+
+        if ($matches->count() === 1) {
+            return $matches->first();
+        }
+
+        return null;
     }
 }

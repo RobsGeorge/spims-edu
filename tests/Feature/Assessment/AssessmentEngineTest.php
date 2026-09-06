@@ -14,20 +14,15 @@ use App\Enums\RequirementType;
 use App\Enums\RoleType;
 use App\Enums\StudentProgramStatus;
 use App\Models\AcademicRecord;
-use App\Models\Assessment;
 use App\Models\AssessmentAttempt;
-use App\Models\Assignment;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
-use App\Models\GradebookComponent;
 use App\Models\GradingScheme;
 use App\Models\Program;
 use App\Models\ProgramCourse;
 use App\Models\ProgramRequirementFulfillment;
-use App\Models\Question;
-use App\Models\QuestionBank;
 use App\Models\StudentProgram;
 use App\Models\User;
 use App\Models\Week;
@@ -152,6 +147,7 @@ class AssessmentEngineTest extends TestCase
             'max_points' => 20,
             'shuffle_questions' => false,
         ]);
+        app(AssessmentService::class)->release($ins, $assessment);
 
         $attempt = app(AttemptService::class)->start($student, $assessment);
         $this->assertSame(AttemptStatus::InProgress, $attempt->status);
@@ -213,6 +209,7 @@ class AssessmentEngineTest extends TestCase
             'max_points' => 25,
         ]);
         app(AssessmentService::class)->attachQuestion($ins, $assessment, $essay);
+        app(AssessmentService::class)->release($ins, $assessment);
 
         $attempt = app(AttemptService::class)->start($student, $assessment);
         app(AttemptService::class)->autosave($student, $attempt, [
@@ -313,5 +310,61 @@ class AssessmentEngineTest extends TestCase
 
         $this->actingAs($aca)->post(route('admin.gradebook.reopen', $bundle['offering']))->assertRedirect();
         $this->assertSame(GradeStatus::InProgress, $enrollment->fresh()->grade_status);
+    }
+
+    #[Test]
+    public function enrolled_student_cannot_start_an_unreleased_assessment(): void
+    {
+        $ins = User::factory()->withRole(RoleType::Instructor)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $bundle = $this->offeringBundle($student);
+        $this->staffOffering($ins, $bundle['offering']);
+
+        $assessment = app(AssessmentService::class)->create($ins, $bundle['offering'], [
+            'title' => 'Unreleased midterm',
+            'mode' => AssessmentMode::Exam->value,
+            'time_limit_minutes' => 30,
+            'attempts_allowed' => 1,
+            'max_points' => 10,
+            'opens_at' => now()->subHour(),
+            'closes_at' => now()->addDay(),
+        ]);
+        $this->assertFalse($assessment->fresh()->released);
+
+        $this->actingAs($student)
+            ->postJson(route('assessments.start', $assessment))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('assessment');
+
+        $this->assertSame(0, AssessmentAttempt::query()->where('assessment_id', $assessment->id)->count());
+    }
+
+    #[Test]
+    public function enrolled_student_can_start_a_released_assessment_in_an_open_window(): void
+    {
+        $ins = User::factory()->withRole(RoleType::Instructor)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $bundle = $this->offeringBundle($student);
+        $this->staffOffering($ins, $bundle['offering']);
+
+        $assessment = app(AssessmentService::class)->create($ins, $bundle['offering'], [
+            'title' => 'Released midterm',
+            'mode' => AssessmentMode::Exam->value,
+            'time_limit_minutes' => 30,
+            'attempts_allowed' => 1,
+            'max_points' => 10,
+            'opens_at' => now()->subHour(),
+            'closes_at' => now()->addDay(),
+        ]);
+        app(AssessmentService::class)->release($ins, $assessment);
+
+        $this->actingAs($student)
+            ->post(route('assessments.start', $assessment))
+            ->assertRedirect();
+
+        $this->assertSame(1, AssessmentAttempt::query()
+            ->where('assessment_id', $assessment->id)
+            ->where('student_id', $student->id)
+            ->count());
     }
 }
