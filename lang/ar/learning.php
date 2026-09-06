@@ -15,6 +15,7 @@ return [
     'continue_learning' => 'متابعة',
     'progress' => ':percent٪ مكتمل',
     'open_player' => 'افتح المقرر',
+    'completion' => 'الإكمال',
     'grades' => 'درجاتي',
     'grades_empty' => 'لا درجات صادرة بعد.',
     'settings' => 'الإعدادات',

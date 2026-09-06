@@ -29,4 +29,5 @@ return [
     'no_items' => 'No items in this week yet.',
     'reading_open' => 'Open reading',
     'back_to_course' => 'Back to course',
+    'completion' => 'Completion',
 ];

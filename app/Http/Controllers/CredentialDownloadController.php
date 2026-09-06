@@ -11,6 +11,7 @@ class CredentialDownloadController extends Controller
 {
     public function __invoke(Request $request, Credential $credential, CredentialService $credentials): Response
     {
+        // Owner downloads their own file; anyone else needs credentials.issue.
         $file = $credentials->download($request->user(), $credential);
 
         return response($file['contents'], 200, [
