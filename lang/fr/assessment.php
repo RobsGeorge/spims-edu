@@ -17,6 +17,7 @@ return array (
   'assignment_submitted' => 'Devoir soumis.',
   'bank_too_small' => 'La banque n’a pas assez de questions.',
   'not_enrolled' => 'Vous devez être inscrit à cette offre.',
+  'resubmission_not_allowed' => 'Vous avez déjà rendu ce devoir et la remise est close.',
   'window_closed' => 'Cette évaluation n’est pas ouverte.',
   'no_attempts' => 'Plus de tentatives.',
   'not_in_progress' => 'La tentative n’est pas en cours.',

@@ -13,9 +13,9 @@ use App\Models\AttemptAnswer;
 use App\Models\Enrollment;
 use App\Models\Question;
 use App\Models\User;
+use App\Services\Offerings\LearningProgressService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
-use App\Services\Offerings\LearningProgressService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -265,7 +265,7 @@ class AttemptService
 
     public function overrideScore(User $grader, AttemptAnswer $answer, float $finalScore, ?string $feedback = null): AttemptAnswer
     {
-        $this->authorize->authorize($grader, 'assessments.grade');
+        $this->authorize->authorize($grader, 'assessments.grade', $answer);
 
         $answer->update([
             'final_score' => $finalScore,

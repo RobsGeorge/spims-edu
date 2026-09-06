@@ -27,7 +27,7 @@ class AssessmentService
      */
     public function create(User $actor, CourseOffering $offering, array $data): Assessment
     {
-        $this->authorize->authorize($actor, 'assessments.manage');
+        $this->authorize->authorize($actor, 'assessments.manage', $offering);
 
         return $this->audit->withAudit($actor, 'assessments.create', function () use ($offering, $data) {
             return Assessment::query()->create([
@@ -61,7 +61,7 @@ class AssessmentService
 
     public function attachQuestion(User $actor, Assessment $assessment, Question $question, ?float $pointsOverride = null, ?int $order = null): AssessmentQuestion
     {
-        $this->authorize->authorize($actor, 'assessments.manage');
+        $this->authorize->authorize($actor, 'assessments.manage', $assessment);
 
         return AssessmentQuestion::query()->updateOrCreate(
             ['assessment_id' => $assessment->id, 'question_id' => $question->id],
@@ -74,7 +74,7 @@ class AssessmentService
 
     public function release(User $actor, Assessment $assessment): Assessment
     {
-        $this->authorize->authorize($actor, 'assessments.manage');
+        $this->authorize->authorize($actor, 'assessments.manage', $assessment);
 
         $assessment->update(['released' => true]);
         $this->audit->write($actor, 'assessments.release', 'Assessment', $assessment->id);

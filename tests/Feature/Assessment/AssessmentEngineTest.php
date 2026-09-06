@@ -120,6 +120,7 @@ class AssessmentEngineTest extends TestCase
         $ins = User::factory()->withRole(RoleType::Instructor)->create();
         $student = User::factory()->withRole(RoleType::Student)->create();
         $bundle = $this->offeringBundle($student);
+        $this->staffOffering($ins, $bundle['offering']);
 
         $bank = app(QuestionBankService::class)->createBank($ins, $bundle['course'], 'Bank');
         $q1 = app(QuestionBankService::class)->addQuestion($ins, $bank, [
@@ -195,6 +196,7 @@ class AssessmentEngineTest extends TestCase
         $ins = User::factory()->withRole(RoleType::Instructor)->create();
         $student = User::factory()->withRole(RoleType::Student)->create();
         $bundle = $this->offeringBundle($student);
+        $this->staffOffering($ins, $bundle['offering']);
 
         $bank = app(QuestionBankService::class)->createBank($ins, $bundle['course'], 'Essays');
         $essay = app(QuestionBankService::class)->addQuestion($ins, $bank, [
@@ -235,6 +237,7 @@ class AssessmentEngineTest extends TestCase
         $aca = User::factory()->withRole(RoleType::AcademicAdmin)->create();
         $student = User::factory()->withRole(RoleType::Student)->create();
         $bundle = $this->offeringBundle($student);
+        $this->staffOffering($ins, $bundle['offering']);
 
         $component = app(GradebookService::class)->addComponent($ins, $bundle['offering'], [
             'name' => 'Exams',

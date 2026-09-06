@@ -33,7 +33,7 @@ class NotificationService
             'metadata' => $metadata,
         ]);
 
-        if ($alsoEmail) {
+        if ($alsoEmail && $this->wantsEmail($user)) {
             $this->sendEmailChannel($user, $type, $title, $body, $metadata);
         }
 
@@ -46,6 +46,15 @@ class NotificationService
         $notification->update(['read_at' => now()]);
 
         return $notification->fresh();
+    }
+
+    /**
+     * Honours the `notify_email` preference exposed in settings. Users predating the
+     * column default to opted-in, matching the column default.
+     */
+    private function wantsEmail(User $user): bool
+    {
+        return $user->notify_email ?? true;
     }
 
     /**

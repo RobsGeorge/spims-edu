@@ -2,17 +2,19 @@
 
 namespace App\Services\Assessment;
 
+use App\Enums\EnrollmentStatus;
+use App\Enums\SubmissionType;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
+use App\Models\AssignmentSubmissionVersion;
 use App\Models\ContentItem;
 use App\Models\Enrollment;
 use App\Models\Setting;
 use App\Models\User;
-use App\Enums\EnrollmentStatus;
-use App\Enums\SubmissionType;
+use App\Services\Offerings\LearningProgressService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
-use App\Services\Offerings\LearningProgressService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class AssignmentService
@@ -28,7 +30,7 @@ class AssignmentService
      */
     public function create(User $actor, ContentItem $item, array $data): Assignment
     {
-        $this->authorize->authorize($actor, 'assignments.manage');
+        $this->authorize->authorize($actor, 'assignments.manage', $item);
 
         return $this->audit->withAudit($actor, 'assignments.create', function () use ($item, $data) {
             return Assignment::query()->create([
@@ -66,17 +68,56 @@ class AssignmentService
         $submittedAt = now();
         $isLate = $assignment->due_date && $submittedAt->gt($assignment->due_date);
 
-        $submission = AssignmentSubmission::query()->updateOrCreate(
-            ['assignment_id' => $assignment->id, 'student_id' => $student->id],
-            [
+        $existing = AssignmentSubmission::query()
+            ->where('assignment_id', $assignment->id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        if ($existing !== null && ! $assignment->allow_resubmission) {
+            throw ValidationException::withMessages([
+                'assignment' => [__('assessment.resubmission_not_allowed')],
+            ]);
+        }
+
+        $submission = DB::transaction(function () use ($assignment, $student, $existing, $textBody, $fileUrl, $submittedAt, $isLate) {
+            if ($existing === null) {
+                return AssignmentSubmission::query()->create([
+                    'assignment_id' => $assignment->id,
+                    'student_id' => $student->id,
+                    'text_body' => $textBody,
+                    'file_url' => $fileUrl,
+                    'submitted_at' => $submittedAt,
+                    'is_late' => (bool) $isLate,
+                    'attempt_no' => 1,
+                ]);
+            }
+
+            $this->archive($existing);
+
+            // A resubmission replaces the graded artifact, so the prior grade no longer
+            // describes what is stored. It is preserved on the archived version.
+            $existing->update([
                 'text_body' => $textBody,
                 'file_url' => $fileUrl,
                 'submitted_at' => $submittedAt,
                 'is_late' => (bool) $isLate,
-            ]
-        );
+                'attempt_no' => $existing->attempt_no + 1,
+                'raw_score' => null,
+                'final_score' => null,
+                'feedback' => null,
+                'graded_by_id' => null,
+                'graded_at' => null,
+            ]);
 
-        $this->audit->write($student, 'assignments.submit', 'AssignmentSubmission', $submission->id);
+            return $existing->fresh();
+        });
+
+        $this->audit->write(
+            $student,
+            $submission->attempt_no > 1 ? 'assignments.resubmit' : 'assignments.submit',
+            'AssignmentSubmission',
+            $submission->id,
+        );
 
         if ($item) {
             $this->progress->recordLinkedItemComplete($student, $item);
@@ -85,9 +126,28 @@ class AssignmentService
         return $submission;
     }
 
+    /** Snapshot the current state of a submission before it is replaced. */
+    private function archive(AssignmentSubmission $submission): AssignmentSubmissionVersion
+    {
+        return AssignmentSubmissionVersion::query()->create([
+            'submission_id' => $submission->id,
+            'attempt_no' => $submission->attempt_no,
+            'text_body' => $submission->text_body,
+            'file_url' => $submission->file_url,
+            'submitted_at' => $submission->submitted_at,
+            'is_late' => $submission->is_late,
+            'raw_score' => $submission->raw_score,
+            'final_score' => $submission->final_score,
+            'feedback' => $submission->feedback,
+            'graded_by_id' => $submission->graded_by_id,
+            'graded_at' => $submission->graded_at,
+            'archived_at' => now(),
+        ]);
+    }
+
     public function grade(User $grader, AssignmentSubmission $submission, float $rawScore, ?string $feedback = null): AssignmentSubmission
     {
-        $this->authorize->authorize($grader, 'assignments.grade');
+        $this->authorize->authorize($grader, 'assignments.grade', $submission);
 
         $assignment = $submission->assignment;
         $final = $this->applyLatePenalty($assignment, $submission, $rawScore);

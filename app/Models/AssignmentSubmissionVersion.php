@@ -5,17 +5,16 @@ namespace App\Models;
 use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class AssignmentSubmission extends Model
+class AssignmentSubmissionVersion extends Model
 {
     use HasUlids;
 
     public $timestamps = false;
 
     protected $fillable = [
-        'assignment_id',
-        'student_id',
+        'submission_id',
+        'attempt_no',
         'text_body',
         'file_url',
         'submitted_at',
@@ -25,31 +24,26 @@ class AssignmentSubmission extends Model
         'feedback',
         'graded_by_id',
         'graded_at',
-        'attempt_no',
+        'archived_at',
     ];
 
     protected $casts = [
-        'submitted_at' => 'datetime',
+        'attempt_no' => 'integer',
         'is_late' => 'boolean',
         'raw_score' => 'float',
         'final_score' => 'float',
+        'submitted_at' => 'datetime',
         'graded_at' => 'datetime',
-        'attempt_no' => 'integer',
+        'archived_at' => 'datetime',
     ];
 
-    public function assignment(): BelongsTo
+    public function submission(): BelongsTo
     {
-        return $this->belongsTo(Assignment::class);
+        return $this->belongsTo(AssignmentSubmission::class, 'submission_id');
     }
 
-    public function student(): BelongsTo
+    public function gradedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'student_id');
-    }
-
-    public function versions(): HasMany
-    {
-        return $this->hasMany(AssignmentSubmissionVersion::class, 'submission_id')
-            ->orderBy('attempt_no');
+        return $this->belongsTo(User::class, 'graded_by_id');
     }
 }

@@ -75,6 +75,7 @@ class PortalD6PolishTest extends TestCase
             'mode' => OfferingMode::SelfPaced,
             'status' => 'OPEN',
         ]);
+        $this->staffOffering($ins, $offering);
         Enrollment::query()->create([
             'student_id' => $student->id,
             'offering_id' => $offering->id,

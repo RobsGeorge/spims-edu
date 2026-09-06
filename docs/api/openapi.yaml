@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: SPIMS Mobile API
+  version: "1.0"
+  description: >
+    Bearer-token API for the SPIMS student and instructor mobile clients.
+    Every registered `api.v1.*` route must have an entry here — enforced by
+    tests/Feature/Api/V1/OpenApiCoverageTest.php.
+servers:
+  - url: /api/v1
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Error:
+      type: object
+      required: [message, code]
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+          enum:
+            - UNAUTHENTICATED
+            - FORBIDDEN
+            - NOT_FOUND
+            - CONFLICT
+            - VALIDATION_FAILED
+            - LOCKED
+            - RATE_LIMITED
+            - METHOD_NOT_ALLOWED
+            - SERVER_ERROR
+            - ERROR
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string, nullable: true }
+        first_name: { type: string }
+        last_name: { type: string }
+        roles:
+          type: array
+          items: { type: string }
+        status: { type: string, enum: [ACTIVE, SUSPENDED, PENDING] }
+        email_verified: { type: boolean }
+        preferred_locale: { type: string, enum: [ar, en, fr] }
+        theme_preference: { type: string, nullable: true, enum: [LIGHT, DARK, SYSTEM] }
+        notify_email: { type: boolean }
+
+paths:
+  /branding:
+    get:
+      operationId: branding
+      summary: Public theme tokens and branding, safe to call before login.
+      security: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      site_name: { type: string }
+                      logo_light_url: { type: string, nullable: true }
+                      logo_dark_url: { type: string, nullable: true }
+                      favicon_url: { type: string, nullable: true }
+                      tokens: { type: object }
+
+  /login:
+    post:
+      operationId: login
+      summary: Exchange email + password for a bearer token.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+                device_name: { type: string, nullable: true }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      token: { type: string }
+                      token_type: { type: string, enum: [Bearer] }
+                      user: { $ref: "#/components/schemas/User" }
+        "422":
+          description: Invalid credentials, suspended, or not yet active.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "429":
+          description: Too many attempts for this email + IP.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /logout:
+    post:
+      operationId: logout
+      summary: Revoke the token used to authenticate this request (only that one).
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204":
+          description: No content.
+        "401":
+          description: Missing or invalid token.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /me:
+    get:
+      operationId: me
+      summary: The authenticated user's profile.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/User" }
+        "401":
+          description: Missing or invalid token.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
