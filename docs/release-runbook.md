@@ -2,11 +2,12 @@
 
 ## Pre-release
 
-- [ ] CI green on the commit (all PHPUnit suites + PostgreSQL migrate:fresh --seed)
+- [ ] CI green on the commit (lint + all PHPUnit suites on SQLite and PostgreSQL + migrate:fresh --seed)
 - [ ] Changelog / release notes drafted
 - [ ] `FORCE_HTTPS=true` and `APP_DEBUG=false` on production `.env`
 - [ ] `SUPERADMIN_PASSWORD` rotated from default if still using bootstrap secret
 - [ ] Mail / payment / Zoom secrets present (or mock flags intentional)
+- [ ] GitHub secrets in [owner-actions.md](owner-actions.md) are present (`SSH_*`, health URLs)
 - [ ] Staging smoke passed (below)
 
 ## Staging promote
@@ -15,6 +16,7 @@
 2. Wait for GitHub Actions staging deploy.
 3. Smoke:
    - `GET https://staging.spims-edu.com/health` → `status: ok`
+   - `GET https://staging.spims-edu.com/api/v1/branding` → `200` + `data`
    - Login as Super Admin
    - Open sample catalog / offering preview (`DEMO101`)
    - Create a dummy enrollment path if finance mocks enabled
@@ -33,12 +35,13 @@
 
 ## Rollback
 
+Preferred: GitHub Actions → **Rollback** → `production` or `staging` + the last good SHA.
+
+Manual:
+
 1. `cd /var/www/spims && git fetch && git reset --hard <previous-sha>`
-2. `composer install --no-dev --optimize-autoloader`
-3. `php8.2 artisan migrate --force` (only if new migrations are backward-compatible; otherwise restore DB snapshot first — see `docs/backups-and-restore.md`)
-4. `php8.2 artisan optimize:clear && php8.2 artisan config:cache && php8.2 artisan route:cache`
-5. `sudo systemctl reload php8.2-fpm && sudo systemctl restart spims-queue`
-6. `php8.2 artisan up`
+2. `SKIP_GIT=1 ./scripts/vps-sync.sh && QUEUE_UNIT=spims-queue ./scripts/vps-release.sh`
+3. If the SHA predates those scripts: `composer install --no-dev --optimize-autoloader`, then `migrate --force` (only if new migrations are backward-compatible; otherwise restore a DB snapshot first — see `docs/backups-and-restore.md`), `optimize:clear` + `config:cache` + `route:cache`, reload php-fpm, restart `spims-queue`, `artisan up`.
 
 ## Seed after fresh install
 

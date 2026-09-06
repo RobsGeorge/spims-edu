@@ -1,0 +1,17 @@
+[Unit]
+Description=SPIMS production queue worker
+After=network.target redis-server.service postgresql.service
+Wants=redis-server.service
+
+[Service]
+Type=simple
+User=deploy
+Group=www-data
+WorkingDirectory=/var/www/spims
+ExecStart=/usr/bin/php8.2 artisan queue:work redis --sleep=3 --tries=3 --max-time=3600 --max-jobs=500
+Restart=always
+RestartSec=3
+Nice=5
+
+[Install]
+WantedBy=multi-user.target

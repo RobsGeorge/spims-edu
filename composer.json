@@ -34,6 +34,18 @@
         }
     },
     "scripts": {
+        "lint": [
+            "bash scripts/verify-pipelines.sh"
+        ],
+        "test": [
+            "@php artisan test --compact"
+        ],
+        "test:api": [
+            "@php artisan test --testsuite=Api --compact"
+        ],
+        "test:ci": [
+            "@php artisan test --compact"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
