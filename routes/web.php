@@ -66,6 +66,7 @@ use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\Teach\AssessmentController as TeachAssessmentController;
 use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController;
 use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController;
 use App\Http\Controllers\Teach\CompletionController as TeachCompletionController;
@@ -160,6 +161,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/teach/{offering}/sessions/{session}/reopen', [TeachAttendanceController::class, 'reopen'])->name('teach.attendance.reopen');
     Route::post('/teach/{offering}/sessions/{session}/excuse', [TeachAttendanceController::class, 'excuse'])->name('teach.attendance.excuse');
     Route::post('/teach/{offering}/sessions/{session}/check-in-code', [TeachAttendanceController::class, 'issueCode'])->name('teach.attendance.code');
+
+    Route::get('/teach/{offering}/assessments/{assessment}/attempts', [TeachAssessmentController::class, 'attempts'])
+        ->middleware('permission:assessments.grade')
+        ->name('teach.assessments.attempts');
+    Route::post('/teach/{offering}/assessments/{assessment}/answers/{attemptAnswer}/grade', [TeachAssessmentController::class, 'gradeAnswer'])
+        ->middleware('permission:assessments.grade')
+        ->name('teach.assessments.grade');
+    Route::post('/teach/{offering}/assessments/{assessment}/announce-results', [TeachAssessmentController::class, 'announceResults'])
+        ->middleware('permission:assessments.announce_results')
+        ->name('teach.assessments.announce');
 
     Route::get('/teach/{offering}/assignments', [TeachAssignmentController::class, 'index'])->name('teach.assignments.index');
     Route::post('/teach/{offering}/assignments/{assignment}/remind', [TeachAssignmentController::class, 'remind'])->name('teach.assignments.remind');
