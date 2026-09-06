@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Attendance;
 
+require_once __DIR__.'/AttendanceFixtures.php';
+
 use App\Enums\AttendanceStatus;
 use App\Enums\RoleType;
 use App\Exceptions\AuthorizationException;
@@ -9,10 +11,15 @@ use App\Exceptions\ResourceLockedException;
 use App\Models\AttendanceEntry;
 use App\Models\User;
 use App\Services\Live\AttendanceService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
-class AttendanceMarkingTest extends AttendanceTestCase
+class AttendanceMarkingTest extends TestCase
 {
+    use AttendanceFixtures;
+    use RefreshDatabase;
+
     #[Test]
     public function instructor_can_mark_amend_excuse_fill_missing_and_close(): void
     {

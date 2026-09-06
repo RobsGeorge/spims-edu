@@ -18,9 +18,7 @@ use App\Support\AuthorizeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AttendanceController extends Controller
 {
@@ -225,16 +223,23 @@ class AttendanceController extends Controller
         return back()->with('status', __('attendance.code_issued', ['code' => $code->code]));
     }
 
-    public function reportCsv(Request $request, CourseOffering $offering): StreamedResponse
+    public function reportCsv(Request $request, CourseOffering $offering): Response
     {
         $this->guardTeach($request, $offering);
         $report = $this->attendance->report($request->user(), $offering);
+        $headers = ['student_id', 'first_name', 'last_name', 'email', 'present', 'absent', 'late', 'excused', 'percent'];
+        $lines = [implode(',', $headers)];
+        foreach ($report['students'] as $row) {
+            $lines[] = implode(',', array_map(
+                fn (string $key) => $this->csvValue($row[$key] ?? ''),
+                $headers
+            ));
+        }
 
-        return $this->csvDownload(
-            'attendance-'.$offering->id.'.csv',
-            ['student_id', 'first_name', 'last_name', 'email', 'present', 'absent', 'late', 'excused', 'percent'],
-            $report['students'],
-        );
+        return response(implode("\n", $lines)."\n", 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="attendance-'.$offering->id.'.csv"',
+        ]);
     }
 
     public function rosterCsv(Request $request, CourseOffering $offering): Response
@@ -271,19 +276,13 @@ class AttendanceController extends Controller
         $this->teachAccess->assertCanTeachOffering($user, $offering);
     }
 
-    /**
-     * @param  list<string>  $headers
-     * @param  list<array<string, mixed>>  $rows
-     */
-    private function csvDownload(string $filename, array $headers, array $rows): StreamedResponse
+    private function csvValue(mixed $value): string
     {
-        return response()->streamDownload(function () use ($headers, $rows) {
-            $out = fopen('php://output', 'w');
-            fputcsv($out, $headers);
-            foreach ($rows as $row) {
-                fputcsv($out, array_map(fn ($key) => $row[$key] ?? '', $headers));
-            }
-            fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+        $value = (string) $value;
+        if (str_contains($value, ',') || str_contains($value, '"') || str_contains($value, "\n")) {
+            return '"'.str_replace('"', '""', $value).'"';
+        }
+
+        return $value;
     }
 }

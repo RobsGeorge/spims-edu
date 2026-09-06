@@ -2,14 +2,21 @@
 
 namespace Tests\Feature\Attendance;
 
+require_once __DIR__.'/AttendanceFixtures.php';
+
 use App\Enums\RoleType;
 use App\Models\Announcement;
 use App\Models\User;
 use App\Services\Attendance\RosterService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
-class RosterTest extends AttendanceTestCase
+class RosterTest extends TestCase
 {
+    use AttendanceFixtures;
+    use RefreshDatabase;
+
     #[Test]
     public function roster_csv_birthdays_and_announcement_work(): void
     {

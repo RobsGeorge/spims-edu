@@ -2,7 +2,6 @@
 
 namespace App\Services\Attendance;
 
-use App\Enums\EnrollmentStatus;
 use App\Models\Announcement;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;

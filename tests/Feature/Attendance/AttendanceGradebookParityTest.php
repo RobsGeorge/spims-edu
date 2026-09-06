@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Attendance;
 
+require_once __DIR__.'/AttendanceFixtures.php';
+
 use App\Enums\AttendanceStatus;
 use App\Enums\ComponentKind;
 use App\Enums\RoleType;
@@ -11,10 +13,15 @@ use App\Models\LiveSession;
 use App\Models\User;
 use App\Services\Gradebook\GradebookService;
 use App\Services\Live\AttendanceService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
-class AttendanceGradebookParityTest extends AttendanceTestCase
+class AttendanceGradebookParityTest extends TestCase
 {
+    use AttendanceFixtures;
+    use RefreshDatabase;
+
     #[Test]
     public function gradebook_attendance_matches_the_legacy_zoom_only_formula(): void
     {

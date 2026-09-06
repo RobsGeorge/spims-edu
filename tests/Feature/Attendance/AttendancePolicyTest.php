@@ -2,14 +2,21 @@
 
 namespace Tests\Feature\Attendance;
 
+require_once __DIR__.'/AttendanceFixtures.php';
+
 use App\Enums\AttendanceStatus;
 use App\Enums\RoleType;
 use App\Models\User;
 use App\Services\Live\AttendanceService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
-class AttendancePolicyTest extends AttendanceTestCase
+class AttendancePolicyTest extends TestCase
 {
+    use AttendanceFixtures;
+    use RefreshDatabase;
+
     #[Test]
     public function late_weight_and_min_percentage_change_computed_percent(): void
     {

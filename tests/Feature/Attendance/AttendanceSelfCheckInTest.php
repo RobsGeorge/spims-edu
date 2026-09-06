@@ -2,17 +2,23 @@
 
 namespace Tests\Feature\Attendance;
 
+require_once __DIR__.'/AttendanceFixtures.php';
+
 use App\Enums\AttendanceStatus;
 use App\Enums\RoleType;
-use App\Models\AttendanceCheckInCode;
 use App\Models\AttendanceEntry;
 use App\Models\User;
 use App\Services\Live\AttendanceService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
-class AttendanceSelfCheckInTest extends AttendanceTestCase
+class AttendanceSelfCheckInTest extends TestCase
 {
+    use AttendanceFixtures;
+    use RefreshDatabase;
+
     #[Test]
     public function a_valid_code_marks_the_enrolled_student_present(): void
     {

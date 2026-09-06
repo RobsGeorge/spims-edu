@@ -2,15 +2,22 @@
 
 namespace Tests\Feature\Attendance;
 
+require_once __DIR__.'/AttendanceFixtures.php';
+
 use App\Enums\AttendanceStatus;
 use App\Enums\RoleType;
 use App\Exceptions\AuthorizationException;
 use App\Models\User;
 use App\Services\Live\AttendanceService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
-class AttendanceScopeTest extends AttendanceTestCase
+class AttendanceScopeTest extends TestCase
 {
+    use AttendanceFixtures;
+    use RefreshDatabase;
+
     #[Test]
     public function an_instructor_cannot_mark_another_offerings_roster(): void
     {

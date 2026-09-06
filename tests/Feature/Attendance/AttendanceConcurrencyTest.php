@@ -2,16 +2,23 @@
 
 namespace Tests\Feature\Attendance;
 
+require_once __DIR__.'/AttendanceFixtures.php';
+
 use App\Enums\AttendanceStatus;
 use App\Enums\RoleType;
 use App\Exceptions\ConflictException;
 use App\Models\AttendanceEntry;
 use App\Models\User;
 use App\Services\Live\AttendanceService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
-class AttendanceConcurrencyTest extends AttendanceTestCase
+class AttendanceConcurrencyTest extends TestCase
 {
+    use AttendanceFixtures;
+    use RefreshDatabase;
+
     #[Test]
     public function a_stale_bulk_mark_returns_409_and_does_not_overwrite(): void
     {

@@ -1,17 +1,17 @@
 <?php
 
-use App\Http\Controllers\Admin\CredentialAdminController;
-use App\Http\Controllers\Admin\AssessmentAdminController;
-use App\Http\Controllers\Admin\DiscussionAdminController;
-use App\Http\Controllers\Admin\FinanceAdminController;
 use App\Http\Controllers\Admin\ApplicationFormController;
 use App\Http\Controllers\Admin\ApplicationReviewController;
+use App\Http\Controllers\Admin\AssessmentAdminController;
 use App\Http\Controllers\Admin\AssessmentTemplateController;
+use App\Http\Controllers\Admin\AttendanceAdminController;
 use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\CredentialAdminController;
+use App\Http\Controllers\Admin\DiscussionAdminController;
 use App\Http\Controllers\Admin\EnrollmentAdminController;
+use App\Http\Controllers\Admin\FinanceAdminController;
 use App\Http\Controllers\Admin\GradebookController;
 use App\Http\Controllers\Admin\GradingSchemeController;
-use App\Http\Controllers\Admin\AttendanceAdminController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\ZoomWebhookController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -53,7 +54,6 @@ use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
-use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController;
 use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;

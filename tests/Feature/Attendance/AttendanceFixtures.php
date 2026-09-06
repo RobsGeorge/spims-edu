@@ -5,6 +5,7 @@ namespace Tests\Feature\Attendance;
 use App\Enums\ClassSessionMode;
 use App\Enums\EnrollmentStatus;
 use App\Enums\OfferingMode;
+use App\Enums\OfferingStaffRole;
 use App\Enums\RoleType;
 use App\Models\ClassSession;
 use App\Models\Course;
@@ -12,13 +13,9 @@ use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\User;
 use App\Services\Live\AttendanceService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-abstract class AttendanceTestCase extends TestCase
+trait AttendanceFixtures
 {
-    use RefreshDatabase;
-
     protected function offering(string $code = 'ATT1'): CourseOffering
     {
         $this->seed(\Database\Seeders\SettingsSeeder::class);
@@ -60,7 +57,7 @@ abstract class AttendanceTestCase extends TestCase
     protected function taOn(CourseOffering $offering): User
     {
         $ta = User::factory()->withRole(RoleType::Ta)->create();
-        $this->staffOffering($ta, $offering, \App\Enums\OfferingStaffRole::Ta);
+        $this->staffOffering($ta, $offering, OfferingStaffRole::Ta);
 
         return $ta;
     }
@@ -73,10 +70,5 @@ abstract class AttendanceTestCase extends TestCase
             'duration_minutes' => 60,
             'mode' => ClassSessionMode::InPerson->value,
         ], $overrides));
-    }
-
-    protected function apiToken(User $user, string $ability): string
-    {
-        return $user->createToken('test', [$ability])->plainTextToken;
     }
 }

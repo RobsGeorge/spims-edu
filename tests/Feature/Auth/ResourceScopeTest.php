@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\ClassSessionMode;
 use App\Enums\ComponentKind;
 use App\Enums\ContentItemType;
 use App\Enums\EnrollmentStatus;
@@ -14,7 +15,6 @@ use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\GradebookComponent;
-use App\Enums\ClassSessionMode;
 use App\Models\LiveSession;
 use App\Models\User;
 use App\Models\Week;
@@ -119,17 +119,19 @@ class ResourceScopeTest extends TestCase
                     'duration_minutes' => 60,
                     'mode' => ClassSessionMode::InPerson->value,
                 ]),
-            'attendance.markRoster' => fn () => app(AttendanceService::class)
-                ->markRoster($instructor, app(AttendanceService::class)->openSession(
-                    User::factory()->withRole(RoleType::AcademicAdmin)->create(),
-                    $theirs,
-                    [
-                        'title' => 'Theirs',
-                        'scheduled_start' => now()->addDays(4),
-                        'duration_minutes' => 60,
-                        'mode' => ClassSessionMode::InPerson->value,
-                    ]
-                ), [], 0),
+            'attendance.markRoster' => function () use ($instructor, $theirs) {
+                $classSession = \App\Models\ClassSession::query()->create([
+                    'offering_id' => $theirs->id,
+                    'title' => 'Theirs',
+                    'scheduled_start' => now()->addDays(4),
+                    'duration_minutes' => 60,
+                    'mode' => ClassSessionMode::InPerson,
+                    'lock_version' => 0,
+                ]);
+                app(AttendanceService::class)->markRoster($instructor, $classSession, [
+                    ['student_id' => User::factory()->withRole(RoleType::Student)->create()->id, 'status' => 'PRESENT'],
+                ], 0);
+            },
             'discussions.configure' => fn () => app(DiscussionService::class)
                 ->configureBoard($instructor, $theirs, true),
         ];

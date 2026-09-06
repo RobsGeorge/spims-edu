@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__.'/worktree-autoload.php';
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application

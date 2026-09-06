@@ -7,7 +7,6 @@ use App\Enums\ClassSessionMode;
 use App\Enums\EnrollmentStatus;
 use App\Enums\OfferingMode;
 use App\Enums\RoleType;
-use App\Models\ClassSession;
 use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
@@ -135,11 +134,14 @@ class AttendanceApiTest extends TestCase
         $foreign = User::factory()->withRole(RoleType::Student)->create();
         $this->enroll($foreign, $theirs);
 
-        $mineSession = app(AttendanceService::class)->openSession(
-            User::factory()->withRole(RoleType::Instructor)->create()->tap(fn ($u) => $this->staffOffering($u, $mine)),
-            $mine,
-            ['title' => 'Mine', 'scheduled_start' => now(), 'duration_minutes' => 60, 'mode' => ClassSessionMode::InPerson->value]
-        );
+        $mineInstructor = User::factory()->withRole(RoleType::Instructor)->create();
+        $this->staffOffering($mineInstructor, $mine);
+        $mineSession = app(AttendanceService::class)->openSession($mineInstructor, $mine, [
+            'title' => 'Mine',
+            'scheduled_start' => now(),
+            'duration_minutes' => 60,
+            'mode' => ClassSessionMode::InPerson->value,
+        ]);
         $theirSession = app(AttendanceService::class)->openSession($otherIns, $theirs, [
             'title' => 'Theirs',
             'scheduled_start' => now(),
