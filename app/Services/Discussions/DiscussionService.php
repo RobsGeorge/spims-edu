@@ -25,13 +25,28 @@ class DiscussionService
         private readonly NotificationService $notifications,
     ) {}
 
-    public function ensureBoard(CourseOffering $offering): DiscussionBoard
+    public function ensureBoard(CourseOffering $offering): ?DiscussionBoard
     {
+        return DiscussionBoard::query()->where('offering_id', $offering->id)->first();
+    }
+
+    public function provisionBoard(User $actor, CourseOffering $offering): DiscussionBoard
+    {
+        $existing = $this->ensureBoard($offering);
+        if ($existing) {
+            return $existing;
+        }
+
         $allowStudents = $offering->mode !== OfferingMode::SelfPaced;
 
-        return DiscussionBoard::query()->firstOrCreate(
-            ['offering_id' => $offering->id],
-            ['allow_student_threads' => $allowStudents]
+        return $this->audit->withAudit(
+            $actor,
+            'discussions.board_provision',
+            fn () => DiscussionBoard::query()->create([
+                'offering_id' => $offering->id,
+                'allow_student_threads' => $allowStudents,
+            ]),
+            'DiscussionBoard'
         );
     }
 
@@ -39,7 +54,7 @@ class DiscussionService
     {
         $this->authorize->authorize($actor, 'discussions.configure', $offering);
 
-        $board = $this->ensureBoard($offering);
+        $board = $this->provisionBoard($actor, $offering);
         $board->update(['allow_student_threads' => $allowStudentThreads]);
         $this->audit->write($actor, 'discussions.configure', 'DiscussionBoard', $board->id);
 

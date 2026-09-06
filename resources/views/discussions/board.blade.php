@@ -3,6 +3,7 @@
 @section('content')
 <h1 class="spims-title mb-3">{{ __('live.discussions') }} — {{ $offering->course->code }}</h1>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
+@if($board)
 <form method="POST" action="{{ route('discussions.threads.store', $offering) }}" class="card border-0 shadow-sm mb-4">@csrf
     <div class="card-body row g-2">
         <div class="col-md-6"><input name="title" class="form-control" placeholder="Thread title" required></div>
@@ -20,4 +21,7 @@
     </li>
 @endforeach
 </ul>
+@else
+<div class="alert alert-info">{{ __('live.board_not_yet_configured') }}</div>
+@endif
 @endsection

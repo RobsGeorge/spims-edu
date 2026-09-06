@@ -164,7 +164,7 @@ class LiveCommsTest extends TestCase
             Notification::query()->where('user_id', $student->id)->where('type', 'live.reminder_24h')->exists()
         );
 
-        $board = app(DiscussionService::class)->ensureBoard($offering);
+        $board = app(DiscussionService::class)->provisionBoard($ins, $offering);
         $this->assertTrue($board->allow_student_threads);
 
         $thread = app(DiscussionService::class)->createThread($ins, $board, [

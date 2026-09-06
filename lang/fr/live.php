@@ -33,4 +33,5 @@ return [
     'schedule' => 'Planifier',
     'minutes_abbr' => 'min',
     'override' => 'Modifier',
+    'board_not_yet_configured' => 'Aucun forum de discussion pour cette offre encore. Publiez le premier fil pour en créer un.',
 ];
