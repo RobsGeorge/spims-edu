@@ -32,7 +32,7 @@ class TeachAttendanceController extends Controller
         ]);
     }
 
-    public function storeSession(Request $request, CourseOffering $offering, AttendanceService $attendance): JsonResponse
+    public function storeSession(Request $request, CourseOffering $offering, AttendanceService $attendance, IdempotencyStore $idempotency): JsonResponse
     {
         $data = $request->validate([
             'title' => 'required|string|max:200',
@@ -43,13 +43,18 @@ class TeachAttendanceController extends Controller
             'notify_students' => 'nullable|boolean',
         ]);
 
-        $session = $attendance->openSession($request->user(), $offering, [
-            ...$data,
-            'mode' => $data['mode'] ?? ClassSessionMode::InPerson->value,
-            'notify_students' => (bool) ($data['notify_students'] ?? false),
-        ]);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.sessions.store:'.$offering->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->sessionPayload($attendance->openSession($request->user(), $offering, [
+                ...$data,
+                'mode' => $data['mode'] ?? ClassSessionMode::InPerson->value,
+                'notify_students' => (bool) ($data['notify_students'] ?? false),
+            ])),
+        );
 
-        return response()->json(['data' => $this->sessionPayload($session)], 201);
+        return response()->json(['data' => $payload], 201);
     }
 
     public function roster(Request $request, ClassSession $session, AuthorizeService $authorize): JsonResponse
@@ -149,22 +154,29 @@ class TeachAttendanceController extends Controller
         return response()->json(['data' => $payload]);
     }
 
-    public function issueCheckInCode(Request $request, ClassSession $session, AttendanceService $attendance): JsonResponse
+    public function issueCheckInCode(Request $request, ClassSession $session, AttendanceService $attendance, IdempotencyStore $idempotency): JsonResponse
     {
         $data = $request->validate([
             'ttl_minutes' => 'nullable|integer|min:5|max:240',
             'max_uses' => 'nullable|integer|min:1',
         ]);
 
-        $code = $attendance->issueCheckInCode($request->user(), $session, $data);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.sessions.check-in-code:'.$session->id,
+            $request->header('Idempotency-Key'),
+            function () use ($attendance, $request, $session, $data) {
+                $code = $attendance->issueCheckInCode($request->user(), $session, $data);
 
-        return response()->json([
-            'data' => [
-                'code' => $code->code,
-                'expires_at' => $code->expires_at->toIso8601String(),
-                'max_uses' => $code->max_uses,
-            ],
-        ], 201);
+                return [
+                    'code' => $code->code,
+                    'expires_at' => $code->expires_at->toIso8601String(),
+                    'max_uses' => $code->max_uses,
+                ];
+            },
+        );
+
+        return response()->json(['data' => $payload], 201);
     }
 
     public function report(Request $request, CourseOffering $offering, AttendanceService $attendance): JsonResponse|StreamedResponse

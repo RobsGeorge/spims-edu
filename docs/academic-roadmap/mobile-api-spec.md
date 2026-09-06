@@ -141,9 +141,10 @@ questions. A client-supplied timestamp is never trusted.
 ### Idempotency
 
 Mutations that could be retried on a flaky connection (`submit`, `reserve`, `join`, `check-in`,
-`pay`, and instructor writes such as attendance mark, grade, remind, lock, close, announce, and
-publish) accept an `Idempotency-Key` header. A repeat with the same key returns the original result
-instead of acting twice.
+`pay`, and **every** instructor `POST` / `PUT` / `DELETE` under `/teach/*`) accept an
+`Idempotency-Key` header. A repeat from the same actor with the same key returns the original
+result instead of acting twice. A missing key still runs the write (backward compatible). The
+OpenAPI component is `#/components/parameters/IdempotencyKey`.
 
 ### Confirmation tokens for irreversible actions
 

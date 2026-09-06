@@ -633,6 +633,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -696,6 +697,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -747,6 +749,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '200':
           description: OK
@@ -944,6 +947,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -1095,6 +1099,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '200':
           description: OK
@@ -1123,6 +1128,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '200':
           description: OK
@@ -1145,6 +1151,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         content:
           application/json:
@@ -2137,6 +2144,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -2193,6 +2201,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -2710,6 +2719,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -2759,6 +2769,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '201':
           description: Session started
@@ -2799,6 +2810,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -2850,6 +2862,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '200':
           description: Question closed
@@ -2890,6 +2903,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '200':
           description: Results visible
@@ -2930,6 +2944,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '200':
           description: Session ended
@@ -3202,6 +3217,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3362,6 +3378,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '200':
           description: Submitted
@@ -3442,6 +3459,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3475,6 +3493,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '200':
           description: Marked received
@@ -3494,6 +3513,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '200':
           description: Reminded
@@ -3528,6 +3548,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3561,6 +3582,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3608,6 +3630,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3647,6 +3670,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3678,6 +3702,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3711,6 +3736,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3768,6 +3794,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         content:
           application/json:
@@ -3795,6 +3822,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3828,6 +3856,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3864,6 +3893,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -3913,6 +3943,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         content:
           multipart/form-data:
@@ -3954,6 +3985,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         '200':
           description: Deleted

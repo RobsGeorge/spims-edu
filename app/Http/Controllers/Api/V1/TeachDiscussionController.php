@@ -36,25 +36,33 @@ class TeachDiscussionController extends Controller
         Request $request,
         DiscussionThread $discussionThread,
         DiscussionService $discussions,
+        IdempotencyStore $idempotency,
     ): JsonResponse {
         $flags = $request->validate([
             'locked' => 'nullable|boolean',
             'pinned' => 'nullable|boolean',
         ]);
 
-        $thread = $discussions->moderate($request->user(), $discussionThread, array_filter(
-            $flags,
-            fn ($value) => $value !== null,
-        ));
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.discussions.moderate:'.$discussionThread->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $discussionThread, $discussions, $flags) {
+                $thread = $discussions->moderate($request->user(), $discussionThread, array_filter(
+                    $flags,
+                    fn ($value) => $value !== null,
+                ));
 
-        return response()->json([
-            'data' => [
-                'id' => $thread->id,
-                'title' => $thread->title,
-                'locked' => $thread->locked,
-                'pinned' => $thread->pinned,
-            ],
-        ]);
+                return [
+                    'id' => $thread->id,
+                    'title' => $thread->title,
+                    'locked' => $thread->locked,
+                    'pinned' => $thread->pinned,
+                ];
+            },
+        );
+
+        return response()->json(['data' => $payload]);
     }
 
     public function grade(

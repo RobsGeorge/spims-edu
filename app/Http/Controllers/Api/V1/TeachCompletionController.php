@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Week;
 use App\Services\Completion\ModuleAssessmentService;
 use App\Services\Completion\StudentNoteService;
+use App\Support\Api\IdempotencyStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -24,15 +25,20 @@ class TeachCompletionController extends Controller
         ]);
     }
 
-    public function storeNote(Request $request, CourseOffering $offering, User $student, StudentNoteService $notes): JsonResponse
+    public function storeNote(Request $request, CourseOffering $offering, User $student, StudentNoteService $notes, IdempotencyStore $idempotency): JsonResponse
     {
         $data = $request->validate([
             'body' => ['required', 'string', 'max:4000'],
         ]);
 
-        $note = $notes->add($request->user(), $offering, $student, $data['body']);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.notes.store:'.$offering->id.':'.$student->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->notePayload($notes->add($request->user(), $offering, $student, $data['body'])),
+        );
 
-        return response()->json(['data' => $this->notePayload($note)], 201);
+        return response()->json(['data' => $payload], 201);
     }
 
     public function rate(
@@ -41,6 +47,7 @@ class TeachCompletionController extends Controller
         Week $week,
         User $student,
         ModuleAssessmentService $modules,
+        IdempotencyStore $idempotency,
     ): JsonResponse {
         abort_unless($week->offering_id === $offering->id, 404);
 
@@ -49,15 +56,20 @@ class TeachCompletionController extends Controller
             'comment' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $assessment = $modules->rate(
+        $payload = $idempotency->remember(
             $request->user(),
-            $week,
-            $student,
-            (int) $data['rating'],
-            $data['comment'] ?? null,
+            'teach.modules.rate:'.$week->id.':'.$student->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->assessmentPayload($modules->rate(
+                $request->user(),
+                $week,
+                $student,
+                (int) $data['rating'],
+                $data['comment'] ?? null,
+            )),
         );
 
-        return response()->json(['data' => $this->assessmentPayload($assessment)]);
+        return response()->json(['data' => $payload]);
     }
 
     /** @return array<string, mixed> */

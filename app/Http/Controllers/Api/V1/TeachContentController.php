@@ -8,13 +8,14 @@ use App\Models\ContentItem;
 use App\Models\CourseOffering;
 use App\Models\Week;
 use App\Services\Offerings\OfferingService;
+use App\Support\Api\IdempotencyStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class TeachContentController extends Controller
 {
-    public function storeWeek(Request $request, CourseOffering $offering, OfferingService $offerings): JsonResponse
+    public function storeWeek(Request $request, CourseOffering $offering, OfferingService $offerings, IdempotencyStore $idempotency): JsonResponse
     {
         $data = $request->validate([
             'number' => 'required|integer|min:1',
@@ -23,12 +24,17 @@ class TeachContentController extends Controller
             'order' => 'nullable|integer|min:1',
         ]);
 
-        $week = $offerings->addWeek($request->user(), $offering, $data);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.weeks.store:'.$offering->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->weekPayload($offerings->addWeek($request->user(), $offering, $data)),
+        );
 
-        return response()->json(['data' => $this->weekPayload($week)], 201);
+        return response()->json(['data' => $payload], 201);
     }
 
-    public function storeItem(Request $request, Week $week, OfferingService $offerings): JsonResponse
+    public function storeItem(Request $request, Week $week, OfferingService $offerings, IdempotencyStore $idempotency): JsonResponse
     {
         $types = implode(',', array_column(ContentItemType::cases(), 'value'));
         $data = $request->validate([
@@ -46,17 +52,22 @@ class TeachContentController extends Controller
             ],
         ]);
 
-        $item = $offerings->addContentItem(
+        $payload = $idempotency->remember(
             $request->user(),
-            $week,
-            $data,
-            $request->file('file'),
+            'teach.items.store:'.$week->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->itemPayload($offerings->addContentItem(
+                $request->user(),
+                $week,
+                $data,
+                $request->file('file'),
+            )),
         );
 
-        return response()->json(['data' => $this->itemPayload($item)], 201);
+        return response()->json(['data' => $payload], 201);
     }
 
-    public function updateItem(Request $request, ContentItem $contentItem, OfferingService $offerings): JsonResponse
+    public function updateItem(Request $request, ContentItem $contentItem, OfferingService $offerings, IdempotencyStore $idempotency): JsonResponse
     {
         $types = implode(',', array_column(ContentItemType::cases(), 'value'));
         $data = $request->validate([
@@ -69,21 +80,35 @@ class TeachContentController extends Controller
             'file' => 'nullable|file|max:20480',
         ]);
 
-        $item = $offerings->updateContentItem(
+        $payload = $idempotency->remember(
             $request->user(),
-            $contentItem,
-            $data,
-            $request->file('file'),
+            'teach.items.update:'.$contentItem->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->itemPayload($offerings->updateContentItem(
+                $request->user(),
+                $contentItem,
+                $data,
+                $request->file('file'),
+            )),
         );
 
-        return response()->json(['data' => $this->itemPayload($item)]);
+        return response()->json(['data' => $payload]);
     }
 
-    public function destroyItem(Request $request, ContentItem $contentItem, OfferingService $offerings): JsonResponse
+    public function destroyItem(Request $request, ContentItem $contentItem, OfferingService $offerings, IdempotencyStore $idempotency): JsonResponse
     {
-        $offerings->deleteContentItem($request->user(), $contentItem);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.items.destroy:'.$contentItem->id,
+            $request->header('Idempotency-Key'),
+            function () use ($offerings, $request, $contentItem) {
+                $offerings->deleteContentItem($request->user(), $contentItem);
 
-        return response()->json(['data' => ['deleted' => true]]);
+                return ['deleted' => true];
+            },
+        );
+
+        return response()->json(['data' => $payload]);
     }
 
     /** @return array<string, mixed> */
