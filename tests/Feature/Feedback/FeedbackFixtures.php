@@ -2,56 +2,27 @@
 
 namespace Tests\Feature\Feedback;
 
-use App\Enums\EnrollmentStatus;
 use App\Enums\FeedbackQuestionKind;
-use App\Enums\OfferingMode;
 use App\Enums\RoleType;
-use App\Models\Course;
 use App\Models\CourseOffering;
-use App\Models\Enrollment;
 use App\Models\FeedbackQuestion;
 use App\Models\FeedbackSurvey;
 use App\Models\User;
 use App\Services\Feedback\FeedbackSurveyService;
 use App\Support\AuthorizeService;
+use Tests\Feature\Api\StudentApiFixtures;
 
 trait FeedbackFixtures
 {
+    use StudentApiFixtures;
+
     protected function forgetAuthz(): void
     {
         app(AuthorizeService::class)->forgetMatrixCache();
     }
 
-    protected function offering(string $code): CourseOffering
-    {
-        $course = Course::query()->create([
-            'code' => $code,
-            'title' => "Course $code",
-            'credit_hours' => 3,
-            'is_standalone' => true,
-            'active' => true,
-        ]);
-
-        return CourseOffering::query()->create([
-            'course_id' => $course->id,
-            'mode' => OfferingMode::SelfPaced,
-            'status' => 'OPEN',
-        ]);
-    }
-
-    protected function enroll(User $student, CourseOffering $offering): Enrollment
-    {
-        return Enrollment::query()->create([
-            'student_id' => $student->id,
-            'offering_id' => $offering->id,
-            'status' => EnrollmentStatus::Enrolled,
-            'enrolled_at' => now(),
-            'progress_percent' => 0,
-        ]);
-    }
-
     /**
-     * @return array{instructor: User, admin: User, student: User, offering: CourseOffering, enrollment: Enrollment}
+     * @return array{instructor: User, admin: User, student: User, offering: \App\Models\CourseOffering, enrollment: \App\Models\Enrollment}
      */
     protected function offeringActors(string $code = 'FB1'): array
     {

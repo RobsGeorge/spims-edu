@@ -9,14 +9,12 @@ use App\Models\FeedbackSubmissionIdentity;
 use App\Services\Feedback\FeedbackSubmissionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Feature\Api\StudentApiFixtures;
 use Tests\TestCase;
 
 class SurveySubmitTest extends TestCase
 {
     use FeedbackFixtures;
     use RefreshDatabase;
-    use StudentApiFixtures;
 
     #[Test]
     public function student_can_submit_once_and_answers_are_stored(): void

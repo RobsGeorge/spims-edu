@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Controller;
 use App\Models\FeedbackAnswer;
 use App\Models\FeedbackQuestion;
 use App\Models\FeedbackSubmission;

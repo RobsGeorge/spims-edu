@@ -10,14 +10,12 @@ use App\Services\Feedback\FeedbackSubmissionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Feature\Api\StudentApiFixtures;
 use Tests\TestCase;
 
 class SurveyAnonymityTest extends TestCase
 {
     use FeedbackFixtures;
     use RefreshDatabase;
-    use StudentApiFixtures;
 
     #[Test]
     public function report_has_no_student_ids_while_identity_row_exists(): void

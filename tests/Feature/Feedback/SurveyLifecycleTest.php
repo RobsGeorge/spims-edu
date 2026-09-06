@@ -7,14 +7,12 @@ use App\Services\Feedback\FeedbackSubmissionService;
 use App\Services\Feedback\FeedbackSurveyService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Feature\Api\StudentApiFixtures;
 use Tests\TestCase;
 
 class SurveyLifecycleTest extends TestCase
 {
     use FeedbackFixtures;
     use RefreshDatabase;
-    use StudentApiFixtures;
 
     #[Test]
     public function draft_surveys_are_not_listed_to_students(): void

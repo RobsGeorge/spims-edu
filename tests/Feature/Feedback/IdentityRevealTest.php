@@ -12,14 +12,12 @@ use App\Services\Feedback\FeedbackReportService;
 use App\Services\Feedback\FeedbackSubmissionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Feature\Api\StudentApiFixtures;
 use Tests\TestCase;
 
 class IdentityRevealTest extends TestCase
 {
     use FeedbackFixtures;
     use RefreshDatabase;
-    use StudentApiFixtures;
 
     #[Test]
     public function super_admin_approve_allows_report_to_include_identity(): void

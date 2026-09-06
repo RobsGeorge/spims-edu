@@ -15,7 +15,6 @@ class StudentWaveESurveysTest extends TestCase
 {
     use FeedbackFixtures;
     use RefreshDatabase;
-    use StudentApiFixtures;
 
     #[Test]
     public function student_can_list_show_and_submit_a_published_survey(): void

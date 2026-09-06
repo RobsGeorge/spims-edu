@@ -8,14 +8,12 @@ use App\Models\User;
 use App\Services\Feedback\FeedbackSurveyService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Feature\Api\StudentApiFixtures;
 use Tests\TestCase;
 
 class SurveyScopeTest extends TestCase
 {
     use FeedbackFixtures;
     use RefreshDatabase;
-    use StudentApiFixtures;
 
     #[Test]
     public function student_b_cannot_read_or_submit_a_survey_for_offering_a(): void
