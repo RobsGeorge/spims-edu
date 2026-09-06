@@ -17,6 +17,8 @@ use App\Http\Controllers\Api\V1\DegreeAuditController;
 use App\Http\Controllers\Api\V1\DiscussionController;
 use App\Http\Controllers\Api\V1\DonationController;
 use App\Http\Controllers\Api\V1\EnrollmentController;
+use App\Http\Controllers\Api\V1\EventCheckInController;
+use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -155,6 +157,14 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
         Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
         Route::get('/wallet', [WalletController::class, 'show'])->name('wallet');
         Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
+
+        // --- S6E events (owned by cursor/s6e-events-bcff) ---
+        Route::get('/events', [EventController::class, 'index'])->name('events.index');
+        Route::get('/events/mine', [EventController::class, 'mine'])->name('events.mine');
+        Route::post('/events/check-in/verify', [EventCheckInController::class, 'verify'])->name('events.check-in.verify');
+        Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+        Route::post('/events/{event}/reserve', [EventController::class, 'reserve'])->name('events.reserve');
+        Route::post('/events/{event}/cancel', [EventController::class, 'cancel'])->name('events.cancel');
 
         Route::prefix('teach')->name('teach.')->middleware('api.instructor')->group(function () {
             Route::get('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'sessions'])->name('offerings.sessions');
