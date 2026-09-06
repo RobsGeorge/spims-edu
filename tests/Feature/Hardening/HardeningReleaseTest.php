@@ -15,11 +15,13 @@ use App\Models\Payment;
 use App\Models\Program;
 use App\Models\User;
 use App\Services\Auth\OtpService;
+use App\Http\Middleware\VerifyCsrfToken;
 use App\Support\ProductionSafeDefaults;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -109,6 +111,16 @@ class HardeningReleaseTest extends TestCase
         $previousEnv = $this->app['env'];
         $previousMock = config('services.payments.mock_auto_complete');
 
+        $student = User::factory()->withRole(RoleType::Student)->create(['country_code' => 'US']);
+        $offering = $this->pricedOffering();
+
+        $this->actingAs($student)->post(route('enrollments.store'), [
+            'offering_id' => $offering->id,
+        ])->assertRedirect();
+
+        $invoice = Invoice::query()->where('student_id', $student->id)->first();
+        $this->assertNotNull($invoice);
+
         try {
             $this->app['env'] = 'production';
             config([
@@ -118,15 +130,8 @@ class HardeningReleaseTest extends TestCase
 
             $this->assertFalse(config('services.payments.mock_auto_complete'));
 
-            $student = User::factory()->withRole(RoleType::Student)->create(['country_code' => 'US']);
-            $offering = $this->pricedOffering();
-
-            $this->actingAs($student)->post(route('enrollments.store'), [
-                'offering_id' => $offering->id,
-            ])->assertRedirect();
-
-            $invoice = Invoice::query()->where('student_id', $student->id)->first();
-            $this->assertNotNull($invoice);
+            // production env re-enables CSRF (VerifyCsrfToken::runningUnitTests is env=testing).
+            $this->withoutMiddleware(VerifyCsrfToken::class);
 
             $this->actingAs($student)->post(route('finance.checkout', $invoice), [
                 'wallet_money' => 0,
@@ -207,27 +212,36 @@ class HardeningReleaseTest extends TestCase
     public function otp_notice_omits_the_digits(): void
     {
         $user = User::factory()->withRole(RoleType::Student)->create();
+        $records = [];
 
-        Log::fake();
+        Event::listen(MessageLogged::class, function (MessageLogged $event) use (&$records): void {
+            $records[] = $event;
+        });
 
         $plain = app(OtpService::class)->issue($user, OtpPurpose::EmailVerification);
 
         $this->assertMatchesRegularExpression('/^\d{6}$/', $plain);
 
-        Log::assertLogged(function ($log) use ($user, $plain) {
-            if (! str_contains($log->message, 'SPIMS OTP issued')) {
-                return false;
-            }
+        $otpLogs = array_values(array_filter(
+            $records,
+            fn (MessageLogged $log) => str_contains($log->message, 'SPIMS OTP issued')
+        ));
 
+        $this->assertNotEmpty($otpLogs);
+
+        foreach ($otpLogs as $log) {
             $this->assertSame('notice', $log->level);
             $this->assertSame($user->id, $log->context['user_id'] ?? null);
             $this->assertSame(OtpPurpose::EmailVerification->value, $log->context['purpose'] ?? null);
             $this->assertArrayNotHasKey('code', $log->context);
             $this->assertStringNotContainsString($plain, $log->message);
-            $this->assertStringNotContainsString($plain, json_encode($log->context));
+            $this->assertStringNotContainsString($plain, json_encode($log->context) ?: '');
+        }
 
-            return true;
-        });
+        foreach ($records as $log) {
+            $this->assertStringNotContainsString($plain, $log->message);
+            $this->assertStringNotContainsString($plain, json_encode($log->context) ?: '');
+        }
     }
 
     #[Test]
