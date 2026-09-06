@@ -71,14 +71,13 @@ class StudentWaveDTest extends TestCase
         ])->assertRedirect();
         $form = ApplicationForm::query()->first();
         $fieldId = $form->fields()->value('id');
-        $token = $this->apiToken($student);
 
-        $this->withToken($token)
+        $this->asApi($student)
             ->getJson(route('api.v1.application-forms.show', $form))
             ->assertOk()
             ->assertJsonPath('data.fields.0.label', 'Motivation');
 
-        $applicationId = $this->withToken($token)
+        $applicationId = $this->asApi($student)
             ->postJson(route('api.v1.applications.store'), [
                 'form_id' => $form->id,
                 'answers' => [$fieldId => 'I want to study'],
@@ -86,7 +85,7 @@ class StudentWaveDTest extends TestCase
             ->assertCreated()
             ->json('data.id');
 
-        $this->withToken($token)
+        $this->asApi($student)
             ->postJson(route('api.v1.applications.submit', $applicationId))
             ->assertOk()
             ->assertJsonPath('data.status', 'UNDER_REVIEW');
@@ -131,16 +130,14 @@ class StudentWaveDTest extends TestCase
             'default_price_usd' => 5000,
             'is_free' => false,
         ]);
-        $token = $this->apiToken($student);
-
-        $this->withToken($token)
+        $this->asApi($student)
             ->postJson(route('api.v1.enrollments.store'), ['offering_id' => $offering->id])
             ->assertCreated();
 
         $invoice = Invoice::query()->where('student_id', $student->id)->first();
         $this->assertSame(InvoiceStatus::Open, $invoice->status);
 
-        $shown = $this->withToken($token)
+        $shown = $this->asApi($student)
             ->getJson(route('api.v1.invoices.show', $invoice))
             ->assertOk()
             ->json('data.total');
@@ -148,12 +145,12 @@ class StudentWaveDTest extends TestCase
         $this->assertSame('USD', $shown['currency']);
         $this->assertArrayHasKey('formatted', $shown);
 
-        $this->withToken($this->apiToken($peer))
+        $this->asApi($peer)
             ->getJson(route('api.v1.invoices.show', $invoice))
             ->assertNotFound()
             ->assertJsonPath('code', 'NOT_FOUND');
 
-        $this->withToken($token)
+        $this->asApi($student)
             ->postJson(route('api.v1.invoices.checkout', $invoice), [
                 'wallet_money' => 0,
                 'wallet_points' => 0,
@@ -162,14 +159,14 @@ class StudentWaveDTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.amount.minor_units', 5000);
 
-        $wallet = $this->withToken($token)
+        $wallet = $this->asApi($student)
             ->getJson(route('api.v1.wallet'))
             ->assertOk()
             ->json('data.balances.usd_money');
         $this->assertArrayHasKey('minor_units', $wallet);
         $this->assertSame('USD', $wallet['currency']);
 
-        $this->withToken($token)
+        $this->asApi($student)
             ->postJson(route('api.v1.donations.store'), [
                 'currency' => Currency::Usd->value,
                 'amount_minor' => 2500,

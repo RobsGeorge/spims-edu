@@ -14,12 +14,23 @@ use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\User;
 use App\Models\Week;
+use Illuminate\Support\Facades\Auth;
 
 trait StudentApiFixtures
 {
     protected function apiToken(User $user, string $role = 'STUDENT'): string
     {
         return $user->createToken('api', ["role:{$role}"])->plainTextToken;
+    }
+
+    /**
+     * Sanctum's guard can keep the previous test user; drop it before a new token.
+     */
+    protected function asApi(User $user, string $role = 'STUDENT')
+    {
+        Auth::forgetGuards();
+
+        return $this->withToken($this->apiToken($user, $role));
     }
 
     protected function student(array $attrs = []): User

@@ -61,11 +61,12 @@ class StudentApiParityTest extends TestCase
             ->assertOk()
             ->json('data');
 
-        $this->assertSame($serviceGrades['running_percent'], $apiGrades['running_percent']);
+        // JSON has no float/int distinction (0.0 encodes as 0).
+        $this->assertEquals($serviceGrades['running_percent'], $apiGrades['running_percent']);
         $this->assertSame($serviceGrades['final_letter'], $apiGrades['final_letter']);
-        $this->assertSame($serviceGrades['final_percent'], $apiGrades['final_percent']);
+        $this->assertEquals($serviceGrades['final_percent'], $apiGrades['final_percent']);
         $this->assertSame($serviceGrades['grade_status'], $apiGrades['grade_status']);
-        $this->assertSame(
+        $this->assertEquals(
             collect($serviceGrades['items'])->map(fn (array $item) => [
                 'kind' => $item['kind'],
                 'title' => $item['title'],
