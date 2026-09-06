@@ -178,6 +178,8 @@ class NavigationHub
             self::link('transcript.show', 'hubs.transcript', 'bi-award', 'hubs.transcript_desc'),
             self::link('settings.edit', 'hubs.settings', 'bi-person-gear', 'hubs.settings_desc'),
             self::link('notifications.index', 'hubs.notifications', 'bi-bell', 'hubs.notifications_desc'),
+            self::link('announcements.index', 'hubs.announcements', 'bi-megaphone', 'hubs.announcements_desc'),
+            self::link('settings.notifications.edit', 'hubs.notification_settings', 'bi-sliders', 'hubs.notification_settings_desc'),
         ]));
     }
 
@@ -199,6 +201,8 @@ class NavigationHub
             self::link('admin.credentials.index', 'hubs.credentials', 'bi-patch-check', 'hubs.credentials_desc'),
             self::link('admin.grading-schemes.index', 'hubs.grading_schemes', 'bi-bar-chart-steps', 'hubs.grading_schemes_desc'),
             self::link('admin.translations.index', 'hubs.translations', 'bi-translate', 'hubs.translations_desc'),
+            self::link('admin.communications.report', 'hubs.communications', 'bi-envelope-paper', 'hubs.communications_desc'),
+            self::link('admin.email-templates.index', 'hubs.email_templates', 'bi-file-earmark-text', 'hubs.email_templates_desc'),
         ]));
     }
 
@@ -216,6 +220,7 @@ class NavigationHub
             self::link('admin.theme.edit', 'hubs.theme', 'bi-palette', 'hubs.theme_desc'),
             self::link('admin.application-forms.index', 'hubs.app_forms', 'bi-ui-checks', 'hubs.app_forms_desc'),
             self::link('admin.applications.index', 'hubs.applications', 'bi-inbox', 'hubs.applications_desc'),
+            self::link('admin.communications.report', 'hubs.communications', 'bi-envelope-paper', 'hubs.communications_desc'),
         ]));
     }
 

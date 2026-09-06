@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
+use App\Services\Communications\AnnouncementService;
 use App\Services\Teach\TeachAccessService;
-use App\Support\AuditLogWriter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -16,7 +16,7 @@ class TeachController extends Controller
 {
     public function __construct(
         private readonly TeachAccessService $teachAccess,
-        private readonly AuditLogWriter $audit,
+        private readonly AnnouncementService $announcements,
     ) {}
 
     public function index(Request $request): View
@@ -50,6 +50,7 @@ class TeachController extends Controller
             'rosterCount' => $roster->count(),
             'announcements' => Announcement::query()
                 ->where('offering_id', $offering->id)
+                ->with('targets')
                 ->orderByDesc('created_at')
                 ->limit(20)
                 ->get(),
@@ -65,19 +66,56 @@ class TeachController extends Controller
         $data = $request->validate([
             'title' => ['required', 'string', 'max:200'],
             'body' => ['required', 'string', 'max:10000'],
+            'is_banner' => ['nullable', 'boolean'],
+            'banner_expires_at' => ['nullable', 'date'],
+            'publish' => ['nullable', 'boolean'],
         ]);
 
-        $this->audit->withAudit($user, 'announcement.create', function () use ($data, $offering, $user) {
-            return Announcement::query()->create([
-                'offering_id' => $offering->id,
-                'author_id' => $user->id,
-                'title' => $data['title'],
-                'body' => $data['body'],
-            ]);
-        }, Announcement::class);
+        $announcement = $this->announcements->draft($user, $offering, $data);
+
+        if ($request->boolean('publish')) {
+            $this->announcements->publish($user, $announcement);
+            $status = __('communications.published');
+        } else {
+            $status = __('communications.draft_saved');
+        }
 
         return redirect()
             ->route('teach.show', ['offering' => $offering, 'tab' => 'announcements'])
-            ->with('status', __('teach.announcement_saved'));
+            ->with('status', $status);
+    }
+
+    public function updateAnnouncement(Request $request, Announcement $announcement): RedirectResponse
+    {
+        $data = $request->validate([
+            'title' => ['required', 'string', 'max:200'],
+            'body' => ['required', 'string', 'max:10000'],
+            'is_banner' => ['nullable', 'boolean'],
+            'banner_expires_at' => ['nullable', 'date'],
+        ]);
+
+        $this->announcements->update($request->user(), $announcement, $data);
+
+        return redirect()
+            ->route('teach.show', ['offering' => $announcement->offering_id, 'tab' => 'announcements'])
+            ->with('status', __('communications.updated'));
+    }
+
+    public function publishAnnouncement(Request $request, Announcement $announcement): RedirectResponse
+    {
+        $this->announcements->publish($request->user(), $announcement);
+
+        return redirect()
+            ->route('teach.show', ['offering' => $announcement->offering_id, 'tab' => 'announcements'])
+            ->with('status', __('communications.published'));
+    }
+
+    public function resendAnnouncement(Request $request, Announcement $announcement): RedirectResponse
+    {
+        $this->announcements->resendEmail($request->user(), $announcement);
+
+        return redirect()
+            ->route('teach.show', ['offering' => $announcement->offering_id, 'tab' => 'announcements'])
+            ->with('status', __('communications.resent'));
     }
 }

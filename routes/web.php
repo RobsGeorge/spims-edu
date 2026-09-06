@@ -18,6 +18,11 @@ use App\Http\Controllers\Admin\SemesterController;
 use App\Http\Controllers\Admin\ThemeEditorController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\CommunicationAdminController;
+use App\Http\Controllers\Admin\EmailTemplateAdminController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\CommunicationOpenController;
+use App\Http\Controllers\NotificationSettingsController;
 use App\Http\Controllers\Api\BrandingController;
 use App\Http\Controllers\Api\PaymentWebhookController;
 use App\Http\Controllers\Api\UploadController;
@@ -68,6 +73,7 @@ Route::post('/api/webhooks/zoom', ZoomWebhookController::class)
     ->middleware('throttle:webhooks')
     ->name('api.webhooks.zoom');
 Route::get('/verify/{token}', CredentialVerifyController::class)->name('credentials.verify');
+Route::get('/communications/open/{log}', CommunicationOpenController::class)->name('communications.open');
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
@@ -105,6 +111,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/teach/{offering}', [TeachController::class, 'show'])->name('teach.show');
     Route::post('/teach/{offering}/announcements', [TeachController::class, 'storeAnnouncement'])
         ->name('teach.announcements.store');
+    Route::put('/teach/announcements/{announcement}', [TeachController::class, 'updateAnnouncement'])
+        ->name('teach.announcements.update');
+    Route::post('/teach/announcements/{announcement}/publish', [TeachController::class, 'publishAnnouncement'])
+        ->name('teach.announcements.publish');
+    Route::post('/teach/announcements/{announcement}/resend', [TeachController::class, 'resendAnnouncement'])
+        ->name('teach.announcements.resend');
+
+    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show'])->name('announcements.show');
+    Route::post('/announcements/{announcement}/dismiss-banner', [AnnouncementController::class, 'dismissBanner'])
+        ->name('announcements.dismiss-banner');
 
     Route::middleware('superadmin')->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/', [SuperAdminController::class, 'index'])->name('index');
@@ -139,6 +156,14 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/settings', [SettingsController::class, 'update'])
         ->middleware('permission:profile.edit_own')
         ->name('settings.update');
+    Route::get('/settings/notifications', [NotificationSettingsController::class, 'edit'])
+        ->name('settings.notifications.edit');
+    Route::put('/settings/notifications', [NotificationSettingsController::class, 'update'])
+        ->name('settings.notifications.update');
+    Route::post('/settings/reminders', [NotificationSettingsController::class, 'storeReminder'])
+        ->name('settings.reminders.store');
+    Route::delete('/settings/reminders/{reminder}', [NotificationSettingsController::class, 'cancelReminder'])
+        ->name('settings.reminders.cancel');
 
     Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::get('/applications/forms/{form}', [ApplicationController::class, 'create'])
@@ -479,5 +504,21 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/credentials/{credential}/regenerate', [CredentialAdminController::class, 'regenerate'])
             ->middleware('permission:credentials.issue')
             ->name('credentials.regenerate');
+
+        Route::get('/communications', [CommunicationAdminController::class, 'index'])
+            ->middleware('permission:communications.report')
+            ->name('communications.report');
+        Route::get('/communications/export', [CommunicationAdminController::class, 'export'])
+            ->middleware('permission:communications.report')
+            ->name('communications.export');
+        Route::get('/email-templates', [EmailTemplateAdminController::class, 'index'])
+            ->middleware('permission:email_templates.manage')
+            ->name('email-templates.index');
+        Route::post('/email-templates', [EmailTemplateAdminController::class, 'store'])
+            ->middleware('permission:email_templates.manage')
+            ->name('email-templates.store');
+        Route::post('/email-templates/preview', [EmailTemplateAdminController::class, 'preview'])
+            ->middleware('permission:email_templates.manage')
+            ->name('email-templates.preview');
     });
 });

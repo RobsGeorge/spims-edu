@@ -66,4 +66,12 @@ return [
     'translations_desc' => 'التحقق من الترجمات.',
     'finance_reports' => 'تقارير المالية',
     'finance_reports_desc' => 'الأرصدة والإيرادات.',
+    'announcements' => 'الإعلانات',
+    'announcements_desc' => 'تحديثات المقررات والأشرطة.',
+    'notification_settings' => 'إعدادات الإشعارات',
+    'notification_settings_desc' => 'القنوات والتفضيلات والتذكيرات.',
+    'communications' => 'سجل الاتصالات',
+    'communications_desc' => 'الرسائل الصادرة والتصفية والتصدير.',
+    'email_templates' => 'قوالب البريد',
+    'email_templates_desc' => 'تحرير ومعاينة قوالب البريد.',
 ];

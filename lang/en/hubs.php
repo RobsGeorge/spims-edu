@@ -66,4 +66,12 @@ return [
     'translations_desc' => 'Verify AI and human translations.',
     'finance_reports' => 'Finance reports',
     'finance_reports_desc' => 'Outstanding balances and revenue.',
+    'announcements' => 'Announcements',
+    'announcements_desc' => 'Course updates and banners.',
+    'notification_settings' => 'Notification settings',
+    'notification_settings_desc' => 'Channels, preferences, and reminders.',
+    'communications' => 'Communications log',
+    'communications_desc' => 'Outbound messages, filters, and export.',
+    'email_templates' => 'Email templates',
+    'email_templates_desc' => 'Edit and preview staff email templates.',
 ];

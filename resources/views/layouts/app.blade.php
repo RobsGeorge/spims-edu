@@ -179,6 +179,7 @@
 
                 <main id="main-content" class="app-content container-fluid py-4" tabindex="-1">
                     @include('partials.flash')
+                    @include('partials.announcement-banner')
                     @yield('content')
                 </main>
             </div>

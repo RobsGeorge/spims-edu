@@ -5,9 +5,11 @@ namespace App\Providers;
 use App\Models\Theme;
 use App\Services\Ai\AiClient;
 use App\Services\Ai\GeminiAiClient;
+use App\Services\Communications\AnnouncementService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use App\Support\ThemeTokens;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,12 +34,23 @@ class AppServiceProvider extends ServiceProvider
             $locale = app()->getLocale();
             $isRtl = $locale === 'ar';
 
+            $activeBanner = null;
+            $user = auth()->user();
+            if ($user && Schema::hasTable('announcement_deliveries')) {
+                try {
+                    $activeBanner = app(AnnouncementService::class)->inboxFor($user, bannersOnly: true)->first();
+                } catch (\Throwable) {
+                    $activeBanner = null;
+                }
+            }
+
             $view->with([
                 'activeTheme' => $activeTheme,
                 'cookieTheme' => $cookieTheme,
                 'themeCssBlock' => ThemeTokens::inlineStyleBlock($activeTheme?->tokens),
                 'isRtl' => $isRtl,
                 'localeDir' => $isRtl ? 'rtl' : 'ltr',
+                'activeBanner' => $activeBanner,
             ]);
         });
     }

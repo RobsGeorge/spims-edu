@@ -48,6 +48,7 @@
                 </div>
                 <div class="col-12">
                     <button class="btn btn-primary">{{ __('ui.save') }}</button>
+                    <a href="{{ route('settings.notifications.edit') }}" class="btn btn-outline-secondary">{{ __('communications.preferences_title') }}</a>
                 </div>
             </div>
         </form>

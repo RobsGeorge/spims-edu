@@ -40,12 +40,44 @@
             @csrf
             <div class="col-md-4"><input name="title" class="form-control" placeholder="{{ __('teach.announcement_title') }}" required></div>
             <div class="col-md-6"><input name="body" class="form-control" placeholder="{{ __('teach.announcement_body') }}" required></div>
-            <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('ui.save') }}</button></div>
+            <div class="col-md-2 d-flex flex-column gap-1">
+                <button class="btn btn-outline-primary w-100" name="publish" value="0">{{ __('communications.save_draft') }}</button>
+                <button class="btn btn-primary w-100" name="publish" value="1">{{ __('communications.publish') }}</button>
+            </div>
+            <div class="col-12">
+                <label class="form-check">
+                    <input type="checkbox" name="is_banner" value="1" class="form-check-input">
+                    <span class="form-check-label">{{ __('communications.is_banner') }}</span>
+                </label>
+            </div>
         </form>
         @forelse($announcements as $announcement)
             <article class="border rounded-3 p-3 mb-2">
-                <h3 class="h6 mb-1">{{ $announcement->title }}</h3>
-                <p class="mb-0 text-muted-theme">{{ $announcement->body }}</p>
+                <div class="d-flex justify-content-between gap-2">
+                    <h3 class="h6 mb-1">{{ $announcement->title }}</h3>
+                    <x-status-badge :status="$announcement->status->value" :label="__('communications.status_'.strtolower($announcement->status->value))" />
+                </div>
+                <p class="mb-2 text-muted-theme">{{ $announcement->body }}</p>
+                <form method="POST" action="{{ route('teach.announcements.update', $announcement) }}" class="row g-2 mb-2">
+                    @csrf
+                    @method('PUT')
+                    <div class="col-md-4"><input name="title" class="form-control form-control-sm" value="{{ $announcement->title }}" required></div>
+                    <div class="col-md-6"><input name="body" class="form-control form-control-sm" value="{{ $announcement->body }}" required></div>
+                    <div class="col-md-2"><button class="btn btn-sm btn-outline-secondary w-100">{{ __('communications.edit') }}</button></div>
+                </form>
+                <div class="d-flex gap-2">
+                    @if($announcement->status->value === 'DRAFT')
+                        <form method="POST" action="{{ route('teach.announcements.publish', $announcement) }}">
+                            @csrf
+                            <button class="btn btn-sm btn-primary">{{ __('communications.publish') }}</button>
+                        </form>
+                    @else
+                        <form method="POST" action="{{ route('teach.announcements.resend', $announcement) }}">
+                            @csrf
+                            <button class="btn btn-sm btn-outline-primary">{{ __('communications.resend_email') }}</button>
+                        </form>
+                    @endif
+                </div>
             </article>
         @empty
             <x-empty-state :title="__('teach.no_announcements')" icon="bi-megaphone" />
