@@ -87,7 +87,8 @@ class NavigationHub
                 'active' => request()->routeIs('hubs.learning')
                     || request()->routeIs('courses.*')
                     || request()->routeIs('grades.*')
-                    || request()->routeIs('enrollments.*'),
+                    || request()->routeIs('enrollments.*')
+                    || request()->routeIs('attendance.*'),
             ],
         ];
 
@@ -174,6 +175,7 @@ class NavigationHub
             self::link('applications.index', 'hubs.my_applications', 'bi-file-earmark-text', 'hubs.my_applications_desc'),
             self::link('enrollments.index', 'hubs.enrollments', 'bi-person-check', 'hubs.enrollments_desc'),
             self::link('live.index', 'hubs.live', 'bi-camera-video', 'hubs.live_desc'),
+            self::link('attendance.index', 'hubs.attendance', 'bi-calendar-check', 'hubs.attendance_desc'),
             self::link('finance.index', 'hubs.finance', 'bi-wallet2', 'hubs.finance_desc'),
             self::link('transcript.show', 'hubs.transcript', 'bi-award', 'hubs.transcript_desc'),
             self::link('settings.edit', 'hubs.settings', 'bi-person-gear', 'hubs.settings_desc'),
@@ -199,6 +201,7 @@ class NavigationHub
             self::link('admin.credentials.index', 'hubs.credentials', 'bi-patch-check', 'hubs.credentials_desc'),
             self::link('admin.grading-schemes.index', 'hubs.grading_schemes', 'bi-bar-chart-steps', 'hubs.grading_schemes_desc'),
             self::link('admin.translations.index', 'hubs.translations', 'bi-translate', 'hubs.translations_desc'),
+            self::link('admin.attendance.policy', 'hubs.attendance_admin', 'bi-clipboard-check', 'hubs.attendance_admin_desc'),
         ]));
     }
 

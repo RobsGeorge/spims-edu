@@ -25,6 +25,10 @@
                     <input id="set-phone" name="phone" class="form-control" value="{{ old('phone', $user->phone) }}">
                 </div>
                 <div class="col-md-6">
+                    <label class="form-label" for="set-dob">{{ __('attendance.date_of_birth') }}</label>
+                    <input id="set-dob" type="date" name="date_of_birth" class="form-control" value="{{ old('date_of_birth', $user->date_of_birth?->toDateString()) }}">
+                </div>
+                <div class="col-md-6">
                     <label class="form-label" for="set-locale">{{ __('learning.preferred_locale') }}</label>
                     <select id="set-locale" name="preferred_locale" class="form-select">
                         @foreach(['ar' => 'العربية', 'en' => 'English', 'fr' => 'Français'] as $code => $label)
