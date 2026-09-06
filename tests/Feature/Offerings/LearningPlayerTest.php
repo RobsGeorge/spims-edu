@@ -15,7 +15,6 @@ use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\EnrollmentItemCompletion;
-use App\Models\EnrollmentWeekCompletion;
 use App\Models\User;
 use App\Models\Week;
 use App\Services\Assessment\AssignmentService;
