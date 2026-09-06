@@ -48,6 +48,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\Events\StudentEventController;
 use App\Http\Controllers\ExamAttemptController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FoundationDemoController;
@@ -374,6 +375,22 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/live/{session}/join', [LiveSessionController::class, 'join'])
         ->middleware('permission:live.join')
         ->name('live.join');
+
+    Route::get('/events', [StudentEventController::class, 'index'])
+        ->middleware('permission:events.view')
+        ->name('events.index');
+    Route::get('/events/mine', [StudentEventController::class, 'mine'])
+        ->middleware('permission:events.view')
+        ->name('events.mine');
+    Route::get('/events/{event}', [StudentEventController::class, 'show'])
+        ->middleware('permission:events.view')
+        ->name('events.show');
+    Route::post('/events/{event}/reserve', [StudentEventController::class, 'reserve'])
+        ->middleware('permission:events.reserve')
+        ->name('events.reserve');
+    Route::post('/events/{event}/cancel', [StudentEventController::class, 'cancel'])
+        ->middleware('permission:events.reserve')
+        ->name('events.cancel');
 
     Route::get('/offerings/{offering}/discussions', [DiscussionController::class, 'showBoard'])->name('discussions.board');
     Route::post('/offerings/{offering}/discussions/threads', [DiscussionController::class, 'storeThread'])

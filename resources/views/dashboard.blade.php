@@ -137,6 +137,12 @@
             </a>
         </div>
         <div class="col-md-6 col-lg-4">
+            <a href="{{ route('events.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
+                <h3><i class="bi bi-calendar-event" aria-hidden="true"></i> {{ __('events.hub') }}</h3>
+                <p class="text-muted-theme mb-0">{{ __('events.hub_desc') }}</p>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-4">
             <a href="{{ route('settings.edit') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                 <h3><i class="bi bi-person-gear" aria-hidden="true"></i> {{ __('learning.settings') }}</h3>
                 <p class="text-muted-theme mb-0">{{ __('hubs.settings_desc') }}</p>
