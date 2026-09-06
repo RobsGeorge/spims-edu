@@ -19,7 +19,7 @@ class ConditionalGet
         $etag = hash('sha256', json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         $incoming = $this->incomingMatch($request);
         if ($incoming !== '' && hash_equals($etag, $incoming)) {
-            return response()->noContent(304)->setEtag($etag);
+            return (new JsonResponse(null, 304))->setEtag($etag);
         }
 
         return response()->json($body, $status)->setEtag($etag);
