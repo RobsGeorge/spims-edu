@@ -47,6 +47,8 @@ return [
     'credentials_desc' => 'إصدار الشهادات والسجلات.',
     'users' => 'المستخدمون',
     'users_desc' => 'إنشاء الحسابات وتعيين الأدوار.',
+    'enrollment_admin' => 'استثناءات التسجيل',
+    'enrollment_admin_desc' => 'الحجز المالي والتسجيل بتجاوز وقوائم الانتظار.',
     'theme' => 'السمة',
     'theme_desc' => 'العلامة ورموز Sacred Academic.',
     'app_forms' => 'نماذج التقديم',

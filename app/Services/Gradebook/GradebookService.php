@@ -307,6 +307,8 @@ class GradebookService
             ->where('letter', $enrollment->final_letter)
             ->first();
 
+        $isPassing = (bool) ($band?->is_passing ?? (($enrollment->final_percent ?? 0) >= 60));
+
         $record = AcademicRecord::query()->updateOrCreate(
             ['enrollment_id' => $enrollment->id],
             [
@@ -317,10 +319,15 @@ class GradebookService
                 'gpa_points' => $enrollment->final_gpa_points ?? 0,
                 'credit_hours' => $course->credit_hours,
                 'term' => $term,
-                'is_passing' => (bool) ($band?->is_passing ?? (($enrollment->final_percent ?? 0) >= 60)),
+                'is_passing' => $isPassing,
                 'completed_at' => now(),
             ]
         );
+
+        if ($isPassing && $enrollment->status === EnrollmentStatus::Enrolled) {
+            $enrollment->status = EnrollmentStatus::Completed;
+            $enrollment->save();
+        }
 
         // Cross-program reuse: apply one passed record to every active program that lists this course.
         $programs = StudentProgram::query()

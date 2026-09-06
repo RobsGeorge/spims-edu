@@ -32,7 +32,7 @@ class EnrollmentService
         private readonly PaymentService $payments,
     ) {}
 
-    public function register(User $student, CourseOffering $offering, ?string $studentProgramId = null, bool $adminOverride = false, ?User $actor = null): Enrollment
+    public function register(User $student, CourseOffering $offering, ?string $studentProgramId = null, bool $adminOverride = false, ?User $actor = null, bool $isAudit = false): Enrollment
     {
         $actor = $actor ?? $student;
 
@@ -43,7 +43,7 @@ class EnrollmentService
             $this->assertCanRegister($student, $offering, $studentProgramId);
         }
 
-        return DB::transaction(function () use ($student, $offering, $studentProgramId, $adminOverride, $actor) {
+        return DB::transaction(function () use ($student, $offering, $studentProgramId, $adminOverride, $actor, $isAudit) {
             $enrolledCount = Enrollment::query()
                 ->where('offering_id', $offering->id)
                 ->where('status', EnrollmentStatus::Enrolled)
@@ -64,7 +64,8 @@ class EnrollmentService
                     'status' => $status,
                     'enrolled_at' => now(),
                     'dropped_at' => null,
-                    'grade_type' => GradeType::InProgress,
+                    'is_audit' => $isAudit,
+                    'grade_type' => $isAudit ? GradeType::Audit : GradeType::InProgress,
                 ]
             );
 
@@ -140,9 +141,10 @@ class EnrollmentService
         $active = Enrollment::query()
             ->where('student_id', $student->id)
             ->where('student_program_id', $studentProgram->id)
-            ->where('status', EnrollmentStatus::Enrolled)
-            ->with('offering.course')
-            ->get();
+            ->whereIn('status', [EnrollmentStatus::Enrolled, EnrollmentStatus::Waitlisted])
+            ->with(['offering.course', 'offering.semester'])
+            ->get()
+            ->filter(fn (Enrollment $enrollment) => $this->countsTowardTermCap($enrollment, $offering));
 
         $credits = $active->sum(fn (Enrollment $e) => $e->offering->course->credit_hours);
         if ($credits + $offering->course->credit_hours > $program->max_credits_per_semester) {
@@ -259,10 +261,7 @@ class EnrollmentService
 
     public function hasFinancialHold(User $student): bool
     {
-        $setting = Setting::query()->find('enrollment.financial_holds');
-        $holds = $setting?->value['user_ids'] ?? [];
-
-        if (in_array($student->id, $holds, true)) {
+        if ($this->hasManualFinancialHold($student)) {
             return true;
         }
 
@@ -270,6 +269,14 @@ class EnrollmentService
             ->where('student_id', $student->id)
             ->whereIn('status', [InvoiceStatus::Open, InvoiceStatus::Partial])
             ->exists();
+    }
+
+    public function hasManualFinancialHold(User $student): bool
+    {
+        $setting = Setting::query()->find('enrollment.financial_holds');
+        $holds = $setting?->value['user_ids'] ?? [];
+
+        return in_array($student->id, $holds, true);
     }
 
     /**
@@ -360,6 +367,52 @@ class EnrollmentService
         $setting->save();
 
         $this->audit->write($actor, 'enrollment.financial_hold', 'User', $student->id, null, ['held' => $held]);
+    }
+
+    /**
+     * Credit/course caps are per target term. Waitlisted rows count because they
+     * hold a term slot and take a seat on promote. Self-paced offerings without
+     * a semester count against the current term only when dates overlap.
+     */
+    private function countsTowardTermCap(Enrollment $enrollment, CourseOffering $target): bool
+    {
+        $existing = $enrollment->offering;
+        if ($existing === null) {
+            return false;
+        }
+
+        if ($target->semester_id && $existing->semester_id) {
+            return $existing->semester_id === $target->semester_id;
+        }
+
+        return $this->offeringWindowsOverlap($existing, $target);
+    }
+
+    private function offeringWindowsOverlap(CourseOffering $a, CourseOffering $b): bool
+    {
+        [$aStart, $aEnd] = $this->offeringWindow($a);
+        [$bStart, $bEnd] = $this->offeringWindow($b);
+
+        $now = now();
+        $aStart ??= $now;
+        $aEnd ??= $now;
+        $bStart ??= $now;
+        $bEnd ??= $now;
+
+        return $aStart->lte($bEnd) && $bStart->lte($aEnd);
+    }
+
+    /**
+     * @return array{0: \Illuminate\Support\Carbon|null, 1: \Illuminate\Support\Carbon|null}
+     */
+    private function offeringWindow(CourseOffering $offering): array
+    {
+        $offering->loadMissing('semester');
+
+        return [
+            $offering->start_date ?? $offering->semester?->start_date,
+            $offering->end_date ?? $offering->semester?->end_date,
+        ];
     }
 
     private function currentSemesterWeek(CourseOffering $offering): int

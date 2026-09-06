@@ -47,6 +47,8 @@ return [
     'credentials_desc' => 'Issue certificates and transcripts.',
     'users' => 'Users',
     'users_desc' => 'Create accounts and assign roles.',
+    'enrollment_admin' => 'Enrollment exceptions',
+    'enrollment_admin_desc' => 'Financial holds, override-register, and waitlists.',
     'theme' => 'Theme',
     'theme_desc' => 'Branding and Sacred Academic tokens.',
     'app_forms' => 'Application forms',

@@ -6,6 +6,9 @@
     :subtitle="$offering->mode->value.' · '.$offering->status->value"
 >
     <x-slot:actions>
+        @if($canViewWaitlist)
+            <a href="{{ route('admin.enrollments.waitlist', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('enrollment.waitlist') }}</a>
+        @endif
         <a href="{{ route('offerings.preview', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('offerings.public_preview') }}</a>
         <a href="{{ route('teach.show', $offering) }}" class="btn btn-outline-primary btn-sm">{{ __('teach.workspace') }}</a>
     </x-slot:actions>
