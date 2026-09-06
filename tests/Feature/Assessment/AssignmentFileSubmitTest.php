@@ -100,7 +100,9 @@ class AssignmentFileSubmitTest extends TestCase
         config(['filesystems.default' => 'local']);
 
         ['student' => $student, 'assignment' => $assignment] = $this->bundle();
-        $file = UploadedFile::fake()->create('essay.pdf', 20, 'application/pdf');
+        $file = UploadedFile::fake()
+            ->createWithContent('essay.pdf', "%PDF-1.4\n%assignment-upload\n")
+            ->mimeType('application/pdf');
 
         $this->actingAs($student)
             ->post(route('assignments.submit', $assignment), [
