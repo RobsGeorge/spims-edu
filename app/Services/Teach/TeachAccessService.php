@@ -3,9 +3,12 @@
 namespace App\Services\Teach;
 
 use App\Enums\RoleType;
+use App\Exceptions\AuthorizationException;
 use App\Models\CourseOffering;
+use App\Models\DiscussionThread;
 use App\Models\OfferingStaff;
 use App\Models\User;
+use App\Support\AuthorizeService;
 use Illuminate\Support\Collection;
 
 class TeachAccessService
@@ -53,6 +56,21 @@ class TeachAccessService
         $isStaff = $offering->staff()->where('user_id', $user->id)->exists();
         if (! $isStaff) {
             abort(403);
+        }
+    }
+
+    public function canGradeDiscussions(?User $user, CourseOffering|DiscussionThread $resource): bool
+    {
+        if ($user === null || ! $this->canTeach($user)) {
+            return false;
+        }
+
+        try {
+            app(AuthorizeService::class)->authorize($user, 'discussions.grade', $resource);
+
+            return true;
+        } catch (AuthorizationException) {
+            return false;
         }
     }
 }

@@ -75,6 +75,7 @@ use App\Http\Controllers\Teach\AssessmentController as TeachAssessmentController
 use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController;
 use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController;
 use App\Http\Controllers\Teach\CompletionController as TeachCompletionController;
+use App\Http\Controllers\Teach\DiscussionController as TeachDiscussionController;
 use App\Http\Controllers\Teach\LiveQuizController as TeachLiveQuizController;
 use App\Http\Controllers\Teach\LiveSessionController as TeachLiveSessionController;
 use App\Http\Controllers\Teach\ProjectController as TeachProjectController;
@@ -197,6 +198,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/teach/{offering}/assignments/{assignment}/remind', [TeachAssignmentController::class, 'remind'])->name('teach.assignments.remind');
     Route::post('/teach/{offering}/assignments/{assignment}/mark-received', [TeachAssignmentController::class, 'markReceived'])->name('teach.assignments.mark-received');
     Route::post('/teach/{offering}/assignments/{assignment}/bulk-grade', [TeachAssignmentController::class, 'bulkGradeOffline'])->name('teach.assignments.bulk-grade');
+
+    Route::get('/teach/{offering}/discussions', [TeachDiscussionController::class, 'index'])
+        ->name('teach.discussions.index');
+    Route::post('/teach/{offering}/discussions/threads/{thread}/grade', [TeachDiscussionController::class, 'grade'])
+        ->name('teach.discussions.grade');
 
     Route::get('/teach/{offering}/surveys', [TeachSurveyController::class, 'index'])
         ->middleware('permission:feedback.manage')

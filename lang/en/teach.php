@@ -25,7 +25,7 @@ return array (
   'tab_gradebook_help' => 'Enter scores, lock, or reopen grades.',
   'tab_live_help' => 'Schedule Zoom sessions and attendance.',
   'tab_attendance_help' => 'Class sessions, roster marks, reports, and exports.',
-  'tab_discussions_help' => 'Moderate boards and participation.',
+  'tab_discussions_help' => 'Moderate boards, participation, and thread grades.',
   'tab_announcements_help' => 'Post updates visible in the course player.',
   'create_assessment' => 'Create assessment',
   'open_banks' => 'Question banks',
@@ -105,4 +105,7 @@ return array (
   'open_attempts' => 'Attempts & grading',
   'no_assessments' => 'No assessments yet',
   'attempts_count' => ':count attempts',
+  'open_discussion_grades' => 'Grade threads',
+  'discussions_workspace' => 'Discussion grades',
+  'discussions_workspace_sub' => 'Score enrolled students on discussion threads.',
 );

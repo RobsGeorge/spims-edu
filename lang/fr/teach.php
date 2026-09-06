@@ -25,7 +25,7 @@ return array (
   'tab_gradebook_help' => 'Saisir, verrouiller ou rouvrir les notes.',
   'tab_live_help' => 'Planifier Zoom et la présence.',
   'tab_attendance_help' => 'Séances, marques, rapports et exports.',
-  'tab_discussions_help' => 'Modérer les forums.',
+  'tab_discussions_help' => 'Modérer les forums et noter les fils.',
   'tab_announcements_help' => 'Publier des mises à jour visibles dans le lecteur.',
   'create_assessment' => 'Créer une évaluation',
   'open_banks' => 'Banques de questions',
@@ -105,4 +105,7 @@ return array (
   'open_attempts' => 'Tentatives et notation',
   'no_assessments' => 'Aucune évaluation pour le moment',
   'attempts_count' => ':count tentatives',
+  'open_discussion_grades' => 'Noter les fils',
+  'discussions_workspace' => 'Notes de discussion',
+  'discussions_workspace_sub' => 'Noter les étudiants inscrits sur les fils de discussion.',
 );

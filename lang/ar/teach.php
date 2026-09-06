@@ -25,7 +25,7 @@ return array (
   'tab_gradebook_help' => 'إدخال الدرجات وقفلها أو إعادة فتحها.',
   'tab_live_help' => 'جدولة جلسات زوم والحضور.',
   'tab_attendance_help' => 'جلسات الصف وعلامات القائمة والتقارير والتصدير.',
-  'tab_discussions_help' => 'إدارة اللوحات والمشاركة.',
+  'tab_discussions_help' => 'إدارة اللوحات والمشاركة ودرجات المواضيع.',
   'tab_announcements_help' => 'نشر تحديثات تظهر في مشغّل المقرر.',
   'create_assessment' => 'إنشاء تقييم',
   'open_banks' => 'بنوك الأسئلة',
@@ -105,4 +105,7 @@ return array (
   'open_attempts' => 'المحاولات والتصحيح',
   'no_assessments' => 'لا توجد تقييمات بعد',
   'attempts_count' => ':count محاولات',
+  'open_discussion_grades' => 'تصحيح المواضيع',
+  'discussions_workspace' => 'درجات النقاش',
+  'discussions_workspace_sub' => 'تصحيح الطلاب المسجّلين في مواضيع النقاش.',
 );
