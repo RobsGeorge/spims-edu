@@ -493,6 +493,12 @@ html[dir='rtl'] .spims-landing-brand {
     justify-content: center;
 }
 
+.spims-landing-actions .btn-outline-secondary,
+.app-nav .btn-outline-secondary {
+    border-radius: var(--radius-full) !important;
+    color: var(--color-text) !important;
+}
+
 .spims-demo {
     max-width: 56rem;
     margin-inline: auto;
