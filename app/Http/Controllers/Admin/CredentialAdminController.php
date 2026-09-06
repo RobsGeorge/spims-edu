@@ -51,6 +51,12 @@ class CredentialAdminController extends Controller
                 CourseOffering::query()->findOrFail($data['offering_id']),
                 $language
             ),
+            CredentialType::OfferingCompletion => $credentials->issueOfferingCompletion(
+                $request->user(),
+                $student,
+                CourseOffering::query()->findOrFail($data['offering_id']),
+                $language
+            ),
         };
 
         return back()->with('status', __('credentials.issued', ['serial' => $credential->serial]));

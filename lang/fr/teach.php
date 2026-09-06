@@ -17,6 +17,7 @@ return array (
   'tab_discussions' => 'Discussions',
   'tab_announcements' => 'Annonces',
   'tab_roster' => 'Liste',
+  'tab_completion' => 'Achèvement',
   'tab_content_help' => 'Semaines et éléments d’apprentissage.',
   'tab_assessments_help' => 'Créer des quiz et gérer les banques.',
   'tab_gradebook_help' => 'Saisir, verrouiller ou rouvrir les notes.',

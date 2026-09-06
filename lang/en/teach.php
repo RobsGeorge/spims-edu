@@ -17,6 +17,7 @@ return array (
   'tab_discussions' => 'Discussions',
   'tab_announcements' => 'Announcements',
   'tab_roster' => 'Roster',
+  'tab_completion' => 'Completion',
   'tab_content_help' => 'Weeks and learning items for this offering.',
   'tab_assessments_help' => 'Build quizzes and manage question banks.',
   'tab_gradebook_help' => 'Enter scores, lock, or reopen grades.',

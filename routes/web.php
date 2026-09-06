@@ -5,9 +5,12 @@ use App\Http\Controllers\Admin\ApplicationReviewController;
 use App\Http\Controllers\Admin\AssessmentAdminController;
 use App\Http\Controllers\Admin\AssessmentTemplateController;
 use App\Http\Controllers\Admin\AttendanceAdminController;
+use App\Http\Controllers\Admin\CertificateTemplateController;
 use App\Http\Controllers\Admin\CommunicationAdminController;
+use App\Http\Controllers\Admin\CompletionCriteriaController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\CredentialAdminController;
+use App\Http\Controllers\Admin\OfferingClosingController;
 use App\Http\Controllers\Admin\DiscussionAdminController;
 use App\Http\Controllers\Admin\EmailTemplateAdminController;
 use App\Http\Controllers\Admin\EnrollmentAdminController;
@@ -37,6 +40,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CommunicationOpenController;
 use App\Http\Controllers\CoursePlayerController;
+use App\Http\Controllers\CredentialDownloadController;
 use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
@@ -60,6 +64,7 @@ use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController;
+use App\Http\Controllers\Teach\CompletionController as TeachCompletionController;
 use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
@@ -125,6 +130,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show'])->name('announcements.show');
     Route::post('/announcements/{announcement}/dismiss-banner', [AnnouncementController::class, 'dismissBanner'])
         ->name('announcements.dismiss-banner');
+
+    Route::get('/teach/{offering}/completion', [TeachCompletionController::class, 'show'])->name('teach.completion.show');
+    Route::post('/teach/{offering}/students/{student}/notes', [TeachCompletionController::class, 'storeNote'])->name('teach.completion.notes.store');
+    Route::post('/teach/{offering}/weeks/{week}/students/{student}/assessment', [TeachCompletionController::class, 'rate'])->name('teach.completion.assess');
 
     Route::get('/teach/{offering}/attendance', [TeachAttendanceController::class, 'index'])->name('teach.attendance.index');
     Route::post('/teach/{offering}/attendance/sessions', [TeachAttendanceController::class, 'store'])->name('teach.attendance.store');
@@ -274,6 +283,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transcript', TranscriptController::class)
         ->middleware('permission:transcript.view')
         ->name('transcript.show');
+
+    Route::get('/credentials/{credential}/download', CredentialDownloadController::class)
+        ->name('credentials.download');
 
     Route::post('/foundation/demo', [FoundationDemoController::class, 'mutate'])
         ->middleware('permission:foundation.demo')
@@ -540,6 +552,45 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/credentials/{credential}/regenerate', [CredentialAdminController::class, 'regenerate'])
             ->middleware('permission:credentials.issue')
             ->name('credentials.regenerate');
+
+        Route::get('/courses/{course}/completion-criteria', [CompletionCriteriaController::class, 'index'])
+            ->middleware('permission:completion.configure')
+            ->name('completion-criteria.index');
+        Route::post('/courses/{course}/completion-criteria', [CompletionCriteriaController::class, 'store'])
+            ->middleware('permission:completion.configure')
+            ->name('completion-criteria.store');
+        Route::delete('/completion-criteria/{criterion}', [CompletionCriteriaController::class, 'destroy'])
+            ->middleware('permission:completion.configure')
+            ->name('completion-criteria.destroy');
+
+        Route::get('/offerings/{offering}/closing', [OfferingClosingController::class, 'show'])
+            ->middleware('permission:offering.close')
+            ->name('offering-closing.show');
+        Route::post('/offerings/{offering}/closing/evaluate', [OfferingClosingController::class, 'evaluate'])
+            ->middleware('permission:completion.configure')
+            ->name('offering-closing.evaluate');
+        Route::post('/offerings/{offering}/closing/lock', [OfferingClosingController::class, 'lock'])
+            ->middleware('permission:offering.close')
+            ->name('offering-closing.lock');
+        Route::post('/offerings/{offering}/closing/grace', [OfferingClosingController::class, 'graceMarks'])
+            ->middleware('permission:offering.close')
+            ->name('offering-closing.grace');
+        Route::post('/offerings/{offering}/closing/announce', [OfferingClosingController::class, 'announce'])
+            ->middleware('permission:offering.close')
+            ->name('offering-closing.announce');
+        Route::post('/offerings/{offering}/closing/close', [OfferingClosingController::class, 'close'])
+            ->middleware('permission:offering.close')
+            ->name('offering-closing.close');
+
+        Route::get('/certificate-templates', [CertificateTemplateController::class, 'index'])
+            ->middleware('permission:certificate_templates.manage')
+            ->name('certificate-templates.index');
+        Route::post('/certificate-templates', [CertificateTemplateController::class, 'store'])
+            ->middleware('permission:certificate_templates.manage')
+            ->name('certificate-templates.store');
+        Route::get('/certificate-templates/preview', [CertificateTemplateController::class, 'preview'])
+            ->middleware('permission:certificate_templates.manage')
+            ->name('certificate-templates.preview');
 
         Route::get('/communications', [CommunicationAdminController::class, 'index'])
             ->middleware('permission:communications.report')

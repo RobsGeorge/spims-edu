@@ -17,6 +17,7 @@ return array (
   'tab_discussions' => 'المناقشات',
   'tab_announcements' => 'الإعلانات',
   'tab_roster' => 'القائمة',
+  'tab_completion' => 'الإكمال',
   'tab_content_help' => 'الأسابيع وعناصر التعلم لهذا المقرر.',
   'tab_assessments_help' => 'إنشاء الاختبارات وإدارة بنوك الأسئلة.',
   'tab_gradebook_help' => 'إدخال الدرجات وقفلها أو إعادة فتحها.',

@@ -78,4 +78,8 @@ return [
     'communications_desc' => 'Messages sortants, filtres et export.',
     'email_templates' => 'Modèles d’e-mail',
     'email_templates_desc' => 'Modifier et prévisualiser les modèles.',
+    'certificate_templates' => 'Modèles de certificat',
+    'certificate_templates_desc' => 'Mises en page globales et par cours.',
+    'completion' => 'Achèvement',
+    'completion_desc' => 'Critères, clôture et résultats de cohorte.',
 ];

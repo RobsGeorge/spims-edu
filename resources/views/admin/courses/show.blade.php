@@ -3,6 +3,7 @@
 @section('content')
 <h1 class="spims-title">{{ $course->code }} — {{ $course->title }}</h1>
 <p class="text-muted-theme">{{ __('academics.credits') }}: {{ $course->credit_hours }} · {{ __('academics.interest') }}: {{ $course->interestFlags->count() }}</p>
+<p><a href="{{ route('admin.completion-criteria.index', $course) }}">{{ __('completion.criteria_title') }}</a></p>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
 <div class="card border-0 shadow-sm mb-4">

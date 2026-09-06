@@ -13,6 +13,7 @@
                 <option value="TRANSCRIPT">TRANSCRIPT</option>
                 <option value="PROGRAM_CERTIFICATE">PROGRAM_CERTIFICATE</option>
                 <option value="STANDALONE_CERTIFICATE">STANDALONE_CERTIFICATE</option>
+                <option value="OFFERING_COMPLETION">OFFERING_COMPLETION</option>
             </select>
         </div>
         <div class="col-md-2"><input name="program_id" class="form-control" placeholder="program ULID"></div>
@@ -35,6 +36,7 @@
             <td>{{ $c->type->value }}</td>
             <td class="d-flex gap-1">
                 <a class="btn btn-sm btn-outline-secondary" href="{{ $c->verifyUrl() }}">QR</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{{ route('credentials.download', $c) }}">{{ __('credentials.download') }}</a>
                 @if(!$c->revoked_at)
                 <form method="POST" action="{{ route('admin.credentials.regenerate', $c) }}">@csrf
                     <button class="btn btn-sm btn-outline-primary">{{ __('credentials.regenerate') }}</button>
