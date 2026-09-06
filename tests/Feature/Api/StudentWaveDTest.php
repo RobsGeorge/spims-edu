@@ -9,8 +9,11 @@ use App\Enums\ProgramType;
 use App\Enums\RoleType;
 use App\Models\Application;
 use App\Models\ApplicationForm;
+use App\Models\AuditLog;
+use App\Models\Donation;
 use App\Models\GradingScheme;
 use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\Program;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -86,11 +89,21 @@ class StudentWaveDTest extends TestCase
             ->json('data.id');
 
         $this->asApi($student)
-            ->postJson(route('api.v1.applications.submit', $applicationId))
+            ->postJson(route('api.v1.applications.submit', $applicationId), [], [
+                'Idempotency-Key' => 'apply-1',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'UNDER_REVIEW');
+
+        $this->asApi($student)
+            ->postJson(route('api.v1.applications.submit', $applicationId), [], [
+                'Idempotency-Key' => 'apply-1',
+            ])
             ->assertOk()
             ->assertJsonPath('data.status', 'UNDER_REVIEW');
 
         $this->assertSame('UNDER_REVIEW', Application::query()->find($applicationId)->status->value);
+        $this->assertSame(1, AuditLog::query()->where('action', 'admissions.submit')->count());
     }
 
     #[Test]
@@ -155,9 +168,22 @@ class StudentWaveDTest extends TestCase
                 'wallet_money' => 0,
                 'wallet_points' => 0,
                 'gateway' => 'PAYPAL',
-            ])
+            ], ['Idempotency-Key' => 'pay-1'])
             ->assertOk()
             ->assertJsonPath('data.amount.minor_units', 5000);
+
+        $replay = $this->asApi($student)
+            ->postJson(route('api.v1.invoices.checkout', $invoice), [
+                'wallet_money' => 0,
+                'wallet_points' => 0,
+                'gateway' => 'PAYPAL',
+            ], ['Idempotency-Key' => 'pay-1'])
+            ->assertOk();
+        $this->assertSame(
+            Payment::query()->where('invoice_id', $invoice->id)->value('id'),
+            $replay->json('data.id')
+        );
+        $this->assertSame(1, Payment::query()->where('invoice_id', $invoice->id)->count());
 
         $wallet = $this->asApi($student)
             ->getJson(route('api.v1.wallet'))
@@ -171,10 +197,20 @@ class StudentWaveDTest extends TestCase
                 'currency' => Currency::Usd->value,
                 'amount_minor' => 2500,
                 'designation' => 'Chapel',
-            ])
+            ], ['Idempotency-Key' => 'donate-1'])
             ->assertCreated()
             ->assertJsonPath('data.amount.minor_units', 2500)
             ->assertJsonPath('data.amount.currency', 'USD');
+
+        $this->asApi($student)
+            ->postJson(route('api.v1.donations.store'), [
+                'currency' => Currency::Usd->value,
+                'amount_minor' => 2500,
+                'designation' => 'Chapel',
+            ], ['Idempotency-Key' => 'donate-1'])
+            ->assertCreated();
+
+        $this->assertSame(1, Donation::query()->where('user_id', $student->id)->count());
     }
 
     #[Test]

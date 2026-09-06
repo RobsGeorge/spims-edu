@@ -7,6 +7,7 @@ use App\Enums\AttemptStatus;
 use App\Enums\OfferingMode;
 use App\Enums\QuestionType;
 use App\Enums\RoleType;
+use App\Models\Assessment;
 use App\Models\AssignmentSubmission;
 use App\Models\AuditLog;
 use App\Models\DiscussionBoard;
@@ -50,6 +51,44 @@ class StudentWaveCTest extends TestCase
         $this->assertSame(1, AssignmentSubmission::query()->where('assignment_id', $assignment->id)->count());
         $this->assertSame('First draft', AssignmentSubmission::query()->first()->text_body);
         $this->assertSame(1, AssignmentSubmission::query()->first()->attempt_no);
+    }
+
+    #[Test]
+    public function unpublished_assignment_cannot_be_submitted(): void
+    {
+        $this->seed(\Database\Seeders\SettingsSeeder::class);
+        $bundle = $this->playerBundle('HID1');
+        $assignment = $this->assignmentOn($bundle['offering'], released: false);
+
+        $this->withToken($this->apiToken($bundle['student']))
+            ->post(route('api.v1.assignments.submit', $assignment), [
+                'text_body' => 'Nope',
+            ], ['Accept' => 'application/json'])
+            ->assertNotFound()
+            ->assertJsonPath('code', 'NOT_FOUND');
+
+        $this->assertSame(0, AssignmentSubmission::query()->count());
+    }
+
+    #[Test]
+    public function unpublished_assessment_cannot_be_started(): void
+    {
+        $bundle = $this->playerBundle('HID2');
+        $assessment = Assessment::query()->create([
+            'offering_id' => $bundle['offering']->id,
+            'title' => 'Hidden quiz',
+            'mode' => AssessmentMode::Quiz,
+            'released' => false,
+            'attempts_allowed' => 1,
+            'max_points' => 10,
+        ]);
+
+        $this->withToken($this->apiToken($bundle['student']))
+            ->postJson(route('api.v1.assessments.start', $assessment))
+            ->assertNotFound()
+            ->assertJsonPath('code', 'NOT_FOUND');
+
+        $this->assertSame(0, $assessment->attempts()->count());
     }
 
     #[Test]

@@ -49,9 +49,7 @@ class AssignmentController extends Controller
     {
         $offering = $this->offeringOf($assignment);
         $this->guard->enrollmentForRead($request->user(), $offering);
-        if (! $assignment->released) {
-            abort(404);
-        }
+        $this->assertPublished($assignment);
 
         $submission = $assignment->submissions()->where('student_id', $request->user()->id)->first();
 
@@ -62,6 +60,7 @@ class AssignmentController extends Controller
     {
         $offering = $this->offeringOf($assignment);
         $this->guard->enrollmentForWrite($request->user(), $offering);
+        $this->assertPublished($assignment);
 
         $payload = $this->idempotency->remember(
             $request->user(),
@@ -77,6 +76,7 @@ class AssignmentController extends Controller
     {
         $offering = $this->offeringOf($assignment);
         $this->guard->enrollmentForWrite($request->user(), $offering);
+        $this->assertPublished($assignment);
 
         return response()->json(['data' => $this->storeSubmission($request, $assignment)]);
     }
@@ -110,6 +110,13 @@ class AssignmentController extends Controller
         );
 
         return $this->submissionPayload($assignment->fresh('contentItem'), $submission);
+    }
+
+    private function assertPublished(Assignment $assignment): void
+    {
+        if (! $assignment->released) {
+            abort(404);
+        }
     }
 
     private function offeringOf(Assignment $assignment): CourseOffering

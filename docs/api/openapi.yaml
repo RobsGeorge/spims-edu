@@ -1471,6 +1471,8 @@ paths:
           description: Created
         '403':
           description: Not enrolled
+        '404':
+          description: Unreleased assignment
   /assignments/{assignment}/resubmit:
     post:
       operationId: resubmitAssignment
@@ -1533,6 +1535,10 @@ paths:
       responses:
         '201':
           description: Attempt started
+        '403':
+          description: Not enrolled
+        '404':
+          description: Unreleased assessment
   /attempts/{attempt}:
     get:
       operationId: showAttempt
@@ -1763,13 +1769,17 @@ paths:
   /applications/{application}/submit:
     post:
       operationId: submitApplication
-      summary: Submit a draft application.
+      summary: Submit a draft application. Idempotency-Key supported.
       security:
       - bearerAuth: []
       parameters:
       - in: path
         name: application
         required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
         schema:
           type: string
       responses:
@@ -1853,13 +1863,17 @@ paths:
   /invoices/{invoice}/checkout:
     post:
       operationId: checkoutInvoice
-      summary: Pay an invoice.
+      summary: Pay an invoice. Idempotency-Key supported.
       security:
       - bearerAuth: []
       parameters:
       - in: path
         name: invoice
         required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
         schema:
           type: string
       responses:
@@ -1894,9 +1908,14 @@ paths:
   /donations:
     post:
       operationId: createDonation
-      summary: Donate an amount in minor units.
+      summary: Donate an amount in minor units. Idempotency-Key supported.
       security:
       - bearerAuth: []
+      parameters:
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
       responses:
         '201':
           description: Created

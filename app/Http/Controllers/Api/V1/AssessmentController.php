@@ -42,9 +42,7 @@ class AssessmentController extends Controller
     public function show(Request $request, Assessment $assessment): JsonResponse
     {
         $this->guard->enrollmentForRead($request->user(), $assessment->offering);
-        if (! $assessment->released) {
-            abort(404);
-        }
+        $this->assertPublished($assessment);
 
         return response()->json([
             'data' => $this->payload($assessment, $request->user()->id, detail: true),
@@ -54,6 +52,7 @@ class AssessmentController extends Controller
     public function start(Request $request, Assessment $assessment): JsonResponse
     {
         $this->guard->enrollmentForWrite($request->user(), $assessment->offering);
+        $this->assertPublished($assessment);
         $attempt = $this->attempts->start($request->user(), $assessment);
 
         return response()->json([
@@ -65,6 +64,13 @@ class AssessmentController extends Controller
                 'status' => $attempt->status->value,
             ],
         ], 201);
+    }
+
+    private function assertPublished(Assessment $assessment): void
+    {
+        if (! $assessment->released) {
+            abort(404);
+        }
     }
 
     /** @return array<string, mixed> */

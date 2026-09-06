@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceLine;
 use App\Models\Payment;
 use App\Services\Finance\PaymentService;
+use App\Support\Api\IdempotencyStore;
 use App\Support\Api\PaginatedEnvelope;
 use App\Support\Api\StudentPayload;
 use App\Support\Api\StudentRecordGuard;
@@ -19,6 +20,7 @@ class InvoiceController extends Controller
     public function __construct(
         private readonly StudentRecordGuard $guard,
         private readonly PaymentService $payments,
+        private readonly IdempotencyStore $idempotency,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -51,22 +53,29 @@ class InvoiceController extends Controller
             'gateway' => 'nullable|string',
         ]);
 
-        $payment = $this->payments->checkout($request->user(), $invoice, [
-            'wallet_money' => (int) ($data['wallet_money'] ?? 0),
-            'wallet_points' => (int) ($data['wallet_points'] ?? 0),
-            'gateway' => $data['gateway'] ?? null,
-        ]);
+        $payload = $this->idempotency->remember(
+            $request->user(),
+            'invoices.checkout:'.$invoice->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $invoice, $data) {
+                $payment = $this->payments->checkout($request->user(), $invoice, [
+                    'wallet_money' => (int) ($data['wallet_money'] ?? 0),
+                    'wallet_points' => (int) ($data['wallet_points'] ?? 0),
+                    'gateway' => $data['gateway'] ?? null,
+                ]);
 
-        return response()->json([
-            'data' => [
-                'id' => $payment->id,
-                'status' => $payment->status->value,
-                'method' => $payment->method->value,
-                'gateway_ref' => $payment->gateway_ref,
-                'receipt_serial' => $payment->receipt_serial,
-                'amount' => MoneyPayload::fromMinor($payment->amount_minor, $payment->currency),
-            ],
-        ]);
+                return [
+                    'id' => $payment->id,
+                    'status' => $payment->status->value,
+                    'method' => $payment->method->value,
+                    'gateway_ref' => $payment->gateway_ref,
+                    'receipt_serial' => $payment->receipt_serial,
+                    'amount' => MoneyPayload::fromMinor($payment->amount_minor, $payment->currency),
+                ];
+            },
+        );
+
+        return response()->json(['data' => $payload]);
     }
 
     /** @return array<string, mixed> */

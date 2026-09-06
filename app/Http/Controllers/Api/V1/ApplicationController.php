@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\ApplicationForm;
 use App\Services\Admissions\ApplicationService;
+use App\Support\Api\IdempotencyStore;
 use App\Support\Api\PaginatedEnvelope;
 use App\Support\Api\StudentPayload;
 use App\Support\Api\StudentRecordGuard;
@@ -17,6 +18,7 @@ class ApplicationController extends Controller
     public function __construct(
         private readonly ApplicationService $applications,
         private readonly StudentRecordGuard $guard,
+        private readonly IdempotencyStore $idempotency,
     ) {}
 
     public function form(ApplicationForm $applicationForm): JsonResponse
@@ -100,9 +102,19 @@ class ApplicationController extends Controller
     public function submit(Request $request, Application $application): JsonResponse
     {
         $this->guard->ownWrite($request->user(), $application->applicant_id);
-        $submitted = $this->applications->submit($request->user(), $application->load('form.fields', 'values'));
 
-        return response()->json(['data' => $this->payload($submitted->load(['program', 'values.field']), true)]);
+        $payload = $this->idempotency->remember(
+            $request->user(),
+            'applications.submit:'.$application->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $application) {
+                $submitted = $this->applications->submit($request->user(), $application->load('form.fields', 'values'));
+
+                return $this->payload($submitted->load(['program', 'values.field']), true);
+            },
+        );
+
+        return response()->json(['data' => $payload]);
     }
 
     /** @return array<string, mixed> */
