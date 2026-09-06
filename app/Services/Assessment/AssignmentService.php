@@ -171,7 +171,11 @@ class AssignmentService
             $file->getClientOriginalExtension() ?: $file->extension()
         );
 
-        $this->storage->store($path, $file->get() ?: '');
+        $realPath = $file->getRealPath() ?: $file->getPathname();
+        $contents = is_string($realPath) && is_readable($realPath)
+            ? (string) file_get_contents($realPath)
+            : ($file->get() ?: '');
+        $this->storage->store($path, $contents);
 
         return $path;
     }
