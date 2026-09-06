@@ -19,6 +19,8 @@ return [
     'my_applications_desc' => 'متابعة طلبات القبول.',
     'enrollments' => 'تسجيلاتي',
     'enrollments_desc' => 'التسجيلات الحالية والسابقة.',
+    'projects' => 'مشاريع الفريق',
+    'projects_desc' => 'انضم إلى فريق وأرسل التسليمات.',
     'live' => 'الجلسات المباشرة',
     'live_desc' => 'حصص زووم القادمة.',
     'attendance' => 'الحضور',

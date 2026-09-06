@@ -6,7 +6,12 @@
         <h1 class="spims-title mb-1">{{ $offering->course->code }} — {{ $offering->course->title }}</h1>
         <p class="text-muted-theme mb-0">{{ __('offerings.mode') }}: {{ $offering->mode->value }} · {{ __('learn.progress') }}: {{ number_format($enrollment->progress_percent, 0) }}%</p>
     </div>
-    <a href="{{ route('enrollments.index') }}" class="btn btn-outline-secondary btn-sm">{{ __('ui.nav_enrollments') }}</a>
+    <div class="d-flex flex-wrap gap-2">
+        @if(!empty($hasPublishedProjects))
+            <a href="{{ route('student.projects.index', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('projects.nav') }}</a>
+        @endif
+        <a href="{{ route('enrollments.index') }}" class="btn btn-outline-secondary btn-sm">{{ __('ui.nav_enrollments') }}</a>
+    </div>
 </div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 @error('learn')<div class="alert alert-danger">{{ $message }}</div>@enderror

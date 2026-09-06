@@ -25,7 +25,7 @@ class CoursePlayerService
     ) {}
 
     /**
-     * @return array{enrollment: Enrollment, offering: CourseOffering, weeks: array<int, array<string, mixed>>, completed: array<int, int>, progress: float, announcements: \Illuminate\Support\Collection}
+     * @return array{enrollment: Enrollment, offering: CourseOffering, weeks: array<int, array<string, mixed>>, completed: array<int, int>, progress: float, announcements: \Illuminate\Support\Collection, is_staff: bool, hasPublishedProjects: bool}
      */
     public function playerPayload(User $user, CourseOffering $offering): array
     {
@@ -88,6 +88,7 @@ class CoursePlayerService
                 ->limit(10)
                 ->get(),
             'is_staff' => $isStaff,
+            'hasPublishedProjects' => $offering->hasPublishedProjectAssessments(),
         ];
     }
 

@@ -19,6 +19,8 @@ return [
     'my_applications_desc' => 'Track admission applications.',
     'enrollments' => 'My enrollments',
     'enrollments_desc' => 'Active and past course enrollments.',
+    'projects' => 'Team projects',
+    'projects_desc' => 'Join a team and submit deliverables.',
     'live' => 'Live sessions',
     'live_desc' => 'Upcoming Zoom classes.',
     'attendance' => 'Attendance',

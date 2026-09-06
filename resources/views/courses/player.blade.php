@@ -12,6 +12,9 @@
             <p class="mb-0">{{ __('learning.progress', ['percent' => (int) $progress]) }}</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
+            @if(!empty($hasPublishedProjects))
+                <a href="{{ route('student.projects.index', $offering) }}" class="btn btn-outline-secondary">{{ __('projects.nav') }}</a>
+            @endif
             <a href="{{ route('discussions.board', $offering) }}" class="btn btn-outline-secondary">{{ __('learning.discussions') }}</a>
             <a href="{{ route('grades.index') }}" class="btn btn-outline-secondary">{{ __('learning.grades') }}</a>
         </div>

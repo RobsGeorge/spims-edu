@@ -41,6 +41,7 @@ class LearnController extends Controller
             'completedWeekNumbers' => $completedWeeks,
             'completedItemIds' => $completedItems,
             'progress' => $this->progress,
+            'hasPublishedProjects' => $offering->hasPublishedProjectAssessments(),
         ]);
     }
 
