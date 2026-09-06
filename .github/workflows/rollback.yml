@@ -1,0 +1,86 @@
+name: Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Environment to roll back
+        required: true
+        type: choice
+        options:
+          - production
+          - staging
+      sha:
+        description: Git commit SHA already known-good on this branch
+        required: true
+        type: string
+
+concurrency:
+  group: spims-${{ inputs.target }}-deploy
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Validate SHA
+        run: |
+          SHA="${{ inputs.sha }}"
+          if [[ ! "$SHA" =~ ^[0-9a-f]{7,40}$ ]]; then
+            echo "sha must be a git commit hash" >&2
+            exit 1
+          fi
+
+      - name: Rollback on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          HEALTH_URL: ${{ inputs.target == 'production' && secrets.PRODUCTION_HEALTH_URL || secrets.STAGING_HEALTH_URL }}
+          LOOPBACK_HEALTH_HOST: ${{ inputs.target == 'production' && secrets.PRODUCTION_DOMAIN || secrets.STAGING_DOMAIN }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          timeout: 120s
+          command_timeout: 20m
+          envs: HEALTH_URL,LOOPBACK_HEALTH_HOST
+          script: |
+            set -euo pipefail
+            TARGET="${{ inputs.target }}"
+            SHA="${{ inputs.sha }}"
+            if [[ "$TARGET" = "production" ]]; then
+              APP_DIR="${PRODUCTION_APP_DIR:-/var/www/spims}"
+              QUEUE_UNIT=spims-queue
+              EXPECT_ENV=production
+            else
+              APP_DIR="${STAGING_APP_DIR:-/var/www/spims-staging}"
+              QUEUE_UNIT=spims-queue-staging
+              EXPECT_ENV=staging
+            fi
+            cd "$APP_DIR"
+            test "$(pwd)" = "$APP_DIR"
+            grep -q "APP_ENV=${EXPECT_ENV}" .env
+
+            PHP_BIN=php8.2
+            DEPLOY_USER="$(whoami)"
+            sudo -n chown -R "${DEPLOY_USER}:www-data" storage bootstrap/cache
+            git fetch --prune origin
+            git reset --hard "$SHA"
+
+            export PHP_BIN HEALTH_URL="${HEALTH_URL:-}" LOOPBACK_HEALTH_HOST="${LOOPBACK_HEALTH_HOST:-}" QUEUE_UNIT
+            if [[ -x ./scripts/vps-sync.sh ]]; then
+              SKIP_GIT=1 ./scripts/vps-sync.sh
+              ./scripts/vps-release.sh
+            else
+              COMPOSER_ALLOW_SUPERUSER=1 $PHP_BIN /usr/local/bin/composer install \
+                --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-progress --no-scripts
+              $PHP_BIN artisan down --retry=60 || true
+              $PHP_BIN artisan migrate --force
+              $PHP_BIN artisan optimize:clear
+              $PHP_BIN artisan config:cache
+              $PHP_BIN artisan route:cache
+              sudo -n systemctl reload php8.2-fpm
+              sudo -n systemctl restart "$QUEUE_UNIT" || true
+              $PHP_BIN artisan up || true
+            fi

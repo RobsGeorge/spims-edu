@@ -4,10 +4,11 @@ on:
   push:
     branches:
       - staging
+  workflow_dispatch:
 
 concurrency:
   group: spims-staging-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   test:
@@ -17,10 +18,12 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 35
-
     steps:
       - name: Deploy to staging VPS
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          HEALTH_URL: ${{ secrets.STAGING_HEALTH_URL }}
+          LOOPBACK_HEALTH_HOST: ${{ secrets.STAGING_DOMAIN }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -28,31 +31,23 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           timeout: 120s
           command_timeout: 30m
+          envs: HEALTH_URL,LOOPBACK_HEALTH_HOST
           script: |
-            set -e
-            cd /var/www/spims-staging
-            test "$(pwd)" = "/var/www/spims-staging"
+            set -euo pipefail
+            APP_DIR="${STAGING_APP_DIR:-/var/www/spims-staging}"
+            cd "$APP_DIR"
+            test "$(pwd)" = "$APP_DIR"
             grep -q "DB_DATABASE=spims_staging" .env
             grep -q "APP_ENV=staging" .env
 
             PHP_BIN=php8.2
             DEPLOY_USER="$(whoami)"
-            fix_runtime_permissions() {
-              sudo -n chown -R "${DEPLOY_USER}:www-data" storage bootstrap/cache
-              sudo -n find storage bootstrap/cache -type d -exec chmod 2775 {} +
-              sudo -n find storage bootstrap/cache -type f -exec chmod 664 {} +
-            }
-
             sudo -n chown -R "${DEPLOY_USER}:www-data" storage bootstrap/cache
-            fix_runtime_permissions
-            git fetch origin staging
+
+            git fetch --prune origin
             git reset --hard origin/staging
-            COMPOSER_ALLOW_SUPERUSER=1 $PHP_BIN /usr/local/bin/composer install --no-interaction --prefer-dist --no-progress --no-scripts
-            $PHP_BIN artisan down --retry=60 || true
-            $PHP_BIN artisan migrate --force
-            $PHP_BIN artisan optimize:clear
-            fix_runtime_permissions
-            sudo -n systemctl reload php8.2-fpm
-            sudo -n systemctl restart spims-queue-staging || sudo -n systemctl restart spims-queue || echo "WARN: queue restart"
-            $PHP_BIN artisan up || true
-            $PHP_BIN artisan scheduler:ensure-cron --php=$PHP_BIN || true
+
+            export PHP_BIN HEALTH_URL="${HEALTH_URL:-}" LOOPBACK_HEALTH_HOST="${LOOPBACK_HEALTH_HOST:-}"
+            export QUEUE_UNIT=spims-queue-staging
+            SKIP_GIT=1 ./scripts/vps-sync.sh
+            ./scripts/vps-release.sh
