@@ -405,8 +405,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/enrollments', [EnrollmentController::class, 'store'])
         ->middleware('permission:enrollment.register')
         ->name('enrollments.store');
-    Route::post('/enrollments/{enrollment}/drop', [EnrollmentController::class, 'drop'])->name('enrollments.drop');
-    Route::post('/enrollments/{enrollment}/withdraw', [EnrollmentController::class, 'withdraw'])->name('enrollments.withdraw');
+    Route::post('/enrollments/{enrollment}/drop', [EnrollmentController::class, 'drop'])
+        ->middleware('permission:enrollment.register')
+        ->name('enrollments.drop');
+    Route::post('/enrollments/{enrollment}/withdraw', [EnrollmentController::class, 'withdraw'])
+        ->middleware('permission:enrollment.register')
+        ->name('enrollments.withdraw');
     Route::get('/degree-audit/{studentProgram}', [EnrollmentController::class, 'audit'])->name('enrollments.audit');
 
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
@@ -508,6 +512,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/users', [UserController::class, 'index'])
             ->middleware('permission:users.manage')
             ->name('users.index');
+        Route::get('/users/{user}', [UserController::class, 'show'])
+            ->middleware('permission:users.manage')
+            ->name('users.show');
         Route::post('/users', [UserController::class, 'store'])
             ->middleware('permission:users.manage')
             ->name('users.store');
@@ -687,6 +694,9 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('permission:admissions.decide')
             ->name('applications.decide');
 
+        Route::get('/enrollments', [EnrollmentAdminController::class, 'index'])
+            ->middleware('permission:enrollment.override')
+            ->name('enrollments.index');
         Route::post('/enrollments/override', [EnrollmentAdminController::class, 'overrideRegister'])
             ->middleware('permission:enrollment.override')
             ->name('enrollments.override');
@@ -694,7 +704,7 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('permission:enrollment.override')
             ->name('enrollments.financial-hold');
         Route::get('/offerings/{offering}/waitlist', [EnrollmentAdminController::class, 'waitlist'])
-            ->middleware('permission:enrollment.override')
+            ->middleware('permission:enrollment.waitlist')
             ->name('enrollments.waitlist');
 
         Route::get('/finance', [FinanceAdminController::class, 'index'])

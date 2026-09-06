@@ -14,6 +14,7 @@ use App\Models\Semester;
 use App\Models\User;
 use App\Models\Week;
 use App\Services\Offerings\OfferingService;
+use App\Support\AuthorizeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -58,7 +59,7 @@ class OfferingController extends Controller
         return redirect()->route('admin.offerings.show', $offering)->with('status', __('offerings.offering_created'));
     }
 
-    public function show(CourseOffering $offering): View
+    public function show(Request $request, CourseOffering $offering, AuthorizeService $authorize): View
     {
         $offering->load(['course', 'semester', 'staff.user', 'weeks.items']);
 
@@ -69,6 +70,7 @@ class OfferingController extends Controller
             'contentTypes' => ContentItemType::cases(),
             'statuses' => $this->editableStatuses(),
             'semesters' => Semester::query()->orderByDesc('start_date')->get(),
+            'canViewWaitlist' => $authorize->allows($request->user(), 'enrollment.waitlist'),
         ]);
     }
 

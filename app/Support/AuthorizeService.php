@@ -21,6 +21,17 @@ class AuthorizeService
         private readonly ResourceScopeResolver $scope = new ResourceScopeResolver,
     ) {}
 
+    public function allows(?User $user, string $action, mixed $resource = null): bool
+    {
+        try {
+            $this->authorize($user, $action, $resource);
+
+            return true;
+        } catch (AuthorizationException) {
+            return false;
+        }
+    }
+
     public function authorize(?User $user, string $action, mixed $resource = null): void
     {
         if ($user === null) {
