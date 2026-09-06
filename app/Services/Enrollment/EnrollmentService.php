@@ -6,7 +6,6 @@ use App\Enums\EnrollmentStatus;
 use App\Enums\GradeType;
 use App\Enums\InvoiceStatus;
 use App\Enums\OfferingMode;
-use App\Enums\RequirementType;
 use App\Enums\StudentProgramStatus;
 use App\Models\AcademicRecord;
 use App\Models\CourseOffering;
@@ -271,6 +270,32 @@ class EnrollmentService
             ->where('student_id', $student->id)
             ->whereIn('status', [InvoiceStatus::Open, InvoiceStatus::Partial])
             ->exists();
+    }
+
+    /**
+     * API-facing conflict check: closed window, financial hold, or overlapping live sessions.
+     *
+     * @return 'hold'|'window'|'schedule'|null
+     */
+    public function registrationConflict(User $student, CourseOffering $offering): ?string
+    {
+        if ($this->hasFinancialHold($student)) {
+            return 'hold';
+        }
+
+        $offering->loadMissing('semester');
+
+        if ($offering->mode === OfferingMode::Cohort) {
+            if ($offering->semester === null || ! $offering->semester->isRegistrationOpen()) {
+                return 'window';
+            }
+        }
+
+        if ($this->hasLiveSessionConflict($student, $offering)) {
+            return 'schedule';
+        }
+
+        return null;
     }
 
     /**

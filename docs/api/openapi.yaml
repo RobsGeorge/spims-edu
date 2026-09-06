@@ -83,6 +83,27 @@ components:
           - SYSTEM
         notify_email:
           type: boolean
+        avatar_url:
+          type: string
+          nullable: true
+        enrolled_offering_count:
+          type: integer
+    Money:
+      type: object
+      required:
+      - minor_units
+      - currency
+      - formatted
+      properties:
+        minor_units:
+          type: integer
+        currency:
+          type: string
+          enum:
+          - EGP
+          - USD
+        formatted:
+          type: string
     Announcement:
       type: object
       properties:
@@ -1206,6 +1227,701 @@ paths:
                     type: array
                     items:
                       type: object
+
+  # S6 student API
+  /me/preferences:
+    put:
+      operationId: updatePreferences
+      summary: Update locale, theme, and email-notification preference.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Updated user
+        '401':
+          description: Unauthenticated
+  /me/picture:
+    post:
+      operationId: uploadPicture
+      summary: Upload a profile picture (multipart).
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Updated user with avatar_url
+  /dashboard:
+    get:
+      operationId: studentDashboard
+      summary: Bento payload for the authenticated student.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthenticated
+  /offerings:
+    get:
+      operationId: listStudentOfferings
+      summary: Enrolled offerings with progress.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Paginated offerings
+  /offerings/{offering}:
+    get:
+      operationId: showStudentOffering
+      summary: Offering detail, staff, semester, and gating summary.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not enrolled
+  /offerings/{offering}/weeks:
+    get:
+      operationId: listOfferingWeeks
+      summary: Weeks with lock state and completion.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated weeks
+  /offerings/{offering}/weeks/{week}/items:
+    get:
+      operationId: listWeekItems
+      summary: Gated week items (metadata only).
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: week
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated items
+  /offerings/{offering}/weeks/{week}/complete:
+    post:
+      operationId: completeWeek
+      summary: Mark a week complete.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: week
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not enrolled
+  /offerings/{offering}/grades:
+    get:
+      operationId: offeringGrades
+      summary: Released grades for this offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /items/{item}:
+    get:
+      operationId: showContentItem
+      summary: Item payload; gated items hide body/file/vimeo.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: item
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not enrolled
+  /items/{item}/complete:
+    post:
+      operationId: completeContentItem
+      summary: Mark a passive item complete.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: item
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not enrolled
+  /transcript:
+    get:
+      operationId: studentTranscript
+      summary: Academic records with GPA.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+  /degree-audit/{studentProgram}:
+    get:
+      operationId: degreeAudit
+      summary: Degree-audit for a student program the caller owns.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: studentProgram
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Another student's program
+  /offerings/{offering}/assignments:
+    get:
+      operationId: listOfferingAssignments
+      summary: Released assignments on the offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated assignments
+  /assignments/{assignment}:
+    get:
+      operationId: showAssignment
+      summary: Assignment detail with own submission.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assignment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not enrolled or unreleased
+  /assignments/{assignment}/submit:
+    post:
+      operationId: submitAssignment
+      summary: Submit an assignment (multipart). Idempotency-Key supported.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assignment
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+        '403':
+          description: Not enrolled
+        '404':
+          description: Unreleased assignment
+  /assignments/{assignment}/resubmit:
+    post:
+      operationId: resubmitAssignment
+      summary: Resubmit an assignment. 422 outside the window.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assignment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '422':
+          description: Resubmission not allowed
+  /offerings/{offering}/assessments:
+    get:
+      operationId: listOfferingAssessments
+      summary: Released assessments on the offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated assessments
+  /assessments/{assessment}:
+    get:
+      operationId: showAssessment
+      summary: Assessment rules, attempts, and window.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assessment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /assessments/{assessment}/start:
+    post:
+      operationId: startAssessment
+      summary: Start or resume an attempt.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assessment
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Attempt started
+        '403':
+          description: Not enrolled
+        '404':
+          description: Unreleased assessment
+  /attempts/{attempt}:
+    get:
+      operationId: showAttempt
+      summary: Resume an in-progress attempt.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: attempt
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not the owner
+  /attempts/{attempt}/save:
+    post:
+      operationId: saveAttempt
+      summary: Autosave answers.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: attempt
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /attempts/{attempt}/submit:
+    post:
+      operationId: submitAttempt
+      summary: Submit an attempt. Idempotency-Key supported.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: attempt
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /attempts/{attempt}/timer:
+    get:
+      operationId: attemptTimer
+      summary: Server-authoritative remaining seconds.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: attempt
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /attempts/{attempt}/focus-loss:
+    post:
+      operationId: attemptFocusLoss
+      summary: Log a focus-loss event. May terminate (423).
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: attempt
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Warning recorded
+        '423':
+          description: Attempt terminated
+  /offerings/{offering}/discussions:
+    get:
+      operationId: listOfferingDiscussions
+      summary: Discussion board (read-only; does not provision).
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated threads
+  /discussions/threads/{thread}:
+    get:
+      operationId: showDiscussionThread
+      summary: Thread posts, paginated.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: thread
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /discussions/threads/{thread}/posts:
+    post:
+      operationId: postDiscussionReply
+      summary: Post a reply on a thread.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: thread
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+  /offerings/{offering}/discussions/threads:
+    post:
+      operationId: createDiscussionThread
+      summary: Create a student thread (provisions the board if needed).
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+  /catalog:
+    get:
+      operationId: catalogIndex
+      summary: Public course catalog.
+      responses:
+        '200':
+          description: Paginated courses
+  /catalog/courses/{course}:
+    get:
+      operationId: catalogShowCourse
+      summary: Course detail with prerequisites and region pricing.
+      parameters:
+      - in: path
+        name: course
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /catalog/courses/{course}/interest:
+    post:
+      operationId: catalogFlagInterest
+      summary: Flag interest in a course.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: course
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+  /application-forms/{applicationForm}:
+    get:
+      operationId: showApplicationForm
+      summary: Field definitions for an application form.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: applicationForm
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /applications:
+    get:
+      operationId: listApplications
+      summary: The caller's applications.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Paginated applications
+    post:
+      operationId: createApplication
+      summary: Create or update a draft application.
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Created
+  /applications/{application}:
+    get:
+      operationId: showApplication
+      summary: Application status and answers.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: application
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not the owner
+  /applications/{application}/submit:
+    post:
+      operationId: submitApplication
+      summary: Submit a draft application. Idempotency-Key supported.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: application
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /enrollments:
+    get:
+      operationId: listEnrollments
+      summary: The caller's enrollments.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Paginated enrollments
+    post:
+      operationId: createEnrollment
+      summary: Register. 409 on closed window, hold, or schedule conflict.
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Created
+        '409':
+          description: Conflict
+  /enrollments/{enrollment}/drop:
+    post:
+      operationId: dropEnrollment
+      summary: Drop during add/drop.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: enrollment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /enrollments/{enrollment}/withdraw:
+    post:
+      operationId: withdrawEnrollment
+      summary: Withdraw after add/drop.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: enrollment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+  /invoices:
+    get:
+      operationId: listInvoices
+      summary: The caller's invoices.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Paginated invoices
+  /invoices/{invoice}:
+    get:
+      operationId: showInvoice
+      summary: Invoice with money objects.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: invoice
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not the owner
+  /invoices/{invoice}/checkout:
+    post:
+      operationId: checkoutInvoice
+      summary: Pay an invoice. Idempotency-Key supported.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: invoice
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Payment
+  /payments/{payment}/receipt:
+    get:
+      operationId: paymentReceipt
+      summary: Download a payment receipt.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: payment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: PDF or HTML stream
+        '404':
+          description: Not the owner
+  /wallet:
+    get:
+      operationId: showWallet
+      summary: Four balances plus paginated ledger.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+  /donations:
+    post:
+      operationId: createDonation
+      summary: Donate an amount in minor units. Idempotency-Key supported.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Created
+
+
+  # S4 completion / credentials API
   /me/credentials:
     get:
       operationId: meCredentials
