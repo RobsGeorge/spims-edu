@@ -6,6 +6,25 @@
         <h1 class="spims-title mb-3">{{ __('learning.settings') }}</h1>
         @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
+        <form method="POST" action="{{ route('settings.picture') }}" enctype="multipart/form-data" class="app-card p-4 mb-4">
+            @csrf
+            <h2 class="h5 mb-3">{{ __('learning.profile_picture') }}</h2>
+            @if($avatarUrl)
+                <div class="mb-3">
+                    <img src="{{ $avatarUrl }}" alt="{{ __('learning.profile_picture_current') }}" width="96" height="96" class="rounded-circle" style="object-fit: cover;">
+                </div>
+            @else
+                <p class="text-muted mb-3">{{ __('learning.profile_picture_empty') }}</p>
+            @endif
+            <div class="mb-3">
+                <label class="form-label" for="set-picture">{{ __('learning.profile_picture_choose') }}</label>
+                <input id="set-picture" type="file" name="picture" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" class="form-control @error('picture') is-invalid @enderror" required>
+                <div class="form-text">{{ __('learning.profile_picture_help') }}</div>
+                @error('picture')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+            <button type="submit" class="btn btn-primary">{{ __('learning.profile_picture_save') }}</button>
+        </form>
+
         <form method="POST" action="{{ route('settings.update') }}" class="app-card p-4">
             @csrf
             @method('PUT')
