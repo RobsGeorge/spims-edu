@@ -64,6 +64,18 @@ class InstructorApiScopeTest extends TestCase
             'GET teach project teams' => ['GET', '/api/v1/teach/project-assessments/{projectAssessment}/teams', 403],
             'POST teach project announce' => ['POST', '/api/v1/teach/project-assessments/{projectAssessment}/announce', 403],
             'GET teach project peer-evaluations' => ['GET', '/api/v1/teach/projects/{project}/peer-evaluations', 403],
+
+            'GET teach gradebook' => ['GET', '/api/v1/teach/offerings/{offering}/gradebook', 403],
+            'POST teach gradebook submit' => ['POST', '/api/v1/teach/offerings/{offering}/gradebook/submit', 403],
+            'POST teach gradebook lock' => ['POST', '/api/v1/teach/offerings/{offering}/gradebook/lock', 403],
+            'GET teach assignments' => ['GET', '/api/v1/teach/offerings/{offering}/assignments', 403],
+            'GET teach assignment submissions' => ['GET', '/api/v1/teach/assignments/{assignment}/submissions', 403],
+            'POST teach submission grade' => ['POST', '/api/v1/teach/submissions/{assignmentSubmission}/grade', 403],
+            'POST teach submission mark-received' => ['POST', '/api/v1/teach/submissions/{assignmentSubmission}/mark-received', 403],
+            'POST teach assignment remind' => ['POST', '/api/v1/teach/assignments/{assignment}/remind-unsubmitted', 403],
+            'GET teach assessment attempts' => ['GET', '/api/v1/teach/assessments/{assessment}/attempts', 403],
+            'POST teach answer grade' => ['POST', '/api/v1/teach/answers/{attemptAnswer}/grade', 403],
+            'POST teach announce-results' => ['POST', '/api/v1/teach/assessments/{assessment}/announce-results', 403],
         ];
     }
 
@@ -151,6 +163,10 @@ class InstructorApiScopeTest extends TestCase
             'projectAssessment' => $world['projectAssessmentB']->id,
             'project' => $world['projectB']->id,
             'question' => $world['liveQuizQuestionB']->id,
+            'assignment' => $world['assignmentB']->id,
+            'assignmentSubmission' => $world['assignmentSubmissionB']->id,
+            'assessment' => $world['assessmentB']->id,
+            'attemptAnswer' => $world['attemptAnswerB']->id,
         ];
     }
 
@@ -189,6 +205,16 @@ class InstructorApiScopeTest extends TestCase
             ],
             '/api/v1/teach/offerings/{offering}/close' => [
                 'confirmation' => 'deadbeefdeadbeefdeadbeefdeadbeef',
+            ],
+            '/api/v1/teach/offerings/{offering}/gradebook/lock',
+            '/api/v1/teach/assessments/{assessment}/announce-results' => [
+                'confirmation' => 'deadbeefdeadbeefdeadbeefdeadbeef',
+            ],
+            '/api/v1/teach/submissions/{assignmentSubmission}/grade' => [
+                'raw_score' => 50,
+            ],
+            '/api/v1/teach/answers/{attemptAnswer}/grade' => [
+                'final_score' => 5,
             ],
             default => in_array($method, ['POST', 'PUT'], true) ? [] : [],
         };

@@ -2,19 +2,30 @@
 
 namespace Tests\Feature\Api;
 
+use App\Enums\AssessmentMode;
+use App\Enums\AttemptStatus;
 use App\Enums\ClassSessionMode;
 use App\Enums\CompletionCriterionKind;
 use App\Enums\ComponentKind;
+use App\Enums\ContentItemType;
 use App\Enums\EnrollmentStatus;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStaffRole;
 use App\Enums\ProjectAssessmentStatus;
 use App\Enums\ProjectGradingMode;
 use App\Enums\ProjectStatus;
+use App\Enums\QuestionType;
 use App\Enums\RoleType;
+use App\Enums\SubmissionType;
 use App\Enums\ThreadVisibility;
 use App\Models\Announcement;
+use App\Models\Assessment;
+use App\Models\AssessmentAttempt;
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
+use App\Models\AttemptAnswer;
 use App\Models\ClassSession;
+use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\DiscussionBoard;
@@ -27,6 +38,8 @@ use App\Models\LiveQuizQuestion;
 use App\Models\LiveQuizSession;
 use App\Models\Project;
 use App\Models\ProjectAssessment;
+use App\Models\Question;
+use App\Models\QuestionBank;
 use App\Models\User;
 use App\Models\Week;
 use App\Services\Communications\AnnouncementService;
@@ -117,7 +130,11 @@ trait InstructorApiFixtures
      *     liveQuizSessionB: LiveQuizSession,
      *     liveQuizQuestionB: LiveQuizQuestion,
      *     projectAssessmentB: ProjectAssessment,
-     *     projectB: Project
+     *     projectB: Project,
+     *     assignmentB: Assignment,
+     *     assignmentSubmissionB: AssignmentSubmission,
+     *     assessmentB: Assessment,
+     *     attemptAnswerB: AttemptAnswer
      * }
      */
     protected function staffTwoOfferings(): array
@@ -190,6 +207,63 @@ trait InstructorApiFixtures
             'status' => ProjectStatus::Open,
         ]);
 
+        $assignmentItemB = ContentItem::query()->create([
+            'week_id' => $weekB->id,
+            'type' => ContentItemType::Assignment,
+            'title' => 'B essay',
+            'order' => 10,
+        ]);
+        $assignmentB = Assignment::query()->create([
+            'content_item_id' => $assignmentItemB->id,
+            'instructions' => 'Write B.',
+            'submission_type' => SubmissionType::Both,
+            'allowed_file_types' => ['pdf'],
+            'max_points' => 100,
+            'released' => true,
+            'allow_resubmission' => true,
+        ]);
+        $assignmentSubmissionB = AssignmentSubmission::query()->create([
+            'assignment_id' => $assignmentB->id,
+            'student_id' => $studentB->id,
+            'text_body' => 'B draft',
+            'submitted_at' => now(),
+            'is_late' => false,
+            'attempt_no' => 1,
+        ]);
+
+        $assessmentB = Assessment::query()->create([
+            'offering_id' => $offeringB->id,
+            'mode' => AssessmentMode::Quiz,
+            'title' => 'B quiz',
+            'max_points' => 10,
+            'released' => true,
+        ]);
+        $bankB = QuestionBank::query()->create([
+            'course_id' => $offeringB->course_id,
+            'name' => 'B bank',
+        ]);
+        $questionB = Question::query()->create([
+            'bank_id' => $bankB->id,
+            'type' => QuestionType::TrueFalse,
+            'prompt' => 'Sky is blue',
+            'points' => 10,
+        ]);
+        $attemptB = AssessmentAttempt::query()->create([
+            'assessment_id' => $assessmentB->id,
+            'student_id' => $studentB->id,
+            'attempt_no' => 1,
+            'started_at' => now(),
+            'due_at' => now()->addHour(),
+            'status' => AttemptStatus::Submitted,
+            'submitted_at' => now(),
+        ]);
+        $attemptAnswerB = AttemptAnswer::query()->create([
+            'attempt_id' => $attemptB->id,
+            'question_id' => $questionB->id,
+            'auto_score' => 10,
+            'final_score' => 10,
+        ]);
+
         return compact(
             'offeringA',
             'offeringB',
@@ -207,6 +281,10 @@ trait InstructorApiFixtures
             'liveQuizQuestionB',
             'projectAssessmentB',
             'projectB',
+            'assignmentB',
+            'assignmentSubmissionB',
+            'assessmentB',
+            'attemptAnswerB',
         );
     }
 
