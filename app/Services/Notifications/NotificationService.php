@@ -2,15 +2,16 @@
 
 namespace App\Services\Notifications;
 
+use App\Enums\CommunicationChannel;
 use App\Enums\NotificationChannel;
 use App\Models\Notification;
 use App\Models\User;
-use App\Services\Mail\TransactionalMailer;
+use App\Services\Communications\ChannelDispatcher;
 
 class NotificationService
 {
     public function __construct(
-        private readonly TransactionalMailer $mailer,
+        private readonly ChannelDispatcher $dispatcher,
     ) {}
 
     /**
@@ -24,20 +25,44 @@ class NotificationService
         ?array $metadata = null,
         bool $alsoEmail = true,
     ): Notification {
-        $notification = Notification::query()->create([
-            'user_id' => $user->id,
-            'type' => $type,
-            'title' => $title,
-            'body' => $body,
-            'channel' => NotificationChannel::InApp,
-            'metadata' => $metadata,
-        ]);
+        $this->dispatcher->dispatch(
+            CommunicationChannel::InApp,
+            $user,
+            $type,
+            $title,
+            $body,
+            $metadata,
+            respectPreferences: true,
+        );
 
-        if ($alsoEmail && $this->wantsEmail($user)) {
-            $this->sendEmailChannel($user, $type, $title, $body, $metadata);
+        if ($alsoEmail) {
+            $this->dispatcher->dispatch(
+                CommunicationChannel::Mail,
+                $user,
+                $type,
+                $title,
+                $body,
+                $metadata,
+                respectPreferences: true,
+            );
         }
 
-        return $notification;
+        $notification = Notification::query()
+            ->where('user_id', $user->id)
+            ->where('type', $type)
+            ->where('channel', NotificationChannel::InApp)
+            ->latest('created_at')
+            ->first();
+
+        if ($notification !== null) {
+            return $notification;
+        }
+
+        return Notification::query()
+            ->where('user_id', $user->id)
+            ->where('type', $type)
+            ->latest('created_at')
+            ->firstOrFail();
     }
 
     public function markRead(User $user, Notification $notification): Notification
@@ -48,29 +73,12 @@ class NotificationService
         return $notification->fresh();
     }
 
-    /**
-     * Honours the `notify_email` preference exposed in settings. Users predating the
-     * column default to opted-in, matching the column default.
-     */
-    private function wantsEmail(User $user): bool
+    public function markAllRead(User $user): int
     {
-        return $user->notify_email ?? true;
-    }
-
-    /**
-     * @param  array<string, mixed>|null  $metadata
-     */
-    private function sendEmailChannel(User $user, string $type, string $title, string $body, ?array $metadata): void
-    {
-        Notification::query()->create([
-            'user_id' => $user->id,
-            'type' => $type,
-            'title' => $title,
-            'body' => $body,
-            'channel' => NotificationChannel::Email,
-            'metadata' => $metadata,
-        ]);
-
-        $this->mailer->send((string) $user->email, $title, $body);
+        return Notification::query()
+            ->where('user_id', $user->id)
+            ->where('channel', NotificationChannel::InApp)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
     }
 }

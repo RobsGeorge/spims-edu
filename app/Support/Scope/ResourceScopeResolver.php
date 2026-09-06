@@ -2,6 +2,10 @@
 
 namespace App\Support\Scope;
 
+use App\Models\Announcement;
+use App\Models\AnnouncementDelivery;
+use App\Models\AnnouncementRevision;
+use App\Models\AnnouncementTarget;
 use App\Models\Assessment;
 use App\Models\AssessmentAttempt;
 use App\Models\Assignment;
@@ -13,6 +17,7 @@ use App\Models\CourseOffering;
 use App\Models\DiscussionBoard;
 use App\Models\DiscussionPost;
 use App\Models\DiscussionThread;
+use App\Models\EmailTemplate;
 use App\Models\Enrollment;
 use App\Models\GradebookComponent;
 use App\Models\LiveSession;
@@ -84,6 +89,11 @@ class ResourceScopeResolver
             $resource instanceof AttemptAnswer => $resource->attempt?->assessment?->offering_id,
             $resource instanceof DiscussionThread => $resource->board?->offering_id,
             $resource instanceof DiscussionPost => $resource->thread?->board?->offering_id,
+            $resource instanceof Announcement => $resource->offering_id,
+            $resource instanceof AnnouncementTarget => $resource->announcement?->offering_id,
+            $resource instanceof AnnouncementRevision => $resource->announcement?->offering_id,
+            $resource instanceof AnnouncementDelivery => $resource->announcement?->offering_id,
+            $resource instanceof EmailTemplate => $resource->scope_type === 'offering' ? $resource->scope_id : null,
             default => null,
         };
 
@@ -95,6 +105,7 @@ class ResourceScopeResolver
         $courseId = match (true) {
             $resource instanceof QuestionBank => $resource->course_id,
             $resource instanceof Course => $resource->id,
+            $resource instanceof EmailTemplate && $resource->scope_type === 'course' => $resource->scope_id,
             default => null,
         };
 

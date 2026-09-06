@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         bootstrap="tests/bootstrap.php"
          colors="true"
 >
     <testsuites>
@@ -28,6 +28,7 @@
             <exclude>tests/Feature/Portal</exclude>
             <exclude>tests/Feature/Rbac</exclude>
             <exclude>tests/Feature/Integrations</exclude>
+            <exclude>tests/Feature/Communications</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -82,6 +83,9 @@
         </testsuite>
         <testsuite name="Integrations">
             <directory>tests/Feature/Integrations</directory>
+        </testsuite>
+        <testsuite name="Communications">
+            <directory>tests/Feature/Communications</directory>
         </testsuite>
     </testsuites>
     <source>

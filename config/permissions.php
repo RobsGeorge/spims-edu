@@ -238,4 +238,37 @@ return [
         'INSTRUCTOR' => 'O',
         'STUDENT' => 'O',
     ],
+    'announcements.view' => [
+        'ADMINISTRATIVE_ADMIN' => 'R',
+        'ACADEMIC_ADMIN' => 'R',
+        'FINANCIAL_ADMIN' => 'R',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'STUDENT' => 'O',
+    ],
+    'announcements.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+    ],
+    'announcements.publish' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+    ],
+    'communications.report' => [
+        'ADMINISTRATIVE_ADMIN' => 'R',
+        'ACADEMIC_ADMIN' => 'R',
+    ],
+    'email_templates.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+    ],
+    'notifications.preferences' => [
+        'ADMINISTRATIVE_ADMIN' => 'O',
+        'ACADEMIC_ADMIN' => 'O',
+        'FINANCIAL_ADMIN' => 'O',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'STUDENT' => 'O',
+    ],
 ];

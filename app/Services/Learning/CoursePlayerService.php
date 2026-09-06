@@ -83,6 +83,7 @@ class CoursePlayerService
             'progress' => $progress,
             'announcements' => Announcement::query()
                 ->where('offering_id', $offering->id)
+                ->where('status', \App\Enums\AnnouncementStatus::Published)
                 ->latest('created_at')
                 ->limit(10)
                 ->get(),

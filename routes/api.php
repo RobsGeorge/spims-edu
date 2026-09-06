@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AnnouncementController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BrandingController;
 use App\Http\Controllers\Api\V1\MeController;
+use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\NotificationSettingsController;
+use App\Http\Controllers\Api\V1\TeachAnnouncementController;
 use App\Http\Middleware\Api\SetApiLocale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,5 +47,25 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/me', [MeController::class, 'show'])->name('me');
+
+        Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+        Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show'])->name('announcements.show');
+        Route::post('/announcements/{announcement}/dismiss-banner', [AnnouncementController::class, 'dismissBanner'])
+            ->name('announcements.dismiss-banner');
+
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+        Route::get('/notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
+        Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+
+        Route::get('/notification-settings', [NotificationSettingsController::class, 'show'])->name('notification-settings.show');
+        Route::put('/notification-settings', [NotificationSettingsController::class, 'update'])->name('notification-settings.update');
+
+        Route::post('/teach/offerings/{offering}/announcements', [TeachAnnouncementController::class, 'store'])
+            ->name('teach.announcements.store');
+        Route::put('/teach/announcements/{announcement}', [TeachAnnouncementController::class, 'update'])
+            ->name('teach.announcements.update');
+        Route::post('/teach/announcements/{announcement}/publish', [TeachAnnouncementController::class, 'publish'])
+            ->name('teach.announcements.publish');
     });
 });

@@ -66,4 +66,12 @@ return [
     'translations_desc' => 'Vérifier les traductions.',
     'finance_reports' => 'Rapports finance',
     'finance_reports_desc' => 'Soldes et revenus.',
+    'announcements' => 'Annonces',
+    'announcements_desc' => 'Mises à jour de cours et bannières.',
+    'notification_settings' => 'Paramètres de notification',
+    'notification_settings_desc' => 'Canaux, préférences et rappels.',
+    'communications' => 'Journal des communications',
+    'communications_desc' => 'Messages sortants, filtres et export.',
+    'email_templates' => 'Modèles d’e-mail',
+    'email_templates_desc' => 'Modifier et prévisualiser les modèles.',
 ];

@@ -17,6 +17,10 @@ define('LARAVEL_START', microtime(true));
 
 require __DIR__.'/vendor/autoload.php';
 
+if (is_link(__DIR__.'/vendor')) {
+    require __DIR__.'/bootstrap/worktree-autoload.php';
+}
+
 $app = require_once __DIR__.'/bootstrap/app.php';
 
 /*
