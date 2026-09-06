@@ -11,6 +11,9 @@ use App\Models\AssessmentAttempt;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\AttemptAnswer;
+use App\Models\AttendanceEntry;
+use App\Models\AttendancePolicy;
+use App\Models\ClassSession;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
@@ -79,6 +82,9 @@ class ResourceScopeResolver
             $resource instanceof Week => $resource->offering_id,
             $resource instanceof Enrollment => $resource->offering_id,
             $resource instanceof LiveSession => $resource->offering_id,
+            $resource instanceof ClassSession => $resource->offering_id,
+            $resource instanceof AttendanceEntry => $resource->session?->offering_id,
+            $resource instanceof AttendancePolicy => $resource->offering_id,
             $resource instanceof GradebookComponent => $resource->offering_id,
             $resource instanceof DiscussionBoard => $resource->offering_id,
             $resource instanceof Assessment => $resource->offering_id,

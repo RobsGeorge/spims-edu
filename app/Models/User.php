@@ -18,6 +18,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens;
+
     use HasFactory;
     use HasUlids;
     use Notifiable;
@@ -37,6 +38,7 @@ class User extends Authenticatable
         'status',
         'is_reviewer',
         'last_reviewed_at',
+        'date_of_birth',
     ];
 
     protected $hidden = [
@@ -51,6 +53,7 @@ class User extends Authenticatable
         'is_reviewer' => 'boolean',
         'last_reviewed_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'date_of_birth' => 'date',
     ];
 
     public function roles(): HasMany

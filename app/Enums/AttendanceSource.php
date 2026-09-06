@@ -6,4 +6,5 @@ enum AttendanceSource: string
 {
     case ZoomImport = 'ZOOM_IMPORT';
     case Manual = 'MANUAL';
+    case SelfCheckIn = 'SELF_CHECK_IN';
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\ClassSessionMode;
 use App\Enums\ComponentKind;
 use App\Enums\ContentItemType;
 use App\Enums\EnrollmentStatus;
@@ -111,6 +112,26 @@ class ResourceScopeTest extends TestCase
                 ->schedule($instructor, $theirs, ['title' => 'L', 'scheduled_start' => now()->addDays(2), 'duration_minutes' => 60]),
             'attendance.import' => fn () => app(AttendanceService::class)
                 ->importFromZoom($instructor, $session, []),
+            'attendance.openSession' => fn () => app(AttendanceService::class)
+                ->openSession($instructor, $theirs, [
+                    'title' => 'X',
+                    'scheduled_start' => now()->addDays(3),
+                    'duration_minutes' => 60,
+                    'mode' => ClassSessionMode::InPerson->value,
+                ]),
+            'attendance.markRoster' => function () use ($instructor, $theirs) {
+                $classSession = \App\Models\ClassSession::query()->create([
+                    'offering_id' => $theirs->id,
+                    'title' => 'Theirs',
+                    'scheduled_start' => now()->addDays(4),
+                    'duration_minutes' => 60,
+                    'mode' => ClassSessionMode::InPerson,
+                    'lock_version' => 0,
+                ]);
+                app(AttendanceService::class)->markRoster($instructor, $classSession, [
+                    ['student_id' => User::factory()->withRole(RoleType::Student)->create()->id, 'status' => 'PRESENT'],
+                ], 0);
+            },
             'discussions.configure' => fn () => app(DiscussionService::class)
                 ->configureBoard($instructor, $theirs, true),
         ];

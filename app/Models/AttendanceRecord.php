@@ -16,6 +16,7 @@ class AttendanceRecord extends Model
 
     protected $fillable = [
         'live_session_id',
+        'class_session_id',
         'student_id',
         'status',
         'minutes_attended',
@@ -38,5 +39,10 @@ class AttendanceRecord extends Model
     public function student(): BelongsTo
     {
         return $this->belongsTo(User::class, 'student_id');
+    }
+
+    public function classSession(): BelongsTo
+    {
+        return $this->belongsTo(ClassSession::class, 'class_session_id');
     }
 }

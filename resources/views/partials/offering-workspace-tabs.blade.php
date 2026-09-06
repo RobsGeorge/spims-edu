@@ -6,6 +6,7 @@
         'assessments' => __('teach.tab_assessments'),
         'gradebook' => __('teach.tab_gradebook'),
         'live' => __('teach.tab_live'),
+        'attendance' => __('teach.tab_attendance'),
         'discussions' => __('teach.tab_discussions'),
         'announcements' => __('teach.tab_announcements'),
         'roster' => __('teach.tab_roster'),

@@ -1,14 +1,13 @@
 openapi: 3.0.3
 info:
   title: SPIMS Mobile API
-  version: "1.0"
-  description: >
-    Bearer-token API for the SPIMS student and instructor mobile clients.
-    Every registered `api.v1.*` route must have an entry here — enforced by
-    tests/Feature/Api/V1/OpenApiCoverageTest.php.
-servers:
-  - url: /api/v1
+  version: '1.0'
+  description: 'Bearer-token API for the SPIMS student and instructor mobile clients. Every registered
+    `api.v1.*` route must have an entry here — enforced by tests/Feature/Api/V1/OpenApiCoverageTest.php.
 
+    '
+servers:
+- url: /api/v1
 components:
   securitySchemes:
     bearerAuth:
@@ -17,23 +16,25 @@ components:
   schemas:
     Error:
       type: object
-      required: [message, code]
+      required:
+      - message
+      - code
       properties:
         message:
           type: string
         code:
           type: string
           enum:
-            - UNAUTHENTICATED
-            - FORBIDDEN
-            - NOT_FOUND
-            - CONFLICT
-            - VALIDATION_FAILED
-            - LOCKED
-            - RATE_LIMITED
-            - METHOD_NOT_ALLOWED
-            - SERVER_ERROR
-            - ERROR
+          - UNAUTHENTICATED
+          - FORBIDDEN
+          - NOT_FOUND
+          - CONFLICT
+          - VALIDATION_FAILED
+          - LOCKED
+          - RATE_LIMITED
+          - METHOD_NOT_ALLOWED
+          - SERVER_ERROR
+          - ERROR
         errors:
           type: object
           additionalProperties:
@@ -43,63 +44,124 @@ components:
     User:
       type: object
       properties:
-        id: { type: string }
-        email: { type: string, format: email }
-        phone: { type: string, nullable: true }
-        first_name: { type: string }
-        last_name: { type: string }
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        first_name:
+          type: string
+        last_name:
+          type: string
         roles:
           type: array
-          items: { type: string }
-        status: { type: string, enum: [ACTIVE, SUSPENDED, PENDING] }
-        email_verified: { type: boolean }
-        preferred_locale: { type: string, enum: [ar, en, fr] }
-        theme_preference: { type: string, nullable: true, enum: [LIGHT, DARK, SYSTEM] }
-        notify_email: { type: boolean }
+          items:
+            type: string
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - SUSPENDED
+          - PENDING
+        email_verified:
+          type: boolean
+        preferred_locale:
+          type: string
+          enum:
+          - ar
+          - en
+          - fr
+        theme_preference:
+          type: string
+          nullable: true
+          enum:
+          - LIGHT
+          - DARK
+          - SYSTEM
+        notify_email:
+          type: boolean
     Announcement:
       type: object
       properties:
-        id: { type: string }
-        title: { type: string }
-        body: { type: string }
-        is_banner: { type: boolean }
-        banner_expires_at: { type: string, nullable: true }
-        published_at: { type: string, nullable: true }
-        offering_id: { type: string }
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        is_banner:
+          type: boolean
+        banner_expires_at:
+          type: string
+          nullable: true
+        published_at:
+          type: string
+          nullable: true
+        offering_id:
+          type: string
     Notification:
       type: object
       properties:
-        id: { type: string }
-        type: { type: string }
-        title: { type: string }
-        body: { type: string }
-        read_at: { type: string, nullable: true }
-        created_at: { type: string }
-        metadata: { type: object, nullable: true }
+        id:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        read_at:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+        metadata:
+          type: object
+          nullable: true
     NotificationSettings:
       type: object
       properties:
-        notify_email: { type: boolean }
-        preferences: { type: object }
+        notify_email:
+          type: boolean
+        preferences:
+          type: object
     TeachAnnouncement:
       type: object
       properties:
-        id: { type: string }
-        offering_id: { type: string }
-        title: { type: string }
-        body: { type: string }
-        status: { type: string, enum: [DRAFT, PUBLISHED] }
-        is_banner: { type: boolean }
-        published_at: { type: string, nullable: true }
-        revisions: { type: integer }
+        id:
+          type: string
+        offering_id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - PUBLISHED
+        is_banner:
+          type: boolean
+        published_at:
+          type: string
+          nullable: true
+        revisions:
+          type: integer
     PageMeta:
       type: object
       properties:
-        page: { type: integer }
-        per_page: { type: integer }
-        total: { type: integer }
-        last_page: { type: integer }
-
+        page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+        last_page:
+          type: integer
 paths:
   /branding:
     get:
@@ -107,7 +169,7 @@ paths:
       summary: Public theme tokens and branding, safe to call before login.
       security: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -117,12 +179,19 @@ paths:
                   data:
                     type: object
                     properties:
-                      site_name: { type: string }
-                      logo_light_url: { type: string, nullable: true }
-                      logo_dark_url: { type: string, nullable: true }
-                      favicon_url: { type: string, nullable: true }
-                      tokens: { type: object }
-
+                      site_name:
+                        type: string
+                      logo_light_url:
+                        type: string
+                        nullable: true
+                      logo_dark_url:
+                        type: string
+                        nullable: true
+                      favicon_url:
+                        type: string
+                        nullable: true
+                      tokens:
+                        type: object
   /login:
     post:
       operationId: login
@@ -134,13 +203,20 @@ paths:
           application/json:
             schema:
               type: object
-              required: [email, password]
+              required:
+              - email
+              - password
               properties:
-                email: { type: string, format: email }
-                password: { type: string }
-                device_name: { type: string, nullable: true }
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                device_name:
+                  type: string
+                  nullable: true
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -150,61 +226,71 @@ paths:
                   data:
                     type: object
                     properties:
-                      token: { type: string }
-                      token_type: { type: string, enum: [Bearer] }
-                      user: { $ref: "#/components/schemas/User" }
-        "422":
+                      token:
+                        type: string
+                      token_type:
+                        type: string
+                        enum:
+                        - Bearer
+                      user:
+                        $ref: '#/components/schemas/User'
+        '422':
           description: Invalid credentials, suspended, or not yet active.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "429":
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
           description: Too many attempts for this email + IP.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /logout:
     post:
       operationId: logout
       summary: Revoke the token used to authenticate this request (only that one).
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       responses:
-        "204":
+        '204':
           description: No content.
-        "401":
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /me:
     get:
       operationId: me
       summary: The authenticated user's profile.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { $ref: "#/components/schemas/User" }
-        "401":
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /announcements:
     get:
       operationId: listAnnouncements
       summary: Published announcements delivered to the authenticated user.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -213,55 +299,62 @@ paths:
                 properties:
                   data:
                     type: array
-                    items: { $ref: "#/components/schemas/Announcement" }
-        "401":
+                    items:
+                      $ref: '#/components/schemas/Announcement'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /announcements/{announcement}:
     get:
       operationId: showAnnouncement
       summary: One published announcement from the user's inbox.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       parameters:
-        - in: path
-          name: announcement
-          required: true
-          schema: { type: string }
+      - in: path
+        name: announcement
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { $ref: "#/components/schemas/Announcement" }
-        "401":
+                  data:
+                    $ref: '#/components/schemas/Announcement'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Not a recipient of this announcement.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /announcements/{announcement}/dismiss-banner:
     post:
       operationId: dismissAnnouncementBanner
       summary: Dismiss a banner announcement for the current user.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       parameters:
-        - in: path
-          name: announcement
-          required: true
-          schema: { type: string }
+      - in: path
+        name: announcement
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -271,35 +364,46 @@ paths:
                   data:
                     type: object
                     properties:
-                      dismissed: { type: boolean }
-        "401":
+                      dismissed:
+                        type: boolean
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /notifications:
     get:
       operationId: listNotifications
       summary: Paginated in-app notifications for the current user.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       parameters:
-        - in: query
-          name: unread
-          schema: { type: integer, enum: [0, 1] }
-        - in: query
-          name: page
-          schema: { type: integer }
-        - in: query
-          name: per_page
-          schema: { type: integer, maximum: 100, default: 20 }
+      - in: query
+        name: unread
+        schema:
+          type: integer
+          enum:
+          - 0
+          - 1
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: per_page
+        schema:
+          type: integer
+          maximum: 100
+          default: 20
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -308,21 +412,24 @@ paths:
                 properties:
                   data:
                     type: array
-                    items: { $ref: "#/components/schemas/Notification" }
-                  meta: { $ref: "#/components/schemas/PageMeta" }
-        "401":
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  meta:
+                    $ref: '#/components/schemas/PageMeta'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /notifications/mark-all-read:
     post:
       operationId: markAllNotificationsRead
       summary: Mark every in-app notification as read.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -332,192 +439,234 @@ paths:
                   data:
                     type: object
                     properties:
-                      marked: { type: integer }
-        "401":
+                      marked:
+                        type: integer
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /notifications/{notification}:
     get:
       operationId: showNotification
       summary: Fetch one notification and mark it read.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       parameters:
-        - in: path
-          name: notification
-          required: true
-          schema: { type: string }
+      - in: path
+        name: notification
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { $ref: "#/components/schemas/Notification" }
-        "401":
+                  data:
+                    $ref: '#/components/schemas/Notification'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /notifications/{notification}/read:
     post:
       operationId: markNotificationRead
       summary: Mark one notification as read.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       parameters:
-        - in: path
-          name: notification
-          required: true
-          schema: { type: string }
+      - in: path
+        name: notification
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { $ref: "#/components/schemas/Notification" }
-        "401":
+                  data:
+                    $ref: '#/components/schemas/Notification'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /notification-settings:
     get:
       operationId: getNotificationSettings
       summary: Per-event per-channel notification preference matrix.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { $ref: "#/components/schemas/NotificationSettings" }
-        "401":
+                  data:
+                    $ref: '#/components/schemas/NotificationSettings'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       operationId: putNotificationSettings
       summary: Replace per-event per-channel notification preferences.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [preferences]
+              required:
+              - preferences
               properties:
                 preferences:
                   type: array
                   items:
                     type: object
-                    required: [event_key, channel, enabled]
+                    required:
+                    - event_key
+                    - channel
+                    - enabled
                     properties:
-                      event_key: { type: string }
-                      channel: { type: string, enum: [in_app, mail, whatsapp] }
-                      enabled: { type: boolean }
+                      event_key:
+                        type: string
+                      channel:
+                        type: string
+                        enum:
+                        - in_app
+                        - mail
+                        - whatsapp
+                      enabled:
+                        type: boolean
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { $ref: "#/components/schemas/NotificationSettings" }
-        "401":
+                  data:
+                    $ref: '#/components/schemas/NotificationSettings'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "422":
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
           description: Validation failed.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /teach/offerings/{offering}/announcements:
     post:
       operationId: createTeachAnnouncement
       summary: Create a draft announcement for an offering.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       parameters:
-        - in: path
-          name: offering
-          required: true
-          schema: { type: string }
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [title, body]
+              required:
+              - title
+              - body
               properties:
-                title: { type: string }
-                body: { type: string }
-                is_banner: { type: boolean }
-                banner_expires_at: { type: string, format: date-time, nullable: true }
+                title:
+                  type: string
+                body:
+                  type: string
+                is_banner:
+                  type: boolean
+                banner_expires_at:
+                  type: string
+                  format: date-time
+                  nullable: true
                 targets:
                   type: array
                   items:
                     type: object
                     properties:
-                      type: { type: string }
-                      id: { type: string }
+                      type:
+                        type: string
+                      id:
+                        type: string
       responses:
-        "201":
+        '201':
           description: Created
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { $ref: "#/components/schemas/TeachAnnouncement" }
-        "401":
+                  data:
+                    $ref: '#/components/schemas/TeachAnnouncement'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /teach/announcements/{announcement}:
     put:
       operationId: updateTeachAnnouncement
       summary: Revise a draft or published announcement (writes a revision).
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       parameters:
-        - in: path
-          name: announcement
-          required: true
-          schema: { type: string }
+      - in: path
+        name: announcement
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -525,56 +674,535 @@ paths:
             schema:
               type: object
               properties:
-                title: { type: string }
-                body: { type: string }
-                is_banner: { type: boolean }
-                banner_expires_at: { type: string, format: date-time, nullable: true }
+                title:
+                  type: string
+                body:
+                  type: string
+                is_banner:
+                  type: boolean
+                banner_expires_at:
+                  type: string
+                  format: date-time
+                  nullable: true
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { $ref: "#/components/schemas/TeachAnnouncement" }
-        "401":
+                  data:
+                    $ref: '#/components/schemas/TeachAnnouncement'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
+              schema:
+                $ref: '#/components/schemas/Error'
   /teach/announcements/{announcement}/publish:
     post:
       operationId: publishTeachAnnouncement
       summary: Publish an announcement and fan out deliveries. TAs are denied.
-      security: [{ bearerAuth: [] }]
+      security:
+      - bearerAuth: []
       parameters:
-        - in: path
-          name: announcement
-          required: true
-          schema: { type: string }
+      - in: path
+        name: announcement
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  data: { $ref: "#/components/schemas/TeachAnnouncement" }
-        "401":
+                  data:
+                    $ref: '#/components/schemas/TeachAnnouncement'
+        '401':
           description: Missing or invalid token.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-        "403":
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
           description: Forbidden (including TA)
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Error" }
+              schema:
+                $ref: '#/components/schemas/Error'
+  /attendance/mine:
+    get:
+      operationId: attendanceMine
+      summary: Paginated attendance history for the authenticated student across offerings.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: per_page
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                      per_page:
+                        type: integer
+                      total:
+                        type: integer
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /offerings/{offering}/attendance/mine:
+    get:
+      operationId: offeringAttendanceMine
+      summary: The student's attendance percentage and policy threshold for one offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      percent:
+                        type: number
+                        nullable: true
+                      threshold:
+                        type: integer
+                        nullable: true
+                      policy_enabled:
+                        type: boolean
+                        nullable: true
+                      meets_threshold:
+                        type: boolean
+                        nullable: true
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /sessions/{session}/check-in:
+    post:
+      operationId: sessionCheckIn
+      summary: Student self check-in with a session code.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: session
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              properties:
+                code:
+                  type: string
+      responses:
+        '201':
+          description: Marked present
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Invalid, expired, exhausted, replayed, or wrong-session code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '423':
+          description: Session closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /teach/offerings/{offering}/sessions:
+    get:
+      operationId: teachOfferingSessions
+      summary: List class sessions for an offering (instructor/TA).
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: teachCreateSession
+      summary: Create a class session, including in-person.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - title
+              - scheduled_start
+              - duration_minutes
+              properties:
+                title:
+                  type: string
+                scheduled_start:
+                  type: string
+                  format: date-time
+                duration_minutes:
+                  type: integer
+                mode:
+                  type: string
+                  enum:
+                  - IN_PERSON
+                  - ONLINE
+                  - HYBRID
+                location:
+                  type: string
+                  nullable: true
+                notify_students:
+                  type: boolean
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /teach/sessions/{session}/roster:
+    get:
+      operationId: teachSessionRoster
+      summary: Session roster with current marks and lock_version.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: session
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+  /teach/sessions/{session}/attendance:
+    post:
+      operationId: teachMarkAttendance
+      summary: Bulk-mark attendance. Body carries lock_version; stale writes return 409.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: session
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - lock_version
+              - marks
+              properties:
+                lock_version:
+                  type: integer
+                marks:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - student_id
+                    - status
+                    properties:
+                      student_id:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                        - PRESENT
+                        - ABSENT
+                        - LATE
+                        - EXCUSED
+                      minutes_attended:
+                        type: integer
+                      excuse_reason:
+                        type: string
+                        nullable: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      lock_version:
+                        type: integer
+        '409':
+          description: Stale lock_version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '423':
+          description: Session closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /teach/sessions/{session}/attendance/fill-missing:
+    post:
+      operationId: teachFillMissing
+      summary: Mark remaining enrolled students absent.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: session
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '423':
+          description: Session closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /teach/sessions/{session}/close:
+    post:
+      operationId: teachCloseSession
+      summary: Close attendance. Further writes return 423 LOCKED.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: session
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+  /teach/sessions/{session}/check-in-code:
+    post:
+      operationId: teachIssueCheckInCode
+      summary: Issue a self check-in code for the session.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: session
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ttl_minutes:
+                  type: integer
+                max_uses:
+                  type: integer
+                  nullable: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+  /teach/offerings/{offering}/attendance/report:
+    get:
+      operationId: teachAttendanceReport
+      summary: Per-student, per-session, and aggregate attendance report. Use format=csv for a download.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - csv
+      responses:
+        '200':
+          description: JSON report or CSV
+  /teach/offerings/{offering}/roster:
+    get:
+      operationId: teachOfferingRoster
+      summary: Offering roster. Use format=csv for a download.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - csv
+      responses:
+        '200':
+          description: JSON roster or CSV
+  /teach/offerings/{offering}/birthdays:
+    get:
+      operationId: teachOfferingBirthdays
+      summary: Roster birthdays within a window (sparse until date_of_birth is populated).
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: days
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object

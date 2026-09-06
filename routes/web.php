@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ApplicationFormController;
 use App\Http\Controllers\Admin\ApplicationReviewController;
 use App\Http\Controllers\Admin\AssessmentAdminController;
 use App\Http\Controllers\Admin\AssessmentTemplateController;
+use App\Http\Controllers\Admin\AttendanceAdminController;
 use App\Http\Controllers\Admin\CommunicationAdminController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\CredentialAdminController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\ZoomWebhookController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -57,6 +59,7 @@ use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController;
 use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
@@ -122,6 +125,29 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show'])->name('announcements.show');
     Route::post('/announcements/{announcement}/dismiss-banner', [AnnouncementController::class, 'dismissBanner'])
         ->name('announcements.dismiss-banner');
+
+    Route::get('/teach/{offering}/attendance', [TeachAttendanceController::class, 'index'])->name('teach.attendance.index');
+    Route::post('/teach/{offering}/attendance/sessions', [TeachAttendanceController::class, 'store'])->name('teach.attendance.store');
+    Route::get('/teach/{offering}/attendance/report.csv', [TeachAttendanceController::class, 'reportCsv'])->name('teach.attendance.report.csv');
+    Route::get('/teach/{offering}/roster.csv', [TeachAttendanceController::class, 'rosterCsv'])->name('teach.attendance.roster.csv');
+    Route::post('/teach/{offering}/roster/announce', [TeachAttendanceController::class, 'announce'])->name('teach.attendance.announce');
+    Route::get('/teach/{offering}/sessions/{session}', [TeachAttendanceController::class, 'show'])->name('teach.attendance.show');
+    Route::post('/teach/{offering}/sessions/{session}/attendance', [TeachAttendanceController::class, 'mark'])->name('teach.attendance.mark');
+    Route::post('/teach/{offering}/sessions/{session}/fill-missing', [TeachAttendanceController::class, 'fillMissing'])->name('teach.attendance.fill-missing');
+    Route::post('/teach/{offering}/sessions/{session}/close', [TeachAttendanceController::class, 'close'])->name('teach.attendance.close');
+    Route::post('/teach/{offering}/sessions/{session}/reopen', [TeachAttendanceController::class, 'reopen'])->name('teach.attendance.reopen');
+    Route::post('/teach/{offering}/sessions/{session}/excuse', [TeachAttendanceController::class, 'excuse'])->name('teach.attendance.excuse');
+    Route::post('/teach/{offering}/sessions/{session}/check-in-code', [TeachAttendanceController::class, 'issueCode'])->name('teach.attendance.code');
+
+    Route::get('/attendance', [AttendanceController::class, 'index'])
+        ->middleware('permission:attendance.view_own')
+        ->name('attendance.index');
+    Route::get('/attendance/check-in', [AttendanceController::class, 'checkInForm'])
+        ->middleware('permission:attendance.self_check_in')
+        ->name('attendance.check-in');
+    Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])
+        ->middleware('permission:attendance.self_check_in')
+        ->name('attendance.check-in.store');
 
     Route::middleware('superadmin')->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/', [SuperAdminController::class, 'index'])->name('index');
@@ -484,6 +510,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/live/{session}/attendance/override', [LiveSessionAdminController::class, 'overrideAttendance'])
             ->middleware('permission:attendance.manage')
             ->name('live.attendance.override');
+
+        Route::get('/attendance/policy', [AttendanceAdminController::class, 'policy'])
+            ->middleware('permission:attendance.configure')
+            ->name('attendance.policy');
+        Route::post('/attendance/policy', [AttendanceAdminController::class, 'savePolicy'])
+            ->middleware('permission:attendance.configure')
+            ->name('attendance.policy.save');
+        Route::get('/attendance/report', [AttendanceAdminController::class, 'report'])
+            ->middleware('permission:attendance.report')
+            ->name('attendance.report');
 
         Route::post('/offerings/{offering}/discussions/configure', [DiscussionAdminController::class, 'configure'])
             ->middleware('permission:discussions.configure')

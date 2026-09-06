@@ -23,6 +23,7 @@
             <exclude>tests/Feature/Finance</exclude>
             <exclude>tests/Feature/Assessment</exclude>
             <exclude>tests/Feature/Live</exclude>
+            <exclude>tests/Feature/Attendance</exclude>
             <exclude>tests/Feature/Credentials</exclude>
             <exclude>tests/Feature/Hardening</exclude>
             <exclude>tests/Feature/Portal</exclude>
@@ -68,6 +69,9 @@
         </testsuite>
         <testsuite name="Live">
             <directory>tests/Feature/Live</directory>
+        </testsuite>
+        <testsuite name="Attendance">
+            <directory>tests/Feature/Attendance</directory>
         </testsuite>
         <testsuite name="Credentials">
             <directory>tests/Feature/Credentials</directory>

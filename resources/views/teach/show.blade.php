@@ -31,6 +31,13 @@
     @elseif($tab === 'live')
         <x-page-header :title="__('teach.tab_live')" :subtitle="__('teach.tab_live_help')" />
         <a class="btn btn-primary" href="{{ route('admin.live.index', $offering) }}">{{ __('teach.open_live') }}</a>
+    @elseif($tab === 'attendance')
+        <x-page-header :title="__('teach.tab_attendance')" :subtitle="__('teach.tab_attendance_help')" />
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary" href="{{ route('teach.attendance.index', $offering) }}">{{ __('teach.open_attendance') }}</a>
+            <a class="btn btn-outline-primary" href="{{ route('teach.attendance.index', ['offering' => $offering, 'tab' => 'report']) }}">{{ __('attendance.report') }}</a>
+            <a class="btn btn-outline-secondary" href="{{ route('teach.attendance.roster.csv', $offering) }}">{{ __('attendance.roster_export') }}</a>
+        </div>
     @elseif($tab === 'discussions')
         <x-page-header :title="__('teach.tab_discussions')" :subtitle="__('teach.tab_discussions_help')" />
         <a class="btn btn-primary" href="{{ route('discussions.board', $offering) }}">{{ __('teach.open_discussions') }}</a>
@@ -104,6 +111,10 @@
         @empty
             <x-empty-state :title="__('teach.empty_roster')" icon="bi-people" />
         @endforelse
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a class="btn btn-outline-primary btn-sm" href="{{ route('teach.attendance.roster.csv', $offering) }}">{{ __('attendance.roster_export') }}</a>
+            <a class="btn btn-outline-secondary btn-sm" href="{{ route('teach.attendance.index', ['offering' => $offering, 'tab' => 'roster']) }}">{{ __('attendance.birthdays') }}</a>
+        </div>
     @else
         <x-page-header :title="__('teach.tab_content')" :subtitle="__('teach.tab_content_help')" />
         <a class="btn btn-primary mb-3" href="{{ route('admin.offerings.show', $offering) }}">{{ __('teach.edit_content') }}</a>

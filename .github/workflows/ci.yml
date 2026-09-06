@@ -84,6 +84,9 @@ jobs:
       - name: Live pipeline
         run: php artisan test --testsuite=Live --compact
 
+      - name: Attendance pipeline
+        run: php artisan test --testsuite=Attendance --compact
+
       - name: Communications pipeline
         run: php artisan test --testsuite=Communications --compact
 

@@ -32,6 +32,7 @@ class SettingsController extends Controller
             'preferred_locale' => 'required|in:ar,en,fr',
             'theme_preference' => 'required|in:LIGHT,DARK,SYSTEM',
             'notify_email' => 'nullable|boolean',
+            'date_of_birth' => 'nullable|date',
         ]);
 
         $user = $request->user();
@@ -44,6 +45,7 @@ class SettingsController extends Controller
                 'preferred_locale' => $data['preferred_locale'],
                 'theme_preference' => ThemePreference::from($data['theme_preference']),
                 'notify_email' => (bool) ($data['notify_email'] ?? false),
+                'date_of_birth' => $data['date_of_birth'] ?? null,
             ]);
 
             return $user->fresh();
