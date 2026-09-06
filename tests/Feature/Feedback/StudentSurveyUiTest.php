@@ -231,6 +231,30 @@ class StudentSurveyUiTest extends TestCase
     }
 
     #[Test]
+    public function arabic_student_survey_pages_are_rtl(): void
+    {
+        $actors = $this->offeringActors('WSAR');
+        $actors['student']->forceFill(['preferred_locale' => 'ar'])->save();
+        $survey = $this->publishedSurvey($actors['instructor'], $actors['offering'], 'تقييم المقرر');
+
+        foreach ([
+            $this->actingAs($actors['student']->fresh())->get(route('student.surveys.index')),
+            $this->actingAs($actors['student']->fresh())->get(route('student.surveys.show', $survey)),
+        ] as $response) {
+            $response->assertOk();
+            $html = $response->getContent();
+            $this->assertStringContainsString('lang="ar"', $html);
+            $this->assertStringContainsString('dir="rtl"', $html);
+            $this->assertStringContainsString('bootstrap.rtl.min.css', $html);
+            $this->assertStringContainsString('spims-theme.css', $html);
+        }
+
+        $this->actingAs($actors['student']->fresh())
+            ->get(route('student.surveys.index'))
+            ->assertSee(__('feedback.inbox_title', [], 'ar'), false);
+    }
+
+    #[Test]
     public function student_locale_keys_exist_in_ar_en_fr(): void
     {
         foreach (['ar', 'en', 'fr'] as $locale) {
