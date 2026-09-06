@@ -18,7 +18,11 @@
                     {{ $row['kind'] }}: {{ $row['passed'] ? __('completion.passed') : __('completion.failed') }}@if(! $loop->last), @endif
                 @endforeach
             </td>
-            <td><a href="{{ route('teach.completion.show', ['offering' => $offering, 'student_id' => $result->student_id]) }}">{{ __('completion.notes') }}</a></td>
+            <td class="text-nowrap">
+                <a href="{{ route('teach.students.show', [$offering, $result->student_id]) }}">{{ __('teach.view_dossier') }}</a>
+                <span class="text-muted-theme">·</span>
+                <a href="{{ route('teach.completion.show', ['offering' => $offering, 'student_id' => $result->student_id]) }}">{{ __('completion.notes') }}</a>
+            </td>
         </tr>
     @empty
         <tr><td colspan="4" class="text-muted-theme">{{ __('completion.no_results') }}</td></tr>
@@ -28,7 +32,9 @@
 </div>
 
 @if($selectedStudent)
-<h2 class="h5">{{ __('completion.notes') }} — {{ $selectedStudent->email }}</h2>
+<h2 class="h5">{{ __('completion.notes') }} — {{ $selectedStudent->email }}
+    <a class="fs-6 fw-normal" href="{{ route('teach.students.show', [$offering, $selectedStudent]) }}">{{ __('teach.view_dossier') }}</a>
+</h2>
 <form method="POST" action="{{ route('teach.completion.notes.store', [$offering, $selectedStudent]) }}" class="card border-0 shadow-sm mb-4">
     @csrf
     <div class="card-body">
