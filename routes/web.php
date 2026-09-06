@@ -71,6 +71,7 @@ use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController
 use App\Http\Controllers\Teach\CompletionController as TeachCompletionController;
 use App\Http\Controllers\Teach\LiveQuizController as TeachLiveQuizController;
 use App\Http\Controllers\Teach\ProjectController as TeachProjectController;
+use App\Http\Controllers\Teach\StudentController as TeachStudentController;
 use App\Http\Controllers\Teach\SurveyController as TeachSurveyController;
 use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
@@ -124,6 +125,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/teach', [TeachController::class, 'index'])->name('teach.index');
     Route::get('/teach/{offering}', [TeachController::class, 'show'])->name('teach.show');
+    Route::get('/teach/{offering}/students/{student}', [TeachStudentController::class, 'show'])
+        ->name('teach.students.show');
     Route::post('/teach/{offering}/announcements', [TeachController::class, 'storeAnnouncement'])
         ->name('teach.announcements.store');
     Route::put('/teach/announcements/{announcement}', [TeachController::class, 'updateAnnouncement'])
