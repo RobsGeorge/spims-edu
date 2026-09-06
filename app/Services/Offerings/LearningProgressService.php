@@ -92,7 +92,7 @@ class LearningProgressService
             throw ValidationException::withMessages(['learn' => [__('learn.week_locked')]]);
         }
 
-        if ($manual && ! in_array($item->type, [ContentItemType::Video, ContentItemType::Reading, ContentItemType::Text], true)) {
+        if ($manual && ! in_array($item->type, [ContentItemType::Video, ContentItemType::Reading, ContentItemType::Text, ContentItemType::File], true)) {
             throw ValidationException::withMessages(['learn' => [__('learn.manual_complete_only_passive')]]);
         }
 

@@ -28,6 +28,8 @@ use App\Models\ClassSession;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
+use App\Enums\ProjectDeliverableKind;
+use App\Enums\ProjectReviewStatus;
 use App\Models\DiscussionBoard;
 use App\Models\DiscussionGrade;
 use App\Models\DiscussionThread;
@@ -36,8 +38,12 @@ use App\Models\GradebookComponent;
 use App\Models\LiveQuiz;
 use App\Models\LiveQuizQuestion;
 use App\Models\LiveQuizSession;
+use App\Models\LiveSession;
 use App\Models\Project;
 use App\Models\ProjectAssessment;
+use App\Models\ProjectDeliverable;
+use App\Models\ProjectDeliverableSubmission;
+use App\Models\ProjectPhase;
 use App\Models\Question;
 use App\Models\QuestionBank;
 use App\Models\User;
@@ -134,7 +140,12 @@ trait InstructorApiFixtures
      *     assignmentB: Assignment,
      *     assignmentSubmissionB: AssignmentSubmission,
      *     assessmentB: Assessment,
-     *     attemptAnswerB: AttemptAnswer
+     *     attemptAnswerB: AttemptAnswer,
+     *     liveSessionB: LiveSession,
+     *     discussionThreadB: DiscussionThread,
+     *     contentItemB: ContentItem,
+     *     projectDeliverableSubmissionB: ProjectDeliverableSubmission,
+     *     projectB2: Project
      * }
      */
     protected function staffTwoOfferings(): array
@@ -264,6 +275,55 @@ trait InstructorApiFixtures
             'final_score' => 10,
         ]);
 
+        $liveSessionB = LiveSession::query()->create([
+            'offering_id' => $offeringB->id,
+            'title' => 'B live',
+            'scheduled_start' => now()->addHour(),
+            'duration_minutes' => 60,
+            'zoom_meeting_id' => 'zb',
+            'zoom_join_url' => 'https://zoom.test/j/b',
+        ]);
+
+        $boardB = DiscussionBoard::query()->firstOrCreate(
+            ['offering_id' => $offeringB->id],
+            ['allow_student_threads' => true]
+        );
+        $discussionThreadB = DiscussionThread::query()->firstOrCreate(
+            ['board_id' => $boardB->id, 'title' => 'B thread'],
+            [
+                'author_id' => $studentB->id,
+                'visibility' => ThreadVisibility::Open,
+                'is_graded' => true,
+                'locked' => false,
+                'pinned' => false,
+            ]
+        );
+
+        $contentItemB = $assignmentItemB;
+
+        $projectB2 = Project::query()->create([
+            'project_assessment_id' => $projectAssessmentB->id,
+            'name' => 'Team B2',
+            'status' => ProjectStatus::Open,
+        ]);
+        $phaseB = ProjectPhase::query()->create([
+            'project_assessment_id' => $projectAssessmentB->id,
+            'name' => 'Phase 1',
+            'position' => 1,
+        ]);
+        $deliverableB = ProjectDeliverable::query()->create([
+            'phase_id' => $phaseB->id,
+            'kind' => ProjectDeliverableKind::Text,
+            'title' => 'Abstract',
+            'due_at' => now()->addDay(),
+        ]);
+        $projectDeliverableSubmissionB = ProjectDeliverableSubmission::query()->create([
+            'project_id' => $projectB->id,
+            'deliverable_id' => $deliverableB->id,
+            'body' => 'B draft',
+            'review_status' => ProjectReviewStatus::Pending,
+        ]);
+
         return compact(
             'offeringA',
             'offeringB',
@@ -285,6 +345,11 @@ trait InstructorApiFixtures
             'assignmentSubmissionB',
             'assessmentB',
             'attemptAnswerB',
+            'liveSessionB',
+            'discussionThreadB',
+            'contentItemB',
+            'projectDeliverableSubmissionB',
+            'projectB2',
         );
     }
 

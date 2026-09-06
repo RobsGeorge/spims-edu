@@ -76,6 +76,19 @@ class InstructorApiScopeTest extends TestCase
             'GET teach assessment attempts' => ['GET', '/api/v1/teach/assessments/{assessment}/attempts', 403],
             'POST teach answer grade' => ['POST', '/api/v1/teach/answers/{attemptAnswer}/grade', 403],
             'POST teach announce-results' => ['POST', '/api/v1/teach/assessments/{assessment}/announce-results', 403],
+
+            'GET teach live-sessions' => ['GET', '/api/v1/teach/offerings/{offering}/live-sessions', 403],
+            'POST teach live-session import' => ['POST', '/api/v1/teach/live-sessions/{liveSession}/attendance/import', 403],
+            'POST teach project move' => ['POST', '/api/v1/teach/projects/{project}/members/move', 403],
+            'POST teach project review' => ['POST', '/api/v1/teach/project-submissions/{projectDeliverableSubmission}/review', 403],
+            'POST teach project grade' => ['POST', '/api/v1/teach/projects/{project}/grade', 403],
+            'GET teach discussion threads' => ['GET', '/api/v1/teach/offerings/{offering}/discussions/threads', 403],
+            'POST teach discussion moderate' => ['POST', '/api/v1/teach/discussions/threads/{discussionThread}/moderate', 403],
+            'POST teach discussion grade' => ['POST', '/api/v1/teach/discussions/threads/{discussionThread}/grade', 403],
+            'POST teach weeks store' => ['POST', '/api/v1/teach/offerings/{offering}/weeks', 403],
+            'POST teach week items' => ['POST', '/api/v1/teach/weeks/{week}/items', 403],
+            'PUT teach content item' => ['PUT', '/api/v1/teach/items/{contentItem}', 403],
+            'DELETE teach content item' => ['DELETE', '/api/v1/teach/items/{contentItem}', 403],
         ];
     }
 
@@ -167,6 +180,11 @@ class InstructorApiScopeTest extends TestCase
             'assignmentSubmission' => $world['assignmentSubmissionB']->id,
             'assessment' => $world['assessmentB']->id,
             'attemptAnswer' => $world['attemptAnswerB']->id,
+            'liveSession' => $world['liveSessionB']->id,
+            'discussionThread' => $world['discussionThreadB']->id,
+            'contentItem' => $world['contentItemB']->id,
+            'projectDeliverableSubmission' => $world['projectDeliverableSubmissionB']->id,
+            'to_project' => $world['projectB2']->id,
         ];
     }
 
@@ -215,6 +233,40 @@ class InstructorApiScopeTest extends TestCase
             ],
             '/api/v1/teach/answers/{attemptAnswer}/grade' => [
                 'final_score' => 5,
+            ],
+            '/api/v1/teach/project-assessments/{projectAssessment}/announce' => [
+                'confirmation' => 'deadbeefdeadbeefdeadbeefdeadbeef',
+            ],
+            '/api/v1/teach/live-sessions/{liveSession}/attendance/import' => [
+                'participants' => [['email' => 'nobody@example.com', 'minutes' => 10]],
+            ],
+            '/api/v1/teach/projects/{project}/members/move' => [
+                'student_id' => $ids['student'],
+                'to_project_id' => $ids['to_project'],
+            ],
+            '/api/v1/teach/project-submissions/{projectDeliverableSubmission}/review' => [
+                'review_status' => 'ACCEPTED',
+            ],
+            '/api/v1/teach/projects/{project}/grade' => [
+                'team_score' => 10,
+            ],
+            '/api/v1/teach/discussions/threads/{discussionThread}/moderate' => [
+                'locked' => true,
+            ],
+            '/api/v1/teach/discussions/threads/{discussionThread}/grade' => [
+                'student_id' => $ids['student'],
+                'score' => 10,
+            ],
+            '/api/v1/teach/offerings/{offering}/weeks' => [
+                'number' => 9,
+                'title' => 'Hijack',
+            ],
+            '/api/v1/teach/weeks/{week}/items' => [
+                'type' => 'TEXT',
+                'title' => 'Hijack',
+            ],
+            '/api/v1/teach/items/{contentItem}' => [
+                'title' => 'Hijack',
             ],
             default => in_array($method, ['POST', 'PUT'], true) ? [] : [],
         };
