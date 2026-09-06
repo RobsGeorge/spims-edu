@@ -9,5 +9,6 @@ enum ComponentKind: string
     case Exam = 'EXAM';
     case Attendance = 'ATTENDANCE';
     case Discussion = 'DISCUSSION';
+    case Project = 'PROJECT';
     case Other = 'OTHER';
 }

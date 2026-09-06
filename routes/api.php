@@ -27,10 +27,12 @@ use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\NotificationSettingsController;
 use App\Http\Controllers\Api\V1\OfferingController;
 use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\V1\ProjectController;
 use App\Http\Controllers\Api\V1\TeachAnnouncementController;
 use App\Http\Controllers\Api\V1\TeachAttendanceController;
 use App\Http\Controllers\Api\V1\TeachCompletionController;
 use App\Http\Controllers\Api\V1\TeachLiveQuizController;
+use App\Http\Controllers\Api\V1\TeachProjectController;
 use App\Http\Controllers\Api\V1\TranscriptController;
 use App\Http\Controllers\Api\V1\WalletController;
 use App\Http\Middleware\Api\SetApiLocale;
@@ -181,6 +183,23 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
         Route::post('/live-quiz/sessions/{liveQuizSession}/questions/{liveQuizQuestion}/answer', [LiveQuizController::class, 'answer'])
             ->name('live-quiz.sessions.answer');
 
+        // --- S6E projects (owned by cursor/s6e-projects-bcff) ---
+        Route::get('/offerings/{offering}/project-assessments', [ProjectController::class, 'index'])
+            ->name('offerings.project-assessments');
+        Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+        Route::post('/project-assessments/{projectAssessment}/join', [ProjectController::class, 'join'])
+            ->name('project-assessments.join');
+        Route::post('/project-assessments/{projectAssessment}/leave', [ProjectController::class, 'leave'])
+            ->name('project-assessments.leave');
+        Route::post('/projects/{project}/deliverables/{projectDeliverable}/submit', [ProjectController::class, 'submit'])
+            ->name('projects.deliverables.submit');
+        Route::delete('/projects/{project}/submission-files/{projectSubmissionFile}', [ProjectController::class, 'destroyFile'])
+            ->name('projects.submission-files.destroy');
+        Route::get('/projects/{project}/peer-evaluations/pending', [ProjectController::class, 'pendingPeerEvaluations'])
+            ->name('projects.peer-evaluations.pending');
+        Route::post('/projects/{project}/peer-evaluations', [ProjectController::class, 'storePeerEvaluation'])
+            ->name('projects.peer-evaluations.store');
+
         Route::prefix('teach')->name('teach.')->middleware('api.instructor')->group(function () {
             Route::get('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'sessions'])->name('offerings.sessions');
             Route::post('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'storeSession'])->name('offerings.sessions.store');
@@ -214,6 +233,16 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
                 ->name('live-quiz.sessions.results');
             Route::post('/live-quiz/sessions/{liveQuizSession}/end', [TeachLiveQuizController::class, 'end'])
                 ->name('live-quiz.sessions.end');
+
+            // --- S6E projects staff (owned by cursor/s6e-projects-bcff) ---
+            Route::get('/offerings/{offering}/project-assessments', [TeachProjectController::class, 'index'])
+                ->name('offerings.project-assessments');
+            Route::get('/project-assessments/{projectAssessment}/teams', [TeachProjectController::class, 'teams'])
+                ->name('project-assessments.teams');
+            Route::post('/project-assessments/{projectAssessment}/announce', [TeachProjectController::class, 'announce'])
+                ->name('project-assessments.announce');
+            Route::get('/projects/{project}/peer-evaluations', [TeachProjectController::class, 'peerAggregates'])
+                ->name('projects.peer-evaluations');
         });
     });
 });

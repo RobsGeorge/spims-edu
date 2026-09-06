@@ -446,4 +446,32 @@ return [
         'INSTRUCTOR' => 'O',
         'ACADEMIC_ADMIN' => 'F',
     ],
+
+    // S6E projects
+    'projects.view' => [
+        'STUDENT' => 'O',
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'projects.join' => [
+        'STUDENT' => 'O',
+    ],
+    'projects.manage' => [
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'projects.grade' => [
+        'INSTRUCTOR' => 'O',
+        'TA' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'projects.announce' => [
+        'INSTRUCTOR' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'projects.peer_eval' => [
+        'STUDENT' => 'O',
+    ],
 ];

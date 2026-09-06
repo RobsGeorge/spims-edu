@@ -40,4 +40,9 @@ class GradebookComponent extends Model
     {
         return $this->hasMany(Assignment::class, 'component_id');
     }
+
+    public function projectAssessments(): HasMany
+    {
+        return $this->hasMany(ProjectAssessment::class, 'component_id');
+    }
 }

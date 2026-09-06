@@ -40,6 +40,18 @@ use App\Models\ModuleStudentAssessment;
 use App\Models\OfferingClosing;
 use App\Models\OfferingStaff;
 use App\Models\ProctorEvent;
+use App\Models\Project;
+use App\Models\ProjectAssessment;
+use App\Models\ProjectChangeRequest;
+use App\Models\ProjectDeliverable;
+use App\Models\ProjectDeliverableSubmission;
+use App\Models\ProjectGrade;
+use App\Models\ProjectGradeCriterion;
+use App\Models\ProjectMembership;
+use App\Models\ProjectMembershipEvent;
+use App\Models\ProjectPeerEvaluation;
+use App\Models\ProjectPhase;
+use App\Models\ProjectSubmissionFile;
 use App\Models\QuestionBank;
 use App\Models\StudentNote;
 use App\Models\User;
@@ -132,6 +144,18 @@ class ResourceScopeResolver
             $resource instanceof LiveQuiz => $resource->offering_id,
             $resource instanceof LiveQuizSession => $resource->quiz?->offering_id,
             $resource instanceof LiveQuizQuestion => $resource->quiz?->offering_id,
+            $resource instanceof ProjectAssessment => $resource->offering_id,
+            $resource instanceof Project => $resource->assessment?->offering_id,
+            $resource instanceof ProjectMembership => $resource->project?->assessment?->offering_id,
+            $resource instanceof ProjectMembershipEvent => $resource->project?->assessment?->offering_id,
+            $resource instanceof ProjectPhase => $resource->assessment?->offering_id,
+            $resource instanceof ProjectDeliverable => $resource->phase?->assessment?->offering_id,
+            $resource instanceof ProjectDeliverableSubmission => $resource->project?->assessment?->offering_id,
+            $resource instanceof ProjectSubmissionFile => $resource->submission?->project?->assessment?->offering_id,
+            $resource instanceof ProjectChangeRequest => $resource->assessment?->offering_id,
+            $resource instanceof ProjectGradeCriterion => $resource->assessment?->offering_id,
+            $resource instanceof ProjectGrade => $resource->assessment?->offering_id,
+            $resource instanceof ProjectPeerEvaluation => $resource->project?->assessment?->offering_id,
             default => null,
         };
 
