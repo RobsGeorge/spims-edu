@@ -13,6 +13,7 @@ use App\Services\Projects\PeerEvaluationService;
 use App\Services\Projects\ProjectDeliverableService;
 use App\Services\Projects\ProjectGradingService;
 use App\Services\Projects\ProjectTeamService;
+use App\Support\Api\ConditionalGet;
 use App\Support\Api\ConfirmationToken;
 use App\Support\Api\IdempotencyStore;
 use App\Support\AuthorizeService;
@@ -21,7 +22,7 @@ use Illuminate\Http\Request;
 
 class TeachProjectController extends Controller
 {
-    public function index(Request $request, CourseOffering $offering, AuthorizeService $authorize): JsonResponse
+    public function index(Request $request, CourseOffering $offering, AuthorizeService $authorize, ConditionalGet $conditional): JsonResponse
     {
         $authorize->authorize($request->user(), 'projects.view', $offering);
 
@@ -30,7 +31,7 @@ class TeachProjectController extends Controller
             ->orderBy('title')
             ->get();
 
-        return response()->json([
+        return $conditional->json($request, [
             'data' => $assessments->map(fn (ProjectAssessment $a) => [
                 'id' => $a->id,
                 'title' => $a->title,
@@ -201,11 +202,12 @@ class TeachProjectController extends Controller
         Project $project,
         PeerEvaluationService $peers,
         AuthorizeService $authorize,
+        ConditionalGet $conditional,
     ): JsonResponse {
         $project->loadMissing('assessment');
         $authorize->authorize($request->user(), 'projects.view', $project);
 
-        return response()->json([
+        return $conditional->json($request, [
             'data' => $peers->aggregatesForStaff($request->user(), $project->assessment),
         ]);
     }

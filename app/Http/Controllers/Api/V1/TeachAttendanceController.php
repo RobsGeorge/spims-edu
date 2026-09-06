@@ -14,6 +14,7 @@ use App\Support\Api\IdempotencyStore;
 use App\Support\AuthorizeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TeachAttendanceController extends Controller
@@ -57,7 +58,7 @@ class TeachAttendanceController extends Controller
         return response()->json(['data' => $payload], 201);
     }
 
-    public function roster(Request $request, ClassSession $session, AuthorizeService $authorize): JsonResponse
+    public function roster(Request $request, ClassSession $session, AuthorizeService $authorize, ConditionalGet $conditional): JsonResponse
     {
         $authorize->authorize($request->user(), 'attendance.view_all', $session);
 
@@ -81,7 +82,7 @@ class TeachAttendanceController extends Controller
                 ];
             });
 
-        return response()->json([
+        return $conditional->json($request, [
             'data' => [
                 'session_id' => $session->id,
                 'lock_version' => $session->lock_version,
@@ -179,7 +180,7 @@ class TeachAttendanceController extends Controller
         return response()->json(['data' => $payload], 201);
     }
 
-    public function report(Request $request, CourseOffering $offering, AttendanceService $attendance): JsonResponse|StreamedResponse
+    public function report(Request $request, CourseOffering $offering, AttendanceService $attendance, ConditionalGet $conditional): JsonResponse|StreamedResponse
     {
         $report = $attendance->report($request->user(), $offering);
 
@@ -189,10 +190,10 @@ class TeachAttendanceController extends Controller
             ], $report['students']);
         }
 
-        return response()->json(['data' => $report]);
+        return $conditional->json($request, ['data' => $report]);
     }
 
-    public function offeringRoster(Request $request, CourseOffering $offering, RosterService $roster): JsonResponse|StreamedResponse
+    public function offeringRoster(Request $request, CourseOffering $offering, RosterService $roster, ConditionalGet $conditional): JsonResponse|StreamedResponse|Response
     {
         if ($request->query('format') === 'csv') {
             $csv = $roster->exportCsv($request->user(), $offering);
@@ -212,10 +213,10 @@ class TeachAttendanceController extends Controller
             'date_of_birth' => $enrollment->student?->date_of_birth?->toDateString(),
         ]);
 
-        return response()->json(['data' => $rows]);
+        return $conditional->json($request, ['data' => $rows]);
     }
 
-    public function birthdays(Request $request, CourseOffering $offering, RosterService $roster): JsonResponse
+    public function birthdays(Request $request, CourseOffering $offering, RosterService $roster, ConditionalGet $conditional): JsonResponse
     {
         $window = (int) $request->query('days', 14);
         $rows = $roster->birthdays($request->user(), $offering, $window)->map(fn (array $row) => [
@@ -227,7 +228,7 @@ class TeachAttendanceController extends Controller
             'days_until' => $row['days_until'],
         ]);
 
-        return response()->json(['data' => $rows]);
+        return $conditional->json($request, ['data' => $rows]);
     }
 
     /** @return array<string, mixed> */

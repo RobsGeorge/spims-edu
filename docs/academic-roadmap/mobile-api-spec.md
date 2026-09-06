@@ -164,9 +164,12 @@ returned key.
 
 ### Offline behaviour
 
-The API is read-cacheable and write-explicit. Every collection response carries an `ETag`;
-clients send `If-None-Match` and handle 304. There is no sync protocol and no server-side
-write queue — a failed mutation is the client's to retry, with `Idempotency-Key`.
+The API is read-cacheable and write-explicit. Every **safe** instructor collection `GET`
+under `/teach/*` carries an `ETag`; clients send `If-None-Match` and handle 304. Confirmation-
+issuing GETs (`offering` show, `gradebook`, assessment attempts, project teams) must not —
+their body includes a minted token. CSV `format=` variants stay streams and do not use ETags.
+There is no sync protocol and no server-side write queue — a failed mutation is the client's
+to retry, with `Idempotency-Key`.
 
 ---
 

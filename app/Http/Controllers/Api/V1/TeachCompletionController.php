@@ -10,17 +10,18 @@ use App\Models\User;
 use App\Models\Week;
 use App\Services\Completion\ModuleAssessmentService;
 use App\Services\Completion\StudentNoteService;
+use App\Support\Api\ConditionalGet;
 use App\Support\Api\IdempotencyStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TeachCompletionController extends Controller
 {
-    public function notes(Request $request, CourseOffering $offering, User $student, StudentNoteService $notes): JsonResponse
+    public function notes(Request $request, CourseOffering $offering, User $student, StudentNoteService $notes, ConditionalGet $conditional): JsonResponse
     {
         $items = $notes->forStudent($request->user(), $offering, $student);
 
-        return response()->json([
+        return $conditional->json($request, [
             'data' => $items->map(fn (StudentNote $note) => $this->notePayload($note))->values(),
         ]);
     }
