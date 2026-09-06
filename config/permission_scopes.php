@@ -35,6 +35,9 @@ return [
         'discussions.configure',
         'discussions.moderate',
         'discussions.grade',
+        'announcements.manage',
+        'announcements.publish',
+        'email_templates.manage',
     ],
 
     /*
