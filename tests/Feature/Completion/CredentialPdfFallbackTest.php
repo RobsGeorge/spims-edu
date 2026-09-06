@@ -26,14 +26,10 @@ class CredentialPdfFallbackTest extends TestCase
         $credential = app(CredentialService::class)->issueOfferingCompletion($admin, $student, $offering, 'en');
 
         $this->assertNotNull($credential->file_url);
-        $this->assertTrue(str_ends_with($credential->file_url, '.pdf') || str_ends_with($credential->file_url, '.html'));
+        $this->assertTrue(str_ends_with($credential->file_url, '.pdf'));
 
         $bytes = app(ObjectStorageService::class)->disk()->get($credential->file_url);
-        $this->assertNotSame('', $bytes);
-
-        if (str_ends_with($credential->file_url, '.pdf')) {
-            $this->assertStringStartsWith('%PDF-', $bytes);
-        }
+        $this->assertStringStartsWith('%PDF-', $bytes);
     }
 
     #[Test]

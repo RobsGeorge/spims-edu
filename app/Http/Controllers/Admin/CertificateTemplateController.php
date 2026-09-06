@@ -6,14 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\CertificateTemplate;
 use App\Models\Course;
 use App\Services\Credentials\CertificateTemplateService;
+use App\Support\AuthorizeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CertificateTemplateController extends Controller
 {
-    public function index(): View
+    public function index(Request $request, AuthorizeService $authorize): View
     {
+        $authorize->authorize($request->user(), 'certificate_templates.manage');
+
         return view('admin.certificate-templates.index', [
             'templates' => CertificateTemplate::query()->with('course')->orderBy('locale')->get(),
             'courses' => Course::query()->where('active', true)->orderBy('code')->get(),

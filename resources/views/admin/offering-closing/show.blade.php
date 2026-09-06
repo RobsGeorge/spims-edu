@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('title', __('completion.closing_title'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('completion.closing_title') }} — {{ $offering->course->code }}</h1>
-<p class="text-muted-theme">{{ __('completion.status') }}: <strong>{{ $status->value }}</strong></p>
+<x-page-header :title="__('completion.closing_title').' — '.$offering->course->code" :subtitle="__('completion.status').': '.$status->value" />
+@include('partials.offering-workspace-tabs', ['offering' => $offering, 'active' => 'completion', 'prefix' => 'admin'])
 @if(session('status'))<div class="alert alert-success" role="status">{{ session('status') }}</div>@endif
 @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 
@@ -32,13 +32,15 @@
     @csrf
     <div class="card-body">
         <h2 class="h6">{{ __('completion.grace_marks') }}</h2>
-        @foreach($results as $result)
+        @forelse($enrollments as $enrollment)
             <div class="row g-2 mb-2">
-                <input type="hidden" name="student_id[]" value="{{ $result->student_id }}">
-                <div class="col-md-6">{{ $result->student?->email }}</div>
-                <div class="col-md-3"><input name="amount[]" type="number" step="0.01" class="form-control" value="0"></div>
+                <input type="hidden" name="student_id[]" value="{{ $enrollment->student_id }}">
+                <div class="col-md-6">{{ $enrollment->student?->email }}</div>
+                <div class="col-md-3"><input name="amount[]" type="number" step="0.01" class="form-control" value="{{ $graceMarks[$enrollment->student_id] ?? 0 }}"></div>
             </div>
-        @endforeach
+        @empty
+            <p class="text-muted-theme mb-0">{{ __('completion.no_results') }}</p>
+        @endforelse
         <button class="btn btn-outline-primary">{{ __('completion.apply_grace') }}</button>
     </div>
 </form>
@@ -46,15 +48,20 @@
 
 <div class="table-responsive spims-table-wrap">
 <table class="table table-sm">
-    <thead><tr><th>{{ __('completion.student') }}</th><th>{{ __('completion.outcome') }}</th></tr></thead>
+    <thead><tr><th>{{ __('completion.student') }}</th><th>{{ __('completion.outcome') }}</th><th>{{ __('completion.met_criteria') }}</th></tr></thead>
     <tbody>
     @forelse($results as $result)
         <tr>
             <td>{{ $result->student?->email }}</td>
             <td>{{ $result->outcome->value }}</td>
+            <td class="small">
+                @foreach($result->met_criteria ?? [] as $row)
+                    {{ $row['kind'] }}: {{ $row['passed'] ? __('completion.passed') : __('completion.failed') }}@if(! $loop->last), @endif
+                @endforeach
+            </td>
         </tr>
     @empty
-        <tr><td colspan="2" class="text-muted-theme">{{ __('completion.no_results') }}</td></tr>
+        <tr><td colspan="3" class="text-muted-theme">{{ __('completion.no_results') }}</td></tr>
     @endforelse
     </tbody>
 </table>

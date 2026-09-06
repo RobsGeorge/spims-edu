@@ -106,7 +106,10 @@
                     <strong>{{ $enrollment->student->first_name }} {{ $enrollment->student->last_name }}</strong>
                     <div class="small text-muted-theme">{{ $enrollment->student->email }}</div>
                 </div>
-                <x-status-badge :status="$enrollment->status->value" :label="$enrollment->status->value" />
+                <div class="d-flex align-items-center gap-2">
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ route('teach.completion.show', ['offering' => $offering, 'student_id' => $enrollment->student_id]) }}">{{ __('completion.notes') }}</a>
+                    <x-status-badge :status="$enrollment->status->value" :label="$enrollment->status->value" />
+                </div>
             </div>
         @empty
             <x-empty-state :title="__('teach.empty_roster')" icon="bi-people" />

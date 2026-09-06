@@ -50,4 +50,8 @@ return [
     'remove' => 'Remove',
     'closing_announcement_title' => 'Results announced: :course',
     'closing_announcement_body' => 'Grades and completion results for :course are now available.',
+    'content_item' => 'Content item ULID',
+    'met_criteria' => 'Criteria',
+    'passed' => 'passed',
+    'failed' => 'failed',
 ];

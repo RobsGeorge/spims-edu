@@ -33,6 +33,7 @@ class CompletionCriteriaController extends Controller
             'is_required' => ['nullable', 'boolean'],
             'offering_id' => ['nullable', 'exists:course_offerings,id'],
         ]);
+        $data['is_required'] = $request->boolean('is_required');
 
         $completion->addCriterion($request->user(), $course, $data);
 
@@ -41,6 +42,7 @@ class CompletionCriteriaController extends Controller
 
     public function destroy(Request $request, CompletionCriterion $criterion, CompletionService $completion): RedirectResponse
     {
+        $criterion->loadMissing('offering');
         $courseId = $criterion->course_id ?? $criterion->offering?->course_id;
         $completion->deleteCriterion($request->user(), $criterion);
 

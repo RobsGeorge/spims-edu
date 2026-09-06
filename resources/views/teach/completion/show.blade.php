@@ -1,21 +1,27 @@
 @extends('layouts.app')
 @section('title', __('completion.cohort_title'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('completion.cohort_title') }} — {{ $offering->course->code }}</h1>
+<x-page-header :title="__('completion.cohort_title').' — '.$offering->course->code" />
+@include('partials.offering-workspace-tabs', ['offering' => $offering, 'active' => 'completion', 'prefix' => 'teach'])
 @if(session('status'))<div class="alert alert-success" role="status">{{ session('status') }}</div>@endif
 
 <div class="table-responsive spims-table-wrap mb-4">
 <table class="table table-sm">
-    <thead><tr><th>{{ __('completion.student') }}</th><th>{{ __('completion.outcome') }}</th><th></th></tr></thead>
+    <thead><tr><th>{{ __('completion.student') }}</th><th>{{ __('completion.outcome') }}</th><th>{{ __('completion.met_criteria') }}</th><th></th></tr></thead>
     <tbody>
     @forelse($results as $result)
         <tr>
             <td>{{ $result->student?->email }}</td>
             <td>{{ $result->outcome->value }}</td>
+            <td class="small">
+                @foreach($result->met_criteria ?? [] as $row)
+                    {{ $row['kind'] }}: {{ $row['passed'] ? __('completion.passed') : __('completion.failed') }}@if(! $loop->last), @endif
+                @endforeach
+            </td>
             <td><a href="{{ route('teach.completion.show', ['offering' => $offering, 'student_id' => $result->student_id]) }}">{{ __('completion.notes') }}</a></td>
         </tr>
     @empty
-        <tr><td colspan="3" class="text-muted-theme">{{ __('completion.no_results') }}</td></tr>
+        <tr><td colspan="4" class="text-muted-theme">{{ __('completion.no_results') }}</td></tr>
     @endforelse
     </tbody>
 </table>
