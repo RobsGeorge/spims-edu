@@ -38,12 +38,23 @@ class ObjectiveGrader
         return ($correct && $correct->id === $selected) ? $maxPoints : 0.0;
     }
 
+    /**
+     * Proportional partial credit, same rule as matching: hits / total correct
+     * options. Extra (incorrect) selections are ignored and do not add credit.
+     */
     private function scoreMulti(Question $question, array $response, float $maxPoints): float
     {
-        $selected = collect($response['option_ids'] ?? [])->map(fn ($id) => (string) $id)->sort()->values()->all();
-        $correct = $question->options->where('is_correct', true)->pluck('id')->map(fn ($id) => (string) $id)->sort()->values()->all();
+        $selected = collect($response['option_ids'] ?? [])->map(fn ($id) => (string) $id)->unique()->all();
+        $correct = $question->options->where('is_correct', true);
+        $total = $correct->count();
 
-        return $selected === $correct ? $maxPoints : 0.0;
+        if ($total === 0) {
+            return 0.0;
+        }
+
+        $hits = $correct->filter(fn (QuestionOption $option) => in_array((string) $option->id, $selected, true))->count();
+
+        return round($maxPoints * ($hits / $total), 2);
     }
 
     private function scoreNumeric(Question $question, array $response, float $maxPoints): float

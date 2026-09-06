@@ -832,6 +832,17 @@ html[dir='rtl'] .app-bottom-link i {
     letter-spacing: 0.01em;
 }
 
+.exam-matching__row .exam-match-select {
+    max-width: 18rem;
+}
+
+.exam-ordering-list__item {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md, 0.5rem);
+    background: var(--color-surface);
+}
+
 /* —— D6: exam progress rail + near-expiry pulse —— */
 .exam-progress-rail__track {
     height: 0.45rem;

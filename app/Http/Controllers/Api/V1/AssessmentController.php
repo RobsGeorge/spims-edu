@@ -97,6 +97,7 @@ class AssessmentController extends Controller
         if ($detail) {
             $data['scoring_rule'] = $assessment->scoring_rule->value;
             $data['results_visibility'] = $assessment->results_visibility->value;
+            $data['reveal_answers'] = $assessment->reveal_answers;
             $data['enforce_full_screen'] = $assessment->enforce_full_screen;
             $data['one_at_a_time'] = $assessment->one_at_a_time;
             $data['no_backtrack'] = $assessment->no_backtrack;

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Assessment;
 use App\Models\AssessmentAttempt;
 use App\Services\Assessment\AttemptService;
+use App\Services\Assessment\ResultsVisibilityService;
+use App\Services\Learning\OfferingAccessService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,17 +14,32 @@ use Illuminate\View\View;
 
 class ExamAttemptController extends Controller
 {
-    public function show(Assessment $assessment, AttemptService $attempts, \App\Services\Learning\OfferingAccessService $access): View
-    {
-        $access->assertCanAccessAssessment(auth()->user(), $assessment);
+    public function show(
+        Assessment $assessment,
+        OfferingAccessService $access,
+        ResultsVisibilityService $visibility,
+    ): View {
+        $user = auth()->user();
+        $access->assertCanAccessAssessment($user, $assessment);
+
+        $showScores = $visibility->scoresVisible($assessment, $user);
+        $showAnswers = $visibility->answersVisible($assessment, $user);
+
+        $attempts = AssessmentAttempt::query()
+            ->where('assessment_id', $assessment->id)
+            ->where('student_id', $user->id)
+            ->latest('attempt_no')
+            ->get();
+
+        if ($showAnswers) {
+            $attempts->load(['answers.question.options']);
+        }
 
         return view('assessments.show', [
-            'assessment' => $assessment->load('offering.course'),
-            'attempts' => AssessmentAttempt::query()
-                ->where('assessment_id', $assessment->id)
-                ->where('student_id', auth()->id())
-                ->latest('attempt_no')
-                ->get(),
+            'assessment' => $assessment->load('offering.course', 'resultAnnouncement'),
+            'attempts' => $attempts,
+            'showScores' => $showScores,
+            'showAnswers' => $showAnswers,
         ]);
     }
 
@@ -70,6 +87,17 @@ class ExamAttemptController extends Controller
 
         return redirect()->route('assessments.show', $attempt->assessment_id)
             ->with('status', __('assessment.submitted'));
+    }
+
+    public function upload(Request $request, AssessmentAttempt $attempt, AttemptService $attempts): JsonResponse
+    {
+        $data = $request->validate([
+            'file' => ['required', 'file', 'max:10240'],
+        ]);
+
+        $stored = $attempts->uploadFile($request->user(), $attempt, $data['file']);
+
+        return response()->json($stored, 201);
     }
 
     public function focusLoss(Request $request, AssessmentAttempt $attempt, AttemptService $attempts): JsonResponse

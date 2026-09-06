@@ -440,6 +440,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/attempts/{attempt}/submit', [ExamAttemptController::class, 'submit'])
         ->middleware('permission:assessments.take')
         ->name('assessments.submit');
+    Route::post('/attempts/{attempt}/upload', [ExamAttemptController::class, 'upload'])
+        ->middleware('permission:assessments.take')
+        ->name('assessments.upload');
     Route::post('/attempts/{attempt}/focus-loss', [ExamAttemptController::class, 'focusLoss'])
         ->middleware('permission:assessments.take')
         ->name('assessments.focus-loss');

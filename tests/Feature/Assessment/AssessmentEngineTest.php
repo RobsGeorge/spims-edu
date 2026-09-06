@@ -11,6 +11,7 @@ use App\Enums\OfferingMode;
 use App\Enums\ProgramType;
 use App\Enums\QuestionType;
 use App\Enums\RequirementType;
+use App\Enums\ResultsVisibility;
 use App\Enums\RoleType;
 use App\Enums\StudentProgramStatus;
 use App\Models\AcademicRecord;
@@ -366,5 +367,187 @@ class AssessmentEngineTest extends TestCase
             ->where('assessment_id', $assessment->id)
             ->where('student_id', $student->id)
             ->count());
+    }
+
+    #[Test]
+    public function matching_question_scores_proportionally_like_partial_pairs(): void
+    {
+        $ins = User::factory()->withRole(RoleType::Instructor)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $bundle = $this->offeringBundle($student);
+        $this->staffOffering($ins, $bundle['offering']);
+
+        $bank = app(QuestionBankService::class)->createBank($ins, $bundle['course'], 'Match');
+        $q = app(QuestionBankService::class)->addQuestion($ins, $bank, [
+            'type' => QuestionType::Matching->value,
+            'prompt' => 'Capitals',
+            'points' => 12,
+            'options' => [
+                ['text' => 'France', 'match_key' => 'Paris'],
+                ['text' => 'England', 'match_key' => 'London'],
+                ['text' => 'Italy', 'match_key' => 'Rome'],
+            ],
+        ]);
+
+        $assessment = app(AssessmentService::class)->create($ins, $bundle['offering'], [
+            'title' => 'Matching quiz',
+            'mode' => AssessmentMode::Quiz->value,
+            'time_limit_minutes' => 10,
+            'max_points' => 12,
+            'shuffle_questions' => false,
+            'shuffle_options' => false,
+        ]);
+        app(AssessmentService::class)->attachQuestion($ins, $assessment, $q);
+        app(AssessmentService::class)->release($ins, $assessment);
+
+        $opts = $q->options()->orderBy('order')->get();
+        $attempt = app(AttemptService::class)->start($student, $assessment);
+        app(AttemptService::class)->autosave($student, $attempt, [
+            $q->id => ['matches' => [
+                $opts[0]->id => 'Paris',
+                $opts[1]->id => 'London',
+                $opts[2]->id => 'Madrid',
+            ]],
+        ]);
+        $attempt = app(AttemptService::class)->submit($student, $attempt);
+
+        $this->assertSame(AttemptStatus::Graded, $attempt->status);
+        $this->assertEquals(8.0, $attempt->total_score);
+    }
+
+    #[Test]
+    public function mcq_multi_partial_credit_is_proportional_hits_over_correct_options_like_matching(): void
+    {
+        $ins = User::factory()->withRole(RoleType::Instructor)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $bundle = $this->offeringBundle($student);
+        $this->staffOffering($ins, $bundle['offering']);
+
+        $bank = app(QuestionBankService::class)->createBank($ins, $bundle['course'], 'Multi');
+        $q = app(QuestionBankService::class)->addQuestion($ins, $bank, [
+            'type' => QuestionType::McqMulti->value,
+            'prompt' => 'Pick the evens',
+            'points' => 10,
+            'options' => [
+                ['text' => '2', 'is_correct' => true],
+                ['text' => '3', 'is_correct' => false],
+                ['text' => '4', 'is_correct' => true],
+                ['text' => '5', 'is_correct' => false],
+            ],
+        ]);
+
+        $assessment = app(AssessmentService::class)->create($ins, $bundle['offering'], [
+            'title' => 'Multi quiz',
+            'mode' => AssessmentMode::Quiz->value,
+            'time_limit_minutes' => 10,
+            'max_points' => 10,
+            'shuffle_questions' => false,
+            'shuffle_options' => false,
+        ]);
+        app(AssessmentService::class)->attachQuestion($ins, $assessment, $q);
+        app(AssessmentService::class)->release($ins, $assessment);
+
+        $correct = $q->options()->where('is_correct', true)->pluck('id')->all();
+        $wrong = $q->options()->where('is_correct', false)->first()->id;
+
+        $attempt = app(AttemptService::class)->start($student, $assessment);
+        app(AttemptService::class)->autosave($student, $attempt, [
+            $q->id => ['option_ids' => [$correct[0], $wrong]],
+        ]);
+        $attempt = app(AttemptService::class)->submit($student, $attempt);
+
+        $this->assertSame(AttemptStatus::Graded, $attempt->status);
+        $this->assertEquals(5.0, $attempt->total_score);
+    }
+
+    #[Test]
+    public function ordering_question_scores_only_when_the_full_sequence_matches(): void
+    {
+        $ins = User::factory()->withRole(RoleType::Instructor)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $bundle = $this->offeringBundle($student);
+        $this->staffOffering($ins, $bundle['offering']);
+
+        $bank = app(QuestionBankService::class)->createBank($ins, $bundle['course'], 'Order');
+        $q = app(QuestionBankService::class)->addQuestion($ins, $bank, [
+            'type' => QuestionType::Ordering->value,
+            'prompt' => 'Liturgy order',
+            'points' => 9,
+            'options' => [
+                ['text' => 'First', 'order' => 0],
+                ['text' => 'Second', 'order' => 1],
+                ['text' => 'Third', 'order' => 2],
+            ],
+        ]);
+
+        $assessment = app(AssessmentService::class)->create($ins, $bundle['offering'], [
+            'title' => 'Order quiz',
+            'mode' => AssessmentMode::Quiz->value,
+            'time_limit_minutes' => 10,
+            'max_points' => 9,
+            'shuffle_questions' => false,
+            'shuffle_options' => false,
+        ]);
+        app(AssessmentService::class)->attachQuestion($ins, $assessment, $q);
+        app(AssessmentService::class)->release($ins, $assessment);
+
+        $ids = $q->options()->orderBy('order')->pluck('id')->all();
+        $attempt = app(AttemptService::class)->start($student, $assessment);
+        app(AttemptService::class)->autosave($student, $attempt, [
+            $q->id => ['order' => [$ids[1], $ids[0], $ids[2]]],
+        ]);
+        $wrong = app(AttemptService::class)->submit($student, $attempt);
+        $this->assertEquals(0.0, $wrong->total_score);
+
+        $assessment->update(['attempts_allowed' => 2]);
+        $attempt2 = app(AttemptService::class)->start($student, $assessment);
+        app(AttemptService::class)->autosave($student, $attempt2, [
+            $q->id => ['order' => $ids],
+        ]);
+        $right = app(AttemptService::class)->submit($student, $attempt2);
+        $this->assertEquals(9.0, $right->total_score);
+    }
+
+    #[Test]
+    public function on_release_visibility_hides_effective_student_payload_until_announced(): void
+    {
+        $ins = User::factory()->withRole(RoleType::Instructor)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $bundle = $this->offeringBundle($student);
+        $this->staffOffering($ins, $bundle['offering']);
+
+        $bank = app(QuestionBankService::class)->createBank($ins, $bundle['course'], 'Vis');
+        $q = app(QuestionBankService::class)->addQuestion($ins, $bank, [
+            'type' => QuestionType::McqSingle->value,
+            'prompt' => 'Q',
+            'points' => 23,
+            'options' => [
+                ['text' => 'A', 'is_correct' => true],
+                ['text' => 'B', 'is_correct' => false],
+            ],
+        ]);
+
+        $assessment = app(AssessmentService::class)->create($ins, $bundle['offering'], [
+            'title' => 'Hidden scores',
+            'mode' => AssessmentMode::Quiz->value,
+            'time_limit_minutes' => 10,
+            'max_points' => 23,
+            'results_visibility' => ResultsVisibility::OnRelease->value,
+            'shuffle_questions' => false,
+        ]);
+        app(AssessmentService::class)->attachQuestion($ins, $assessment, $q);
+        app(AssessmentService::class)->release($ins, $assessment);
+
+        $attempt = app(AttemptService::class)->start($student, $assessment);
+        $opt = $q->options()->where('is_correct', true)->first();
+        app(AttemptService::class)->autosave($student, $attempt, [$q->id => ['option_id' => $opt->id]]);
+        $attempt = app(AttemptService::class)->submit($student, $attempt);
+        $this->assertEquals(23.0, $attempt->total_score);
+
+        $visibility = app(\App\Services\Assessment\ResultsVisibilityService::class);
+        $this->assertFalse($visibility->scoresVisible($assessment->fresh(), $student));
+
+        app(AssessmentService::class)->announceResults($ins, $assessment);
+        $this->assertTrue($visibility->scoresVisible($assessment->fresh(), $student));
     }
 }

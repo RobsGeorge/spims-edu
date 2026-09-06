@@ -6,6 +6,7 @@ use App\Enums\AttemptStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AssessmentAttempt;
 use App\Services\Assessment\AttemptService;
+use App\Services\Assessment\ResultsVisibilityService;
 use App\Support\Api\IdempotencyStore;
 use App\Support\Api\StudentPayload;
 use App\Support\Api\StudentRecordGuard;
@@ -19,6 +20,7 @@ class AttemptController extends Controller
         private readonly StudentRecordGuard $guard,
         private readonly AttemptService $attempts,
         private readonly IdempotencyStore $idempotency,
+        private readonly ResultsVisibilityService $visibility,
     ) {}
 
     public function show(Request $request, AssessmentAttempt $attempt): JsonResponse
@@ -99,7 +101,10 @@ class AttemptController extends Controller
     /** @return array<string, mixed> */
     private function payload(AssessmentAttempt $attempt): array
     {
-        return [
+        $attempt->loadMissing(['assessment.resultAnnouncement', 'answers']);
+        $viewer = request()->user();
+
+        $data = [
             'id' => $attempt->id,
             'assessment_id' => $attempt->assessment_id,
             'attempt_no' => $attempt->attempt_no,
@@ -113,11 +118,17 @@ class AttemptController extends Controller
                 'question_id' => $answer->question_id,
                 'response' => $answer->response,
                 'final_score' => $answer->final_score,
-            ])->values(),
+            ])->values()->all(),
             'remaining_seconds' => $attempt->due_at
                 ? max(0, now()->diffInSeconds($attempt->due_at, false))
                 : null,
             'terminated_for_cheating' => (bool) $attempt->terminated_for_cheating,
         ];
+
+        if ($attempt->assessment && $viewer) {
+            $data = $this->visibility->redactStudentAttempt($attempt->assessment, $data, $viewer);
+        }
+
+        return $data;
     }
 }

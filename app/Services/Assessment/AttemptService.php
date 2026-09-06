@@ -16,8 +16,10 @@ use App\Models\Enrollment;
 use App\Models\Question;
 use App\Models\User;
 use App\Services\Offerings\LearningProgressService;
+use App\Services\Storage\ObjectStorageService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -32,6 +34,7 @@ class AttemptService
         private readonly EssayAiGrader $essayAi,
         private readonly LearningProgressService $progress,
         private readonly ProctorService $proctor,
+        private readonly ObjectStorageService $storage,
     ) {}
 
     public function start(User $student, Assessment $assessment): AssessmentAttempt
@@ -105,17 +108,7 @@ class AttemptService
             if ($assessment->shuffle_options) {
                 $options = $options->shuffle()->values();
             }
-            $snapshot[] = [
-                'id' => $q->id,
-                'type' => $q->type->value,
-                'prompt' => $q->prompt,
-                'points' => $this->pointsFor($assessment, $q),
-                'options' => $options->map(fn ($o) => [
-                    'id' => $o->id,
-                    'text' => $o->text,
-                    'match_key' => $o->match_key,
-                ])->all(),
-            ];
+            $snapshot[] = $this->studentSnapshotQuestion($assessment, $q, $options);
         }
 
         $attempt = AssessmentAttempt::query()->create([
@@ -169,6 +162,42 @@ class AttemptService
         });
 
         return $attempt->fresh('answers');
+    }
+
+    /**
+     * Store a FILE_UPLOAD answer artifact via ObjectStorageService. The path is
+     * returned so the runner can persist it on the next autosave.
+     *
+     * @return array{path: string, filename: string}
+     */
+    public function uploadFile(User $student, AssessmentAttempt $attempt, UploadedFile $file): array
+    {
+        $this->authorize->authorize($student, 'assessments.take');
+        $this->assertOwner($student, $attempt);
+
+        if ($attempt->status !== AttemptStatus::InProgress) {
+            throw ValidationException::withMessages(['attempt' => [__('assessment.not_in_progress')]]);
+        }
+
+        if ($attempt->isExpired()) {
+            $this->submit($student, $attempt, auto: true);
+            throw ValidationException::withMessages(['attempt' => [__('assessment.window_closed')]]);
+        }
+
+        $extension = $file->getClientOriginalExtension() ?: $file->extension();
+        $path = $this->storage->signedUploadPath('submissions', $attempt->id, $extension);
+        $filename = $file->getClientOriginalName();
+
+        $this->audit->withAudit($student, 'assessments.attempt_upload', function () use ($file, $path, $attempt) {
+            $this->storage->store($path, $file->get() ?: '');
+
+            return $attempt;
+        }, 'AssessmentAttempt');
+
+        return [
+            'path' => $path,
+            'filename' => $filename,
+        ];
     }
 
     /**
@@ -359,6 +388,39 @@ class AttemptService
         }
 
         return $count;
+    }
+
+    /**
+     * Student-facing snapshot: option text only. Matching choices are a shuffled
+     * unique list of keys so the correct pairing is not leaked on each option.
+     *
+     * @param  Collection<int, \App\Models\QuestionOption>  $options
+     * @return array<string, mixed>
+     */
+    private function studentSnapshotQuestion(Assessment $assessment, Question $question, Collection $options): array
+    {
+        $entry = [
+            'id' => $question->id,
+            'type' => $question->type->value,
+            'prompt' => $question->prompt,
+            'points' => $this->pointsFor($assessment, $question),
+            'options' => $options->map(fn ($option) => [
+                'id' => $option->id,
+                'text' => $option->text,
+            ])->all(),
+        ];
+
+        if ($question->type === QuestionType::Matching) {
+            $entry['match_choices'] = $options
+                ->pluck('match_key')
+                ->filter()
+                ->unique()
+                ->shuffle()
+                ->values()
+                ->all();
+        }
+
+        return $entry;
     }
 
     private function pointsFor(Assessment $assessment, Question $question): float
