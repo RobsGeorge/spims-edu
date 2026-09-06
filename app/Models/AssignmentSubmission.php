@@ -26,6 +26,8 @@ class AssignmentSubmission extends Model
         'graded_by_id',
         'graded_at',
         'attempt_no',
+        'received_at',
+        'received_by_id',
     ];
 
     protected $casts = [
@@ -35,6 +37,7 @@ class AssignmentSubmission extends Model
         'final_score' => 'float',
         'graded_at' => 'datetime',
         'attempt_no' => 'integer',
+        'received_at' => 'datetime',
     ];
 
     public function assignment(): BelongsTo
@@ -45,6 +48,11 @@ class AssignmentSubmission extends Model
     public function student(): BelongsTo
     {
         return $this->belongsTo(User::class, 'student_id');
+    }
+
+    public function receivedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'received_by_id');
     }
 
     public function versions(): HasMany

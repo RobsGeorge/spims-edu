@@ -8,4 +8,7 @@ enum AttemptStatus: string
     case Submitted = 'SUBMITTED';
     case AutoSubmitted = 'AUTO_SUBMITTED';
     case Graded = 'GRADED';
+
+    /** Ended by ProctorService after crossing the proctoring escalation threshold. */
+    case Terminated = 'TERMINATED';
 }

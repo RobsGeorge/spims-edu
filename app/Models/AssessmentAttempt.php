@@ -26,6 +26,12 @@ class AssessmentAttempt extends Model
         'focus_loss_count',
         'question_ids',
         'exam_snapshot',
+        'proctor_warnings',
+        'terminated_for_cheating',
+        'terminated_at',
+        'terminated_by_id',
+        'termination_cleared_at',
+        'termination_cleared_by_id',
     ];
 
     protected $casts = [
@@ -38,6 +44,10 @@ class AssessmentAttempt extends Model
         'focus_loss_count' => 'integer',
         'question_ids' => 'array',
         'exam_snapshot' => 'array',
+        'proctor_warnings' => 'integer',
+        'terminated_for_cheating' => 'boolean',
+        'terminated_at' => 'datetime',
+        'termination_cleared_at' => 'datetime',
     ];
 
     public function assessment(): BelongsTo
@@ -53,6 +63,16 @@ class AssessmentAttempt extends Model
     public function answers(): HasMany
     {
         return $this->hasMany(AttemptAnswer::class, 'attempt_id');
+    }
+
+    public function proctorEvents(): HasMany
+    {
+        return $this->hasMany(ProctorEvent::class, 'attempt_id');
+    }
+
+    public function terminatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'terminated_by_id');
     }
 
     public function isExpired(): bool

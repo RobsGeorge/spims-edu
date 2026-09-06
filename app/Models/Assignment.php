@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DeliveryMode;
 use App\Enums\SubmissionType;
 use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +27,8 @@ class Assignment extends Model
         'due_date',
         'late_penalty_override',
         'allow_resubmission',
+        'delivery_mode',
+        'resubmission_deadline',
     ];
 
     protected $casts = [
@@ -37,6 +40,8 @@ class Assignment extends Model
         'due_date' => 'datetime',
         'late_penalty_override' => 'float',
         'allow_resubmission' => 'boolean',
+        'delivery_mode' => DeliveryMode::class,
+        'resubmission_deadline' => 'datetime',
     ];
 
     public function contentItem(): BelongsTo
