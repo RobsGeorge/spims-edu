@@ -14,6 +14,7 @@ use App\Services\Discussions\DiscussionService;
 use App\Support\AuthorizeService;
 use Database\Seeders\ThemeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Lang;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -139,6 +140,23 @@ class StaffDiscussionGradeTest extends TestCase
             'student_id' => $student->id,
             'overridden' => true,
         ]);
+    }
+
+    #[Test]
+    public function discussion_grade_strings_exist_in_ar_en_fr(): void
+    {
+        $enKeys = array_keys(Lang::get('discussions', locale: 'en'));
+        $this->assertNotEmpty($enKeys);
+
+        foreach (['ar', 'fr'] as $locale) {
+            $this->assertSame($enKeys, array_keys(Lang::get('discussions', locale: $locale)));
+        }
+
+        foreach (['open_discussion_grades', 'discussions_workspace', 'discussions_workspace_sub'] as $key) {
+            foreach (['ar', 'en', 'fr'] as $locale) {
+                $this->assertTrue(Lang::has('teach.'.$key, $locale, false), $locale.' missing teach.'.$key);
+            }
+        }
     }
 
     #[Test]
