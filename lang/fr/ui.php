@@ -8,6 +8,8 @@ return [
     'home_cta_secondary' => 'Connexion',
     'home_cta_dashboard' => 'Aller au tableau de bord',
     'home_cta_catalog' => 'Parcourir les cours',
+    'home_cta_demo' => 'Essayer la démo',
+    'nav_demo' => 'Démo',
     'nav_settings' => 'Paramètres',
     'nav_grades' => 'Notes',
     'nav_learning' => 'Mon apprentissage',

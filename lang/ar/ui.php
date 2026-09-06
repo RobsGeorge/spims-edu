@@ -8,6 +8,8 @@ return [
     'home_cta_secondary' => 'تسجيل الدخول',
     'home_cta_dashboard' => 'إلى لوحة التحكم',
     'home_cta_catalog' => 'تصفح المقررات',
+    'home_cta_demo' => 'جرّب التجربة',
+    'nav_demo' => 'تجربة',
     'nav_settings' => 'الإعدادات',
     'nav_grades' => 'الدرجات',
     'nav_learning' => 'تعلّمي',

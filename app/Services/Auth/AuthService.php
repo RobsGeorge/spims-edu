@@ -73,10 +73,30 @@ class AuthService
 
     public function login(string $email, string $password): User
     {
-        $user = $this->verifyCredentials($email, $password);
+        return $this->establishSession($this->verifyCredentials($email, $password), 'auth.login');
+    }
 
+    /**
+     * Session login for a user already resolved by a trusted caller (demo console).
+     * Performs the same account-status checks as password login.
+     */
+    public function loginAs(User $user, string $action = 'auth.login'): User
+    {
+        if ($user->status === UserStatus::Suspended) {
+            throw ValidationException::withMessages(['email' => [__('auth.suspended')]]);
+        }
+
+        if ($user->status !== UserStatus::Active) {
+            throw ValidationException::withMessages(['email' => [__('auth.not_active')]]);
+        }
+
+        return $this->establishSession($user, $action);
+    }
+
+    private function establishSession(User $user, string $action): User
+    {
         Auth::login($user, false);
-        $this->audit->write($user, 'auth.login', 'User', $user->id);
+        $this->audit->write($user, $action, 'User', $user->id);
 
         return $user;
     }

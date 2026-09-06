@@ -45,7 +45,8 @@
             ? ($activeTheme->logo_dark_url ?: $activeTheme->logo_light_url)
             : ($activeTheme->logo_light_url ?: $activeTheme->logo_dark_url);
     }
-    $shellLess = request()->routeIs('home') || request()->routeIs('auth.*') || !auth()->check();
+    $shellLess = request()->routeIs('home') || request()->routeIs('demo.show') || request()->routeIs('auth.*') || !auth()->check();
+    $demoConsole = (bool) config('spims.demo_console');
 @endphp
 <body class="theme-{{ $themeClass }} {{ $shellLess ? 'shell-guest' : 'shell-app' }}">
     <a class="spims-skip-link" href="#main-content">{{ __('ui.skip_to_content') }}</a>
@@ -60,6 +61,9 @@
                     <span>{{ $activeTheme?->site_name ?? 'SPIMS' }}</span>
                 </a>
                 <div class="d-flex align-items-center gap-2 ms-auto">
+                    @if($demoConsole && ! request()->routeIs('demo.show'))
+                        <a href="{{ route('demo.show') }}" class="btn btn-sm btn-outline-secondary">{{ __('ui.nav_demo') }}</a>
+                    @endif
                     <a href="{{ route('auth.login') }}" class="btn btn-sm btn-outline-primary">{{ __('ui.login') }}</a>
                     <a href="{{ route('auth.register') }}" class="btn btn-sm btn-primary">{{ __('ui.register') }}</a>
                     <form method="POST" action="{{ route('locale.update') }}" class="d-inline">

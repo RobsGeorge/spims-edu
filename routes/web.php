@@ -45,6 +45,7 @@ use App\Http\Controllers\CoursePlayerController;
 use App\Http\Controllers\CredentialDownloadController;
 use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DemoConsoleController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\EnrollmentController;
@@ -87,6 +88,21 @@ use App\Http\Controllers\TranscriptController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::middleware('demo.console')->group(function () {
+    Route::get('/demo', [DemoConsoleController::class, 'show'])->name('demo.show');
+    Route::post('/demo/seed', [DemoConsoleController::class, 'seed'])
+        ->middleware('throttle:demo-mutate')
+        ->name('demo.seed');
+    Route::post('/demo/reset', [DemoConsoleController::class, 'reset'])
+        ->middleware('throttle:demo-mutate')
+        ->name('demo.reset');
+    Route::post('/demo/enter/{persona}', [DemoConsoleController::class, 'enter'])
+        ->middleware('throttle:demo-enter')
+        ->where('persona', '[a-z0-9]+')
+        ->name('demo.enter');
+});
+
 Route::get('/health', HealthController::class)->name('health');
 Route::get('/up', HealthController::class)->name('up');
 Route::get('/api/branding', [BrandingController::class, 'show'])->name('api.branding');

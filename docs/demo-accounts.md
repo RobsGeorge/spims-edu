@@ -20,12 +20,13 @@ php artisan migrate:fresh --seed
 php artisan serve
 ```
 
-Open `http://localhost:8000` (or https://staging.spims-edu.com).
+Open `http://localhost:8000` (or the school domain). Guests can also open **Try a demo** on the home page (`/demo`) to seed or reset walkthrough rows and sign in as a persona in one click. The shared password is never shown on that page.
 
 | Flag | Default | Effect |
 |---|---|---|
 | `SEED_SAMPLE_DATA` | `true` | Tiny extra program `DEMO-DIP` / course `DEMO101` |
 | `SEED_DEMO_DATA` | `true` | All accounts and curriculum below |
+| `DEMO_CONSOLE` | `true` | Public `/demo` console (persona enter + re-seed). Set `false` to hide it |
 | `SUPERADMIN_EMAIL` | `robeir.george@outlook.com` | Super-admin identity |
 | `SUPERADMIN_PASSWORD` | `Spims@Dev2026!` | Super-admin password **only** |
 
@@ -183,13 +184,15 @@ Locked grades and credentials are **not** seeded. A hollow certificate is worse 
 
 ## 8. Staging vs production
 
-| Environment | Seed demo? | Who may log in |
+| Environment | Seed demo? | Public `/demo` console |
 |---|---|---|
-| Local | Yes (`SEED_DEMO_DATA=true`) | Developers + rehearsal |
-| Staging | Yes | School leadership for UAT |
-| Production | **No** | Set `SEED_DEMO_DATA=false`. Create real staff in `/admin/users`. Super admin only via `SUPERADMIN_*` env |
+| Local | Yes (`SEED_DEMO_DATA=true`) | Yes (`DEMO_CONSOLE=true`) |
+| Staging | Yes | Yes — shared database; Reset restores walkthrough rows for everyone |
+| Production | Yes for the school trial | Yes at first so leadership can try it on their domain. Set `DEMO_CONSOLE=false` when the trial should come down |
 
-Never reuse `Spims@Test2026!` in production. Rotate `SUPERADMIN_PASSWORD` on first deploy.
+`GET /demo` is public. Seed and Reset re-run `DemoDataSeeder` only (not `migrate:fresh`). Enter signs the guest in as a `@spims.test` persona; the password is applied by the system and is never rendered.
+
+Do not put the super-admin on the demo page. Rotate `SUPERADMIN_PASSWORD` on first deploy. Set `DEMO_CONSOLE=false` before treating production as a live school.
 
 ---
 

@@ -15,6 +15,9 @@
                 <a href="{{ route('dashboard') }}" class="btn btn-primary">{{ __('ui.home_cta_dashboard') }}</a>
                 <a href="{{ route('catalog.index') }}" class="btn btn-outline-primary">{{ __('ui.home_cta_catalog') }}</a>
             @endguest
+            @if(config('spims.demo_console'))
+                <a href="{{ route('demo.show') }}" class="btn btn-outline-secondary">{{ __('ui.home_cta_demo') }}</a>
+            @endif
         </div>
     </div>
 </section>

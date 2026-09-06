@@ -493,6 +493,46 @@ html[dir='rtl'] .spims-landing-brand {
     justify-content: center;
 }
 
+.spims-demo {
+    max-width: 56rem;
+    margin-inline: auto;
+    padding-bottom: 3rem;
+}
+
+.spims-demo-hero {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.spims-demo-heading {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--color-title);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 0.75rem;
+}
+
+html[dir='rtl'] .spims-demo-heading {
+    font-family: var(--font-arabic);
+}
+
+.spims-demo-lead {
+    font-size: 1.125rem;
+    max-width: 40rem;
+    margin-inline: auto;
+    line-height: 1.6;
+}
+
+.spims-demo-tools {
+    padding: 1.25rem 1.5rem;
+}
+
+.spims-demo-ready {
+    border-radius: var(--radius-md);
+}
+
 .auth-card {
     border-radius: var(--radius-lg) !important;
     box-shadow: var(--shadow-soft);

@@ -19,6 +19,7 @@ class HomePageTest extends TestCase
 
         $response->assertOk();
         $response->assertSee(__('ui.home_heading'));
+        $response->assertDontSee(__('ui.home_cta_demo'));
     }
 
     #[Test]
