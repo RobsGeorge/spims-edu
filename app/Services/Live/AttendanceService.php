@@ -327,38 +327,51 @@ class AttendanceService
             ->get()
             ->keyBy('class_session_id');
 
-        $lateWeight = $policy !== null ? ((int) $policy->late_grade_percentage) / 100 : 0.0;
-        $earned = 0.0;
-        $counted = 0;
+        return $this->percentFromSessions($sessions, $entries, $policy);
+    }
 
-        foreach ($sessions as $session) {
-            $entry = $entries->get($session->id);
-            $status = $entry?->status;
+    /**
+     * Attendance % for every enrolled student on the offering, one session/entry load.
+     *
+     * @return array<string, float|null>
+     */
+    public function offeringPercents(CourseOffering $offering): array
+    {
+        $policy = $this->resolvePolicy($offering);
 
-            if ($status === AttendanceStatus::Excused) {
-                continue;
+        if ($policy !== null && (! $policy->is_enabled || ! $policy->counts_toward_grade)) {
+            return [];
+        }
+
+        $studentIds = Enrollment::query()
+            ->where('offering_id', $offering->id)
+            ->pluck('student_id');
+
+        $sessions = ClassSession::query()->where('offering_id', $offering->id)->get();
+
+        if ($sessions->isEmpty()) {
+            $result = [];
+            foreach ($studentIds as $studentId) {
+                $student = new User;
+                $student->id = $studentId;
+                $result[$studentId] = $this->legacyLivePercent($offering, $student);
             }
 
-            $counted++;
-
-            if ($status === AttendanceStatus::Present) {
-                $earned += 1.0;
-            } elseif ($status === AttendanceStatus::Late) {
-                $earned += $lateWeight;
-            }
+            return $result;
         }
 
-        if ($counted === 0) {
-            return null;
+        $entries = AttendanceEntry::query()
+            ->whereIn('class_session_id', $sessions->pluck('id')->all() ?: ['-'])
+            ->get()
+            ->groupBy('student_id');
+
+        $result = [];
+        foreach ($studentIds as $studentId) {
+            $studentEntries = collect($entries->get($studentId, collect()))->keyBy('class_session_id');
+            $result[$studentId] = $this->percentFromSessions($sessions, $studentEntries, $policy);
         }
 
-        $raw = ($earned / $counted) * 100;
-
-        if ($policy !== null && (int) $policy->min_percentage > 0 && $raw < (int) $policy->min_percentage) {
-            return 0.0;
-        }
-
-        return round($raw, 2);
+        return $result;
     }
 
     /**
@@ -752,6 +765,46 @@ class AttendanceService
                 ],
             ]);
         }
+    }
+
+    /**
+     * @param  Collection<int, ClassSession>  $sessions
+     * @param  Collection<string, AttendanceEntry>  $entries  keyed by class_session_id
+     */
+    private function percentFromSessions(Collection $sessions, Collection $entries, ?AttendancePolicy $policy): ?float
+    {
+        $lateWeight = $policy !== null ? ((int) $policy->late_grade_percentage) / 100 : 0.0;
+        $earned = 0.0;
+        $counted = 0;
+
+        foreach ($sessions as $session) {
+            $entry = $entries->get($session->id);
+            $status = $entry?->status;
+
+            if ($status === AttendanceStatus::Excused) {
+                continue;
+            }
+
+            $counted++;
+
+            if ($status === AttendanceStatus::Present) {
+                $earned += 1.0;
+            } elseif ($status === AttendanceStatus::Late) {
+                $earned += $lateWeight;
+            }
+        }
+
+        if ($counted === 0) {
+            return null;
+        }
+
+        $raw = ($earned / $counted) * 100;
+
+        if ($policy !== null && (int) $policy->min_percentage > 0 && $raw < (int) $policy->min_percentage) {
+            return 0.0;
+        }
+
+        return round($raw, 2);
     }
 
     private function legacyLivePercent(CourseOffering $offering, User $student): ?float

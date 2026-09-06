@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Services\Offerings\LearningProgressService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -319,6 +320,16 @@ class AttemptService
             ->whereIn('status', [AttemptStatus::Submitted, AttemptStatus::AutoSubmitted, AttemptStatus::Graded])
             ->get();
 
+        return $this->scoreFromAttempts($assessment, $attempts);
+    }
+
+    /**
+     * Same scoring-rule math as effectiveScore(), from an already-loaded attempt set.
+     *
+     * @param  Collection<int, AssessmentAttempt>  $attempts
+     */
+    public function scoreFromAttempts(Assessment $assessment, Collection $attempts): ?float
+    {
         if ($attempts->isEmpty()) {
             return null;
         }

@@ -6,6 +6,7 @@
     :subtitle="__('teach.tab_gradebook_help')"
 >
     <x-slot:actions>
+        <a href="{{ route('admin.gradebook.csv', $offering) }}" class="btn btn-outline-primary btn-sm">{{ __('assessment.export_csv') }}</a>
         <a href="{{ route('teach.show', ['offering' => $offering, 'tab' => 'gradebook']) }}" class="btn btn-outline-secondary btn-sm">{{ __('teach.workspace') }}</a>
     </x-slot:actions>
 </x-page-header>
@@ -44,30 +45,30 @@
     </x-slot:confirm>
 </x-confirm-dialog>
 
-<form method="POST" action="{{ route('admin.gradebook.components', $offering) }}" class="row g-2 mb-4">@csrf
+<form method="POST" action="{{ route('admin.gradebook.components', $offering) }}" class="row g-2 mb-3">@csrf
     <div class="col-md-3"><input name="name" class="form-control" placeholder="{{ __('assessment.component') }}" required></div>
     <div class="col-md-2"><input type="number" step="0.01" name="weight_percent" class="form-control" placeholder="%" required></div>
-    <div class="col-md-2"><select name="kind" class="form-select"><option>EXAM</option><option>QUIZ</option><option>ASSIGNMENT</option><option>OTHER</option></select></div>
+    <div class="col-md-3">
+        <select name="kind" class="form-select" aria-label="{{ __('assessment.component') }}">
+            @foreach($componentKinds as $kind)
+                <option value="{{ $kind->value }}">{{ __('assessment.kind_'.$kind->value) }}</option>
+            @endforeach
+        </select>
+    </div>
     <div class="col-md-2"><button class="btn btn-primary">{{ __('ui.save') }}</button></div>
 </form>
 
-<ul>@foreach($components as $c)<li>{{ $c->name }} — {{ $c->weight_percent }}% ({{ $c->kind->value }})</li>@endforeach</ul>
+<p class="mb-2" data-weight-sum="{{ $weightSum }}">
+    {{ __('assessment.weight_sum', ['sum' => $weightSum]) }}
+</p>
+@if(abs($weightSum - 100) > 0.01)
+    <div class="alert alert-warning">{{ __('assessment.weights_not_100', ['sum' => $weightSum]) }}</div>
+@endif
 
-<div class="spims-table-wrap">
-<table class="table">
-    <thead><tr><th>{{ __('assessment.student') }}</th><th>%</th><th>{{ __('ui.status') }}</th><th>{{ __('assessment.letter') }}</th></tr></thead>
-    <tbody>
-    @forelse($enrollments as $e)
-        <tr>
-            <td>{{ $e->student->first_name }} {{ $e->student->last_name }} <span class="text-muted-theme small">{{ $e->student->email }}</span></td>
-            <td>{{ $e->computed['percent'] }}</td>
-            <td><x-status-badge :status="$e->grade_status->value" :label="$e->grade_status->value" /></td>
-            <td>{{ $e->final_letter }}</td>
-        </tr>
-    @empty
-        <tr><td colspan="4"><x-empty-state :title="__('teach.empty_roster')" icon="bi-people" /></td></tr>
-    @endforelse
-    </tbody>
-</table>
-</div>
+@include('admin.gradebook._grid', [
+    'offering' => $offering,
+    'components' => $components,
+    'enrollments' => $enrollments,
+    'gradeUrls' => $gradeUrls,
+])
 @endsection

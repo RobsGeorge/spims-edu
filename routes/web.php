@@ -710,6 +710,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/offerings/{offering}/gradebook', [GradebookController::class, 'show'])
             ->middleware('permission:gradebook.configure')
             ->name('gradebook.show');
+        Route::get('/offerings/{offering}/gradebook.csv', [GradebookController::class, 'export'])
+            ->middleware('permission:gradebook.configure')
+            ->name('gradebook.csv');
         Route::post('/offerings/{offering}/gradebook/components', [GradebookController::class, 'addComponent'])
             ->middleware('permission:gradebook.configure')
             ->name('gradebook.components');
