@@ -99,4 +99,7 @@ return array (
   'date_of_birth' => 'Date of birth',
   'preferred_locale' => 'Preferred language',
   'status' => 'Status',
+  'close_offering' => 'Close offering',
+  'close_confirm_title' => 'Close this offering?',
+  'close_confirm_body' => 'Closing issues completion certificates and cannot be undone. Reopening the gradebook stays in Academic Admin.',
 );

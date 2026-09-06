@@ -1,9 +1,14 @@
 @extends('layouts.app')
 @section('title', __('completion.cohort_title'))
 @section('content')
-<x-page-header :title="__('completion.cohort_title').' — '.$offering->course->code" />
+<x-page-header :title="__('completion.cohort_title').' — '.$offering->course->code">
+    <x-slot:actions>
+        @include('teach.partials.close-offering', ['offering' => $offering, 'closeToken' => $closeToken ?? null])
+    </x-slot:actions>
+</x-page-header>
 @include('partials.offering-workspace-tabs', ['offering' => $offering, 'active' => 'completion', 'prefix' => 'teach'])
 @if(session('status'))<div class="alert alert-success" role="status">{{ session('status') }}</div>@endif
+@if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 
 <div class="table-responsive spims-table-wrap mb-4">
 <table class="table table-sm">

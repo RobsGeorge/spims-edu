@@ -9,11 +9,15 @@
     <x-slot:actions>
         <a href="{{ route('teach.index') }}" class="btn btn-outline-secondary btn-sm">{{ __('teach.back') }}</a>
         <a href="{{ route('admin.offerings.show', $offering) }}" class="btn btn-outline-primary btn-sm">{{ __('teach.open_admin') }}</a>
+        @include('teach.partials.close-offering', ['offering' => $offering, 'closeToken' => $closeToken ?? null])
     </x-slot:actions>
 </x-page-header>
 
 @if(session('status'))
     <div class="alert alert-success">{{ session('status') }}</div>
+@endif
+@if($errors->any())
+    <div class="alert alert-danger">{{ $errors->first() }}</div>
 @endif
 
 @include('partials.offering-workspace-tabs', ['offering' => $offering, 'active' => $tab, 'prefix' => 'teach'])

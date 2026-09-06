@@ -99,4 +99,7 @@ return array (
   'date_of_birth' => 'Date de naissance',
   'preferred_locale' => 'Langue préférée',
   'status' => 'Statut',
+  'close_offering' => 'Clôturer l’offre',
+  'close_confirm_title' => 'Clôturer cette offre ?',
+  'close_confirm_body' => 'La clôture délivre les certificats d’achèvement et est irréversible. La réouverture du carnet reste réservée à l’admin académique.',
 );
