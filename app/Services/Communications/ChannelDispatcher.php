@@ -57,20 +57,6 @@ class ChannelDispatcher
         $metadata = $metadata ?? [];
         $metadata['communication_log_id'] = $logId;
 
-        if ($respectPreferences && ! $this->preferences->enabled($recipient, $type, $channel)) {
-            return $this->logs->write(
-                type: $type,
-                channel: $channel,
-                recipient: $recipient,
-                subject: $subject,
-                locale: $locale,
-                status: CommunicationLogStatus::Skipped,
-                error: 'preference_disabled',
-                metadata: $metadata,
-                id: $logId,
-            );
-        }
-
         $driver = $this->drivers[$channel->value] ?? null;
         if (! $driver instanceof OutboundChannel) {
             return $this->logs->write(
@@ -81,6 +67,20 @@ class ChannelDispatcher
                 locale: $locale,
                 status: CommunicationLogStatus::Skipped,
                 error: 'unimplemented',
+                metadata: $metadata,
+                id: $logId,
+            );
+        }
+
+        if ($respectPreferences && ! $this->preferences->enabled($recipient, $type, $channel)) {
+            return $this->logs->write(
+                type: $type,
+                channel: $channel,
+                recipient: $recipient,
+                subject: $subject,
+                locale: $locale,
+                status: CommunicationLogStatus::Skipped,
+                error: 'preference_disabled',
                 metadata: $metadata,
                 id: $logId,
             );

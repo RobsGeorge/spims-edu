@@ -60,15 +60,8 @@ class EmailTemplateService
             return ['subject' => $global->subject, 'body' => $global->body, 'source' => 'global'];
         }
 
-        $subject = trans("communications.templates.{$key}.subject", [], $locale);
-        $body = trans("communications.templates.{$key}.body", [], $locale);
-
-        if ($subject === "communications.templates.{$key}.subject") {
-            $subject = trans("communications.templates.{$key}.subject", [], 'en');
-        }
-        if ($body === "communications.templates.{$key}.body") {
-            $body = trans("communications.templates.{$key}.body", [], 'en');
-        }
+        $subject = $this->langLine($key, 'subject', $locale);
+        $body = $this->langLine($key, 'body', $locale);
 
         return ['subject' => $subject, 'body' => $body, 'source' => 'lang'];
     }
@@ -180,6 +173,21 @@ class EmailTemplateService
     private function fallbackLocale(string $locale): string
     {
         return $locale === 'en' ? 'en' : 'en';
+    }
+
+    private function langLine(string $key, string $field, string $locale): string
+    {
+        $group = trans('communications.templates', [], $locale);
+        if (is_array($group) && isset($group[$key][$field]) && is_string($group[$key][$field])) {
+            return $group[$key][$field];
+        }
+
+        $fallback = trans('communications.templates', [], 'en');
+        if (is_array($fallback) && isset($fallback[$key][$field]) && is_string($fallback[$key][$field])) {
+            return $fallback[$key][$field];
+        }
+
+        return $key.'.'.$field;
     }
 
     private function assertAllowlist(string $text): void
