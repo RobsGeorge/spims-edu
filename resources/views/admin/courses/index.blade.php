@@ -13,7 +13,10 @@
             <tbody>
             @foreach($courses as $course)
                 <tr>
-                    <td><a href="{{ route('admin.courses.show', $course) }}">{{ $course->code }}</a></td>
+                    <td>
+                        <a href="{{ route('admin.courses.show', $course) }}">{{ $course->code }}</a>
+                        <a href="{{ route('admin.courses.edit', $course) }}" class="btn btn-sm btn-link">{{ __('ui.edit') }}</a>
+                    </td>
                     <td>{{ $course->title }}</td>
                     <td>{{ $course->credit_hours }}</td>
                     <td>{{ $course->interest_flags_count }}</td>

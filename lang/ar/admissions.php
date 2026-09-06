@@ -2,7 +2,15 @@
 
 return [
     'form_created' => 'تم إنشاء نموذج التقديم.',
+    'form_updated' => 'تم تحديث نموذج التقديم.',
     'form_name' => 'اسم النموذج',
+    'edit_form' => 'تعديل النموذج',
+    'add_field' => 'إضافة حقل',
+    'deactivate_field' => 'تعطيل',
+    'field_added' => 'تمت إضافة الحقل.',
+    'field_deactivated' => 'تم تعطيل الحقل.',
+    'fields' => 'الحقول',
+    'no_fields' => 'لا توجد حقول بعد.',
     'field_label' => 'تسمية الحقل',
     'required' => 'مطلوب',
     'review' => 'مراجعة',

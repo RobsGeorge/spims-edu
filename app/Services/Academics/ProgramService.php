@@ -79,4 +79,19 @@ class ProgramService
             );
         }, 'ProgramCourse');
     }
+
+    public function detachCourse(User $actor, Program $program, ProgramCourse $programCourse): void
+    {
+        $this->authorize->authorize($actor, 'programs.manage');
+
+        if ($programCourse->program_id !== $program->id) {
+            throw ValidationException::withMessages(['course' => [__('academics.course_not_attached')]]);
+        }
+
+        $this->audit->withAudit($actor, 'programs.detach_course', function () use ($programCourse) {
+            $programCourse->delete();
+
+            return $programCourse;
+        }, 'ProgramCourse');
+    }
 }

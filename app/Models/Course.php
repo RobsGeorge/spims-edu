@@ -52,6 +52,11 @@ class Course extends Model
         )->withPivot('id');
     }
 
+    public function prerequisiteLinks(): HasMany
+    {
+        return $this->hasMany(CoursePrerequisite::class, 'course_id');
+    }
+
     public function interestFlags(): HasMany
     {
         return $this->hasMany(CourseInterestFlag::class);

@@ -120,7 +120,7 @@ class NavigationHub
                 'label' => __('hubs.nav_admin'),
                 'route' => 'hubs.admin',
                 'icon' => 'bi-gear',
-                'active' => request()->routeIs('hubs.admin') || request()->routeIs('admin.users.*') || request()->routeIs('admin.applications.*'),
+                'active' => request()->routeIs('hubs.admin') || request()->routeIs('admin.users.*') || request()->routeIs('admin.applications.*') || request()->routeIs('admin.enrollments.*'),
             ];
         }
 
@@ -231,6 +231,7 @@ class NavigationHub
 
         return array_values(array_filter([
             self::link('admin.users.index', 'hubs.users', 'bi-people', 'hubs.users_desc'),
+            self::link('admin.enrollments.index', 'hubs.enrollment_admin', 'bi-person-plus', 'hubs.enrollment_admin_desc'),
             self::link('admin.theme.edit', 'hubs.theme', 'bi-palette', 'hubs.theme_desc'),
             self::link('admin.application-forms.index', 'hubs.app_forms', 'bi-ui-checks', 'hubs.app_forms_desc'),
             self::link('admin.applications.index', 'hubs.applications', 'bi-inbox', 'hubs.applications_desc'),

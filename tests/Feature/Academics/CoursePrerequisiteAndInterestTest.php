@@ -78,4 +78,61 @@ class CoursePrerequisiteAndInterestTest extends TestCase
             ->assertSee('HIST100')
             ->assertSee('1');
     }
+
+    #[Test]
+    public function academic_admin_can_update_and_archive_course(): void
+    {
+        $aca = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $course = Course::query()->create([
+            'code' => 'ARCH1',
+            'title' => 'Typo Title',
+            'credit_hours' => 3,
+            'default_price_usd' => 1000,
+            'default_price_egp' => 5000,
+            'active' => true,
+        ]);
+
+        $this->actingAs($aca)->get(route('admin.courses.show', $course))
+            ->assertOk()
+            ->assertSee(__('ui.edit'), false);
+
+        $this->actingAs($aca)->get(route('admin.courses.edit', $course))
+            ->assertOk()
+            ->assertSee('Typo Title');
+
+        $this->actingAs($aca)->put(route('admin.courses.update', $course), [
+            'title' => 'Archived Course',
+            'credit_hours' => 3,
+            'default_price_usd' => 1000,
+            'default_price_egp' => 5000,
+            'active' => 0,
+        ])->assertRedirect(route('admin.courses.show', $course));
+
+        $course->refresh();
+        $this->assertSame('Archived Course', $course->title);
+        $this->assertFalse($course->active);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'courses.update']);
+    }
+
+    #[Test]
+    public function student_cannot_update_course(): void
+    {
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $course = Course::query()->create([
+            'code' => 'LOCK1',
+            'title' => 'Locked',
+            'credit_hours' => 2,
+            'active' => true,
+        ]);
+
+        $this->actingAs($student)->get(route('admin.courses.edit', $course))->assertForbidden();
+        $this->actingAs($student)->put(route('admin.courses.update', $course), [
+            'title' => 'Hacked',
+            'credit_hours' => 2,
+            'active' => 0,
+        ])->assertForbidden();
+
+        $this->assertSame('Locked', $course->fresh()->title);
+        $this->assertTrue($course->fresh()->active);
+    }
 }

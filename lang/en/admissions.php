@@ -2,7 +2,15 @@
 
 return [
     'form_created' => 'Application form created.',
+    'form_updated' => 'Application form updated.',
     'form_name' => 'Form name',
+    'edit_form' => 'Edit form',
+    'add_field' => 'Add field',
+    'deactivate_field' => 'Deactivate',
+    'field_added' => 'Field added.',
+    'field_deactivated' => 'Field deactivated.',
+    'fields' => 'Fields',
+    'no_fields' => 'No fields yet.',
     'field_label' => 'Field label',
     'required' => 'Required',
     'review' => 'Review',

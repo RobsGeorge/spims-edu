@@ -119,6 +119,10 @@ return [
     'enrollment.override' => [
         'ADMINISTRATIVE_ADMIN' => 'F',
     ],
+    'enrollment.waitlist' => [
+        'ACADEMIC_ADMIN' => 'R',
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
     'finance.invoices' => [
         'FINANCIAL_ADMIN' => 'F',
         'ADMINISTRATIVE_ADMIN' => 'R',

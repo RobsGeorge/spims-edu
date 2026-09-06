@@ -90,4 +90,5 @@ return [
     'error_500_body' => 'An unexpected error occurred. Please try again later.',
     'go_home' => 'Go home',
     'save_changes' => 'Save changes',
+    'edit' => 'Edit',
 ];

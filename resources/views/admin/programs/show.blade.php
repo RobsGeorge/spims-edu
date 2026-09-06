@@ -1,8 +1,13 @@
 @extends('layouts.app')
 @section('title', $program->name)
 @section('content')
-<h1 class="spims-title mb-1">{{ $program->code }} — {{ $program->name }}</h1>
-<p class="text-muted-theme">{{ $program->type->value }} · {{ __('academics.passing_threshold') }}: {{ $program->passing_threshold }}%</p>
+<div class="d-flex justify-content-between align-items-start mb-1">
+    <div>
+        <h1 class="spims-title mb-1">{{ $program->code }} — {{ $program->name }}</h1>
+        <p class="text-muted-theme mb-0">{{ $program->type->value }} · {{ __('academics.passing_threshold') }}: {{ $program->passing_threshold }}% · {{ $program->active ? __('academics.active') : __('academics.inactive') }}</p>
+    </div>
+    <a href="{{ route('admin.programs.edit', $program) }}" class="btn btn-outline-primary">{{ __('ui.edit') }}</a>
+</div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
 <div class="card border-0 shadow-sm mb-4">
@@ -29,7 +34,7 @@
 <div class="card border-0 shadow-sm">
     <div class="table-responsive">
         <table class="table mb-0">
-            <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('academics.title') }}</th><th>{{ __('academics.requirement') }}</th><th>{{ __('academics.year_level') }}</th></tr></thead>
+            <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('academics.title') }}</th><th>{{ __('academics.requirement') }}</th><th>{{ __('academics.year_level') }}</th><th></th></tr></thead>
             <tbody>
             @forelse($program->programCourses as $pc)
                 <tr>
@@ -37,9 +42,16 @@
                     <td>{{ $pc->course->title }}</td>
                     <td>{{ $pc->requirement->value }}</td>
                     <td>{{ $pc->year_level ?? '—' }}</td>
+                    <td>
+                        <form method="POST" action="{{ route('admin.programs.detach-course', [$program, $pc]) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-outline-danger">{{ __('academics.detach_course') }}</button>
+                        </form>
+                    </td>
                 </tr>
             @empty
-                <tr><td colspan="4" class="text-muted-theme">{{ __('academics.no_courses') }}</td></tr>
+                <tr><td colspan="5" class="text-muted-theme">{{ __('academics.no_courses') }}</td></tr>
             @endforelse
             </tbody>
         </table>

@@ -4,7 +4,7 @@
 <h1 class="spims-title mb-3">{{ $form->program->code }} — {{ $form->name }}</h1>
 <form method="POST" action="{{ route('applications.store', $application) }}" enctype="multipart/form-data">
     @csrf
-    @foreach($form->fields as $field)
+    @foreach($form->fields->where('active', true) as $field)
         @php
             $existing = $application->values->firstWhere('field_id', $field->id);
             $current = old('answers.'.$field->id, $existing?->value ?? ($prefill[$field->id] ?? ''));

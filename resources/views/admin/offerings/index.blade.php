@@ -13,7 +13,10 @@
             <tbody>
             @foreach($offerings as $offering)
                 <tr>
-                    <td><a href="{{ route('admin.offerings.show', $offering) }}">{{ $offering->course->code }}</a></td>
+                    <td>
+                        <a href="{{ route('admin.offerings.show', $offering) }}">{{ $offering->course->code }}</a>
+                        <a href="{{ route('admin.offerings.edit', $offering) }}" class="btn btn-sm btn-link">{{ __('ui.edit') }}</a>
+                    </td>
                     <td>{{ $offering->mode->value }}</td>
                     <td>{{ $offering->semester?->name ?? '—' }}</td>
                     <td>{{ $offering->status->value }}</td>

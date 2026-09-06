@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\RoleType;
+use App\Enums\StudentProgramStatus;
 use App\Http\Controllers\Controller;
+use App\Models\CourseOffering;
+use App\Models\StudentProgram;
 use App\Models\User;
 use App\Services\Admin\UserAdminService;
+use App\Services\Enrollment\EnrollmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -19,6 +23,25 @@ class UserController extends Controller
         return view('admin.users.index', [
             'users' => $users,
             'assignableRoles' => RoleType::cases(),
+        ]);
+    }
+
+    public function show(User $user, EnrollmentService $enrollments): View
+    {
+        $user->load('roles');
+
+        return view('admin.users.show', [
+            'user' => $user,
+            'held' => $enrollments->hasManualFinancialHold($user),
+            'offerings' => CourseOffering::query()
+                ->with(['course', 'semester'])
+                ->latest()
+                ->get(),
+            'programs' => StudentProgram::query()
+                ->with('program')
+                ->where('student_id', $user->id)
+                ->where('status', StudentProgramStatus::Active)
+                ->get(),
         ]);
     }
 

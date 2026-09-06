@@ -90,6 +90,76 @@ class OfferingService
         });
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function update(User $actor, CourseOffering $offering, array $data): CourseOffering
+    {
+        $this->authorize->authorize($actor, 'offerings.manage');
+
+        if ($offering->mode === OfferingMode::Cohort && array_key_exists('semester_id', $data) && empty($data['semester_id'])) {
+            throw ValidationException::withMessages([
+                'semester_id' => [__('offerings.cohort_requires_semester')],
+            ]);
+        }
+
+        $before = $offering->only([
+            'seat_capacity',
+            'start_date',
+            'end_date',
+            'status',
+            'semester_id',
+            'attendance_threshold_percent',
+        ]);
+        $previousStatus = $offering->status;
+
+        $payload = [
+            'seat_capacity' => array_key_exists('seat_capacity', $data) ? $data['seat_capacity'] : $offering->seat_capacity,
+            'start_date' => array_key_exists('start_date', $data) ? $data['start_date'] : $offering->start_date,
+            'end_date' => array_key_exists('end_date', $data) ? $data['end_date'] : $offering->end_date,
+            'attendance_threshold_percent' => $data['attendance_threshold_percent'] ?? $offering->attendance_threshold_percent,
+        ];
+
+        if (array_key_exists('semester_id', $data) && $offering->mode === OfferingMode::Cohort) {
+            $payload['semester_id'] = $data['semester_id'];
+        }
+
+        if (isset($data['status'])) {
+            $payload['status'] = $data['status'] instanceof OfferingStatus
+                ? $data['status']
+                : OfferingStatus::from($data['status']);
+        }
+
+        $offering->update($payload);
+        $fresh = $offering->fresh();
+
+        $this->audit->write(
+            $actor,
+            'offerings.update',
+            'CourseOffering',
+            $offering->id,
+            $before,
+            $fresh->only([
+                'seat_capacity',
+                'start_date',
+                'end_date',
+                'status',
+                'semester_id',
+                'attendance_threshold_percent',
+            ]),
+        );
+
+        if ($previousStatus !== $fresh->status) {
+            $this->audit->write($actor, 'offerings.status_change', 'CourseOffering', $offering->id, [
+                'status' => $previousStatus->value,
+            ], [
+                'status' => $fresh->status->value,
+            ]);
+        }
+
+        return $fresh;
+    }
+
     public function assignStaff(User $actor, CourseOffering $offering, string $userId, string $role): OfferingStaff
     {
         $this->authorize->authorize($actor, 'offerings.manage');
@@ -102,6 +172,21 @@ class OfferingService
             ],
             ['role' => OfferingStaffRole::from($role)]
         ), 'OfferingStaff');
+    }
+
+    public function removeStaff(User $actor, CourseOffering $offering, OfferingStaff $staff): void
+    {
+        $this->authorize->authorize($actor, 'offerings.manage');
+
+        if ($staff->offering_id !== $offering->id) {
+            throw ValidationException::withMessages(['staff' => [__('offerings.staff_not_assigned')]]);
+        }
+
+        $this->audit->withAudit($actor, 'offerings.remove_staff', function () use ($staff) {
+            $staff->delete();
+
+            return $staff;
+        }, 'OfferingStaff');
     }
 
     public function setPricing(User $actor, CourseOffering $offering, ?int $usd, ?int $egp): CourseOffering

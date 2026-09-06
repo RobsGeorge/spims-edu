@@ -53,6 +53,8 @@ return [
     'credentials_desc' => 'Émettre certificats et relevés.',
     'users' => 'Utilisateurs',
     'users_desc' => 'Créer des comptes et rôles.',
+    'enrollment_admin' => 'Exceptions d’inscription',
+    'enrollment_admin_desc' => 'Holds financiers, inscription forcée et listes d’attente.',
     'theme' => 'Thème',
     'theme_desc' => 'Marque et jetons Sacred Academic.',
     'app_forms' => 'Formulaires',
