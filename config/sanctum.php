@@ -46,7 +46,8 @@ return [
     |
     */
 
-    'expiration' => null,
+    // Minutes until a personal access token is rejected. Null would never expire.
+    'expiration' => (int) env('SANCTUM_TOKEN_EXPIRATION', 60 * 24 * 30) ?: (60 * 24 * 30),
 
     /*
     |--------------------------------------------------------------------------

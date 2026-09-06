@@ -9,22 +9,11 @@ class TransactionalMailer
 {
     /**
      * Send a plain-text transactional message.
-     * When MAIL_MAILER is log/array, only logs (OTP/dev path stays green).
+     * Missing/broken mailers degrade (never block). MAIL_MAILER=log writes to the
+     * dedicated mail channel (storage/logs/mail.log), not laravel.log.
      */
     public function send(string $to, string $subject, string $body): bool
     {
-        $mailer = (string) config('mail.default');
-
-        if (in_array($mailer, ['log', 'array'], true)) {
-            Log::info('Transactional mail (logged, not sent)', [
-                'to' => $to,
-                'subject' => $subject,
-                'mailer' => $mailer,
-            ]);
-
-            return true;
-        }
-
         try {
             Mail::raw($body, function ($message) use ($to, $subject): void {
                 $message->to($to)->subject($subject);

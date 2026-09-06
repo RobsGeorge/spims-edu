@@ -58,7 +58,11 @@ return [
     ],
 
     'payments' => [
-        'mock_auto_complete' => env('PAYMENTS_MOCK_AUTO_COMPLETE', true),
+        // True only in local/testing. Staging/production default to false when unset.
+        'mock_auto_complete' => \App\Support\ProductionSafeDefaults::paymentsMockAutoComplete(
+            env('PAYMENTS_MOCK_AUTO_COMPLETE'),
+            (string) env('APP_ENV', 'production'),
+        ),
     ],
 
     'vimeo' => [

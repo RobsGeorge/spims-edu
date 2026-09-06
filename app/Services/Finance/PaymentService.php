@@ -82,7 +82,7 @@ class PaymentService
                 $ref = $this->gateways->charge($method, $gatewayPortion, $invoice->currency, $payment->id);
                 $payment->update(['gateway_ref' => $ref, 'method' => $method]);
 
-                if (config('services.payments.mock_auto_complete', true)) {
+                if ($this->mockAutoCompleteEnabled()) {
                     $payment->update(['status' => PaymentStatus::Completed]);
                     $this->finalizeCompletedPayment($payment->fresh());
                 }
@@ -337,6 +337,19 @@ class PaymentService
         $setting->save();
 
         return sprintf('SPIMS-%s-%05d', $year, $next);
+    }
+
+    /**
+     * Auto-complete simulated gateway charges only in local/testing, and only
+     * when the payments mock flag is on. Staging/production wait for a webhook.
+     */
+    private function mockAutoCompleteEnabled(): bool
+    {
+        if (! app()->environment(['local', 'testing'])) {
+            return false;
+        }
+
+        return (bool) config('services.payments.mock_auto_complete');
     }
 
     private function resolvePrimaryMethod(Currency $currency, int $walletMoney, int $walletPoints, int $gatewayPortion, ?string $gateway): PaymentMethod

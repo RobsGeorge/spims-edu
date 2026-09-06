@@ -32,12 +32,14 @@ class OtpService
             'expires_at' => now()->addMinutes(15),
         ]);
 
-        // Always log OTP in log/array mail environments (dev + CI); never block.
-        Log::info('SPIMS OTP issued', [
-            'email' => $user->email,
-            'purpose' => $purpose->value,
-            'code' => $plain,
-        ]);
+        // Never write the digits to laravel.log. Local verify uses the mail log
+        // (MAIL_MAILER=log) and the session UI, not application error/info logs.
+        if (in_array((string) config('mail.default'), ['log', 'array'], true)) {
+            Log::notice('SPIMS OTP issued', [
+                'user_id' => $user->id,
+                'purpose' => $purpose->value,
+            ]);
+        }
 
         $this->mailer->send(
             (string) $user->email,
