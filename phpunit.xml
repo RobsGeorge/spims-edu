@@ -35,6 +35,7 @@
             <exclude>tests/Feature/Events</exclude>
             <exclude>tests/Feature/LiveQuiz</exclude>
             <exclude>tests/Feature/Projects</exclude>
+            <exclude>tests/Feature/StaffUi</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -110,6 +111,9 @@
         </testsuite>
         <testsuite name="Projects">
             <directory>tests/Feature/Projects</directory>
+        </testsuite>
+        <testsuite name="StaffUi">
+            <directory>tests/Feature/StaffUi</directory>
         </testsuite>
     </testsuites>
     <source>

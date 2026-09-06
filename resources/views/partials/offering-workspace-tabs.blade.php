@@ -1,4 +1,6 @@
 @php
+    use Illuminate\Support\Facades\Route;
+
     $prefix = $prefix ?? 'admin';
     $active = $active ?? 'content';
     $tabs = [
@@ -13,6 +15,17 @@
         'roster' => __('teach.tab_roster'),
         'completion' => __('teach.tab_completion'),
     ];
+    if ($prefix === 'teach') {
+        if (Route::has('teach.projects.index')) {
+            $tabs['projects'] = __('teach.tab_projects');
+        }
+        if (Route::has('teach.live-quiz.index')) {
+            $tabs['live_quiz'] = __('teach.tab_live_quiz');
+        }
+        if (Route::has('teach.surveys.index')) {
+            $tabs['surveys'] = __('teach.tab_surveys');
+        }
+    }
 @endphp
 <nav class="offering-workspace-tabs" aria-label="{{ __('teach.workspace') }}">
     <ul class="nav nav-pills flex-nowrap gap-2 overflow-auto pb-1">
@@ -22,6 +35,9 @@
                     ? match ($key) {
                         'completion' => route('teach.completion.show', $offering),
                         'assignments' => route('teach.assignments.index', $offering),
+                        'projects' => route('teach.projects.index', $offering),
+                        'live_quiz' => route('teach.live-quiz.index', $offering),
+                        'surveys' => route('teach.surveys.index', $offering),
                         default => route('teach.show', ['offering' => $offering, 'tab' => $key]),
                     }
                     : ($key === 'completion'

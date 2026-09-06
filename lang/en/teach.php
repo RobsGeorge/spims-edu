@@ -63,4 +63,13 @@ return array (
   'assignments_mark_received' => 'Mark received',
   'assignments_bulk_grade_label' => 'Bulk grade offline (one per line: student_id,score,feedback)',
   'assignments_bulk_grade' => 'Grade batch',
+  'tab_projects' => 'Projects',
+  'tab_live_quiz' => 'Live quiz',
+  'tab_surveys' => 'Surveys',
+  'tab_projects_help' => 'Team projects, seating, deliverables, and grades.',
+  'tab_live_quiz_help' => 'Host a live quiz session for this offering.',
+  'tab_surveys_help' => 'Course feedback surveys and anonymous reports.',
+  'open_projects' => 'Open projects',
+  'open_live_quiz' => 'Open live quiz',
+  'open_surveys' => 'Open surveys',
 );

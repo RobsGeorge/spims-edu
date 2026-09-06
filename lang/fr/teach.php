@@ -63,4 +63,13 @@ return array (
   'assignments_mark_received' => 'Marquer reçu',
   'assignments_bulk_grade_label' => 'Notation groupée hors ligne (une ligne par étudiant : student_id,score,feedback)',
   'assignments_bulk_grade' => 'Noter le lot',
+  'tab_projects' => 'Projets',
+  'tab_live_quiz' => 'Quiz live',
+  'tab_surveys' => 'Sondages',
+  'tab_projects_help' => 'Projets d’équipe, placement, livrables et notes.',
+  'tab_live_quiz_help' => 'Animer un quiz live pour cette offre.',
+  'tab_surveys_help' => 'Sondages de cours et rapports anonymes.',
+  'open_projects' => 'Ouvrir les projets',
+  'open_live_quiz' => 'Ouvrir le quiz live',
+  'open_surveys' => 'Ouvrir les sondages',
 );

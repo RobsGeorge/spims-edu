@@ -207,6 +207,7 @@ class NavigationHub
             self::link('admin.communications.report', 'hubs.communications', 'bi-envelope-paper', 'hubs.communications_desc'),
             self::link('admin.email-templates.index', 'hubs.email_templates', 'bi-file-earmark-text', 'hubs.email_templates_desc'),
             self::link('admin.certificate-templates.index', 'hubs.certificate_templates', 'bi-award', 'hubs.certificate_templates_desc'),
+            self::link('admin.surveys.index', 'staff.surveys.hub', 'bi-clipboard-data', 'staff.surveys.hub_desc'),
         ]));
     }
 
@@ -225,6 +226,7 @@ class NavigationHub
             self::link('admin.application-forms.index', 'hubs.app_forms', 'bi-ui-checks', 'hubs.app_forms_desc'),
             self::link('admin.applications.index', 'hubs.applications', 'bi-inbox', 'hubs.applications_desc'),
             self::link('admin.communications.report', 'hubs.communications', 'bi-envelope-paper', 'hubs.communications_desc'),
+            self::link('admin.events.index', 'staff.events.hub', 'bi-calendar-event', 'staff.events.hub_desc'),
         ]));
     }
 
@@ -339,6 +341,16 @@ class NavigationHub
                 'superadmin_only' => true,
             ],
         ];
+
+        if (Route::has('superadmin.feedback-reveals.index')) {
+            $links[] = [
+                'label' => __('staff.surveys.reveals_hub'),
+                'url' => route('superadmin.feedback-reveals.index'),
+                'icon' => 'bi-eye-slash',
+                'description' => __('staff.surveys.reveals_hub_desc'),
+                'superadmin_only' => true,
+            ];
+        }
 
         return [
             [
