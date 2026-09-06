@@ -14,6 +14,7 @@ use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\GradebookComponent;
+use App\Enums\ClassSessionMode;
 use App\Models\LiveSession;
 use App\Models\User;
 use App\Models\Week;
@@ -111,6 +112,24 @@ class ResourceScopeTest extends TestCase
                 ->schedule($instructor, $theirs, ['title' => 'L', 'scheduled_start' => now()->addDays(2), 'duration_minutes' => 60]),
             'attendance.import' => fn () => app(AttendanceService::class)
                 ->importFromZoom($instructor, $session, []),
+            'attendance.openSession' => fn () => app(AttendanceService::class)
+                ->openSession($instructor, $theirs, [
+                    'title' => 'X',
+                    'scheduled_start' => now()->addDays(3),
+                    'duration_minutes' => 60,
+                    'mode' => ClassSessionMode::InPerson->value,
+                ]),
+            'attendance.markRoster' => fn () => app(AttendanceService::class)
+                ->markRoster($instructor, app(AttendanceService::class)->openSession(
+                    User::factory()->withRole(RoleType::AcademicAdmin)->create(),
+                    $theirs,
+                    [
+                        'title' => 'Theirs',
+                        'scheduled_start' => now()->addDays(4),
+                        'duration_minutes' => 60,
+                        'mode' => ClassSessionMode::InPerson->value,
+                    ]
+                ), [], 0),
             'discussions.configure' => fn () => app(DiscussionService::class)
                 ->configureBoard($instructor, $theirs, true),
         ];
