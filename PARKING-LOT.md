@@ -11,8 +11,8 @@ Promote an item into an active phase only when the phase owner accepts it.
 
 ## Still deferred
 
-- WebSockets / SSE for notifications & discussions (v1 = poll/reload) — scheduled last, in S9, with
-  a polling fallback so no earlier phase depends on it
+- WebSockets / SSE for notifications & discussions, and Laravel Reverb for live quiz — S9 domain
+  (events + live quiz) shipped with polling. Reverb is still optional and not required for CI.
 - Framer Motion–class route transitions (keep CSS/Alpine micro-motion under no-npm constraint)
 - Public marketing site beyond the in-app landing
 - Parent / guardian roles — explicitly out of scope; Khedma's guardian check-in path is not being ported
@@ -35,7 +35,7 @@ Promote an item into an active phase only when the phase owner accepts it.
 - **Full REST JSON API surface** matching the original `api-route-structure.md` (the app remains
   Blade-first for its own UI). **Foundation done in S1** — `/api/v1` with `login`, `logout`, `me`
   and `branding`. S2 added announcements/notifications/settings; S3 added attendance/roster.
-  Remaining endpoint surfaces: **S6** (student API, remaining waves) and **S8** (instructor API).
+  Remaining endpoint surface: **S8** (instructor API). Student waves A–E are on `main`.
 
 ## Spec docs not yet vendored into this repo
 

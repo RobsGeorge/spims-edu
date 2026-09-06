@@ -15,7 +15,7 @@ Read them in this order:
 
 ## Status
 
-**S0–S6 are done. S7 (team projects) is next.** Wave E of the student API (projects, live quiz, events, surveys) waits on S7 and S9.
+**S0–S7 are done, plus S6 Wave E and the S9 domain (events + live quiz on polling).** S8 (instructor API) is next. Laravel Reverb remains optional — live quiz degrades to poll.
 
 Landed on branch
 [`feat/authz-scope-and-api-foundation`](https://github.com/RobsGeorge/spims-edu/compare/main...feat/authz-scope-and-api-foundation):
@@ -39,9 +39,13 @@ The full suite went from 124 to 178 passing on S0/S1, to **212** after S2 and S3
 | [`cursor/ci-postgres-full-suite-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/ci-postgres-full-suite-bcff) | CI | Full PHPUnit suite on PostgreSQL 16 (not just migrate:fresh). |
 | [`cursor/fix-discussion-board-audit-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/fix-discussion-board-audit-bcff) | G-07 | `DiscussionService::ensureBoard()` no longer writes on GET; provisioning is audited. |
 | [`cursor/s4-completion-api-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s4-completion-api-bcff) | **S4 API** | Student credentials + own completion; staff cohort/evaluate, notes, week assessment. |
-| [`cursor/s6-student-api-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6-student-api-bcff) | **S6** | Student mobile API waves A–D. Wave E waits on S7/S9. |
+| [`cursor/s6-student-api-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6-student-api-bcff) | **S6 A–D** | Student mobile API waves A–D. |
+| [`cursor/s6e-surveys-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6e-surveys-bcff) | **S6E** | Feedback surveys: anonymous submit, sealed identity, Super Admin reveal. |
+| [`cursor/s6e-events-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6e-events-bcff) | **S6E / S9** | Events: capacity, waitlist, eligibility, signed QR check-in. |
+| [`cursor/s6e-livequiz-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6e-livequiz-bcff) | **S6E / S9** | Live quiz play + host machine; polling fallback, no Reverb. |
+| [`cursor/s6e-projects-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6e-projects-bcff) | **S7 / S6E** | Team projects: join/leave, deliverables, peer eval (never grades), announce → gradebook. |
 
-**S7 — team projects** is next. Detail in
+**S8 — instructor mobile API** is next. Detail in
 [`implementation-plan.md`](implementation-plan.md), sequencing in
 [`execution-order.md`](execution-order.md).
 

@@ -39,8 +39,9 @@ use Tests\TestCase;
  *   POST /catalog/courses/{course}/interest, GET /application-forms/{applicationForm}
  * - pre-existing S1–S3 routes: announcements, notifications, sessions/{session}/check-in,
  *   offerings/{offering}/attendance/mine
- * - S4-owned completion/credential routes
- * - Wave E (projects, live quiz, events, surveys)
+ * - S4-owned completion/credential routes (`CompletionApiTest`)
+ * - Wave E: surveys (`SurveyScopeTest`), events (`EventScopeTest`),
+ *   live quiz (`LiveQuizScopeTest`), projects (`ProjectScopeTest`)
  */
 class StudentApiScopeTest extends TestCase
 {
