@@ -36,9 +36,4 @@ class Week extends Model
     {
         return $this->hasMany(ContentItem::class)->orderBy('order');
     }
-
-    public function contentItems(): HasMany
-    {
-        return $this->hasMany(ContentItem::class)->orderBy('order');
-    }
 }

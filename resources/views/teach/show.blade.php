@@ -136,7 +136,7 @@
         @forelse($offering->weeks as $week)
             <div class="border rounded-3 p-3 mb-2">
                 <h3 class="h6 mb-1">{{ __('teach.week_n', ['n' => $week->number]) }} — {{ $week->title }}</h3>
-                <p class="small text-muted-theme mb-0">{{ $week->contentItems->count() }} {{ __('teach.items') }}</p>
+                <p class="small text-muted-theme mb-0">{{ $week->items->count() }} {{ __('teach.items') }}</p>
             </div>
         @empty
             <x-empty-state :title="__('teach.no_weeks')" :message="__('teach.no_weeks_help')" icon="bi-calendar-week" />

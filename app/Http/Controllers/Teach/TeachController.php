@@ -35,7 +35,7 @@ class TeachController extends Controller
         abort_unless($this->teachAccess->canTeach($user), 403);
         $this->teachAccess->assertCanTeachOffering($user, $offering);
 
-        $offering->load(['course', 'semester', 'weeks.contentItems', 'staff.user']);
+        $offering->load(['course', 'semester', 'weeks.items', 'staff.user']);
         $tab = $request->query('tab', 'content');
         $roster = Enrollment::query()
             ->where('offering_id', $offering->id)
