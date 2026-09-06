@@ -28,4 +28,7 @@ return [
     'invalid_transition' => 'Impossible de passer cette évaluation de :from à :to.',
     'same_team' => 'Les équipes source et cible doivent être différentes.',
     'file_not_on_submission' => 'Ce fichier n’appartient pas à la soumission de cette équipe.',
+    'scores_required' => 'Indiquez une note d’équipe et/ou des notes par étudiant.',
+    'announce_confirm_title' => 'Annoncer les notes de projet ?',
+    'announce_confirm_body' => 'Les notes annoncées deviennent visibles dans le carnet et ne peuvent pas être retirées depuis cet écran.',
 ];

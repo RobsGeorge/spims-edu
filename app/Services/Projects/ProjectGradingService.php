@@ -149,6 +149,52 @@ class ProjectGradingService
         return $pending;
     }
 
+    /**
+     * Record a team score and/or per-student overrides for one project.
+     *
+     * @param  array{
+     *     team_score?: float|int|null,
+     *     students?: array<int, array{student_id: string, score: float|int}>,
+     *     criterion_id?: string|null
+     * }  $data
+     * @return array{team: ?ProjectGrade, students: array<int, ProjectGrade>}
+     */
+    public function recordScores(User $actor, Project $project, array $data): array
+    {
+        $project->loadMissing('assessment');
+        $this->authorize->authorize($actor, 'projects.grade', $project->assessment);
+
+        $hasTeam = array_key_exists('team_score', $data) && $data['team_score'] !== null && $data['team_score'] !== '';
+        $students = $data['students'] ?? [];
+        if (! $hasTeam && $students === []) {
+            throw ValidationException::withMessages([
+                'scores' => [__('projects.scores_required')],
+            ]);
+        }
+
+        $criterionId = $data['criterion_id'] ?? null;
+        $team = null;
+        $studentGrades = [];
+
+        if ($hasTeam) {
+            $team = $this->setTeamScore($actor, $project, (float) $data['team_score'], $criterionId);
+        }
+
+        foreach ($students as $row) {
+            $student = User::query()->findOrFail($row['student_id']);
+            $studentGrades[] = $this->setStudentOverride(
+                $actor,
+                $project->assessment,
+                $student,
+                (float) $row['score'],
+                $criterionId,
+                $project->id,
+            );
+        }
+
+        return ['team' => $team, 'students' => $studentGrades];
+    }
+
     public function announcedPercentForComponent(GradebookComponent $component, User $student): ?float
     {
         $assessments = ProjectAssessment::query()

@@ -3167,7 +3167,7 @@ paths:
   /teach/project-assessments/{projectAssessment}/teams:
     get:
       operationId: teachProjectTeams
-      summary: Team seating for a project assessment.
+      summary: Team seating for a project assessment. Issues a confirmation token for announce.
       security:
       - bearerAuth: []
       parameters:
@@ -3184,7 +3184,7 @@ paths:
   /teach/project-assessments/{projectAssessment}/announce:
     post:
       operationId: teachAnnounceProjectGrades
-      summary: Announce project grades into the gradebook. Idempotent.
+      summary: Announce project grades into the gradebook. Idempotent. Requires confirmation.
       security:
       - bearerAuth: []
       parameters:
@@ -3193,11 +3193,28 @@ paths:
         required: true
         schema:
           type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - confirmation
+              properties:
+                confirmation:
+                  type: string
       responses:
         '200':
           description: OK
         '403':
           description: Not allowed to announce
+        '422':
+          description: Missing, invalid, or replayed confirmation token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /teach/projects/{project}/peer-evaluations:
     get:
       operationId: teachProjectPeerAggregates
@@ -3550,3 +3567,384 @@ paths:
         '422':
           description: Missing, invalid, or replayed confirmation
 
+# S8 ops
+  /teach/offerings/{offering}/live-sessions:
+    get:
+      operationId: teachListLiveSessions
+      summary: Live sessions for an offering, including join URL when present.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering
+  /teach/live-sessions/{liveSession}/attendance/import:
+    post:
+      operationId: teachImportLiveAttendance
+      summary: Import Zoom participants into live-session attendance.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: liveSession
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - participants
+              properties:
+                participants:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - minutes
+                    properties:
+                      email:
+                        type: string
+                      user_id:
+                        type: string
+                      minutes:
+                        type: integer
+      responses:
+        '200':
+          description: Imported
+        '403':
+          description: Not staffed on this offering
+  /teach/projects/{project}/members/move:
+    post:
+      operationId: teachMoveProjectMember
+      summary: Move a student from one project team to another.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - student_id
+              - to_project_id
+              properties:
+                student_id:
+                  type: string
+                to_project_id:
+                  type: string
+      responses:
+        '200':
+          description: Moved
+        '403':
+          description: Not staffed on this offering
+  /teach/project-submissions/{projectDeliverableSubmission}/review:
+    post:
+      operationId: teachReviewProjectSubmission
+      summary: Staff review of a project deliverable submission.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: projectDeliverableSubmission
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - review_status
+              properties:
+                review_status:
+                  type: string
+                  enum:
+                  - PENDING
+                  - ACCEPTED
+                  - REJECTED
+                  - NEEDS_REVISION
+      responses:
+        '200':
+          description: Reviewed
+        '403':
+          description: Not staffed on this offering
+  /teach/projects/{project}/grade:
+    post:
+      operationId: teachGradeProject
+      summary: Record team and/or per-student project scores.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                team_score:
+                  type: number
+                students:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - student_id
+                    - score
+                    properties:
+                      student_id:
+                        type: string
+                      score:
+                        type: number
+                criterion_id:
+                  type: string
+      responses:
+        '200':
+          description: Graded
+        '403':
+          description: Not staffed on this offering
+  /teach/offerings/{offering}/discussions/threads:
+    get:
+      operationId: teachListDiscussionThreads
+      summary: Staff list of discussion threads for an offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering
+  /teach/discussions/threads/{discussionThread}/moderate:
+    post:
+      operationId: teachModerateDiscussionThread
+      summary: Lock or pin a discussion thread.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: discussionThread
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                locked:
+                  type: boolean
+                pinned:
+                  type: boolean
+      responses:
+        '200':
+          description: Moderated
+        '403':
+          description: Not staffed on this offering
+  /teach/discussions/threads/{discussionThread}/grade:
+    post:
+      operationId: teachGradeDiscussionThread
+      summary: Override a student's discussion grade.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: discussionThread
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - student_id
+              - score
+              properties:
+                student_id:
+                  type: string
+                score:
+                  type: number
+                feedback:
+                  type: string
+      responses:
+        '200':
+          description: Graded
+        '403':
+          description: Not staffed on this offering
+  /teach/offerings/{offering}/weeks:
+    post:
+      operationId: teachCreateOfferingWeek
+      summary: Create a content week on an offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - number
+              - title
+              properties:
+                number:
+                  type: integer
+                title:
+                  type: string
+                unlock_date:
+                  type: string
+                  format: date-time
+                order:
+                  type: integer
+      responses:
+        '201':
+          description: Created
+        '403':
+          description: Not staffed or missing offerings.content
+  /teach/weeks/{week}/items:
+    post:
+      operationId: teachCreateWeekItem
+      summary: Create a content item. Multipart for FILE items.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: week
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - type
+              - title
+              properties:
+                type:
+                  type: string
+                title:
+                  type: string
+                body:
+                  type: string
+                vimeo_id:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+          application/json:
+            schema:
+              type: object
+              required:
+              - type
+              - title
+              properties:
+                type:
+                  type: string
+                title:
+                  type: string
+      responses:
+        '201':
+          description: Created
+        '403':
+          description: Not staffed or missing offerings.content
+  /teach/items/{contentItem}:
+    put:
+      operationId: teachUpdateContentItem
+      summary: Update a content item.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: contentItem
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                type:
+                  type: string
+                body:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                type:
+                  type: string
+                body:
+                  type: string
+      responses:
+        '200':
+          description: Updated
+        '403':
+          description: Not staffed or missing offerings.content
+    delete:
+      operationId: teachDeleteContentItem
+      summary: Delete a content item.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: contentItem
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Deleted
+        '403':
+          description: Not staffed or missing offerings.content

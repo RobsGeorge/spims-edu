@@ -28,4 +28,7 @@ return [
     'invalid_transition' => 'Cannot move this assessment from :from to :to.',
     'same_team' => 'Source and target teams must be different.',
     'file_not_on_submission' => 'That file does not belong to this team submission.',
+    'scores_required' => 'Provide a team score and/or per-student scores.',
+    'announce_confirm_title' => 'Announce project grades?',
+    'announce_confirm_body' => 'Announced scores become visible in the gradebook and cannot be withdrawn from this screen.',
 ];
