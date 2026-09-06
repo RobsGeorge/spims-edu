@@ -7,6 +7,8 @@ use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\CourseOffering;
 use App\Services\Assessment\AssignmentService;
+use App\Support\Api\ConditionalGet;
+use App\Support\Api\IdempotencyStore;
 use App\Support\Api\StudentPayload;
 use App\Support\AuthorizeService;
 use Illuminate\Http\JsonResponse;
@@ -17,11 +19,13 @@ class TeachAssignmentController extends Controller
     public function __construct(
         private readonly AssignmentService $assignments,
         private readonly AuthorizeService $authorize,
+        private readonly IdempotencyStore $idempotency,
+        private readonly ConditionalGet $conditional,
     ) {}
 
     public function index(Request $request, CourseOffering $offering): JsonResponse
     {
-        return response()->json([
+        return $this->conditional->json($request, [
             'data' => $this->assignments->dashboardStats($request->user(), $offering),
         ]);
     }
@@ -48,28 +52,43 @@ class TeachAssignmentController extends Controller
             'feedback' => 'nullable|string',
         ]);
 
-        $graded = $this->assignments->grade(
+        $payload = $this->idempotency->remember(
             $request->user(),
-            $assignmentSubmission,
-            (float) $data['raw_score'],
-            $data['feedback'] ?? null,
+            'teach.submissions.grade:'.$assignmentSubmission->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->submissionPayload($this->assignments->grade(
+                $request->user(),
+                $assignmentSubmission,
+                (float) $data['raw_score'],
+                $data['feedback'] ?? null,
+            )),
         );
 
-        return response()->json(['data' => $this->submissionPayload($graded)]);
+        return response()->json(['data' => $payload]);
     }
 
     public function markReceived(Request $request, AssignmentSubmission $assignmentSubmission): JsonResponse
     {
-        $updated = $this->assignments->markReceived($request->user(), $assignmentSubmission);
+        $payload = $this->idempotency->remember(
+            $request->user(),
+            'teach.submissions.received:'.$assignmentSubmission->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->submissionPayload($this->assignments->markReceived($request->user(), $assignmentSubmission)),
+        );
 
-        return response()->json(['data' => $this->submissionPayload($updated)]);
+        return response()->json(['data' => $payload]);
     }
 
     public function remindUnsubmitted(Request $request, Assignment $assignment): JsonResponse
     {
-        $count = $this->assignments->remindUnsubmitted($request->user(), $assignment);
+        $payload = $this->idempotency->remember(
+            $request->user(),
+            'teach.assignments.remind:'.$assignment->id,
+            $request->header('Idempotency-Key'),
+            fn () => ['reminded' => $this->assignments->remindUnsubmitted($request->user(), $assignment)],
+        );
 
-        return response()->json(['data' => ['reminded' => $count]]);
+        return response()->json(['data' => $payload]);
     }
 
     /** @return array<string, mixed> */

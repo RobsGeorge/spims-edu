@@ -45,7 +45,7 @@ The full suite went from 124 to 178 passing on S0/S1, to **212** after S2 and S3
 | [`cursor/s6e-livequiz-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6e-livequiz-bcff) | **S6E / S9** | Live quiz play + host machine; polling fallback, no Reverb. |
 | [`cursor/s6e-projects-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6e-projects-bcff) | **S7 / S6E** | Team projects: join/leave, deliverables, peer eval (never grades), announce → gradebook. |
 
-**S8 — instructor mobile API and thin Blade staff UIs** landed on `main`: teaching context and confirmation tokens; gradebook/assignments/assessments; live, projects, discussions, and content; plus survey, event, project, and live-quiz staff pages. Detail in
+**S8 — instructor mobile API and thin Blade staff UIs** landed on `main`: teaching context and confirmation tokens; gradebook/assignments/assessments; live, projects, discussions, and content; plus survey, event, project, and live-quiz staff pages. S8 hardening adds stable confirmation tokens, `Idempotency-Key` on teach writes, ETags on safe list GETs, and TA denials for lock/announce. Detail in
 [`implementation-plan.md`](implementation-plan.md), sequencing in
 [`execution-order.md`](execution-order.md).
 

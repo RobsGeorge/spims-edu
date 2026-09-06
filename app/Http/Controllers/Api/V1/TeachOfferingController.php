@@ -17,7 +17,9 @@ use App\Services\Completion\OfferingClosingService;
 use App\Services\Gradebook\GradebookService;
 use App\Services\Live\AttendanceService;
 use App\Services\Teach\TeachAccessService;
+use App\Support\Api\ConditionalGet;
 use App\Support\Api\ConfirmationToken;
+use App\Support\Api\IdempotencyStore;
 use App\Support\Api\PaginatedEnvelope;
 use App\Support\AuthorizeService;
 use Illuminate\Http\JsonResponse;
@@ -31,6 +33,8 @@ class TeachOfferingController extends Controller
         private readonly TeachAccessService $teachAccess,
         private readonly AuthorizeService $authorize,
         private readonly ConfirmationToken $tokens,
+        private readonly IdempotencyStore $idempotency,
+        private readonly ConditionalGet $conditional,
         private readonly OfferingClosingService $closing,
         private readonly GradebookService $gradebook,
         private readonly AttendanceService $attendance,
@@ -68,7 +72,7 @@ class TeachOfferingController extends Controller
             ['path' => $request->url(), 'query' => $request->query()],
         );
 
-        return response()->json(PaginatedEnvelope::from($paginator));
+        return $this->conditional->json($request, PaginatedEnvelope::from($paginator));
     }
 
     public function show(Request $request, CourseOffering $offering): JsonResponse
@@ -153,17 +157,23 @@ class TeachOfferingController extends Controller
         $user = $request->user();
         $this->authorize->authorize($user, 'offering.close', $offering);
 
-        $raw = $request->input('confirmation');
-        $this->tokens->consume($user, 'offering.close', $offering->id, is_string($raw) ? $raw : null);
+        $payload = $this->idempotency->remember(
+            $user,
+            'teach.offering.close:'.$offering->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $user, $offering) {
+                $raw = $request->input('confirmation');
+                $this->tokens->consume($user, 'offering.close', $offering->id, is_string($raw) ? $raw : null);
+                $record = $this->closing->close($user, $offering);
 
-        $record = $this->closing->close($user, $offering);
+                return [
+                    'status' => $record->status->value,
+                    'closed_at' => $record->closed_at?->toIso8601String(),
+                ];
+            },
+        );
 
-        return response()->json([
-            'data' => [
-                'status' => $record->status->value,
-                'closed_at' => $record->closed_at?->toIso8601String(),
-            ],
-        ]);
+        return response()->json(['data' => $payload]);
     }
 
     /**

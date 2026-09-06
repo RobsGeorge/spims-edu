@@ -9,6 +9,8 @@ use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Services\Attendance\RosterService;
 use App\Services\Live\AttendanceService;
+use App\Support\Api\ConditionalGet;
+use App\Support\Api\IdempotencyStore;
 use App\Support\AuthorizeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TeachAttendanceController extends Controller
 {
-    public function sessions(Request $request, CourseOffering $offering, AuthorizeService $authorize): JsonResponse
+    public function sessions(Request $request, CourseOffering $offering, AuthorizeService $authorize, ConditionalGet $conditional): JsonResponse
     {
         $authorize->authorize($request->user(), 'attendance.view_all', $offering);
 
@@ -25,8 +27,8 @@ class TeachAttendanceController extends Controller
             ->orderByDesc('scheduled_start')
             ->get();
 
-        return response()->json([
-            'data' => $sessions->map(fn (ClassSession $session) => $this->sessionPayload($session)),
+        return $conditional->json($request, [
+            'data' => $sessions->map(fn (ClassSession $session) => $this->sessionPayload($session))->values()->all(),
         ]);
     }
 
@@ -84,7 +86,7 @@ class TeachAttendanceController extends Controller
         ]);
     }
 
-    public function mark(Request $request, ClassSession $session, AttendanceService $attendance): JsonResponse
+    public function mark(Request $request, ClassSession $session, AttendanceService $attendance, IdempotencyStore $idempotency): JsonResponse
     {
         $data = $request->validate([
             'lock_version' => 'required|integer|min:0',
@@ -95,37 +97,56 @@ class TeachAttendanceController extends Controller
             'marks.*.excuse_reason' => 'nullable|string|max:500',
         ]);
 
-        $attendance->markRoster($request->user(), $session, $data['marks'], (int) $data['lock_version']);
-        $session->refresh();
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.attendance.mark:'.$session->id,
+            $request->header('Idempotency-Key'),
+            function () use ($attendance, $request, $session, $data) {
+                $attendance->markRoster($request->user(), $session, $data['marks'], (int) $data['lock_version']);
+                $session->refresh();
 
-        return response()->json([
-            'data' => [
-                'lock_version' => $session->lock_version,
-            ],
-        ]);
+                return ['lock_version' => $session->lock_version];
+            },
+        );
+
+        return response()->json(['data' => $payload]);
     }
 
-    public function fillMissing(Request $request, ClassSession $session, AttendanceService $attendance): JsonResponse
+    public function fillMissing(Request $request, ClassSession $session, AttendanceService $attendance, IdempotencyStore $idempotency): JsonResponse
     {
-        $entries = $attendance->fillMissing($request->user(), $session);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.attendance.fill:'.$session->id,
+            $request->header('Idempotency-Key'),
+            function () use ($attendance, $request, $session) {
+                $entries = $attendance->fillMissing($request->user(), $session);
 
-        return response()->json([
-            'data' => [
-                'filled' => $entries->count(),
-                'lock_version' => $session->fresh()->lock_version,
-            ],
-        ]);
+                return [
+                    'filled' => $entries->count(),
+                    'lock_version' => $session->fresh()->lock_version,
+                ];
+            },
+        );
+
+        return response()->json(['data' => $payload]);
     }
 
-    public function close(Request $request, ClassSession $session, AttendanceService $attendance): JsonResponse
+    public function close(Request $request, ClassSession $session, AttendanceService $attendance, IdempotencyStore $idempotency): JsonResponse
     {
-        $closed = $attendance->closeSession($request->user(), $session);
+        $payload = $idempotency->remember(
+            $request->user(),
+            'teach.attendance.close:'.$session->id,
+            $request->header('Idempotency-Key'),
+            function () use ($attendance, $request, $session) {
+                $closed = $attendance->closeSession($request->user(), $session);
 
-        return response()->json([
-            'data' => [
-                'attendance_closed_at' => $closed->attendance_closed_at?->toIso8601String(),
-            ],
-        ]);
+                return [
+                    'attendance_closed_at' => $closed->attendance_closed_at?->toIso8601String(),
+                ];
+            },
+        );
+
+        return response()->json(['data' => $payload]);
     }
 
     public function issueCheckInCode(Request $request, ClassSession $session, AttendanceService $attendance): JsonResponse

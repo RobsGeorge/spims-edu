@@ -141,7 +141,8 @@ questions. A client-supplied timestamp is never trusted.
 ### Idempotency
 
 Mutations that could be retried on a flaky connection (`submit`, `reserve`, `join`, `check-in`,
-`pay`) accept an `Idempotency-Key` header. A repeat with the same key returns the original result
+`pay`, and instructor writes such as attendance mark, grade, remind, lock, close, announce, and
+publish) accept an `Idempotency-Key` header. A repeat with the same key returns the original result
 instead of acting twice.
 
 ### Confirmation tokens for irreversible actions
@@ -149,7 +150,9 @@ instead of acting twice.
 `gradebook.lock`, `offering.close`, `projects.announce`, and `assessments.announce_results` require a
 two-step call. The preceding `GET` returns a short-lived `confirmation_token` alongside a
 human-readable summary of consequences; the mutation must echo it. A missing or replayed token is
-422. This is the API form of SPIMS's consequence-aware confirm dialogs, and it is what stops a
+422. A repeated GET reuses the unexpired token so a pull-to-refresh cannot invalidate the dialog.
+A retry that also sends `Idempotency-Key` returns the original success after the token is consumed.
+This is the API form of SPIMS's consequence-aware confirm dialogs, and it is what stops a
 mis-tap on a phone from locking a term.
 
 ### Uploads

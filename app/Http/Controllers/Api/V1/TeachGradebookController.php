@@ -12,6 +12,7 @@ use App\Models\GradebookComponent;
 use App\Models\User;
 use App\Services\Gradebook\GradebookService;
 use App\Support\Api\ConfirmationToken;
+use App\Support\Api\IdempotencyStore;
 use App\Support\AuthorizeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class TeachGradebookController extends Controller
         private readonly GradebookService $gradebook,
         private readonly AuthorizeService $authorize,
         private readonly ConfirmationToken $confirmation,
+        private readonly IdempotencyStore $idempotency,
     ) {}
 
     public function show(Request $request, CourseOffering $offering): JsonResponse
@@ -81,9 +83,18 @@ class TeachGradebookController extends Controller
 
     public function submit(Request $request, CourseOffering $offering): JsonResponse
     {
-        $this->gradebook->submitGrades($request->user(), $offering);
+        $payload = $this->idempotency->remember(
+            $request->user(),
+            'teach.gradebook.submit:'.$offering->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $offering) {
+                $this->gradebook->submitGrades($request->user(), $offering);
 
-        return response()->json(['data' => ['submitted' => true]]);
+                return ['submitted' => true];
+            },
+        );
+
+        return response()->json(['data' => $payload]);
     }
 
     public function lock(Request $request, CourseOffering $offering): JsonResponse
@@ -91,20 +102,25 @@ class TeachGradebookController extends Controller
         $actor = $request->user();
         $this->authorize->authorize($actor, 'gradebook.lock', $offering);
 
-        $data = $request->validate([
-            'confirmation' => 'nullable|string',
-        ]);
-
-        $this->confirmation->consume(
+        $payload = $this->idempotency->remember(
             $actor,
-            'gradebook.lock',
-            $offering->id,
-            $data['confirmation'] ?? null,
+            'teach.gradebook.lock:'.$offering->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $actor, $offering) {
+                $raw = $request->input('confirmation');
+                $this->confirmation->consume(
+                    $actor,
+                    'gradebook.lock',
+                    $offering->id,
+                    is_string($raw) ? $raw : null,
+                );
+                $this->gradebook->lockGrades($actor, $offering);
+
+                return ['locked' => true];
+            },
         );
 
-        $this->gradebook->lockGrades($actor, $offering);
-
-        return response()->json(['data' => ['locked' => true]]);
+        return response()->json(['data' => $payload]);
     }
 
     /** @return array{confirmation_token: string, consequences: array<int, mixed>, expires_at: string}|null */

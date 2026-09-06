@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\Assessment\AssessmentService;
 use App\Services\Assessment\AttemptService;
 use App\Support\Api\ConfirmationToken;
+use App\Support\Api\IdempotencyStore;
 use App\Support\Api\StudentPayload;
 use App\Support\AuthorizeService;
 use Illuminate\Http\JsonResponse;
@@ -24,6 +25,7 @@ class TeachAssessmentGradingController extends Controller
         private readonly AssessmentService $assessments,
         private readonly AuthorizeService $authorize,
         private readonly ConfirmationToken $confirmation,
+        private readonly IdempotencyStore $idempotency,
     ) {}
 
     public function attempts(Request $request, Assessment $assessment): JsonResponse
@@ -80,22 +82,29 @@ class TeachAssessmentGradingController extends Controller
             'feedback' => 'nullable|string',
         ]);
 
-        $graded = $this->attempts->overrideScore(
+        $payload = $this->idempotency->remember(
             $request->user(),
-            $attemptAnswer,
-            (float) $data['final_score'],
-            $data['feedback'] ?? null,
+            'teach.answers.grade:'.$attemptAnswer->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $attemptAnswer, $data) {
+                $graded = $this->attempts->overrideScore(
+                    $request->user(),
+                    $attemptAnswer,
+                    (float) $data['final_score'],
+                    $data['feedback'] ?? null,
+                );
+
+                return [
+                    'id' => $graded->id,
+                    'question_id' => $graded->question_id,
+                    'final_score' => $graded->final_score,
+                    'feedback' => $graded->feedback,
+                    'graded_at' => StudentPayload::iso($graded->graded_at),
+                ];
+            },
         );
 
-        return response()->json([
-            'data' => [
-                'id' => $graded->id,
-                'question_id' => $graded->question_id,
-                'final_score' => $graded->final_score,
-                'feedback' => $graded->feedback,
-                'graded_at' => StudentPayload::iso($graded->graded_at),
-            ],
-        ]);
+        return response()->json(['data' => $payload]);
     }
 
     public function announceResults(Request $request, Assessment $assessment): JsonResponse
@@ -103,27 +112,30 @@ class TeachAssessmentGradingController extends Controller
         $actor = $request->user();
         $this->authorize->authorize($actor, 'assessments.announce_results', $assessment);
 
-        $data = $request->validate([
-            'confirmation' => 'nullable|string',
-        ]);
-
-        $this->confirmation->consume(
+        $payload = $this->idempotency->remember(
             $actor,
-            'assessments.announce_results',
-            $assessment->id,
-            $data['confirmation'] ?? null,
+            'teach.assessments.announce:'.$assessment->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $actor, $assessment) {
+                $raw = $request->input('confirmation');
+                $this->confirmation->consume(
+                    $actor,
+                    'assessments.announce_results',
+                    $assessment->id,
+                    is_string($raw) ? $raw : null,
+                );
+                $announcement = $this->assessments->announceResults($actor, $assessment);
+
+                return [
+                    'id' => $announcement->id,
+                    'assessment_id' => $announcement->assessment_id,
+                    'announced_at' => StudentPayload::iso($announcement->announced_at),
+                    'announced_by_id' => $announcement->announced_by_id,
+                ];
+            },
         );
 
-        $announcement = $this->assessments->announceResults($actor, $assessment);
-
-        return response()->json([
-            'data' => [
-                'id' => $announcement->id,
-                'assessment_id' => $announcement->assessment_id,
-                'announced_at' => StudentPayload::iso($announcement->announced_at),
-                'announced_by_id' => $announcement->announced_by_id,
-            ],
-        ]);
+        return response()->json(['data' => $payload]);
     }
 
     /** @return array{confirmation_token: string, consequences: array<int, mixed>, expires_at: string}|null */

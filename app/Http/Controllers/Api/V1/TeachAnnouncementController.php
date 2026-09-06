@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Models\CourseOffering;
 use App\Services\Communications\AnnouncementService;
+use App\Support\Api\IdempotencyStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,7 @@ class TeachAnnouncementController extends Controller
 {
     public function __construct(
         private readonly AnnouncementService $announcements,
+        private readonly IdempotencyStore $idempotency,
     ) {}
 
     public function store(Request $request, CourseOffering $offering): JsonResponse
@@ -51,9 +53,14 @@ class TeachAnnouncementController extends Controller
 
     public function publish(Request $request, Announcement $announcement): JsonResponse
     {
-        $announcement = $this->announcements->publish($request->user(), $announcement);
+        $payload = $this->idempotency->remember(
+            $request->user(),
+            'teach.announcements.publish:'.$announcement->id,
+            $request->header('Idempotency-Key'),
+            fn () => $this->payload($this->announcements->publish($request->user(), $announcement)),
+        );
 
-        return response()->json(['data' => $this->payload($announcement)]);
+        return response()->json(['data' => $payload]);
     }
 
     /** @return array<string, mixed> */

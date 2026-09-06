@@ -8,16 +8,18 @@ use App\Models\DiscussionGrade;
 use App\Models\DiscussionThread;
 use App\Models\User;
 use App\Services\Discussions\DiscussionService;
+use App\Support\Api\ConditionalGet;
+use App\Support\Api\IdempotencyStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TeachDiscussionController extends Controller
 {
-    public function threads(Request $request, CourseOffering $offering, DiscussionService $discussions): JsonResponse
+    public function threads(Request $request, CourseOffering $offering, DiscussionService $discussions, ConditionalGet $conditional): JsonResponse
     {
         $threads = $discussions->threadsForOffering($request->user(), $offering);
 
-        return response()->json([
+        return $conditional->json($request, [
             'data' => $threads->map(fn (DiscussionThread $thread) => [
                 'id' => $thread->id,
                 'title' => $thread->title,
@@ -59,6 +61,7 @@ class TeachDiscussionController extends Controller
         Request $request,
         DiscussionThread $discussionThread,
         DiscussionService $discussions,
+        IdempotencyStore $idempotency,
     ): JsonResponse {
         $data = $request->validate([
             'student_id' => 'required|string|exists:users,id',
@@ -66,15 +69,20 @@ class TeachDiscussionController extends Controller
             'feedback' => 'nullable|string',
         ]);
 
-        $grade = $discussions->overrideGrade(
+        $payload = $idempotency->remember(
             $request->user(),
-            $discussionThread,
-            User::query()->findOrFail($data['student_id']),
-            (float) $data['score'],
-            $data['feedback'] ?? null,
+            'teach.discussions.grade:'.$discussionThread->id.':'.$data['student_id'],
+            $request->header('Idempotency-Key'),
+            fn () => $this->gradePayload($discussions->overrideGrade(
+                $request->user(),
+                $discussionThread,
+                User::query()->findOrFail($data['student_id']),
+                (float) $data['score'],
+                $data['feedback'] ?? null,
+            )),
         );
 
-        return response()->json(['data' => $this->gradePayload($grade)]);
+        return response()->json(['data' => $payload]);
     }
 
     /** @return array<string, mixed> */

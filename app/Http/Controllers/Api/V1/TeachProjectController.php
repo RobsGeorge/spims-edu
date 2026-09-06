@@ -14,6 +14,7 @@ use App\Services\Projects\ProjectDeliverableService;
 use App\Services\Projects\ProjectGradingService;
 use App\Services\Projects\ProjectTeamService;
 use App\Support\Api\ConfirmationToken;
+use App\Support\Api\IdempotencyStore;
 use App\Support\AuthorizeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -76,20 +77,28 @@ class TeachProjectController extends Controller
         ProjectGradingService $grading,
         ConfirmationToken $confirmation,
         AuthorizeService $authorize,
+        IdempotencyStore $idempotency,
     ): JsonResponse {
         $authorize->authorize($request->user(), 'projects.announce', $projectAssessment);
 
-        $raw = $request->input('confirmation');
-        $confirmation->consume(
+        $payload = $idempotency->remember(
             $request->user(),
-            'projects.announce',
-            $projectAssessment->id,
-            is_string($raw) ? $raw : null,
+            'teach.projects.announce:'.$projectAssessment->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $projectAssessment, $grading, $confirmation) {
+                $raw = $request->input('confirmation');
+                $confirmation->consume(
+                    $request->user(),
+                    'projects.announce',
+                    $projectAssessment->id,
+                    is_string($raw) ? $raw : null,
+                );
+
+                return ['announced' => $grading->announce($request->user(), $projectAssessment)];
+            },
         );
 
-        $count = $grading->announce($request->user(), $projectAssessment);
-
-        return response()->json(['data' => ['announced' => $count]]);
+        return response()->json(['data' => $payload]);
     }
 
     public function moveMember(
