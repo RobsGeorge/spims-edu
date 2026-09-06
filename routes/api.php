@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\DegreeAuditController;
 use App\Http\Controllers\Api\V1\DiscussionController;
 use App\Http\Controllers\Api\V1\DonationController;
 use App\Http\Controllers\Api\V1\EnrollmentController;
+use App\Http\Controllers\Api\V1\FeedbackSurveyController;
 use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -155,6 +156,11 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
         Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
         Route::get('/wallet', [WalletController::class, 'show'])->name('wallet');
         Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
+
+        // --- S6E surveys (owned by cursor/s6e-surveys-bcff) ---
+        Route::get('/feedback/surveys', [FeedbackSurveyController::class, 'index'])->name('feedback.surveys.index');
+        Route::get('/feedback/surveys/{feedbackSurvey}', [FeedbackSurveyController::class, 'show'])->name('feedback.surveys.show');
+        Route::post('/feedback/surveys/{feedbackSurvey}/submit', [FeedbackSurveyController::class, 'submit'])->name('feedback.surveys.submit');
 
         Route::prefix('teach')->name('teach.')->middleware('api.instructor')->group(function () {
             Route::get('/offerings/{offering}/sessions', [TeachAttendanceController::class, 'sessions'])->name('offerings.sessions');

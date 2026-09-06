@@ -25,6 +25,12 @@ use App\Models\DiscussionPost;
 use App\Models\DiscussionThread;
 use App\Models\EmailTemplate;
 use App\Models\Enrollment;
+use App\Models\FeedbackAnswer;
+use App\Models\FeedbackIdentityRevealRequest;
+use App\Models\FeedbackQuestion;
+use App\Models\FeedbackSubmission;
+use App\Models\FeedbackSubmissionIdentity;
+use App\Models\FeedbackSurvey;
 use App\Models\GradebookComponent;
 use App\Models\LiveSession;
 use App\Models\ModuleStudentAssessment;
@@ -114,6 +120,12 @@ class ResourceScopeResolver
             $resource instanceof StudentNote => $resource->offering_id,
             $resource instanceof ModuleStudentAssessment => $resource->week?->offering_id,
             $resource instanceof CompletionCriterion && $resource->isOfferingScoped() => $resource->offering_id,
+            $resource instanceof FeedbackSurvey => $resource->offering_id,
+            $resource instanceof FeedbackQuestion => $resource->survey?->offering_id,
+            $resource instanceof FeedbackSubmission => $resource->survey?->offering_id,
+            $resource instanceof FeedbackAnswer => $resource->submission?->survey?->offering_id,
+            $resource instanceof FeedbackSubmissionIdentity => $resource->submission?->survey?->offering_id,
+            $resource instanceof FeedbackIdentityRevealRequest => $resource->submission?->survey?->offering_id,
             default => null,
         };
 
