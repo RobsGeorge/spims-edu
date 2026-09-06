@@ -64,7 +64,7 @@ class StaffTeachCloseUiTest extends TestCase
     #[Test]
     public function instructor_with_offering_close_sees_the_confirm_dialog(): void
     {
-        [$offering, $admin, $instructor] = $this->announcedOffering();
+        [$offering, , $instructor] = $this->announcedOffering();
 
         $this->actingAs($instructor)
             ->get(route('teach.show', $offering))
