@@ -233,7 +233,7 @@ domain endpoints exist yet, and that is correct.
 
 ---
 
-## S2 — Communications spine (G-09, G-10, G-11, G-12)
+## S2 — Communications spine (G-09, G-10, G-11, G-12) ✅ **Done**
 
 **Why early.** Announcements, reminders, graduation notices, and project deadlines all need one
 delivery path with one log. Building them per-feature is how delivery reporting becomes impossible.
@@ -320,7 +320,7 @@ a student who disabled email still gets the in-app copy.
 
 ---
 
-## S3 — Attendance as an SIS record, roster, and sessions (G-03, G-04, G-15)
+## S3 — Attendance as an SIS record, roster, and sessions (G-03, G-04, G-15, G-21) ✅ **Done**
 
 **The most consequential SIS phase.** It decouples attendance from Zoom.
 

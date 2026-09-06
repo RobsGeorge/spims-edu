@@ -36,8 +36,8 @@ different agents without colliding: they touch disjoint tables and services.
 |---|---|---|---|
 | 0 | **S0 — resource scope** ✅ | Every later phase adds routes; adding them over unenforced `O` multiplies a live vulnerability | `ResourceScopeTest` green; cross-offering denied on every route |
 | 1 | **S1 — API foundation** ✅ | Fixes the envelope, errors, and locale once, before 60+ endpoints bake in a shape | Token auth works; `/me` returns Arabic; OpenAPI coverage test green |
-| 2 | **S2 — communications spine** | Announcements, reminders, graduation notices and project deadlines all need one delivery path and one log. Per-feature notification code is how delivery reporting becomes impossible | Instructor publishes to an offering; every enrolled student receives it in their locale; the registrar exports a CSV proving it |
-| 3 | **S3 — attendance + roster** | The largest SIS gap, and S4's criteria engine reads from it | An in-person session with no Zoom meeting is marked, excused, and reported; the gradebook attendance component is unchanged from outside |
+| 2 | **S2 — communications spine** ✅ | Announcements, reminders, graduation notices and project deadlines all need one delivery path and one log. Per-feature notification code is how delivery reporting becomes impossible | Instructor publishes to an offering; every enrolled student receives it in their locale; the registrar exports a CSV proving it |
+| 3 | **S3 — attendance + roster** ✅ | The largest SIS gap, and S4's criteria engine reads from it | An in-person session with no Zoom meeting is marked, excused, and reported; the gradebook attendance component is unchanged from outside |
 | 4 | **S5 — assessment completion** | Small, additive, unblocks the S6 Wave C write path | Proctor events escalate and terminate; offline assignments; reminders fire once |
 | 5 | **S4 — completion + credentials** | Needs S3 (attendance criteria) and S2 (announce) | Criteria evaluated, grace marks applied, offering closed, PDF certificate verifies publicly |
 | 6 | **S6 — student API, waves A→E** | Each wave ships only after its domain phase | A student completes the year on a phone in Arabic |
