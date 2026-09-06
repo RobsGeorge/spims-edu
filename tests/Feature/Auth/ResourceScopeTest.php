@@ -267,5 +267,9 @@ class ResourceScopeTest extends TestCase
         $this->actingAs($instructor)
             ->get(route('admin.gradebook.show', $theirs))
             ->assertForbidden();
+
+        $this->actingAs($instructor)
+            ->get(route('admin.gradebook.csv', $theirs))
+            ->assertForbidden();
     }
 }
