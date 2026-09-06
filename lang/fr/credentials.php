@@ -29,6 +29,7 @@ return [
     'not_standalone' => 'L’offre n’est pas un cours autonome.',
     'not_passed' => 'L’étudiant n’a pas réussi ce cours.',
     'download' => 'Télécharger',
+    'no_credentials' => 'Aucun diplôme émis pour le moment.',
     'certificate_default_title' => 'Certificat d’achèvement',
     'certificate_default_body' => 'Ceci certifie que {{student_name}} a achevé {{course_title}}.',
 ];

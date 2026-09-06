@@ -64,6 +64,7 @@ use App\Http\Controllers\NotificationSettingsController;
 use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\StudentCompletionController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController;
@@ -393,6 +394,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transcript', TranscriptController::class)
         ->middleware('permission:transcript.view')
         ->name('transcript.show');
+
+    Route::get('/offerings/{offering}/completion', [StudentCompletionController::class, 'show'])
+        ->middleware('permission:completion.view')
+        ->name('offerings.completion');
 
     Route::get('/credentials/{credential}/download', CredentialDownloadController::class)
         ->name('credentials.download');

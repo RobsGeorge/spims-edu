@@ -15,6 +15,7 @@ return [
     'continue_learning' => 'Continuer',
     'progress' => ':percent % terminé',
     'open_player' => 'Ouvrir le cours',
+    'completion' => 'Achèvement',
     'grades' => 'Mes notes',
     'grades_empty' => 'Pas encore de notes publiées.',
     'settings' => 'Paramètres',

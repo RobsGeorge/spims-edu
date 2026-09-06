@@ -29,6 +29,7 @@ return [
     'not_standalone' => 'العرض ليس مقرراً مستقلاً.',
     'not_passed' => 'الطالب لم ينجح في هذا المقرر.',
     'download' => 'تنزيل',
+    'no_credentials' => 'لا توجد شهادات صادرة بعد.',
     'certificate_default_title' => 'شهادة إكمال',
     'certificate_default_body' => 'نشهد أن {{student_name}} قد أكمل {{course_title}}.',
 ];

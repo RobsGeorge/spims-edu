@@ -29,4 +29,5 @@ return [
     'no_items' => 'Aucun élément dans cette semaine.',
     'reading_open' => 'Ouvrir la lecture',
     'back_to_course' => 'Retour au cours',
+    'completion' => 'Achèvement',
 ];

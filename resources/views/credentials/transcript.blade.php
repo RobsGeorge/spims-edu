@@ -33,8 +33,15 @@
 
 <h2 class="h5 mt-4">{{ __('credentials.my_credentials') }}</h2>
 <ul>
-@foreach($credentials as $c)
-    <li>{{ $c->type->value }} — {{ $c->serial }} — <a href="{{ $c->verifyUrl() }}">{{ __('credentials.verify_link') }}</a></li>
-@endforeach
+@forelse($credentials as $c)
+    <li>
+        {{ $c->type->value }} — {{ $c->serial }} —
+        <a href="{{ $c->verifyUrl() }}">{{ __('credentials.verify_link') }}</a>
+        —
+        <a href="{{ route('credentials.download', $c) }}">{{ __('credentials.download') }}</a>
+    </li>
+@empty
+    <li class="text-muted-theme">{{ __('credentials.no_credentials') }}</li>
+@endforelse
 </ul>
 @endsection
