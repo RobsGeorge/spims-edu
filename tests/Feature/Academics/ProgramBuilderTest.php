@@ -83,4 +83,69 @@ class ProgramBuilderTest extends TestCase
             'max_semesters_to_graduate' => 4,
         ])->assertForbidden();
     }
+
+    #[Test]
+    public function academic_admin_can_update_program_name_and_deactivate(): void
+    {
+        $aca = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $program = Program::query()->create([
+            'code' => 'EDIT1',
+            'name' => 'Old Name',
+            'type' => ProgramType::Certificate,
+            'max_credits_per_semester' => 12,
+            'max_courses_per_semester' => 4,
+            'max_semesters_to_graduate' => 4,
+            'active' => true,
+        ]);
+
+        $this->actingAs($aca)->get(route('admin.programs.show', $program))
+            ->assertOk()
+            ->assertSee(__('ui.edit'), false);
+
+        $this->actingAs($aca)->get(route('admin.programs.edit', $program))
+            ->assertOk()
+            ->assertSee('Old Name');
+
+        $this->actingAs($aca)->put(route('admin.programs.update', $program), [
+            'name' => 'Corrected Name',
+            'type' => ProgramType::Certificate->value,
+            'max_credits_per_semester' => 12,
+            'max_courses_per_semester' => 4,
+            'max_semesters_to_graduate' => 4,
+            'active' => 0,
+        ])->assertRedirect(route('admin.programs.show', $program));
+
+        $program->refresh();
+        $this->assertSame('Corrected Name', $program->name);
+        $this->assertFalse($program->active);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'programs.update']);
+    }
+
+    #[Test]
+    public function student_cannot_update_program(): void
+    {
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $program = Program::query()->create([
+            'code' => 'NOPE',
+            'name' => 'Locked',
+            'type' => ProgramType::Certificate,
+            'max_credits_per_semester' => 12,
+            'max_courses_per_semester' => 4,
+            'max_semesters_to_graduate' => 4,
+            'active' => true,
+        ]);
+
+        $this->actingAs($student)->get(route('admin.programs.edit', $program))->assertForbidden();
+        $this->actingAs($student)->put(route('admin.programs.update', $program), [
+            'name' => 'Hacked',
+            'type' => ProgramType::Certificate->value,
+            'max_credits_per_semester' => 12,
+            'max_courses_per_semester' => 4,
+            'max_semesters_to_graduate' => 4,
+            'active' => 0,
+        ])->assertForbidden();
+
+        $this->assertSame('Locked', $program->fresh()->name);
+        $this->assertTrue($program->fresh()->active);
+    }
 }

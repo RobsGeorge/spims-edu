@@ -108,6 +108,7 @@ class ResourceScopeResolver
 
         $single = match (true) {
             $resource instanceof Week => $resource->offering_id,
+            $resource instanceof OfferingStaff => $resource->offering_id,
             $resource instanceof Enrollment => $resource->offering_id,
             $resource instanceof LiveSession => $resource->offering_id,
             $resource instanceof ClassSession => $resource->offering_id,

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OfferingStatus;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\StudentProgram;
@@ -26,7 +27,7 @@ class EnrollmentController extends Controller
             'programs' => $audit->activePrograms($user),
             'offerings' => CourseOffering::query()
                 ->with(['course', 'semester'])
-                ->whereIn('status', ['OPEN', 'IN_PROGRESS', 'DRAFT'])
+                ->where('status', OfferingStatus::Open)
                 ->latest()
                 ->get(),
         ]);

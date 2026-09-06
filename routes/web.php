@@ -534,9 +534,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/programs/{program}', [ProgramController::class, 'show'])
             ->middleware('permission:programs.view')
             ->name('programs.show');
+        Route::get('/programs/{program}/edit', [ProgramController::class, 'edit'])
+            ->middleware('permission:programs.manage')
+            ->name('programs.edit');
+        Route::match(['put', 'patch'], '/programs/{program}', [ProgramController::class, 'update'])
+            ->middleware('permission:programs.manage')
+            ->name('programs.update');
         Route::post('/programs/{program}/courses', [ProgramController::class, 'attachCourse'])
             ->middleware('permission:programs.manage')
             ->name('programs.attach-course');
+        Route::delete('/programs/{program}/courses/{programCourse}', [ProgramController::class, 'detachCourse'])
+            ->middleware('permission:programs.manage')
+            ->name('programs.detach-course');
 
         Route::get('/courses', [CourseController::class, 'index'])
             ->middleware('permission:courses.view')
@@ -550,9 +559,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/courses/{course}', [CourseController::class, 'show'])
             ->middleware('permission:courses.view')
             ->name('courses.show');
+        Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])
+            ->middleware('permission:courses.manage')
+            ->name('courses.edit');
+        Route::match(['put', 'patch'], '/courses/{course}', [CourseController::class, 'update'])
+            ->middleware('permission:courses.manage')
+            ->name('courses.update');
         Route::post('/courses/{course}/prerequisites', [CourseController::class, 'addPrerequisite'])
             ->middleware('permission:courses.manage')
             ->name('courses.prerequisites');
+        Route::delete('/courses/{course}/prerequisites/{prerequisite}', [CourseController::class, 'removePrerequisite'])
+            ->middleware('permission:courses.manage')
+            ->name('courses.detach-prerequisite');
 
         Route::get('/assessment-templates', [AssessmentTemplateController::class, 'index'])
             ->middleware('permission:assessment_templates.manage')
@@ -593,6 +611,18 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/academic-years/{year}/semesters', [SemesterController::class, 'storeSemester'])
             ->middleware('permission:semesters.manage')
             ->name('semesters.store');
+        Route::get('/academic-years/{year}/edit', [SemesterController::class, 'editYear'])
+            ->middleware('permission:semesters.manage')
+            ->name('academic-years.edit');
+        Route::put('/academic-years/{year}', [SemesterController::class, 'updateYear'])
+            ->middleware('permission:semesters.manage')
+            ->name('academic-years.update');
+        Route::get('/semesters/{semester}/edit', [SemesterController::class, 'editSemester'])
+            ->middleware('permission:semesters.manage')
+            ->name('semesters.edit');
+        Route::put('/semesters/{semester}', [SemesterController::class, 'updateSemester'])
+            ->middleware('permission:semesters.manage')
+            ->name('semesters.update');
 
         Route::get('/offerings', [OfferingController::class, 'index'])
             ->middleware('permission:offerings.view')
@@ -606,9 +636,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/offerings/{offering}', [OfferingController::class, 'show'])
             ->middleware('permission:offerings.view')
             ->name('offerings.show');
+        Route::get('/offerings/{offering}/edit', [OfferingController::class, 'edit'])
+            ->middleware('permission:offerings.manage')
+            ->name('offerings.edit');
+        Route::match(['put', 'patch'], '/offerings/{offering}', [OfferingController::class, 'update'])
+            ->middleware('permission:offerings.manage')
+            ->name('offerings.update');
         Route::post('/offerings/{offering}/staff', [OfferingController::class, 'assignStaff'])
             ->middleware('permission:offerings.manage')
             ->name('offerings.staff');
+        Route::delete('/offerings/{offering}/staff/{staff}', [OfferingController::class, 'removeStaff'])
+            ->middleware('permission:offerings.manage')
+            ->name('offerings.unstaff');
         Route::post('/offerings/{offering}/pricing', [OfferingController::class, 'setPricing'])
             ->middleware('permission:offerings.pricing')
             ->name('offerings.pricing');
@@ -625,6 +664,18 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/application-forms', [ApplicationFormController::class, 'store'])
             ->middleware('permission:admissions.forms')
             ->name('application-forms.store');
+        Route::get('/application-forms/{form}', [ApplicationFormController::class, 'show'])
+            ->middleware('permission:admissions.forms')
+            ->name('application-forms.show');
+        Route::put('/application-forms/{form}', [ApplicationFormController::class, 'update'])
+            ->middleware('permission:admissions.forms')
+            ->name('application-forms.update');
+        Route::post('/application-forms/{form}/fields', [ApplicationFormController::class, 'addField'])
+            ->middleware('permission:admissions.forms')
+            ->name('application-forms.fields.store');
+        Route::post('/application-forms/{form}/fields/{field}/deactivate', [ApplicationFormController::class, 'deactivateField'])
+            ->middleware('permission:admissions.forms')
+            ->name('application-forms.fields.deactivate');
 
         Route::get('/applications', [ApplicationReviewController::class, 'index'])
             ->middleware('permission:admissions.review')

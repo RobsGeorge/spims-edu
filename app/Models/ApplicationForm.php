@@ -33,6 +33,11 @@ class ApplicationForm extends Model
         return $this->hasMany(ApplicationFormField::class, 'form_id')->orderBy('order');
     }
 
+    public function activeFields(): HasMany
+    {
+        return $this->hasMany(ApplicationFormField::class, 'form_id')->where('active', true)->orderBy('order');
+    }
+
     public function applications(): HasMany
     {
         return $this->hasMany(Application::class, 'form_id');

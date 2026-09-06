@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\GradingScheme;
 use App\Models\Program;
+use App\Models\ProgramCourse;
 use App\Services\Academics\ProgramService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -62,6 +63,25 @@ class ProgramController extends Controller
         ]);
     }
 
+    public function edit(Program $program): View
+    {
+        return view('admin.programs.edit', [
+            'program' => $program,
+            'types' => ProgramType::cases(),
+            'schemes' => GradingScheme::query()->orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(Request $request, Program $program, ProgramService $service): RedirectResponse
+    {
+        $data = $request->validate($this->programRules());
+        $data['active'] = $request->boolean('active');
+
+        $service->update($request->user(), $program, $data);
+
+        return redirect()->route('admin.programs.show', $program)->with('status', __('academics.program_updated'));
+    }
+
     public function attachCourse(Request $request, Program $program, ProgramService $service): RedirectResponse
     {
         $data = $request->validate([
@@ -79,5 +99,32 @@ class ProgramController extends Controller
         );
 
         return back()->with('status', __('academics.course_attached'));
+    }
+
+    public function detachCourse(Request $request, Program $program, ProgramCourse $programCourse, ProgramService $service): RedirectResponse
+    {
+        $service->detachCourse($request->user(), $program, $programCourse);
+
+        return back()->with('status', __('academics.course_detached'));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function programRules(): array
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:'.implode(',', array_column(ProgramType::cases(), 'value')),
+            'passing_threshold' => 'nullable|numeric|min:0|max:100',
+            'max_credits_per_semester' => 'required|integer|min:1',
+            'max_courses_per_semester' => 'required|integer|min:1',
+            'max_semesters_to_graduate' => 'required|integer|min:1',
+            'elective_credits_required' => 'nullable|integer|min:0',
+            'signatory_name' => 'nullable|string|max:255',
+            'signatory_title' => 'nullable|string|max:255',
+            'grading_scheme_id' => 'nullable|exists:grading_schemes,id',
+            'active' => 'sometimes|boolean',
+        ];
     }
 }

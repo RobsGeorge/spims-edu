@@ -9,6 +9,7 @@ use App\Enums\OfferingStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseOffering;
+use App\Models\OfferingStaff;
 use App\Models\Semester;
 use App\Models\User;
 use App\Models\Week;
@@ -66,7 +67,29 @@ class OfferingController extends Controller
             'staffRoles' => OfferingStaffRole::cases(),
             'instructors' => User::query()->whereHas('roles', fn ($q) => $q->whereIn('role', ['INSTRUCTOR', 'TA', 'ACADEMIC_ADMIN']))->orderBy('first_name')->get(),
             'contentTypes' => ContentItemType::cases(),
+            'statuses' => $this->editableStatuses(),
+            'semesters' => Semester::query()->orderByDesc('start_date')->get(),
         ]);
+    }
+
+    public function edit(CourseOffering $offering): View
+    {
+        $offering->load(['course', 'semester']);
+
+        return view('admin.offerings.edit', [
+            'offering' => $offering,
+            'statuses' => $this->editableStatuses(),
+            'semesters' => Semester::query()->orderByDesc('start_date')->get(),
+        ]);
+    }
+
+    public function update(Request $request, CourseOffering $offering, OfferingService $service): RedirectResponse
+    {
+        $data = $request->validate($this->offeringUpdateRules());
+
+        $service->update($request->user(), $offering, $data);
+
+        return redirect()->route('admin.offerings.show', $offering)->with('status', __('offerings.offering_updated'));
     }
 
     public function assignStaff(Request $request, CourseOffering $offering, OfferingService $service): RedirectResponse
@@ -79,6 +102,13 @@ class OfferingController extends Controller
         $service->assignStaff($request->user(), $offering, $data['user_id'], $data['role']);
 
         return back()->with('status', __('offerings.staff_assigned'));
+    }
+
+    public function removeStaff(Request $request, CourseOffering $offering, OfferingStaff $staff, OfferingService $service): RedirectResponse
+    {
+        $service->removeStaff($request->user(), $offering, $staff);
+
+        return back()->with('status', __('offerings.staff_removed'));
     }
 
     public function setPricing(Request $request, CourseOffering $offering, OfferingService $service): RedirectResponse
@@ -125,5 +155,33 @@ class OfferingController extends Controller
         $service->addContentItem($request->user(), $week, $data);
 
         return back()->with('status', __('offerings.content_added'));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function offeringUpdateRules(): array
+    {
+        return [
+            'semester_id' => 'nullable|exists:semesters,id',
+            'seat_capacity' => 'nullable|integer|min:1',
+            'attendance_threshold_percent' => 'nullable|numeric|min:0|max:100',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after:start_date',
+            'status' => 'required|in:'.implode(',', array_map(fn (OfferingStatus $status) => $status->value, $this->editableStatuses())),
+        ];
+    }
+
+    /**
+     * @return list<OfferingStatus>
+     */
+    private function editableStatuses(): array
+    {
+        return [
+            OfferingStatus::Draft,
+            OfferingStatus::Open,
+            OfferingStatus::InProgress,
+            OfferingStatus::Completed,
+        ];
     }
 }

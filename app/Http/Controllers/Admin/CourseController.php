@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AssessmentTemplate;
 use App\Models\Course;
+use App\Models\CoursePrerequisite;
 use App\Services\Academics\CourseService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,18 +31,11 @@ class CourseController extends Controller
 
     public function store(Request $request, CourseService $service): RedirectResponse
     {
-        $data = $request->validate([
-            'code' => 'required|string|max:32|unique:courses,code',
-            'title' => 'required|string|max:255',
-            'credit_hours' => 'required|integer|min:0',
-            'default_price_usd' => 'nullable|integer|min:0',
-            'default_price_egp' => 'nullable|integer|min:0',
-            'is_free' => 'boolean',
-            'is_standalone' => 'boolean',
-            'passing_threshold' => 'nullable|numeric|min:0|max:100',
-            'assessment_template_id' => 'nullable|exists:assessment_templates,id',
-            'prerequisite_id' => 'nullable|exists:courses,id',
-        ]);
+        $data = $request->validate(array_merge(
+            ['code' => 'required|string|max:32|unique:courses,code'],
+            $this->courseRules(),
+            ['prerequisite_id' => 'nullable|exists:courses,id'],
+        ));
 
         $course = $service->create($request->user(), $data);
 
@@ -54,7 +48,7 @@ class CourseController extends Controller
 
     public function show(Course $course): View
     {
-        $course->load(['prerequisites', 'assessmentTemplate', 'interestFlags']);
+        $course->load(['prerequisites', 'prerequisiteLinks.prerequisite', 'assessmentTemplate', 'interestFlags']);
 
         return view('admin.courses.show', [
             'course' => $course,
@@ -66,6 +60,26 @@ class CourseController extends Controller
         ]);
     }
 
+    public function edit(Course $course): View
+    {
+        return view('admin.courses.edit', [
+            'course' => $course,
+            'templates' => AssessmentTemplate::query()->orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(Request $request, Course $course, CourseService $service): RedirectResponse
+    {
+        $data = $request->validate($this->courseRules());
+        $data['is_free'] = $request->boolean('is_free');
+        $data['is_standalone'] = $request->boolean('is_standalone');
+        $data['active'] = $request->boolean('active');
+
+        $service->update($request->user(), $course, $data);
+
+        return redirect()->route('admin.courses.show', $course)->with('status', __('academics.course_updated'));
+    }
+
     public function addPrerequisite(Request $request, Course $course, CourseService $service): RedirectResponse
     {
         $data = $request->validate([
@@ -75,5 +89,30 @@ class CourseController extends Controller
         $service->addPrerequisite($request->user(), $course, $data['prerequisite_id']);
 
         return back()->with('status', __('academics.prerequisite_added'));
+    }
+
+    public function removePrerequisite(Request $request, Course $course, CoursePrerequisite $prerequisite, CourseService $service): RedirectResponse
+    {
+        $service->removePrerequisite($request->user(), $course, $prerequisite);
+
+        return back()->with('status', __('academics.prerequisite_removed'));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function courseRules(): array
+    {
+        return [
+            'title' => 'required|string|max:255',
+            'credit_hours' => 'required|integer|min:0',
+            'default_price_usd' => 'nullable|integer|min:0',
+            'default_price_egp' => 'nullable|integer|min:0',
+            'is_free' => 'sometimes|boolean',
+            'is_standalone' => 'sometimes|boolean',
+            'passing_threshold' => 'nullable|numeric|min:0|max:100',
+            'assessment_template_id' => 'nullable|exists:assessment_templates,id',
+            'active' => 'sometimes|boolean',
+        ];
     }
 }

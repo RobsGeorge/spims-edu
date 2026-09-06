@@ -6,6 +6,7 @@
     :subtitle="$offering->mode->value.' · '.$offering->status->value"
 >
     <x-slot:actions>
+        <a href="{{ route('admin.offerings.edit', $offering) }}" class="btn btn-outline-primary btn-sm">{{ __('ui.edit') }}</a>
         <a href="{{ route('offerings.preview', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('offerings.public_preview') }}</a>
         <a href="{{ route('teach.show', $offering) }}" class="btn btn-outline-primary btn-sm">{{ __('teach.workspace') }}</a>
     </x-slot:actions>
@@ -36,7 +37,14 @@
                 </form>
                 <ul class="mt-3 mb-0">
                     @foreach($offering->staff as $staff)
-                        <li>{{ $staff->user->first_name }} {{ $staff->user->last_name }} ({{ $staff->role->value }})</li>
+                        <li class="d-flex justify-content-between align-items-center gap-2">
+                            <span>{{ $staff->user->first_name }} {{ $staff->user->last_name }} ({{ $staff->role->value }})</span>
+                            <form method="POST" action="{{ route('admin.offerings.unstaff', [$offering, $staff]) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger">{{ __('offerings.remove_staff') }}</button>
+                            </form>
+                        </li>
                     @endforeach
                 </ul>
             </div>
@@ -55,6 +63,48 @@
                 </form>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mt-3" id="edit">
+    <div class="card-body">
+        <h2 class="h6">{{ __('offerings.update_offering') }}</h2>
+        <form method="POST" action="{{ route('admin.offerings.update', $offering) }}" class="row g-2">
+            @csrf
+            @method('PUT')
+            @if($offering->mode->value === 'COHORT')
+            <div class="col-md-3">
+                <label class="form-label">{{ __('offerings.semester') }}</label>
+                <select name="semester_id" class="form-select">
+                    <option value="">—</option>
+                    @foreach($semesters as $semester)
+                        <option value="{{ $semester->id }}" @selected($offering->semester_id === $semester->id)>{{ $semester->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
+            <div class="col-md-2">
+                <label class="form-label">{{ __('offerings.seat_capacity') }}</label>
+                <input type="number" name="seat_capacity" class="form-control" value="{{ $offering->seat_capacity }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">{{ __('offerings.start_date') }}</label>
+                <input type="date" name="start_date" class="form-control" value="{{ $offering->start_date?->toDateString() }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">{{ __('offerings.end_date') }}</label>
+                <input type="date" name="end_date" class="form-control" value="{{ $offering->end_date?->toDateString() }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">{{ __('offerings.status') }}</label>
+                <select name="status" class="form-select" required>
+                    @foreach($statuses as $status)
+                        <option value="{{ $status->value }}" @selected($offering->status->value === $status->value)>{{ $status->value }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-12"><button class="btn btn-primary btn-sm">{{ __('ui.save_changes') }}</button></div>
+        </form>
     </div>
 </div>
 

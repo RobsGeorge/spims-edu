@@ -6,6 +6,7 @@ use App\Enums\EnrollmentStatus;
 use App\Enums\GradeType;
 use App\Enums\InvoiceStatus;
 use App\Enums\OfferingMode;
+use App\Enums\OfferingStatus;
 use App\Enums\StudentProgramStatus;
 use App\Models\AcademicRecord;
 use App\Models\CourseOffering;
@@ -84,6 +85,10 @@ class EnrollmentService
     public function assertCanRegister(User $student, CourseOffering $offering, ?string $studentProgramId = null): void
     {
         $offering->load(['course.prerequisites', 'semester', 'course']);
+
+        if ($offering->status !== OfferingStatus::Open) {
+            throw ValidationException::withMessages(['enrollment' => [__('enrollment.offering_not_open')]]);
+        }
 
         if ($this->hasFinancialHold($student)) {
             throw ValidationException::withMessages(['enrollment' => [__('enrollment.financial_hold')]]);
