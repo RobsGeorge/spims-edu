@@ -102,6 +102,9 @@ jobs:
       - name: Feedback pipeline
         run: php artisan test --testsuite=Feedback --compact
 
+      - name: Events pipeline
+        run: php artisan test --testsuite=Events --compact
+
       - name: Hardening pipeline
         run: php artisan test --testsuite=Hardening --compact
 
@@ -297,6 +300,9 @@ jobs:
 
       - name: Feedback pipeline
         run: php artisan test --testsuite=Feedback --compact
+
+      - name: Events pipeline
+        run: php artisan test --testsuite=Events --compact
 
       - name: Hardening pipeline
         run: php artisan test --testsuite=Hardening --compact

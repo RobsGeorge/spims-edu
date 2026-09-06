@@ -413,4 +413,24 @@ return [
     'feedback.identity.reveal' => [
         // Super Admin only (empty role map is OK; Super Admin bypasses AuthorizeService)
     ],
+
+    // S6E events
+    'events.view' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+        'ACADEMIC_ADMIN' => 'F',
+        'FINANCIAL_ADMIN' => 'R',
+        'INSTRUCTOR' => 'R',
+        'TA' => 'R',
+        'STUDENT' => 'O',
+    ],
+    'events.reserve' => [
+        'STUDENT' => 'O',
+    ],
+    'events.admin' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'events.check_in' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
 ];

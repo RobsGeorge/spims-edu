@@ -2348,3 +2348,180 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  # S6E events
+  /events:
+    get:
+      operationId: listEvents
+      summary: Published school events.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Paginated published events
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /events/mine:
+    get:
+      operationId: myEventReservations
+      summary: The caller's event reservations.
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /events/check-in/verify:
+    post:
+      operationId: verifyEventCheckIn
+      summary: Verify a signed reservation QR payload once (staff).
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - payload
+              properties:
+                payload:
+                  type: string
+      responses:
+        '201':
+          description: Checked in
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forged signature or missing check-in grant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Replay or cancelled reservation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Malformed payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /events/{event}:
+    get:
+      operationId: showEvent
+      summary: A published event. Drafts 404 for students.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: event
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Unpublished or missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /events/{event}/reserve:
+    post:
+      operationId: reserveEvent
+      summary: Reserve a seat or join the waitlist. Idempotency-Key supported.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: event
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Reserved or waitlisted
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Ineligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Unpublished or missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Already reserved or full without waitlist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /events/{event}/cancel:
+    post:
+      operationId: cancelEventReservation
+      summary: Cancel the caller's open reservation. Idempotency-Key supported.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: event
+        required: true
+        schema:
+          type: string
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Cancelled
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No open reservation for the caller
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

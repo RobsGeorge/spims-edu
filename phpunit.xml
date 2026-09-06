@@ -32,6 +32,7 @@
             <exclude>tests/Feature/Communications</exclude>
             <exclude>tests/Feature/Completion</exclude>
             <exclude>tests/Feature/Feedback</exclude>
+            <exclude>tests/Feature/Events</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -98,6 +99,9 @@
         </testsuite>
         <testsuite name="Feedback">
             <directory>tests/Feature/Feedback</directory>
+        </testsuite>
+        <testsuite name="Events">
+            <directory>tests/Feature/Events</directory>
         </testsuite>
     </testsuites>
     <source>
