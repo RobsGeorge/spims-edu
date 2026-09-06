@@ -105,6 +105,9 @@ jobs:
       - name: Events pipeline
         run: php artisan test --testsuite=Events --compact
 
+      - name: LiveQuiz pipeline
+        run: php artisan test --testsuite=LiveQuiz --compact
+
       - name: Hardening pipeline
         run: php artisan test --testsuite=Hardening --compact
 
@@ -303,6 +306,9 @@ jobs:
 
       - name: Events pipeline
         run: php artisan test --testsuite=Events --compact
+
+      - name: LiveQuiz pipeline
+        run: php artisan test --testsuite=LiveQuiz --compact
 
       - name: Hardening pipeline
         run: php artisan test --testsuite=Hardening --compact

@@ -2525,3 +2525,427 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  # S6E live quiz
+  /live-quiz/join:
+    post:
+      operationId: liveQuizJoin
+      summary: Join a live quiz session by short join code. Enrolled students of that offering only.
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              properties:
+                code:
+                  type: string
+      responses:
+        '200':
+          description: Already a participant; current session snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '201':
+          description: Joined; lobby (or current) session snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not enrolled in the offering
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Unknown join code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Session ended and is not accepting participants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /live-quiz/sessions/{liveQuizSession}:
+    get:
+      operationId: liveQuizSessionPoll
+      summary: Poll fallback for live quiz state (no websocket required). Read-only.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: liveQuizSession
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Current state, server_now, and current question (options omit is_correct while QUESTION_OPEN)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not a participant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /live-quiz/sessions/{liveQuizSession}/questions/{liveQuizQuestion}/answer:
+    post:
+      operationId: liveQuizAnswer
+      summary: Submit one answer for the open question. Server time is authoritative.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: liveQuizSession
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: liveQuizQuestion
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - option_id
+              properties:
+                option_id:
+                  type: string
+      responses:
+        '201':
+          description: Answer recorded with score
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Not a participant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Session, question, or option not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Second answer, or answers not accepted in this state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /teach/offerings/{offering}/live-quizzes:
+    post:
+      operationId: teachCreateLiveQuiz
+      summary: Create a live quiz (and optional questions) for an offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - title
+              properties:
+                title:
+                  type: string
+                questions:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /teach/live-quiz/{liveQuiz}/host/start:
+    post:
+      operationId: teachLiveQuizStart
+      summary: Start a live quiz session in LOBBY and issue a join code.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: liveQuiz
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Session started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Quiz not ready, or an active session already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /teach/live-quiz/sessions/{liveQuizSession}/launch:
+    post:
+      operationId: teachLiveQuizLaunch
+      summary: Launch a question (QUESTION_OPEN). closes_at is server now + time_limit_seconds.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: liveQuizSession
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - question_id
+              properties:
+                question_id:
+                  type: string
+      responses:
+        '200':
+          description: Question open
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Out-of-order transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /teach/live-quiz/sessions/{liveQuizSession}/close:
+    post:
+      operationId: teachLiveQuizClose
+      summary: Close the open question (QUESTION_CLOSED).
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: liveQuizSession
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Question closed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Out-of-order transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /teach/live-quiz/sessions/{liveQuizSession}/results:
+    post:
+      operationId: teachLiveQuizResults
+      summary: Show results for the current question (RESULTS). Options include is_correct.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: liveQuizSession
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Results visible
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Out-of-order transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /teach/live-quiz/sessions/{liveQuizSession}/end:
+    post:
+      operationId: teachLiveQuizEnd
+      summary: End the live quiz session (ENDED).
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: liveQuizSession
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Session ended
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Already ended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

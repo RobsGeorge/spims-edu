@@ -33,6 +33,7 @@
             <exclude>tests/Feature/Completion</exclude>
             <exclude>tests/Feature/Feedback</exclude>
             <exclude>tests/Feature/Events</exclude>
+            <exclude>tests/Feature/LiveQuiz</exclude>
         </testsuite>
         <testsuite name="Smoke">
             <directory>tests/Feature/Smoke</directory>
@@ -103,6 +104,9 @@
         <testsuite name="Events">
             <directory>tests/Feature/Events</directory>
         </testsuite>
+        <testsuite name="LiveQuiz">
+            <directory>tests/Feature/LiveQuiz</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
@@ -119,6 +123,7 @@
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <env name="BROADCAST_DRIVER" value="null"/>
         <env name="SUPERADMIN_EMAIL" value="robeir.george@outlook.com"/>
         <env name="SUPERADMIN_PASSWORD" value="Spims@Dev2026!"/>
         <env name="SEED_DEMO_DATA" value="false"/>

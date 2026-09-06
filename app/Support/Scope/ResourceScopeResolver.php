@@ -32,6 +32,9 @@ use App\Models\FeedbackSubmission;
 use App\Models\FeedbackSubmissionIdentity;
 use App\Models\FeedbackSurvey;
 use App\Models\GradebookComponent;
+use App\Models\LiveQuiz;
+use App\Models\LiveQuizQuestion;
+use App\Models\LiveQuizSession;
 use App\Models\LiveSession;
 use App\Models\ModuleStudentAssessment;
 use App\Models\OfferingClosing;
@@ -126,6 +129,9 @@ class ResourceScopeResolver
             $resource instanceof FeedbackAnswer => $resource->submission?->survey?->offering_id,
             $resource instanceof FeedbackSubmissionIdentity => $resource->submission?->survey?->offering_id,
             $resource instanceof FeedbackIdentityRevealRequest => $resource->submission?->survey?->offering_id,
+            $resource instanceof LiveQuiz => $resource->offering_id,
+            $resource instanceof LiveQuizSession => $resource->quiz?->offering_id,
+            $resource instanceof LiveQuizQuestion => $resource->quiz?->offering_id,
             default => null,
         };
 
