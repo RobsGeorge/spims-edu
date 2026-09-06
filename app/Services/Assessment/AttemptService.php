@@ -4,8 +4,10 @@ namespace App\Services\Assessment;
 
 use App\Enums\AttemptStatus;
 use App\Enums\EnrollmentStatus;
+use App\Enums\GradeStatus;
 use App\Enums\QuestionType;
 use App\Enums\ScoringRule;
+use App\Exceptions\ResourceLockedException;
 use App\Models\Assessment;
 use App\Models\AssessmentAttempt;
 use App\Models\AssessmentQuestion;
@@ -282,6 +284,8 @@ class AttemptService
             ]);
         }
 
+        $this->assertGradebookWritable($ownerAttempt);
+
         $answer->update([
             'final_score' => $finalScore,
             'feedback' => $feedback,
@@ -356,6 +360,29 @@ class AttemptService
     {
         if ($attempt->student_id !== $student->id && ! $student->isSuperAdmin()) {
             throw ValidationException::withMessages(['attempt' => [__('assessment.not_owner')]]);
+        }
+    }
+
+    private function assertGradebookWritable(?AssessmentAttempt $attempt): void
+    {
+        if ($attempt === null) {
+            return;
+        }
+
+        $attempt->loadMissing('assessment');
+        $offeringId = $attempt->assessment?->offering_id;
+        if ($offeringId === null) {
+            return;
+        }
+
+        $locked = Enrollment::query()
+            ->where('offering_id', $offeringId)
+            ->where('student_id', $attempt->student_id)
+            ->where('grade_status', GradeStatus::Locked)
+            ->exists();
+
+        if ($locked) {
+            throw new ResourceLockedException(__('assessment.grades_locked'));
         }
     }
 }

@@ -29,8 +29,11 @@ use App\Http\Controllers\Api\V1\OfferingController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ProjectController;
 use App\Http\Controllers\Api\V1\TeachAnnouncementController;
+use App\Http\Controllers\Api\V1\TeachAssessmentGradingController;
+use App\Http\Controllers\Api\V1\TeachAssignmentController;
 use App\Http\Controllers\Api\V1\TeachAttendanceController;
 use App\Http\Controllers\Api\V1\TeachCompletionController;
+use App\Http\Controllers\Api\V1\TeachGradebookController;
 use App\Http\Controllers\Api\V1\TeachLiveQuizController;
 use App\Http\Controllers\Api\V1\TeachProjectController;
 use App\Http\Controllers\Api\V1\TranscriptController;
@@ -243,6 +246,30 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
                 ->name('project-assessments.announce');
             Route::get('/projects/{project}/peer-evaluations', [TeachProjectController::class, 'peerAggregates'])
                 ->name('projects.peer-evaluations');
+
+            // --- S8 grading (owned by cursor/s8-grading-bcff) ---
+            Route::get('/offerings/{offering}/gradebook', [TeachGradebookController::class, 'show'])
+                ->name('offerings.gradebook');
+            Route::post('/offerings/{offering}/gradebook/submit', [TeachGradebookController::class, 'submit'])
+                ->name('offerings.gradebook.submit');
+            Route::post('/offerings/{offering}/gradebook/lock', [TeachGradebookController::class, 'lock'])
+                ->name('offerings.gradebook.lock');
+            Route::get('/offerings/{offering}/assignments', [TeachAssignmentController::class, 'index'])
+                ->name('offerings.assignments');
+            Route::get('/assignments/{assignment}/submissions', [TeachAssignmentController::class, 'submissions'])
+                ->name('assignments.submissions');
+            Route::post('/submissions/{assignmentSubmission}/grade', [TeachAssignmentController::class, 'grade'])
+                ->name('submissions.grade');
+            Route::post('/submissions/{assignmentSubmission}/mark-received', [TeachAssignmentController::class, 'markReceived'])
+                ->name('submissions.mark-received');
+            Route::post('/assignments/{assignment}/remind-unsubmitted', [TeachAssignmentController::class, 'remindUnsubmitted'])
+                ->name('assignments.remind-unsubmitted');
+            Route::get('/assessments/{assessment}/attempts', [TeachAssessmentGradingController::class, 'attempts'])
+                ->name('assessments.attempts');
+            Route::post('/answers/{attemptAnswer}/grade', [TeachAssessmentGradingController::class, 'gradeAnswer'])
+                ->name('answers.grade');
+            Route::post('/assessments/{assessment}/announce-results', [TeachAssessmentGradingController::class, 'announceResults'])
+                ->name('assessments.announce-results');
         });
     });
 });

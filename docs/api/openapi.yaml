@@ -3215,3 +3215,248 @@ paths:
           description: OK
         '403':
           description: Not staffed on this offering
+# S8 grading
+  /teach/offerings/{offering}/gradebook:
+    get:
+      operationId: teachGradebook
+      summary: Gradebook grid for an offering. Issues a confirmation token for lock.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering
+  /teach/offerings/{offering}/gradebook/submit:
+    post:
+      operationId: teachGradebookSubmit
+      summary: Submit computed grades for the offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Submitted
+        '403':
+          description: Not allowed to submit grades
+  /teach/offerings/{offering}/gradebook/lock:
+    post:
+      operationId: teachGradebookLock
+      summary: Lock grades. Instructor only. Confirmation token required. TA is 403.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirmation:
+                  type: string
+      responses:
+        '200':
+          description: Locked
+        '403':
+          description: TA or not staffed
+        '422':
+          description: Missing, invalid, or replayed confirmation
+  /teach/offerings/{offering}/assignments:
+    get:
+      operationId: teachAssignmentDashboard
+      summary: Assignment dashboard counts for an offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering
+  /teach/assignments/{assignment}/submissions:
+    get:
+      operationId: teachAssignmentSubmissions
+      summary: List submissions for an assignment.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assignment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering
+  /teach/submissions/{assignmentSubmission}/grade:
+    post:
+      operationId: teachGradeSubmission
+      summary: Grade an assignment submission.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assignmentSubmission
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - raw_score
+              properties:
+                raw_score:
+                  type: number
+                feedback:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Graded
+        '403':
+          description: Not staffed on this offering
+        '423':
+          description: Gradebook locked
+  /teach/submissions/{assignmentSubmission}/mark-received:
+    post:
+      operationId: teachMarkSubmissionReceived
+      summary: Mark an offline submission as physically received.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assignmentSubmission
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Marked received
+        '403':
+          description: Not staffed on this offering
+        '422':
+          description: Not an offline assignment
+  /teach/assignments/{assignment}/remind-unsubmitted:
+    post:
+      operationId: teachRemindUnsubmitted
+      summary: Remind enrolled students who have not submitted.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assignment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Reminded
+        '403':
+          description: Not staffed on this offering
+  /teach/assessments/{assessment}/attempts:
+    get:
+      operationId: teachAssessmentAttempts
+      summary: Attempts with proctor warnings. Issues a confirmation token for announce-results.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assessment
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Not staffed on this offering
+  /teach/answers/{attemptAnswer}/grade:
+    post:
+      operationId: teachGradeAttemptAnswer
+      summary: Override an auto or AI score on an attempt answer.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: attemptAnswer
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - final_score
+              properties:
+                final_score:
+                  type: number
+                feedback:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Graded
+        '403':
+          description: Not staffed on this offering
+        '423':
+          description: Gradebook locked
+  /teach/assessments/{assessment}/announce-results:
+    post:
+      operationId: teachAnnounceAssessmentResults
+      summary: Announce assessment results. Confirmation token required. TA is 403.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: assessment
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirmation:
+                  type: string
+      responses:
+        '200':
+          description: Announced
+        '403':
+          description: TA or not staffed
+        '422':
+          description: Missing, invalid, or replayed confirmation
+
