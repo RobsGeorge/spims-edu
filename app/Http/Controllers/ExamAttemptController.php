@@ -76,7 +76,12 @@ class ExamAttemptController extends Controller
     {
         $updated = $attempts->logFocusLoss($request->user(), $attempt);
 
-        return response()->json(['focus_loss_count' => $updated->focus_loss_count]);
+        return response()->json([
+            'focus_loss_count' => $updated->focus_loss_count,
+            'proctor_warnings' => $updated->proctor_warnings,
+            'terminated_for_cheating' => $updated->terminated_for_cheating,
+            'status' => $updated->status->value,
+        ]);
     }
 
     public function timer(AssessmentAttempt $attempt): JsonResponse
