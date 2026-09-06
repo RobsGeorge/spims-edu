@@ -141,6 +141,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/teach/{offering}/completion', [TeachCompletionController::class, 'show'])
         ->middleware('permission:completion.view')
         ->name('teach.completion.show');
+    Route::post('/teach/{offering}/close', [TeachCompletionController::class, 'close'])
+        ->name('teach.offerings.close');
     Route::post('/teach/{offering}/students/{student}/notes', [TeachCompletionController::class, 'storeNote'])
         ->middleware('permission:student_notes.manage')
         ->name('teach.completion.notes.store');

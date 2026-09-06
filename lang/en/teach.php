@@ -72,4 +72,7 @@ return array (
   'open_projects' => 'Open projects',
   'open_live_quiz' => 'Open live quiz',
   'open_surveys' => 'Open surveys',
+  'close_offering' => 'Close offering',
+  'close_confirm_title' => 'Close this offering?',
+  'close_confirm_body' => 'Closing issues completion certificates and cannot be undone. Reopening the gradebook stays in Academic Admin.',
 );

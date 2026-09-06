@@ -3,20 +3,29 @@
 namespace App\Http\Controllers\Teach;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Teach\Concerns\IssuesOfferingCloseConfirmation;
 use App\Models\Announcement;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Services\Communications\AnnouncementService;
+use App\Services\Completion\OfferingClosingService;
 use App\Services\Teach\TeachAccessService;
+use App\Support\AuthorizeService;
+use App\Support\ConfirmationToken;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class TeachController extends Controller
 {
+    use IssuesOfferingCloseConfirmation;
+
     public function __construct(
         private readonly TeachAccessService $teachAccess,
         private readonly AnnouncementService $announcements,
+        private readonly AuthorizeService $authorize,
+        private readonly ConfirmationToken $confirm,
+        private readonly OfferingClosingService $closing,
     ) {}
 
     public function index(Request $request): View
@@ -54,6 +63,13 @@ class TeachController extends Controller
                 ->orderByDesc('created_at')
                 ->limit(20)
                 ->get(),
+            'closeToken' => $this->offeringCloseToken(
+                $user,
+                $offering,
+                $this->authorize,
+                $this->confirm,
+                $this->closing,
+            ),
         ]);
     }
 

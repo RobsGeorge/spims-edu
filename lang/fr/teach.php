@@ -72,4 +72,7 @@ return array (
   'open_projects' => 'Ouvrir les projets',
   'open_live_quiz' => 'Ouvrir le quiz live',
   'open_surveys' => 'Ouvrir les sondages',
+  'close_offering' => 'Clôturer l’offre',
+  'close_confirm_title' => 'Clôturer cette offre ?',
+  'close_confirm_body' => 'La clôture délivre les certificats d’achèvement et est irréversible. La réouverture du carnet reste réservée à l’admin académique.',
 );
