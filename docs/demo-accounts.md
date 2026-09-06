@@ -58,7 +58,7 @@ Use these in this order. Each row is a **persona**, not just a login.
 | `adm@spims.test` | Admin Office | Administrative Admin | en | Users, admissions queue (10 applications, mixed status), semesters, branding |
 | `aca@spims.test` | Academic Dean | Academic Admin | en | Programs, courses, offerings, gradebook, live admin, translations |
 | `fin@spims.test` | Finance Bursar | Financial Admin | en | Finance hub with invoices; student9 has a verified cash payment |
-| `ins1@spims.test` | Mina Instructor | Instructor | en | Teach TH101 (lessons, quiz, announcement, attendance, live). Also BI102, CH101, FREE1 |
+| `ins1@spims.test` | Mina Instructor | Instructor | en | Teach TH101 (lessons, quiz, announcement, attendance, live, **live-quiz lobby**, surveys, team project). Also BI102, CH101, FREE1 |
 | `ins2@spims.test` | Mariana Teacher | Instructor | **ar** | Teach BI101 (Week 1 lessons). Also LI101, ET101 cohort, TH201 |
 | `ta1@spims.test` | Yousef Assistant | TA | en | Staffed on TH101, BI101, BI102. Cannot lock grades |
 | `dual@spims.test` | Dual Role | Instructor + Student | en | Instructor on FREE1; enrolled in ET101 self-paced |
@@ -67,7 +67,7 @@ Use these in this order. Each row is a **persona**, not just a login.
 
 | Email | Name | Locale | Application | Enrollments | Best use |
 |---|---|---|---|---|---|
-| `student1@spims.test` | John Student | en | DIP-THEO **Accepted** (answers filled) | TH101 + BI101 enrolled, BI102 **waitlisted** | Primary student walkthrough: lesson, announcement, invoice, attendance |
+| `student1@spims.test` | John Student | en | DIP-THEO **Accepted** (answers filled) | TH101 + BI101 enrolled, BI102 **waitlisted** | Primary student walkthrough: lesson, announcement, invoice, attendance, **survey, event reserve, live-quiz join, team project** |
 | `student2@spims.test` | Sara Habib | **ar** | DIP-THEO Submitted | none | Arabic applicant; admissions still in flight |
 | `student3@spims.test` | Mark Shenouda | en | DIP-THEO Under review (answers filled) | none | Reviewer queue |
 | `student4@spims.test` | Mary Guirguis | **fr** | DIP-THEO Waitlisted | none | French UI + waitlisted application |
@@ -109,6 +109,10 @@ After `migrate:fresh --seed` with `SEED_DEMO_DATA=true`:
 | Live sessions | 1 | TH101, scheduled in the next 24h (mock Zoom) |
 | Class sessions / attendance | 1 / 3 | student1 Present, student6 Late, student7 Excused |
 | Discussion posts | 2 | Instructor thread + student1 reply on TH101 |
+| Feedback surveys | 1 | Published **TH101 Week 1 feedback** (text + scale). Not pre-submitted — student1 can fill it |
+| Events | 1 | Published **TH101 chapel vigil**, eligibility = TH101 offering, capacity 40. Not pre-reserved — student1 can reserve and see the check-in text |
+| Live quizzes / sessions | 1 / 1 | **TH101 Week 1 live quiz** in **LOBBY**. Join code is printed by `artisan db:seed` and shown on ins1 Teach → Live quiz |
+| Team projects | 1 | Published **TH101 reflection team** with open **Team Alpha** (1–3 seats, text deliverable). Nobody pre-joined |
 | Credentials / academic records | 0 | Not seeded — no locked grades or honest certificate |
 
 Curriculum (demo programs):
@@ -144,10 +148,14 @@ Do this on **staging** after a fresh seed.
 ### 5.1 Fifteen-minute “what is this product?”
 
 1. **Public catalog** (logged out) → `/catalog`.
-2. **Student** `student1@spims.test` → `/learn/{TH101}` (Week 1 lessons), `/announcements`, `/finance` (open invoices + EGP wallet), `/attendance` (Present on Week 1).
-3. **Admin** `adm@spims.test` → `/admin/applications`. student1/student3 have “Why join?” / “Parish name” answers.
+2. **Student** `student1@spims.test` → `/learn/{TH101}` (Week 1 lessons), `/announcements`, `/finance` (open invoices + EGP wallet), `/attendance` (Present on Week 1). Then the new hub tiles:
+   - `/surveys` → **TH101 Week 1 feedback** (submit once)
+   - `/events` → **TH101 chapel vigil** (reserve; check-in text appears on the event and `/events/mine`)
+   - `/live-quiz/join` → enter the code from ins1’s Teach live-quiz console
+   - `/offerings/{TH101}/projects` → join **Team Alpha**
+3. **Admin** `adm@spims.test` → `/admin/applications`. student1/student3 have “Why join?” / “Parish name” answers. `/admin/events` shows the chapel vigil (admin created it).
 4. **Academic** `aca@spims.test` → `/admin/programs` → DIP-THEO. `/admin/offerings` → Fall vs Spring Draft.
-5. **Instructor** `ins1@spims.test` → `/teach/{TH101}` (content, roster, announcements). Attendance at `/teach/{TH101}/attendance`.
+5. **Instructor** `ins1@spims.test` → `/teach/{TH101}` (content, roster, announcements). Attendance at `/teach/{TH101}/attendance`. Live-quiz lobby + join code under Teach → Live quiz. Surveys and Team Alpha under the matching Teach tabs.
 6. **Finance** `fin@spims.test` → `/admin/finance` lists invoices; student9’s first invoice is paid.
 7. **Dual** `dual@spims.test` → teach FREE1 and learn ET101 self-paced.
 
@@ -168,14 +176,16 @@ The seeder now covers the classroom + money walkthrough. Use the admin/teach scr
 
 ## 7. How dummy data is put into the seeder
 
-`database/seeders/DemoDataSeeder.php` seeds catalog and enrollments, then calls the same services the UI uses for classroom and money rows: `OfferingService`, `QuestionBankService`, `AssessmentService`, `GradebookService`, `InvoiceService`, `PaymentService`, `WalletService`, `AttendanceService`, `AnnouncementService`, `LiveSessionService`, `DiscussionService`, `EnrollmentService`.
+`database/seeders/DemoDataSeeder.php` seeds catalog and enrollments, then calls the same services the UI uses for classroom and money rows: `OfferingService`, `QuestionBankService`, `AssessmentService`, `GradebookService`, `InvoiceService`, `PaymentService`, `WalletService`, `AttendanceService`, `AnnouncementService`, `LiveSessionService`, `DiscussionService`, `EnrollmentService`, plus the S6/S9 slice (`FeedbackSurveyService`, `EventService`, `LiveQuizHostService`, `ProjectAssessmentService`).
+
+The open **Team Alpha** row is created after publish (there is no staff “create empty team” service; `ProjectTeamService` only opens a team on join).
 
 Rules for that work (same as the rest of the repo):
 
 - Mutations go through services + `AuditLogWriter::withAudit()`.
 - Money is integer minor units.
 - Instructors are staffed on the offering before they act on it.
-- `tests/Feature/Database/DemoDataSeederTest.php` asserts content, invoice, class session, announcement, and the dual-role account so a future edit cannot silently empty the demo.
+- `tests/Feature/Database/DemoDataSeederTest.php` asserts content, invoice, class session, announcement, the dual-role account, and the TH101 survey / event / live-quiz lobby / Team Alpha slice so a future edit cannot silently empty the demo.
 
 Locked grades and credentials are **not** seeded. A hollow certificate is worse than none.
 

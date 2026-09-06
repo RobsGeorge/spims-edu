@@ -2,15 +2,27 @@
 
 namespace Tests\Feature\Database;
 
+use App\Enums\EventStatus;
+use App\Enums\FeedbackSurveyStatus;
+use App\Enums\LiveQuizSessionState;
 use App\Enums\OfferingMode;
+use App\Enums\ProjectAssessmentStatus;
+use App\Enums\ProjectStatus;
 use App\Models\Announcement;
 use App\Models\ClassSession;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
+use App\Models\Credential;
 use App\Models\Enrollment;
+use App\Models\Event;
+use App\Models\FeedbackSurvey;
 use App\Models\Invoice;
+use App\Models\LiveQuiz;
+use App\Models\LiveQuizSession;
 use App\Models\OfferingStaff;
+use App\Models\Project;
+use App\Models\ProjectAssessment;
 use App\Models\User;
 use Database\Seeders\DemoDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -111,6 +123,91 @@ class DemoDataSeederTest extends TestCase
             ->get(route('teach.show', $th101))
             ->assertOk()
             ->assertSee('TH101');
+    }
+
+    #[Test]
+    public function th101_classroom_slice_fills_new_hub_tiles_and_leaves_credentials_empty(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+        $ins1 = User::query()->where('email', 'ins1@spims.test')->firstOrFail();
+
+        $survey = FeedbackSurvey::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', DemoDataSeeder::TH101_SURVEY_TITLE)
+            ->first();
+        $this->assertNotNull($survey);
+        $this->assertSame(FeedbackSurveyStatus::Published, $survey->status);
+        $this->assertGreaterThanOrEqual(1, $survey->questions()->count());
+
+        $event = Event::query()->where('title', DemoDataSeeder::TH101_EVENT_TITLE)->first();
+        $this->assertNotNull($event);
+        $this->assertSame(EventStatus::Published, $event->status);
+
+        $quiz = LiveQuiz::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', DemoDataSeeder::TH101_LIVE_QUIZ_TITLE)
+            ->first();
+        $this->assertNotNull($quiz);
+        $session = LiveQuizSession::query()
+            ->where('quiz_id', $quiz->id)
+            ->where('state', LiveQuizSessionState::Lobby)
+            ->first();
+        $this->assertNotNull($session);
+        $this->assertNotSame('', (string) $session->join_code);
+
+        $assessment = ProjectAssessment::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', DemoDataSeeder::TH101_PROJECT_TITLE)
+            ->first();
+        $this->assertNotNull($assessment);
+        $this->assertSame(ProjectAssessmentStatus::Published, $assessment->status);
+        $team = Project::query()
+            ->where('project_assessment_id', $assessment->id)
+            ->where('name', DemoDataSeeder::TH101_PROJECT_TEAM)
+            ->first();
+        $this->assertNotNull($team);
+        $this->assertSame(ProjectStatus::Open, $team->status);
+
+        $this->assertSame(0, Credential::query()->count());
+
+        $this->actingAs($student1)
+            ->get(route('student.surveys.index'))
+            ->assertOk()
+            ->assertSee(DemoDataSeeder::TH101_SURVEY_TITLE);
+
+        $this->actingAs($student1)
+            ->get(route('student.surveys.show', $survey))
+            ->assertOk()
+            ->assertSee(__('feedback.submit'));
+
+        $this->actingAs($student1)
+            ->get(route('events.index'))
+            ->assertOk()
+            ->assertSee(DemoDataSeeder::TH101_EVENT_TITLE);
+
+        $this->actingAs($student1)
+            ->get(route('events.show', $event))
+            ->assertOk()
+            ->assertSee(__('events.reserve'));
+
+        $this->actingAs($student1)
+            ->get(route('student.projects.index', $th101))
+            ->assertOk()
+            ->assertSee(DemoDataSeeder::TH101_PROJECT_TITLE)
+            ->assertSee(DemoDataSeeder::TH101_PROJECT_TEAM);
+
+        $this->actingAs($student1)
+            ->get(route('live-quiz.join'))
+            ->assertOk();
+
+        $this->actingAs($ins1)
+            ->get(route('teach.live-quiz.session', [$th101, $session]))
+            ->assertOk()
+            ->assertSee($session->join_code, false);
     }
 
     private function cohortOffering(string $code): ?CourseOffering

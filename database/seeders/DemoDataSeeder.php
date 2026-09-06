@@ -10,6 +10,8 @@ use App\Enums\ComponentKind;
 use App\Enums\ContentItemType;
 use App\Enums\Currency;
 use App\Enums\EnrollmentStatus;
+use App\Enums\FeedbackQuestionKind;
+use App\Enums\LiveQuizSessionState;
 use App\Enums\FormFieldType;
 use App\Enums\GradeStatus;
 use App\Enums\GradeType;
@@ -19,6 +21,9 @@ use App\Enums\OfferingStaffRole;
 use App\Enums\OfferingStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\ProgramType;
+use App\Enums\ProjectDeliverableKind;
+use App\Enums\ProjectGradingMode;
+use App\Enums\ProjectStatus;
 use App\Enums\QuestionType;
 use App\Enums\RequirementType;
 use App\Enums\RoleType;
@@ -38,6 +43,10 @@ use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\DiscussionPost;
 use App\Models\Enrollment;
+use App\Models\Event;
+use App\Models\FeedbackSurvey;
+use App\Models\LiveQuiz;
+use App\Models\LiveQuizSession;
 use App\Models\GradebookComponent;
 use App\Models\GradingScheme;
 use App\Models\Invoice;
@@ -45,6 +54,8 @@ use App\Models\LiveSession;
 use App\Models\OfferingStaff;
 use App\Models\Program;
 use App\Models\ProgramCourse;
+use App\Models\Project;
+use App\Models\ProjectAssessment;
 use App\Models\QuestionBank;
 use App\Models\Semester;
 use App\Models\StudentProgram;
@@ -56,19 +67,33 @@ use App\Services\Assessment\QuestionBankService;
 use App\Services\Communications\AnnouncementService;
 use App\Services\Discussions\DiscussionService;
 use App\Services\Enrollment\EnrollmentService;
+use App\Services\Events\EventService;
+use App\Services\Feedback\FeedbackSurveyService;
 use App\Services\Finance\InvoiceService;
 use App\Services\Finance\PaymentService;
 use App\Services\Finance\WalletService;
 use App\Services\Gradebook\GradebookService;
 use App\Services\Live\AttendanceService;
 use App\Services\Live\LiveSessionService;
+use App\Services\LiveQuiz\LiveQuizHostService;
 use App\Services\Offerings\OfferingService;
+use App\Services\Projects\ProjectAssessmentService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class DemoDataSeeder extends Seeder
 {
     public const PASSWORD = 'Spims@Test2026!';
+
+    public const TH101_SURVEY_TITLE = 'TH101 Week 1 feedback';
+
+    public const TH101_EVENT_TITLE = 'TH101 chapel vigil';
+
+    public const TH101_LIVE_QUIZ_TITLE = 'TH101 Week 1 live quiz';
+
+    public const TH101_PROJECT_TITLE = 'TH101 reflection team';
+
+    public const TH101_PROJECT_TEAM = 'Team Alpha';
 
     public function run(): void
     {
@@ -601,6 +626,7 @@ class DemoDataSeeder extends Seeder
         $this->seedTh101Announcement($ins1, $th101);
         $this->seedTh101LiveSession($ins1, $th101);
         $this->seedTh101Discussion($ins1, $student1, $th101);
+        $this->seedTh101ClassroomSlice($users['adm@spims.test'], $ins1, $th101);
         $this->seedApplicationAnswers($student1, $student3);
         $this->seedDualRoleAccess($aca, $dual, $free1, $et101SelfPaced);
     }
@@ -879,6 +905,159 @@ class DemoDataSeeder extends Seeder
             'body' => 'Introduce yourself in a sentence and say what you hope to learn this term.',
         ]);
         $discussions->post($student1, $thread, 'Looking forward to this course.');
+    }
+
+    /**
+     * Thin S6/S9 classroom slice so Learning-hub tiles are not empty on a client walkthrough.
+     * Credentials stay unseeded.
+     */
+    private function seedTh101ClassroomSlice(User $adm, User $ins1, CourseOffering $th101): void
+    {
+        $this->seedTh101Survey($ins1, $th101);
+        $this->seedTh101Event($adm, $th101);
+        $this->seedTh101LiveQuizLobby($ins1, $th101);
+        $this->seedTh101TeamProject($ins1, $th101);
+    }
+
+    private function seedTh101Survey(User $ins1, CourseOffering $th101): void
+    {
+        if (FeedbackSurvey::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', self::TH101_SURVEY_TITLE)
+            ->exists()) {
+            return;
+        }
+
+        $surveys = app(FeedbackSurveyService::class);
+        $survey = $surveys->create($ins1, [
+            'title' => self::TH101_SURVEY_TITLE,
+            'anonymous_default' => true,
+            'opens_at' => now()->subHour(),
+            'closes_at' => now()->addWeeks(2),
+        ], $th101);
+        $surveys->addQuestion($ins1, $survey, [
+            'prompt' => 'What should we spend more time on next week?',
+            'kind' => FeedbackQuestionKind::Text->value,
+            'required' => true,
+        ]);
+        $surveys->addQuestion($ins1, $survey, [
+            'prompt' => 'How clear was the Week 1 reading?',
+            'kind' => FeedbackQuestionKind::Scale->value,
+            'required' => true,
+        ]);
+        $surveys->publish($ins1, $survey);
+    }
+
+    private function seedTh101Event(User $adm, CourseOffering $th101): void
+    {
+        if (Event::query()->where('title', self::TH101_EVENT_TITLE)->exists()) {
+            return;
+        }
+
+        $events = app(EventService::class);
+        $event = $events->create($adm, [
+            'title' => self::TH101_EVENT_TITLE,
+            'description' => 'Optional chapel vigil for TH101. Reserve a seat, then show the check-in text on your phone.',
+            'starts_at' => now()->addDays(3)->setTime(18, 0),
+            'ends_at' => now()->addDays(3)->setTime(20, 0),
+            'venue' => 'Campus chapel',
+            'capacity' => 40,
+            'waitlist_enabled' => true,
+            'eligibility' => [
+                'programs' => [],
+                'offerings' => [$th101->id],
+                'roles' => [],
+            ],
+        ]);
+        $events->publish($adm, $event);
+    }
+
+    private function seedTh101LiveQuizLobby(User $ins1, CourseOffering $th101): void
+    {
+        $host = app(LiveQuizHostService::class);
+
+        $quiz = LiveQuiz::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', self::TH101_LIVE_QUIZ_TITLE)
+            ->first();
+
+        if ($quiz === null) {
+            $quiz = $host->createQuiz($ins1, $th101, self::TH101_LIVE_QUIZ_TITLE, [
+                [
+                    'prompt' => 'What is the catalog code for Introduction to Theology?',
+                    'time_limit_seconds' => 30,
+                    'points' => 1000,
+                    'options' => [
+                        ['label' => 'TH101', 'is_correct' => true],
+                        ['label' => 'BI101', 'is_correct' => false],
+                    ],
+                ],
+                [
+                    'prompt' => 'TH101 is a three-credit course.',
+                    'time_limit_seconds' => 20,
+                    'points' => 500,
+                    'options' => [
+                        ['label' => 'True', 'is_correct' => true],
+                        ['label' => 'False', 'is_correct' => false],
+                    ],
+                ],
+            ]);
+        }
+
+        $session = LiveQuizSession::query()
+            ->where('quiz_id', $quiz->id)
+            ->where('state', LiveQuizSessionState::Lobby)
+            ->latest('created_at')
+            ->first();
+
+        if ($session === null) {
+            $session = $host->startSession($ins1, $quiz);
+        }
+
+        $this->command?->info('TH101 live-quiz join code: '.$session->join_code);
+    }
+
+    private function seedTh101TeamProject(User $ins1, CourseOffering $th101): void
+    {
+        $projects = app(ProjectAssessmentService::class);
+
+        $assessment = ProjectAssessment::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', self::TH101_PROJECT_TITLE)
+            ->first();
+
+        if ($assessment === null) {
+            $assessment = $projects->create($ins1, $th101, [
+                'title' => self::TH101_PROJECT_TITLE,
+                'team_size_min' => 1,
+                'team_size_max' => 3,
+                'join_opens_at' => now()->subHour(),
+                'join_closes_at' => now()->addMonths(2),
+                'allow_leave_once' => true,
+                'grading_mode' => ProjectGradingMode::Deliverables->value,
+                'max_points' => 100,
+            ]);
+            $phase = $projects->addPhase($ins1, $assessment, [
+                'name' => 'Reflection',
+                'position' => 1,
+                'due_at' => now()->addWeeks(3),
+            ]);
+            $projects->addDeliverable($ins1, $phase, [
+                'kind' => ProjectDeliverableKind::Text->value,
+                'title' => 'One-paragraph reflection',
+                'points' => 100,
+                'due_at' => now()->addWeeks(3),
+            ]);
+            $assessment = $projects->publish($ins1, $assessment);
+        }
+
+        if (Project::query()->where('project_assessment_id', $assessment->id)->doesntExist()) {
+            Project::query()->create([
+                'project_assessment_id' => $assessment->id,
+                'name' => self::TH101_PROJECT_TEAM,
+                'status' => ProjectStatus::Open,
+            ]);
+        }
     }
 
     private function seedApplicationAnswers(User $student1, User $student3): void
