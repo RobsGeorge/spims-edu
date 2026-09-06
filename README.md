@@ -21,20 +21,31 @@ php artisan serve
 ## Tests
 
 ```bash
-php artisan test --compact
+composer test                 # full PHPUnit suite
+composer test:api             # /api/v1 only
+composer lint                 # deploy/CI artifact checks
 php artisan test --testsuite=Smoke
 ```
 
+CI (every push/PR): lint → full suite on SQLite → `migrate:fresh --seed` on PostgreSQL 16 → full suite on PostgreSQL. Deploy workflows reuse that workflow; a red gate never ships.
+
 ## Deploy
 
-Push to `main` → CI → production deploy via GitHub Actions.
-Push to `staging` → CI → staging deploy.
+Push to `main` → CI → production (`/var/www/spims`).
+Push to `staging` → CI → staging (`/var/www/spims-staging`).
+Manual rollback: Actions → **Rollback** (environment + SHA).
+
+Mobile apps talk to the **same** origin: `https://<domain>/api/v1` (Sanctum Bearer). No extra process.
+
+**What I need from you** (DNS, SSH keys, GitHub secrets, first `.env`): [docs/owner-actions.md](docs/owner-actions.md).
 
 - Client system overview (for school leadership): [docs/client-system-overview.md](docs/client-system-overview.md)
 - Spec summary: [docs/spims-spec-summary.md](docs/spims-spec-summary.md)
 - Design gap analysis & next phases: [docs/portal-design-gap-analysis.md](docs/portal-design-gap-analysis.md)
 - Academic roadmap (S0–S9: SIS gaps, mobile API): [docs/academic-roadmap/](docs/academic-roadmap/)
 - Parking lot (out-of-phase): [PARKING-LOT.md](PARKING-LOT.md)
+- Owner actions (secrets, DNS, keys): [docs/owner-actions.md](docs/owner-actions.md)
+- How `/api/v1` runs: [docs/mobile-api-runtime.md](docs/mobile-api-runtime.md)
 - VPS provisioning: [docs/vps-setup.md](docs/vps-setup.md)
 - Backups: [docs/backups-and-restore.md](docs/backups-and-restore.md)
 - Release checklist: [docs/release-runbook.md](docs/release-runbook.md)
