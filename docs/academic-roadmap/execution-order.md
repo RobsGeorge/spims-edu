@@ -4,7 +4,7 @@ The order to build the plan in, and how each step is proved. Companion to
 [`implementation-plan.md`](implementation-plan.md), which holds the detail; this file is the
 sequence and the exit criteria.
 
-**Status:** S0–S5 are complete and verified — see [`README.md`](README.md). S6 and S7 are next.
+**Status:** S0–S6 are complete and verified — see [`README.md`](README.md). S7 (team projects) is next. Wave E of S6 waits on S7 and S9.
 
 ---
 
@@ -40,7 +40,7 @@ different agents without colliding: they touch disjoint tables and services.
 | 3 | **S3 — attendance + roster** ✅ | The largest SIS gap, and S4's criteria engine reads from it | An in-person session with no Zoom meeting is marked, excused, and reported; the gradebook attendance component is unchanged from outside |
 | 4 | **S5 — assessment completion** | Small, additive, unblocks the S6 Wave C write path | Proctor events escalate and terminate; offline assignments; reminders fire once |
 | 5 | **S4 — completion + credentials** | Needs S3 (attendance criteria) and S2 (announce) | Criteria evaluated, grace marks applied, offering closed, PDF certificate verifies publicly |
-| 6 | **S6 — student API, waves A→E** | Each wave ships only after its domain phase | A student completes the year on a phone in Arabic |
+| 6 | **S6 — student API, waves A→E** ✅ A–D | Each wave ships only after its domain phase | A student completes the year on a phone in Arabic. Wave E waits on S7/S9. |
 | 7 | **S7 — team projects** | Largest new subsystem, but self-contained — can run in parallel from step 2 onward | Team formation, deliverables, grading, peer evaluation, all scoped |
 | 8 | **S8 — instructor API** | Needs S0 + S3 + S5 + S7 to have anything to expose | Instructor runs an offering from a phone; TA is refused the lock |
 | 9 | **S9 — realtime, live quiz, events** | Introduces Reverb; last so nothing else depends on new infrastructure | Live quiz runs with Reverb and degrades to polling when it is off |

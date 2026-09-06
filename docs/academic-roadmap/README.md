@@ -15,7 +15,7 @@ Read them in this order:
 
 ## Status
 
-**S0–S5 are done. S6 (student API waves) and S7 (team projects) are next.**
+**S0–S6 are done. S7 (team projects) is next.** Wave E of the student API (projects, live quiz, events, surveys) waits on S7 and S9.
 
 Landed on branch
 [`feat/authz-scope-and-api-foundation`](https://github.com/RobsGeorge/spims-edu/compare/main...feat/authz-scope-and-api-foundation):
@@ -38,8 +38,10 @@ The full suite went from 124 to 178 passing on S0/S1, to **212** after S2 and S3
 | [`cursor/s5-assessment-completion-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s5-assessment-completion-bcff) | **S5** | Assignment dashboard, reminders, offline delivery, resubmission deadline, proctor escalation, results announcement. Closes G-17, G-18. |
 | [`cursor/ci-postgres-full-suite-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/ci-postgres-full-suite-bcff) | CI | Full PHPUnit suite on PostgreSQL 16 (not just migrate:fresh). |
 | [`cursor/fix-discussion-board-audit-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/fix-discussion-board-audit-bcff) | G-07 | `DiscussionService::ensureBoard()` no longer writes on GET; provisioning is audited. |
+| [`cursor/s4-completion-api-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s4-completion-api-bcff) | **S4 API** | Student credentials + own completion; staff cohort/evaluate, notes, week assessment. |
+| [`cursor/s6-student-api-bcff`](https://github.com/RobsGeorge/spims-edu/tree/cursor/s6-student-api-bcff) | **S6** | Student mobile API waves A–D. Wave E waits on S7/S9. |
 
-**S6 — student mobile API** (waves A–E) and **S7 — team projects** are next. Detail in
+**S7 — team projects** is next. Detail in
 [`implementation-plan.md`](implementation-plan.md), sequencing in
 [`execution-order.md`](execution-order.md).
 
