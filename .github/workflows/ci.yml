@@ -153,3 +153,144 @@ jobs:
 
       - name: migrate:fresh --seed on clean PostgreSQL
         run: php artisan migrate:fresh --seed --force --no-interaction
+
+  pgsql-full-suite:
+    name: Full test suite on PostgreSQL (blocks deploy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    # Forced as real job-level env vars (not just appended to .env): PHPUnit applies
+    # phpunit.xml's <env name="DB_CONNECTION" value="sqlite"/> (force=false) before
+    # Laravel's dotenv bootstraps, and dotenv never overwrites an already-set env var.
+    # Appending DB_* to .env alone (as pgsql-migrate-fresh does) is silently ignored by
+    # `php artisan test` — verified locally: it kept running against SQLite. Setting
+    # these here, so they exist in the process environment before PHP starts, is what
+    # actually makes PHPUnit skip its sqlite default and use PostgreSQL.
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: spims_ci
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: spims_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, curl, json, bcmath, gd, pdo_pgsql
+          coverage: none
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare application (PostgreSQL)
+        run: |
+          cp .env.example .env
+          {
+            echo "DB_CONNECTION=pgsql"
+            echo "DB_HOST=127.0.0.1"
+            echo "DB_PORT=5432"
+            echo "DB_DATABASE=spims_ci"
+            echo "DB_USERNAME=postgres"
+            echo "DB_PASSWORD=postgres"
+          } >> .env
+          php artisan key:generate
+
+      - name: migrate:fresh --seed on clean PostgreSQL
+        run: php artisan migrate:fresh --seed --force --no-interaction
+
+      - name: Unit pipeline
+        run: php artisan test --testsuite=Unit --compact
+
+      - name: Feature (base) pipeline
+        run: php artisan test --testsuite=Feature --compact
+
+      - name: Database pipeline
+        run: php artisan test --testsuite=Database --compact
+
+      - name: Auth pipeline
+        run: php artisan test --testsuite=Auth --compact
+
+      - name: Audit pipeline
+        run: php artisan test --testsuite=Audit --compact
+
+      - name: Smoke pipeline
+        run: php artisan test --testsuite=Smoke --compact
+
+      - name: Admin pipeline
+        run: php artisan test --testsuite=Admin --compact
+
+      - name: Api pipeline
+        run: php artisan test --testsuite=Api --compact
+
+      - name: Academics pipeline
+        run: php artisan test --testsuite=Academics --compact
+
+      - name: Offerings pipeline
+        run: php artisan test --testsuite=Offerings --compact
+
+      - name: Admissions pipeline
+        run: php artisan test --testsuite=Admissions --compact
+
+      - name: Enrollment pipeline
+        run: php artisan test --testsuite=Enrollment --compact
+
+      - name: Finance pipeline
+        run: php artisan test --testsuite=Finance --compact
+
+      - name: Assessment pipeline
+        run: php artisan test --testsuite=Assessment --compact
+
+      - name: Live pipeline
+        run: php artisan test --testsuite=Live --compact
+
+      - name: Attendance pipeline
+        run: php artisan test --testsuite=Attendance --compact
+
+      - name: Communications pipeline
+        run: php artisan test --testsuite=Communications --compact
+
+      - name: Credentials pipeline
+        run: php artisan test --testsuite=Credentials --compact
+
+      - name: Hardening pipeline
+        run: php artisan test --testsuite=Hardening --compact
+
+      - name: Portal pipeline
+        run: php artisan test --testsuite=Portal --compact
+
+      - name: Rbac pipeline
+        run: php artisan test --testsuite=Rbac --compact
+
+      - name: Integrations pipeline
+        run: php artisan test --testsuite=Integrations --compact
