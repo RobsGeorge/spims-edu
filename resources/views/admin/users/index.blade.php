@@ -5,10 +5,12 @@
 @section('content')
 <h1 class="spims-title mb-3">{{ __('ui.nav_users') }}</h1>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
+@include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_users')])
 
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
         <h2 class="h6">{{ __('ui.create_user') }}</h2>
+        <p class="small text-muted-theme">{{ __('superadmin.users_create_help') }}</p>
         <form method="POST" action="{{ route('admin.users.store') }}" class="row g-2">
             @csrf
             <div class="col-md-3"><input name="first_name" class="form-control" placeholder="{{ __('ui.first_name') }}" required></div>
@@ -16,6 +18,7 @@
             <div class="col-md-3"><input name="email" type="email" class="form-control" placeholder="{{ __('ui.email') }}" required></div>
             <div class="col-md-3"><input name="password" type="password" class="form-control" placeholder="{{ __('ui.password') }}" required></div>
             <div class="col-12">
+                <p class="small text-muted-theme mb-2">{{ __('superadmin.users_roles_help') }}</p>
                 @foreach($assignableRoles as $role)
                     <label class="me-3"><input type="checkbox" name="roles[]" value="{{ $role->value }}"> {{ $role->value }}</label>
                 @endforeach

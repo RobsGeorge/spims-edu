@@ -151,6 +151,7 @@
                         {{ __('dashboard.superadmin_hub') }}
                     </h3>
                     <p class="text-muted-theme mb-0">{{ __('dashboard.superadmin_hub_desc') }}</p>
+                    <p class="sa-tile-hint small mb-0 mt-2">{{ __('superadmin.dashboard_hint') }}</p>
                 </a>
             </div>
         @endif

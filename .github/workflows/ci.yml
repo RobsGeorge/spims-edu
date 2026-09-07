@@ -96,6 +96,9 @@ jobs:
       - name: Rbac pipeline
         run: php artisan test --testsuite=Rbac --compact
 
+      - name: SuperAdmin pipeline
+        run: php artisan test --testsuite=SuperAdmin --compact
+
       - name: Integrations pipeline
         run: php artisan test --testsuite=Integrations --compact
 

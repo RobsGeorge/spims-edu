@@ -5,6 +5,7 @@
     <div class="col-lg-7">
         <h1 class="spims-title mb-3">{{ __('learning.settings') }}</h1>
         @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
+        @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_settings')])
 
         <form method="POST" action="{{ route('settings.update') }}" class="app-card p-4">
             @csrf

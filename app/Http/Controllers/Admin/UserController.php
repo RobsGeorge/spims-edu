@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\RoleType;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\Admin\UserAdminService;
+use App\Support\AuthorizeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function index(): View
+    public function index(Request $request, AuthorizeService $authorize): View
     {
         $users = User::query()->with('roles')->orderBy('created_at', 'desc')->paginate(20);
 
+        $actor = $request->user();
+
         return view('admin.users.index', [
             'users' => $users,
-            'assignableRoles' => RoleType::cases(),
+            'assignableRoles' => $actor ? $authorize->assignableRoles($actor) : [],
         ]);
     }
 

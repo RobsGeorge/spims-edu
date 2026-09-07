@@ -1,14 +1,14 @@
 <?php
 
-use App\Http\Controllers\Admin\CredentialAdminController;
-use App\Http\Controllers\Admin\AssessmentAdminController;
-use App\Http\Controllers\Admin\DiscussionAdminController;
-use App\Http\Controllers\Admin\FinanceAdminController;
 use App\Http\Controllers\Admin\ApplicationFormController;
 use App\Http\Controllers\Admin\ApplicationReviewController;
+use App\Http\Controllers\Admin\AssessmentAdminController;
 use App\Http\Controllers\Admin\AssessmentTemplateController;
 use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\CredentialAdminController;
+use App\Http\Controllers\Admin\DiscussionAdminController;
 use App\Http\Controllers\Admin\EnrollmentAdminController;
+use App\Http\Controllers\Admin\FinanceAdminController;
 use App\Http\Controllers\Admin\GradebookController;
 use App\Http\Controllers\Admin\GradingSchemeController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
@@ -119,6 +119,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('superadmin')->prefix('roles-hub')->group(function () {
         Route::get('/', [RolesHubController::class, 'index'])->name('roles.hub');
         Route::put('/roles/{role}', [RolesHubController::class, 'updateRole'])->name('roles.hub.role.update');
+        Route::post('/roles/{role}/reset', [RolesHubController::class, 'resetRole'])->name('roles.hub.role.reset');
     });
 
     Route::get('/api/me', [MeController::class, 'show'])->name('api.me');

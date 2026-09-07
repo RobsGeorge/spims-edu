@@ -1,6 +1,6 @@
 # Super Admin control-plane plan
 
-**Status:** plan only — do not implement until a phase is accepted.  
+**Status:** SA0 implemented (sectioned hub, safety lock, Roles Hub polish, entrance points). SA1–SA6 remain plan only.  
 **Audience:** implementers building Super Admin to the same depth as Learn / Teach.  
 **Traces to:** spec v0.2 Super Admin role (“everything; admin-role grants; cross-system audit”), `AuthorizeService` bypass, Roles Hub, unused `settings` table.
 

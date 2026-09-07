@@ -12,8 +12,8 @@ return [
     'admin_hub_desc' => 'Utilisateurs, thème, file d’admissions.',
     'finance_hub' => 'Finance',
     'finance_hub_desc' => 'Portefeuille, factures, dons, admin finance.',
-    'superadmin_hub' => 'Console superadmin',
-    'superadmin_hub_desc' => 'Sécurité, audit, observabilité et outils système.',
+    'superadmin_hub' => 'Plan de contrôle Super Admin',
+    'superadmin_hub_desc' => 'Rôles, personnes, thème, bureaux école, audit et exploitation — exclusif à ce compte.',
     'notifications' => 'Notifications',
     'notifications_desc' => 'Alertes et mentions.',
 ];

@@ -47,6 +47,7 @@ class RolePermissionService
                             'level' => (string) $level,
                         ]);
                         $written++;
+
                         continue;
                     }
 
@@ -87,11 +88,19 @@ class RolePermissionService
     public function permissionKeys(): array
     {
         $fromDb = RolePermission::query()->distinct()->orderBy('permission_key')->pluck('permission_key')->all();
-        if ($fromDb !== []) {
-            return $fromDb;
-        }
+        $fromConfig = array_keys(config('permissions', []));
+        $keys = array_values(array_unique(array_merge($fromConfig, $fromDb)));
+        sort($keys);
 
-        return array_keys(config('permissions', []));
+        return $keys;
+    }
+
+    public function groupLabel(string $group): string
+    {
+        $key = 'roles_hub.group_'.$group;
+        $label = __($key);
+
+        return $label === $key ? $group : $label;
     }
 
     /**
@@ -162,5 +171,55 @@ class RolePermissionService
         });
 
         $this->authorize->forgetMatrixCache();
+    }
+
+    /**
+     * Replace one role's grants with the defaults from config/permissions.php.
+     */
+    public function resetRoleFromConfig(User $actor, RoleType $role): int
+    {
+        $this->authorize->authorize($actor, 'roles.manage_matrix');
+
+        if ($role === RoleType::SuperAdmin) {
+            abort(403);
+        }
+
+        $defaults = config('permissions', []);
+        $written = 0;
+        $before = RolePermission::query()
+            ->where('role', $role->value)
+            ->pluck('permission_key')
+            ->all();
+
+        DB::transaction(function () use ($actor, $role, $defaults, $before, &$written): void {
+            RolePermission::query()->where('role', $role->value)->delete();
+
+            foreach ($defaults as $permissionKey => $roleLevels) {
+                if (! is_array($roleLevels) || ! array_key_exists($role->value, $roleLevels)) {
+                    continue;
+                }
+
+                RolePermission::query()->create([
+                    'role' => $role->value,
+                    'permission_key' => $permissionKey,
+                    'level' => (string) $roleLevels[$role->value],
+                ]);
+                $written++;
+            }
+
+            $this->audit->write($actor, 'rbac.role_matrix.reset', 'RoleType', $role->value, [
+                'permissions' => $before,
+            ], [
+                'permissions' => RolePermission::query()
+                    ->where('role', $role->value)
+                    ->pluck('permission_key')
+                    ->all(),
+                'written' => $written,
+            ]);
+        });
+
+        $this->authorize->forgetMatrixCache();
+
+        return $written;
     }
 }
