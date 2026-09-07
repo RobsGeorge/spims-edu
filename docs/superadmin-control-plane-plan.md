@@ -1,6 +1,6 @@
 # Super Admin control-plane plan
 
-**Status:** SA0, SA1, SA2, and SA3 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config). SA4–SA6 remain plan only.  
+**Status:** SA0–SA4 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio). SA5–SA6 remain plan only.  
 **Audience:** implementers building Super Admin to the same depth as Learn / Teach.  
 **Traces to:** spec v0.2 Super Admin role (“everything; admin-role grants; cross-system audit”), `AuthorizeService` bypass, Roles Hub, unused `settings` table.
 
@@ -163,21 +163,21 @@ Implementation notes:
 - Super Admin hub always visible; flags do not hide the control plane from Super Admin.
 - Demo console flag, when present, must still honor `DEMO_CONSOLE=false` in PHPUnit (`phpunit.xml`).
 
-### 5.2 Themes — Thin
+### 5.2 Themes — Present (SA4)
 
-Present: `themes` table, `Theme` model, `ThemeTokens` (full Sacred Academic palette), `ThemeAdminService` (audited), editor for **name, site_name, 3 colors × light/dark, logo/favicon URLs**, one active row. Seeder activates “Sacred Academic” and retires parchment “Liturgical”.
+Present: `themes` table, `Theme` model, `ThemeTokens` (full Sacred Academic palette), `ThemeAdminService` (audited), Super Admin **Theme studio** at `/superadmin/theme` (presets, full tokens, logo upload, reset, live chip), plus ADM `/admin/theme` (name, site name, 3 token colors × 2 modes). Seeder activates “Sacred Academic” and retires parchment “Liturgical”.
 
-Gaps:
+Shipped in SA4:
 
-| Gap | Fix (SA4) |
+| Gap | Fix |
 |---|---|
-| Only 6 colors editable; `ThemeTokens` has ~25 per mode | Full token studio grouped (field, type, nav, semantic). Color + text inputs. |
+| Only 6 colors editable; `ThemeTokens` has ~25 per mode | Full token studio grouped (field, type, action, nav, semantic, chrome). Color + text inputs. |
 | No theme list / create / duplicate / activate | Index of presets. Activate is audited. One `is_active`. |
-| Logos are URL-only | Upload via existing `ObjectStorageService` + `/api/uploads`; store path; branding API already serves URLs. |
+| Logos are URL-only | Upload via `ObjectStorageService`; store path; branding API and the shell resolve paths to URLs. |
 | No reset to Sacred Academic defaults | Confirm + write `ThemeTokens::defaults()`. |
-| No live shell preview | iframe or in-page chip of sidebar/button/alert using CSS variables. |
-| Super Admin tile is a deep-link | Keep `/admin/theme` for ADM; add Super Admin “Theme studio” that lists presets. Same service. |
-| `theme-system` historically forced dark | `ThemeTokens::inlineStyleBlock()` already follows `prefers-color-scheme`. Verify in SA4 tests; do not re-break. |
+| No live shell preview | In-page chip of sidebar/button/alert using CSS variables. |
+| Super Admin tile is a deep-link | Keep `/admin/theme` for ADM; Super Admin “Theme studio” lists presets. Same service. |
+| `theme-system` historically forced dark | `ThemeTokens::inlineStyleBlock()` follows `prefers-color-scheme`. Covered in SA4 tests. |
 
 Do not add a second theme CSS build. Blade + `spims-theme.css` + inline token override stays the only path (no npm).
 
@@ -351,13 +351,13 @@ Each phase is one PR-sized slice: tests first, `pint` on owned files, no `migrat
 
 **Goal:** Complete control of appearance.
 
-- Theme index: Sacred Academic + any custom; activate; duplicate; reset defaults.
-- Full token editor (all keys in `ThemeTokens::defaults()`).
-- Logo/favicon upload.
-- Preview.
-- Tests: activate B deactivates A; branding/CSS variables reflect tokens; ADM can still edit active theme; reset restores defaults.
+- Theme index: Sacred Academic + any custom; activate; duplicate; reset defaults. **Shipped** (`/superadmin/theme`).
+- Full token editor (all keys in `ThemeTokens::defaults()`). **Shipped.**
+- Logo/favicon upload. **Shipped** (storage path via `ObjectStorageService`; branding API + shell resolve URLs).
+- Preview. **Shipped** (in-page shell chip, light/dark toggle, CSS variables).
+- Tests: activate B deactivates A; branding/CSS variables reflect tokens; ADM can still edit active theme; reset restores defaults. **Shipped** in `ThemeStudioTest`.
 
-**Done when:** Super Admin can ship a school’s burgundy/gold (or a checked deviation) without editing CSS.
+**Done when:** Super Admin can ship a school’s burgundy/gold (or a checked deviation) without editing CSS. **Shipped.**
 
 ### SA5 — Reports hub
 

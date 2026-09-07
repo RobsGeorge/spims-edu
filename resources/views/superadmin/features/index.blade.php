@@ -28,6 +28,7 @@
 
     <div class="d-flex flex-wrap gap-2 mb-4">
         <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.config') }}">{{ __('features.open_config') }}</a>
+        <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.theme.index') }}">{{ __('theme_studio.nav_studio') }}</a>
         <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.audit.index', ['action' => 'features.']) }}">{{ __('features.open_audit') }}</a>
     </div>
     <p class="small text-muted-theme mb-4">{{ __('features.open_config_help') }}</p>

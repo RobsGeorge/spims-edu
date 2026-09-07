@@ -30,7 +30,8 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertDontSee(__('people.dashboard_tile'))
             ->assertDontSee(__('audit.dashboard_tile'))
             ->assertDontSee(__('features.dashboard_tile'))
-            ->assertDontSee(__('system_settings.dashboard_tile'));
+            ->assertDontSee(__('system_settings.dashboard_tile'))
+            ->assertDontSee(__('theme_studio.dashboard_tile'));
     }
 
     #[Test]
@@ -101,9 +102,11 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee(__('superadmin.tile_roles'))
             ->assertSee(__('superadmin.tile_features'))
             ->assertSee(__('superadmin.tile_config'))
+            ->assertSee(__('superadmin.tile_theme'))
             ->assertSee(route('roles.hub'), false)
             ->assertSee(route('superadmin.features'), false)
             ->assertSee(route('superadmin.config'), false)
+            ->assertSee(route('superadmin.theme.index'), false)
             ->assertSee(__('superadmin.roadmap_title'));
 
         $this->actingAs($sa)->get(route('dashboard'))
@@ -118,7 +121,9 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee(__('features.dashboard_tile'))
             ->assertSee(route('superadmin.features'), false)
             ->assertSee(__('system_settings.dashboard_tile'))
-            ->assertSee(route('superadmin.config'), false);
+            ->assertSee(route('superadmin.config'), false)
+            ->assertSee(__('theme_studio.dashboard_tile'))
+            ->assertSee(route('superadmin.theme.index'), false);
 
         $this->actingAs($sa)->get(route('hubs.admin'))
             ->assertOk()
@@ -178,11 +183,13 @@ class ControlPlaneSafetyTest extends TestCase
     {
         $this->assertTrue(\Illuminate\Support\Facades\Route::has('superadmin.features'));
         $this->assertTrue(\Illuminate\Support\Facades\Route::has('superadmin.config'));
+        $this->assertTrue(\Illuminate\Support\Facades\Route::has('superadmin.theme.index'));
         $this->assertFalse(\Illuminate\Support\Facades\Route::has('superadmin.reports'));
         $sections = NavigationHub::superadminSections();
         $urls = collect($sections)->pluck('links')->flatten(1)->pluck('url');
         $this->assertTrue($urls->contains(fn ($url) => str_contains((string) $url, '/superadmin/features')));
         $this->assertTrue($urls->contains(fn ($url) => str_contains((string) $url, '/superadmin/config')));
+        $this->assertTrue($urls->contains(fn ($url) => str_contains((string) $url, '/superadmin/theme')));
         $this->assertFalse($urls->contains(fn ($url) => str_contains((string) $url, '/superadmin/reports')));
     }
 }

@@ -79,6 +79,7 @@ use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\SystemSettingController;
+use App\Http\Controllers\SuperAdmin\ThemeStudioController;
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\Teach\AssessmentController as TeachAssessmentController;
 use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController;
@@ -349,6 +350,30 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/config', [SystemSettingController::class, 'update'])
             ->middleware('permission:system_settings.manage')
             ->name('config.update');
+        Route::get('/theme', [ThemeStudioController::class, 'index'])
+            ->middleware('permission:theme.manage')
+            ->name('theme.index');
+        Route::post('/theme', [ThemeStudioController::class, 'store'])
+            ->middleware('permission:theme.manage')
+            ->name('theme.store');
+        Route::get('/theme/{theme}', [ThemeStudioController::class, 'edit'])
+            ->middleware('permission:theme.manage')
+            ->name('theme.edit');
+        Route::put('/theme/{theme}', [ThemeStudioController::class, 'update'])
+            ->middleware('permission:theme.manage')
+            ->name('theme.update');
+        Route::post('/theme/{theme}/duplicate', [ThemeStudioController::class, 'duplicate'])
+            ->middleware('permission:theme.manage')
+            ->name('theme.duplicate');
+        Route::post('/theme/{theme}/activate', [ThemeStudioController::class, 'activate'])
+            ->middleware('permission:theme.manage')
+            ->name('theme.activate');
+        Route::post('/theme/{theme}/reset', [ThemeStudioController::class, 'reset'])
+            ->middleware('permission:theme.manage')
+            ->name('theme.reset');
+        Route::post('/theme/{theme}/assets', [ThemeStudioController::class, 'asset'])
+            ->middleware('permission:theme.manage')
+            ->name('theme.assets');
         Route::get('/security', [SuperAdminController::class, 'security'])->name('security');
         Route::post('/sessions/flush', [SuperAdminController::class, 'flushSessions'])->name('sessions.flush');
         Route::get('/audit', [AuditExplorerController::class, 'index'])->name('audit.index');

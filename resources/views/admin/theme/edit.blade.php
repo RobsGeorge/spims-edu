@@ -5,6 +5,7 @@
 @section('content')
 <x-page-header :title="__('ui.nav_theme')" :subtitle="__('hubs.theme_desc')" />
 @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_theme')])
+@include('partials.theme-entrance-banner', ['caption' => __('theme_studio.entrance_from_theme')])
 @include('partials.config-entrance-banner', ['caption' => __('system_settings.entrance_from_theme')])
 
 @if(session('status'))
@@ -60,15 +61,15 @@
             </div>
             <div class="col-md-4">
                 <label class="form-label">{{ __('ui.logo_light_url') }}</label>
-                <input type="url" name="logo_light_url" class="form-control" value="{{ old('logo_light_url', $theme->logo_light_url) }}" placeholder="https://">
+                <input type="text" name="logo_light_url" class="form-control" value="{{ old('logo_light_url', $theme->logo_light_url) }}" placeholder="https:// or logos/…">
             </div>
             <div class="col-md-4">
                 <label class="form-label">{{ __('ui.logo_dark_url') }}</label>
-                <input type="url" name="logo_dark_url" class="form-control" value="{{ old('logo_dark_url', $theme->logo_dark_url) }}" placeholder="https://">
+                <input type="text" name="logo_dark_url" class="form-control" value="{{ old('logo_dark_url', $theme->logo_dark_url) }}" placeholder="https:// or logos/…">
             </div>
             <div class="col-md-4">
                 <label class="form-label">{{ __('ui.favicon_url') }}</label>
-                <input type="url" name="favicon_url" class="form-control" value="{{ old('favicon_url', $theme->favicon_url) }}" placeholder="https://">
+                <input type="text" name="favicon_url" class="form-control" value="{{ old('favicon_url', $theme->favicon_url) }}" placeholder="https:// or logos/…">
             </div>
             <div class="col-12">
                 <label class="form-check">

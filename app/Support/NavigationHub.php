@@ -312,7 +312,8 @@ class NavigationHub
                 'title' => __('superadmin.section_appearance'),
                 'description' => __('superadmin.section_appearance_desc'),
                 'links' => array_values(array_filter([
-                    self::superadminTile('admin.theme.edit', 'superadmin.tile_theme', 'bi-palette', 'superadmin.tile_theme_desc', 'superadmin.tile_theme_hint'),
+                    self::superadminTile('superadmin.theme.index', 'superadmin.tile_theme', 'bi-palette', 'superadmin.tile_theme_desc', 'superadmin.tile_theme_hint'),
+                    self::superadminTile('admin.theme.edit', 'superadmin.tile_theme_staff', 'bi-brush', 'superadmin.tile_theme_staff_desc', 'superadmin.tile_theme_staff_hint'),
                 ])),
             ],
             [

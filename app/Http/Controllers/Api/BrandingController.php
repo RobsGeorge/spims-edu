@@ -25,9 +25,9 @@ class BrandingController extends Controller
 
         return response()->json([
             'siteName' => $theme->site_name,
-            'logoLightUrl' => $theme->logo_light_url,
-            'logoDarkUrl' => $theme->logo_dark_url,
-            'faviconUrl' => $theme->favicon_url,
+            'logoLightUrl' => $theme->resolvedLogoLightUrl(),
+            'logoDarkUrl' => $theme->resolvedLogoDarkUrl(),
+            'faviconUrl' => $theme->resolvedFaviconUrl(),
             'tokens' => ThemeTokens::resolve($theme->tokens),
         ]);
     }

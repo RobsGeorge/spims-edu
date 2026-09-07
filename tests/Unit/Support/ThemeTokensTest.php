@@ -81,6 +81,21 @@ class ThemeTokensTest extends TestCase
     }
 
     #[Test]
+    public function editor_groups_cover_every_default_key(): void
+    {
+        $keys = ThemeTokens::keys();
+        $grouped = array_merge(...array_values(ThemeTokens::groups()));
+
+        $this->assertSame($keys, array_values(array_unique($grouped)));
+        $this->assertTrue(ThemeTokens::isColorToken('primary'));
+        $this->assertTrue(ThemeTokens::isColorToken('bg1'));
+        $this->assertFalse(ThemeTokens::isColorToken('shadow'));
+        $this->assertFalse(ThemeTokens::isColorToken('hairline'));
+        $this->assertSame('--color-primary', ThemeTokens::cssVariable('primary'));
+        $this->assertSame('--shadow-lift', ThemeTokens::cssVariable('shadowLift'));
+    }
+
+    #[Test]
     public function css_variables_map_soft_lift_and_hairline(): void
     {
         $vars = ThemeTokens::toCssVariables(ThemeTokens::defaults()['light']);

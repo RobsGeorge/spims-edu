@@ -8,6 +8,7 @@
         @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_settings')])
         @include('partials.features-entrance-banner', ['caption' => __('features.entrance_from_settings')])
         @include('partials.config-entrance-banner', ['caption' => __('system_settings.entrance_from_settings')])
+        @include('partials.theme-entrance-banner', ['caption' => __('theme_studio.entrance_from_settings')])
         @include('partials.people-entrance-banner')
 
         <form method="POST" action="{{ route('settings.picture') }}" enctype="multipart/form-data" class="app-card p-4 mb-4">

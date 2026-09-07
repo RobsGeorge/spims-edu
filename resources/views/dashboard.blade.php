@@ -197,6 +197,13 @@
                 </a>
             </div>
             <div class="col-md-6 col-lg-4">
+                <a href="{{ route('superadmin.theme.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
+                    <h3><i class="bi bi-palette" aria-hidden="true"></i> {{ __('theme_studio.dashboard_tile') }}</h3>
+                    <p class="text-muted-theme mb-0">{{ __('theme_studio.dashboard_tile_desc') }}</p>
+                    <p class="sa-tile-hint small mb-0 mt-2">{{ __('theme_studio.dashboard_tile_hint') }}</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-4">
                 <a href="{{ route('superadmin.audit.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                     <h3><i class="bi bi-journal-text" aria-hidden="true"></i> {{ __('audit.dashboard_tile') }}</h3>
                     <p class="text-muted-theme mb-0">{{ __('audit.dashboard_tile_desc') }}</p>

@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', $activeTheme?->site_name ?? 'SPIMS')</title>
     @stack('head')
-    @if(!empty($activeTheme?->favicon_url))
-        <link rel="icon" href="{{ $activeTheme->favicon_url }}">
+    @if(!empty($activeTheme?->resolvedFaviconUrl()))
+        <link rel="icon" href="{{ $activeTheme->resolvedFaviconUrl() }}">
     @endif
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,8 +49,8 @@
     $logoUrl = null;
     if ($activeTheme) {
         $logoUrl = $themeClass === 'dark'
-            ? ($activeTheme->logo_dark_url ?: $activeTheme->logo_light_url)
-            : ($activeTheme->logo_light_url ?: $activeTheme->logo_dark_url);
+            ? ($activeTheme->resolvedLogoDarkUrl() ?: $activeTheme->resolvedLogoLightUrl())
+            : ($activeTheme->resolvedLogoLightUrl() ?: $activeTheme->resolvedLogoDarkUrl());
     }
     $shellLess = request()->routeIs('home') || request()->routeIs('auth.*') || !auth()->check();
     $userInitials = '';
@@ -241,6 +241,12 @@
                                         <a class="dropdown-item" href="{{ route('superadmin.config') }}">
                                             <i class="bi bi-sliders2" aria-hidden="true"></i>
                                             {{ __('system_settings.nav_config') }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('superadmin.theme.index') }}">
+                                            <i class="bi bi-palette" aria-hidden="true"></i>
+                                            {{ __('theme_studio.nav_studio') }}
                                         </a>
                                     </li>
                                     <li>

@@ -79,14 +79,45 @@ final class ThemeTokens
     }
 
     /**
-     * Map stored/default mode tokens onto CSS custom properties.
+     * Editor groups for the Theme studio. Keys match defaults() per mode.
      *
-     * @param  array<string, string>  $tokens
+     * @return array<string, list<string>>
+     */
+    public static function groups(): array
+    {
+        return [
+            'field' => ['bg1', 'bg2', 'bg3', 'surface', 'surfaceLow', 'surfaceBorder', 'hairline'],
+            'type' => ['title', 'titleAccent', 'text', 'textMuted', 'link'],
+            'action' => ['primary', 'primaryHover', 'primaryText', 'accent', 'accentText'],
+            'nav' => ['navBg', 'navBorder', 'navText', 'navActive', 'navActiveBg'],
+            'semantic' => ['success', 'warning', 'danger'],
+            'chrome' => ['shadow', 'shadowLift'],
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function keys(): array
+    {
+        return array_keys(self::defaults()['light']);
+    }
+
+    public static function isColorToken(string $key): bool
+    {
+        $sample = self::defaults()['light'][$key] ?? '';
+
+        return is_string($sample) && (bool) preg_match('/^#[0-9A-Fa-f]{6}$/', $sample);
+    }
+
+    /**
+     * Token key → CSS custom property. Keep in sync with public/css/spims-theme.css.
+     *
      * @return array<string, string>
      */
-    public static function toCssVariables(array $tokens): array
+    public static function cssPropertyMap(): array
     {
-        $map = [
+        return [
             'bg1' => '--color-bg-1',
             'bg2' => '--color-bg-2',
             'bg3' => '--color-bg-3',
@@ -115,9 +146,23 @@ final class ThemeTokens
             'shadow' => '--shadow-soft',
             'shadowLift' => '--shadow-lift',
         ];
+    }
 
+    public static function cssVariable(string $key): ?string
+    {
+        return self::cssPropertyMap()[$key] ?? null;
+    }
+
+    /**
+     * Map stored/default mode tokens onto CSS custom properties.
+     *
+     * @param  array<string, string>  $tokens
+     * @return array<string, string>
+     */
+    public static function toCssVariables(array $tokens): array
+    {
         $vars = [];
-        foreach ($map as $key => $cssVar) {
+        foreach (self::cssPropertyMap() as $key => $cssVar) {
             if (isset($tokens[$key]) && is_string($tokens[$key]) && $tokens[$key] !== '') {
                 $vars[$cssVar] = $tokens[$key];
             }

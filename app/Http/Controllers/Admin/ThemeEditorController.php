@@ -31,9 +31,9 @@ class ThemeEditorController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:100',
             'site_name' => 'required|string|max:150',
-            'logo_light_url' => 'nullable|url|max:500',
-            'logo_dark_url' => 'nullable|url|max:500',
-            'favicon_url' => 'nullable|url|max:500',
+            'logo_light_url' => 'nullable|string|max:500',
+            'logo_dark_url' => 'nullable|string|max:500',
+            'favicon_url' => 'nullable|string|max:500',
             'is_active' => 'boolean',
             'tokens' => 'nullable|array',
             'tokens.light' => 'nullable|array',
