@@ -28,6 +28,8 @@ return [
     'no_weeks' => 'No weeks have been published yet.',
     'no_items' => 'No items in this week yet.',
     'reading_open' => 'Open reading',
+    'file_download' => 'Download',
+    'reading_link_only' => 'This file opens outside SPIMS.',
     'back_to_course' => 'Back to course',
     'completion' => 'Completion',
 ];

@@ -4,6 +4,7 @@ namespace App\Services\Offerings;
 
 use App\Enums\ContentItemType;
 use App\Enums\OfferingMode;
+use App\Support\Content\ExternalReadingUrl;
 use App\Support\Content\VideoUrlParser;
 use App\Enums\OfferingStaffRole;
 use App\Enums\OfferingStatus;
@@ -226,6 +227,7 @@ class OfferingService
         }
 
         $data = $this->applyVideoInput($data);
+        $data = $this->applyReadingUrl($data);
 
         $published = array_key_exists('published', $data) ? (bool) $data['published'] : false;
 
@@ -257,6 +259,7 @@ class OfferingService
             }
 
             $data = $this->applyVideoInput($data, $item);
+            $data = $this->applyReadingUrl($data);
 
             if (isset($data['type'])) {
                 $data['type'] = $data['type'] instanceof ContentItemType
@@ -327,14 +330,43 @@ class OfferingService
         return $data;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function applyReadingUrl(array $data): array
+    {
+        $raw = $data['file_url'] ?? null;
+        if (! is_string($raw) || $raw === '' || ! str_starts_with(strtolower($raw), 'http')) {
+            return $data;
+        }
+
+        $ref = ExternalReadingUrl::parse($raw);
+        $data['file_url'] = $ref->canonicalUrl;
+
+        return $data;
+    }
+
     private function storeItemFile(Week $week, UploadedFile $file): string
     {
-        $path = $this->storage->signedUploadPath(
-            'uploads',
-            $week->id,
-            $file->getClientOriginalExtension() ?: $file->extension()
-        );
-        $contents = $file->get() ?: '';
+        $ext = strtolower($file->getClientOriginalExtension() ?: (string) $file->extension());
+        $allowed = config('spims.content.upload_mimes', ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'gif']);
+        if (! in_array($ext, $allowed, true) || in_array($ext, ['html', 'htm', 'svg', 'js'], true)) {
+            throw ValidationException::withMessages([
+                'file' => [__('offerings.upload_type_blocked')],
+            ]);
+        }
+
+        $maxMb = max(1, (int) config('spims.content.upload_max_mb', 20));
+        if ($file->getSize() > $maxMb * 1024 * 1024) {
+            throw ValidationException::withMessages([
+                'file' => [__('offerings.upload_too_large', ['mb' => $maxMb])],
+            ]);
+        }
+
+        $path = $this->storage->signedUploadPath('uploads', $week->id, $ext);
+        $real = $file->getRealPath();
+        $contents = ($real && is_readable($real)) ? (string) file_get_contents($real) : (string) $file->get();
         $this->storage->store($path, $contents);
 
         return $path;

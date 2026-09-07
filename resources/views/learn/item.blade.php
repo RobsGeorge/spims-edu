@@ -18,7 +18,7 @@
             </div>
         </div>
 
-        @if(in_array($item->type->value, ['VIDEO', 'READING', 'TEXT'], true))
+        @if(in_array($item->type->value, ['VIDEO', 'READING', 'TEXT', 'FILE'], true))
             @if($completed)
                 <span class="badge text-bg-success">{{ __('learn.already_complete') }}</span>
             @else

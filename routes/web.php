@@ -42,6 +42,7 @@ use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CommunicationOpenController;
+use App\Http\Controllers\ContentItemFileController;
 use App\Http\Controllers\CoursePlayerController;
 use App\Http\Controllers\CredentialDownloadController;
 use App\Http\Controllers\CredentialVerifyController;
@@ -401,6 +402,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/learn/{offering}/items/{item}', [LearnController::class, 'item'])
         ->middleware('permission:offerings.view')
         ->name('learn.item');
+    Route::get('/learn/items/{item}/file', [ContentItemFileController::class, 'show'])
+        ->middleware('permission:offerings.view')
+        ->name('learn.item.file');
     Route::post('/learn/{offering}/items/{item}/complete', [LearnController::class, 'complete'])
         ->middleware('permission:offerings.view')
         ->name('learn.item.complete');
