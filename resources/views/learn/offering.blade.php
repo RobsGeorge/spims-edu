@@ -4,7 +4,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
     <div>
         <h1 class="spims-title mb-1">{{ $offering->course->code }} — {{ $offering->course->title }}</h1>
-        <p class="text-muted-theme mb-0">{{ __('offerings.mode') }}: {{ $offering->mode->value }} · {{ __('learn.progress') }}: {{ number_format($enrollment->progress_percent, 0) }}%</p>
+        <p class="text-muted-theme mb-0">{{ __('offerings.mode') }}: {{ $offering->mode->value }} · {{ __('learn.progress') }}: {{ number_format($enrollment->progress_percent ?? 0, 0) }}%</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
         @if(!empty($hasPublishedProjects))
@@ -15,6 +15,7 @@
         <a href="{{ route('enrollments.index') }}" class="btn btn-outline-secondary btn-sm">{{ __('ui.nav_enrollments') }}</a>
     </div>
 </div>
+@include('offerings.partials.student-preview-banner')
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 @error('learn')<div class="alert alert-danger">{{ $message }}</div>@enderror
 

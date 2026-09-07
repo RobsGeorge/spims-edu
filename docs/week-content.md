@@ -54,8 +54,11 @@ Student item page and the staff builder preview use `youtube-nocookie.com` or `p
 
 Both editors have Move up / Move down (POST, no JS required) and Move to another week on the same offering. `OfferingService` rewrites `order` 1..n and audits the change. Cross-offering moves are rejected.
 
+## 6. View as student (shipped)
+
+Teach and admin have **View as student**. It opens the real learn player with student gating (cohort dates, self-paced week 1 only), drafts hidden, and writes blocked. Banner + Exit. No impersonation. Audited as `learning.student_preview`.
+
 ## Later slices
 
-6. View as student
 7. Public catalog Week 1 embeds
 8. CSP headers

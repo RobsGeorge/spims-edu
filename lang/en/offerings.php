@@ -82,4 +82,8 @@ return [
     'content_moved' => 'Item moved to another week.',
     'reorder_invalid' => 'Those items do not all belong to this week.',
     'move_week_invalid' => 'You can only move an item to another week in the same offering.',
+    'view_as_student' => 'View as student',
+    'preview_banner' => 'Viewing as a student. Locks and week order match a typical enrolled student. Drafts stay hidden.',
+    'preview_exit' => 'Exit preview',
+    'preview_read_only' => 'Student preview is read-only.',
 ];

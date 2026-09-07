@@ -82,4 +82,8 @@ return [
     'content_moved' => 'Élément déplacé vers une autre semaine.',
     'reorder_invalid' => 'Ces éléments n’appartiennent pas tous à cette semaine.',
     'move_week_invalid' => 'Vous ne pouvez déplacer un élément que vers une autre semaine de la même offre.',
+    'view_as_student' => 'Voir en étudiant',
+    'preview_banner' => 'Affichage en étudiant. Les verrous et l’ordre des semaines correspondent à un étudiant inscrit. Les brouillons restent masqués.',
+    'preview_exit' => 'Quitter l’aperçu',
+    'preview_read_only' => 'L’aperçu étudiant est en lecture seule.',
 ];
