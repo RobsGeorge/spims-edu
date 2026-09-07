@@ -45,6 +45,20 @@ class SecurityHeaders
             }
         }
 
-        return 'frame-src '.implode(' ', array_unique($frames));
+        $frameSrc = implode(' ', array_unique($frames));
+
+        return implode('; ', [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com",
+            "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data:",
+            "img-src 'self' data: https:",
+            "connect-src 'self'",
+            'frame-src '.$frameSrc,
+            "object-src 'none'",
+            "base-uri 'self'",
+            "form-action 'self'",
+            "frame-ancestors 'self'",
+        ]);
     }
 }

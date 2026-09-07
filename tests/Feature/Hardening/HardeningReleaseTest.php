@@ -51,6 +51,9 @@ class HardeningReleaseTest extends TestCase
         $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
         $csp = (string) $response->headers->get('Content-Security-Policy');
+        $this->assertStringContainsString("default-src 'self'", $csp);
+        $this->assertStringContainsString("object-src 'none'", $csp);
+        $this->assertStringContainsString("base-uri 'self'", $csp);
         $this->assertStringContainsString('frame-src', $csp);
         $this->assertStringContainsString('player.vimeo.com', $csp);
         $this->assertStringContainsString('youtube-nocookie.com', $csp);
