@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ContentItemType;
 use App\Enums\VideoProvider;
 use App\Models\Concerns\HasUlids;
+use App\Support\Content\VideoUrlParser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -60,6 +61,17 @@ class ContentItem extends Model
     public function isPublished(): bool
     {
         return (bool) $this->published;
+    }
+
+    public function videoIframeUrl(): ?string
+    {
+        if (! $this->vimeo_id) {
+            return null;
+        }
+
+        $provider = $this->video_provider ?? VideoProvider::Vimeo;
+
+        return VideoUrlParser::iframeUrl($provider, $this->vimeo_id);
     }
 
     public function week(): BelongsTo

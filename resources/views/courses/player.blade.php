@@ -75,9 +75,9 @@
                                                     @endif
                                                 </div>
 
-                                                @if($item['type'] === 'VIDEO' && $item['vimeo_id'])
+                                                @if($item['type'] === 'VIDEO' && !empty($item['iframe_url']))
                                                     <div class="ratio ratio-16x9 mt-3 player-video">
-                                                        <iframe src="{{ \App\Support\VimeoEmbed::iframeUrl($item['vimeo_id']) }}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="{{ $item['title'] }}"></iframe>
+                                                        <iframe src="{{ $item['iframe_url'] }}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="{{ $item['title'] }}"></iframe>
                                                     </div>
                                                 @elseif($item['type'] === 'READING' && $item['file_url'])
                                                     <p class="mt-3 mb-0"><a href="{{ $item['file_url'] }}" target="_blank" rel="noopener">{{ $item['file_url'] }}</a></p>
