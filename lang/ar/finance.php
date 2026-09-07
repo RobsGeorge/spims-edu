@@ -58,4 +58,9 @@ return [
     'outstanding_by_currency' => 'فواتير مستحقة',
     'paid_revenue_by_currency' => 'إيرادات مدفوعة',
     'reports_empty' => 'لا مبالغ في هذه الفئة.',
+    'aging_title' => 'أعمار الفواتير',
+    'aging_0_14' => '٠–١٤ يوماً',
+    'aging_15_30' => '١٥–٣٠ يوماً',
+    'aging_31_plus' => '٣١+ يوماً',
+    'download_aging_csv' => 'تنزيل CSV للأعمار',
 ];

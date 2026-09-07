@@ -1,15 +1,11 @@
 @extends('layouts.app')
-@section('title', __('finance.reports_title'))
+@section('title', __('reports.finance_title'))
 @section('content')
 <div class="hub-page animate-in" style="max-width:1100px;margin:0 auto;">
-    <div class="mb-3">
-        <a href="{{ route('admin.finance.index') }}" class="text-decoration-none text-muted-theme">
-            {{ __('finance.admin_title') }}
-        </a>
-    </div>
-    <x-page-header :title="__('finance.reports_title')" :subtitle="__('finance.reports_desc')">
+    <x-page-header :title="__('reports.finance_title')" :subtitle="__('reports.finance_desc')">
         <x-slot:actions>
-            <a href="{{ route('admin.reports.csv', 'finance') }}" class="btn btn-primary">{{ __('finance.download_aging_csv') }}</a>
+            <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-secondary">{{ __('reports.back_hub') }}</a>
+            <a href="{{ route('admin.reports.csv', 'finance') }}" class="btn btn-primary">{{ __('reports.download_csv') }}</a>
         </x-slot:actions>
     </x-page-header>
 
@@ -38,36 +34,31 @@
         </div>
     </div>
 
-    <h2 class="h5 mb-3">{{ __('finance.aging_title') }}</h2>
-    @if(empty($aging))
-        <p class="text-muted-theme">{{ __('finance.reports_empty') }}</p>
+    <h2 class="h5 mb-3">{{ __('reports.aging_title') }}</h2>
+    @if($aging->isEmpty())
+        <x-empty-state :title="__('reports.empty')" icon="bi-table" />
     @else
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th>{{ __('reports.col_currency') }}</th>
-                        <th>{{ __('finance.aging_0_14') }}</th>
-                        <th>{{ __('finance.aging_15_30') }}</th>
-                        <th>{{ __('finance.aging_31_plus') }}</th>
-                        <th>{{ __('reports.col_outstanding') }}</th>
-                        <th>{{ __('reports.col_paid') }}</th>
+                        @foreach($headers as $header)
+                            <th>{{ $header }}</th>
+                        @endforeach
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($aging as $row)
                         <tr>
-                            <td>{{ $row['currency'] }}</td>
-                            <td>{{ $row['bucket_0_14'] }}</td>
-                            <td>{{ $row['bucket_15_30'] }}</td>
-                            <td>{{ $row['bucket_31_plus'] }}</td>
-                            <td>{{ $row['outstanding'] }}</td>
-                            <td>{{ $row['paid'] }}</td>
+                            @foreach($row as $cell)
+                                <td>{{ $cell }}</td>
+                            @endforeach
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+        {{ $aging->withQueryString()->links() }}
     @endif
 </div>
 @endsection

@@ -90,4 +90,6 @@ return [
     'certificate_templates_desc' => 'Mises en page globales et par cours.',
     'completion' => 'Achèvement',
     'completion_desc' => 'Critères, clôture et résultats de cohorte.',
+    'reports' => 'Rapports',
+    'reports_desc' => 'Effectifs, assiduité, notes, vieillissement financier et statut.',
 ];

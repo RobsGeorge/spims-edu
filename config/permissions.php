@@ -342,6 +342,15 @@ return [
         'ADMINISTRATIVE_ADMIN' => 'R',
         'ACADEMIC_ADMIN' => 'R',
     ],
+    /*
+     * School-wide registrar/finance reports. Do not add to
+     * `permission_scopes.offering_scoped`.
+     */
+    'reports.view' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+        'ACADEMIC_ADMIN' => 'R',
+        'FINANCIAL_ADMIN' => 'R',
+    ],
     'email_templates.manage' => [
         'ACADEMIC_ADMIN' => 'F',
         'INSTRUCTOR' => 'O',

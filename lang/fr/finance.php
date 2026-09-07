@@ -58,4 +58,9 @@ return [
     'outstanding_by_currency' => 'Factures en souffrance',
     'paid_revenue_by_currency' => 'Revenus encaissés',
     'reports_empty' => 'Aucun montant dans cette catégorie.',
+    'aging_title' => 'Vieillissement des factures',
+    'aging_0_14' => '0–14 jours',
+    'aging_15_30' => '15–30 jours',
+    'aging_31_plus' => '31+ jours',
+    'download_aging_csv' => 'Télécharger le CSV de vieillissement',
 ];

@@ -29,6 +29,7 @@ use App\Models\User;
 use App\Services\Assessment\AttemptService;
 use App\Services\Live\AttendanceService;
 use App\Services\Projects\ProjectGradingService;
+use App\Services\Reports\AcademicStandingService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use Illuminate\Support\Collection;
@@ -58,6 +59,7 @@ class GradebookService
         private readonly AttemptService $attempts,
         private readonly AttendanceService $attendance,
         private readonly ProjectGradingService $projects,
+        private readonly AcademicStandingService $standing,
     ) {}
 
     public function seedFromTemplate(User $actor, CourseOffering $offering, ?AssessmentTemplate $template = null): void
@@ -605,11 +607,13 @@ class GradebookService
         $credits = $records->sum('credit_hours');
         if ($credits <= 0) {
             $sp->update(['cached_gpa' => null]);
+            $this->standing->apply($sp->fresh());
 
             return;
         }
 
         $points = $records->sum(fn (AcademicRecord $r) => $r->gpa_points * $r->credit_hours);
         $sp->update(['cached_gpa' => round($points / $credits, 2)]);
+        $this->standing->apply($sp->fresh());
     }
 }

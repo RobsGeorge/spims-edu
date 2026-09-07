@@ -58,4 +58,9 @@ return [
     'outstanding_by_currency' => 'Outstanding invoices',
     'paid_revenue_by_currency' => 'Paid revenue',
     'reports_empty' => 'No amounts in this category.',
+    'aging_title' => 'Invoice aging',
+    'aging_0_14' => '0–14 days',
+    'aging_15_30' => '15–30 days',
+    'aging_31_plus' => '31+ days',
+    'download_aging_csv' => 'Download aging CSV',
 ];
