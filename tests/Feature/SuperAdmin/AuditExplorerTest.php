@@ -22,14 +22,14 @@ class AuditExplorerTest extends TestCase
             'email' => 'theme.writer@example.com',
         ]);
 
-        $suspend = $this->writeLog($sa, 'users.suspend', [
+        $suspend = $this->writeLog($sa, 'users.suspend.sa2filter', [
             'entity_type' => 'User',
             'entity_id' => $instructor->id,
             'before' => ['status' => 'ACTIVE'],
             'after' => ['status' => 'SUSPENDED'],
             'request_id' => 'req-users-1',
         ]);
-        $this->writeLog($instructor, 'theme.update', [
+        $this->writeLog($instructor, 'theme.update.sa2filter', [
             'entity_type' => 'Theme',
             'after' => ['name' => 'Sacred Academic'],
         ]);
@@ -40,15 +40,15 @@ class AuditExplorerTest extends TestCase
             ->assertSee(__('audit.filter_action_help'))
             ->assertSee(__('audit.filter_actor_help'))
             ->assertSee(__('audit.append_only'))
-            ->assertSee('users.suspend')
+            ->assertSee('users.suspend.sa2filter')
             ->assertSee(route('superadmin.audit.show', $suspend), false)
-            ->assertDontSee('theme.update')
+            ->assertDontSee('theme.update.sa2filter')
             ->assertDontSee('theme.writer@example.com');
 
         $this->actingAs($sa)->get(route('superadmin.audit.index', ['actor' => 'theme.writer']))
             ->assertOk()
-            ->assertSee('theme.update')
-            ->assertDontSee('users.suspend');
+            ->assertSee('theme.update.sa2filter')
+            ->assertDontSee('users.suspend.sa2filter');
     }
 
     #[Test]
