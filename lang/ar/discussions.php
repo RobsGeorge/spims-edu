@@ -18,4 +18,9 @@ return [
     'thread_title' => 'عنوان الموضوع',
     'opening_post' => 'المشاركة الأولى',
     'new_thread' => 'موضوع جديد',
+    'attach_file' => 'إرفاق ملف',
+    'attachments' => 'المرفقات',
+    'download' => 'تنزيل',
+    'invalid_attachment' => 'هذا المرفق غير صالح.',
+    'file_type_not_allowed' => 'نوع الملف غير مسموح.',
 ];

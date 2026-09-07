@@ -50,7 +50,7 @@ The full suite went from 124 to 178 passing on S0/S1, to **212** after S2 and S3
 [`implementation-plan.md`](implementation-plan.md), sequencing in
 [`execution-order.md`](execution-order.md).
 
-Still parked: Reverb (polling already works), WhatsApp driver, lockdown browser, native apps, and `gradebook.reopen` on the instructor API (Academic Admin, web only).
+Still parked: Reverb (polling already works), WhatsApp driver, lockdown browser, and native apps. `gradebook.reopen` on the instructor API and applicant `WITHDRAWN` already landed (`e50faa8` and after).
 
 ## Two things S0 changed for every phase after it
 

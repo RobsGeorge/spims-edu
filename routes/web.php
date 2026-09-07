@@ -533,6 +533,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/discussions/threads/{thread}/posts', [DiscussionController::class, 'storePost'])
         ->middleware('permission:discussions.post')
         ->name('discussions.posts.store');
+    Route::get('/discussions/posts/{post}/attachments/{index}', [DiscussionController::class, 'downloadAttachment'])
+        ->whereNumber('index')
+        ->name('discussions.posts.attachment');
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');

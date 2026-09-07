@@ -18,4 +18,9 @@ return [
     'thread_title' => 'Thread title',
     'opening_post' => 'Opening post',
     'new_thread' => 'New thread',
+    'attach_file' => 'Attach file',
+    'attachments' => 'Attachments',
+    'download' => 'Download',
+    'invalid_attachment' => 'This attachment is not valid.',
+    'file_type_not_allowed' => 'This file type is not allowed.',
 ];
