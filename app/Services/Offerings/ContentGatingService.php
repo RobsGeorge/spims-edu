@@ -29,12 +29,15 @@ class ContentGatingService
             'week_one' => $weeks->firstWhere('number', 1)?->items
                 ->filter(fn ($item) => $item->isPublished())
                 ->map(fn ($item) => [
-                'type' => $item->type->value,
-                'title' => $item->title,
-                'vimeo_id' => $item->vimeo_id,
-                'body' => $item->body,
-                'file_url' => $item->file_url,
-            ])->all() ?? [],
+                    'id' => $item->id,
+                    'type' => $item->type->value,
+                    'title' => $item->title,
+                    'vimeo_id' => $item->vimeo_id,
+                    'iframe_url' => $item->videoIframeUrl(),
+                    'body' => $item->body,
+                    'file_url' => $item->isRemoteFile() ? $item->file_url : null,
+                    'has_stored_file' => $item->isStoredFile(),
+                ])->all() ?? [],
         ];
     }
 

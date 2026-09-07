@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContentItem;
+use App\Models\CourseOffering;
 use App\Services\Learning\OfferingAccessService;
 use App\Services\Offerings\LearningAccessService;
 use App\Services\Offerings\LearningProgressService;
@@ -42,10 +43,25 @@ class ContentItemFileController extends Controller
             abort(403, __('offerings.download_disabled'));
         }
 
-        abort_unless($this->storage->exists($item->file_url), 404);
+        return $this->stream($item, $download);
+    }
+
+    public function publicPreview(CourseOffering $offering, ContentItem $item): StreamedResponse
+    {
+        $item->loadMissing('week.offering');
+        $week = $item->week;
+        abort_unless($week !== null && $week->offering_id === $offering->id, 404);
+        abort_unless($week->number === 1 && $item->isPublished() && $item->isStoredFile(), 404);
+
+        return $this->stream($item, false);
+    }
+
+    private function stream(ContentItem $item, bool $download): StreamedResponse
+    {
+        abort_unless($this->storage->exists((string) $item->file_url), 404);
 
         $mime = $this->mimeFor($item);
-        $name = basename($item->file_url);
+        $name = basename((string) $item->file_url);
         $disposition = ($download ? 'attachment' : 'inline').'; filename="'.$name.'"';
 
         return response()->stream(function () use ($item) {

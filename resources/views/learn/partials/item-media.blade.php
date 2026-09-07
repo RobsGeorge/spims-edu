@@ -1,8 +1,9 @@
 @php
     use App\Enums\ContentItemType;
     $type = $item->type instanceof ContentItemType ? $item->type->value : (string) $item->type;
-    $canDownload = (bool) config('spims.content.student_file_download', true);
+    $canDownload = (bool) config('spims.content.student_file_download', true) && empty($hideDownload);
     $remote = $item->remoteReading();
+    $storedUrl = $storedFileUrl ?? ($item->isStoredFile() ? route('learn.item.file', $item) : null);
 @endphp
 @if($type === 'VIDEO' && $item->videoIframeUrl())
     <div class="ratio ratio-16x9 mb-3 player-video">
@@ -15,13 +16,13 @@
     @if($item->isStoredFile())
         @if($item->isStoredPdf())
             <div class="ratio ratio-4x3 mb-3">
-                <iframe src="{{ route('learn.item.file', $item) }}" title="{{ $item->title }}"></iframe>
+                <iframe src="{{ $storedUrl }}" title="{{ $item->title }}"></iframe>
             </div>
         @elseif($item->isStoredImage())
-            <img src="{{ route('learn.item.file', $item) }}" alt="{{ $item->title }}" class="img-fluid rounded mb-3">
+            <img src="{{ $storedUrl }}" alt="{{ $item->title }}" class="img-fluid rounded mb-3">
         @endif
-        @if($canDownload)
-            <a class="btn btn-outline-primary" href="{{ route('learn.item.file', ['item' => $item, 'download' => 1]) }}">{{ __('learn.file_download') }}</a>
+        @if($canDownload && $storedUrl)
+            <a class="btn btn-outline-primary" href="{{ $storedUrl }}{{ str_contains($storedUrl, '?') ? '&' : '?' }}download=1">{{ __('learn.file_download') }}</a>
         @endif
     @elseif($remote)
         @if($remote->embeddable)
