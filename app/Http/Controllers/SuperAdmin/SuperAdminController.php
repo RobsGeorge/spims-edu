@@ -119,6 +119,8 @@ class SuperAdminController extends Controller
         $tasks = [
             ['command' => 'assessments:auto-submit-expired', 'schedule' => __('superadmin.schedule_every_minute')],
             ['command' => 'live:send-reminders', 'schedule' => __('superadmin.schedule_every_five')],
+            ['command' => 'communications:fire-reminders', 'schedule' => __('superadmin.schedule_every_minute')],
+            ['command' => 'finance:dunning-overdue-installments', 'schedule' => __('superadmin.schedule_daily')],
             ['command' => 'spims:backup-database', 'schedule' => __('superadmin.schedule_daily_0230')],
         ];
 

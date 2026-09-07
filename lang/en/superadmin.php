@@ -49,6 +49,7 @@ return [
     'schedule_every_minute' => 'Every minute',
     'schedule_every_five' => 'Every five minutes',
     'schedule_daily_0230' => 'Daily at 02:30',
+    'schedule_daily' => 'Daily',
     'actor' => 'Actor',
     'action' => 'Action',
     'entity' => 'Entity',

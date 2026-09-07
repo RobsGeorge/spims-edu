@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\PaymentStatus;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\PaymentPlanInstallment;
+use App\Services\Finance\PaymentPlanService;
 use App\Services\Finance\PaymentService;
 use App\Services\Finance\ReceiptPdfService;
 use App\Services\Finance\WalletService;
@@ -21,7 +23,7 @@ class FinanceController extends Controller
 
         $invoices = Invoice::query()
             ->where('student_id', $user->id)
-            ->with(['lines', 'payments.refunds'])
+            ->with(['lines', 'payments.refunds', 'paymentPlans.installments'])
             ->latest()
             ->paginate(15, ['*'], 'invoices')
             ->withQueryString();
@@ -48,7 +50,7 @@ class FinanceController extends Controller
     {
         abort_unless($invoice->student_id === $request->user()->id || $request->user()->isSuperAdmin(), 403);
 
-        $invoice->load(['lines', 'payments.refunds', 'enrollment.offering.course']);
+        $invoice->load(['lines', 'payments.refunds', 'enrollment.offering.course', 'paymentPlans.installments']);
 
         foreach ($invoice->payments as $payment) {
             if ($payment->status === PaymentStatus::Completed) {
@@ -57,13 +59,36 @@ class FinanceController extends Controller
         }
 
         return view('finance.invoice', [
-            'invoice' => $invoice->fresh(['lines', 'payments.refunds', 'enrollment.offering.course']),
+            'invoice' => $invoice->fresh(['lines', 'payments.refunds', 'enrollment.offering.course', 'paymentPlans.installments']),
             'wallet' => app(WalletService::class)->ensureWallet($request->user()),
         ]);
     }
 
-    public function checkout(Request $request, Invoice $invoice, PaymentService $payments): RedirectResponse
+    public function storePaymentPlan(Request $request, Invoice $invoice, PaymentPlanService $plans): RedirectResponse
     {
+        $data = $request->validate([
+            'installment_count' => 'required|integer|min:2|max:12',
+            'start_on' => 'nullable|date',
+        ]);
+
+        $plans->create(
+            $request->user(),
+            $invoice,
+            (int) $data['installment_count'],
+            isset($data['start_on']) ? \Illuminate\Support\Carbon::parse($data['start_on']) : null
+        );
+
+        return back()->with('status', __('finance.plan_created'));
+    }
+
+    public function payInstallment(
+        Request $request,
+        Invoice $invoice,
+        PaymentPlanInstallment $installment,
+        PaymentService $payments,
+    ): RedirectResponse {
+        abort_unless($installment->payment_plan_id === $invoice->openPaymentPlan()?->id, 404);
+
         $data = $request->validate([
             'wallet_money' => 'nullable|integer|min:0',
             'wallet_points' => 'nullable|integer|min:0',
@@ -74,6 +99,27 @@ class FinanceController extends Controller
             'wallet_money' => (int) ($data['wallet_money'] ?? 0),
             'wallet_points' => (int) ($data['wallet_points'] ?? 0),
             'gateway' => $data['gateway'] ?? null,
+            'amount_minor' => $installment->amount_minor,
+            'installment_id' => $installment->id,
+        ]);
+
+        return redirect()->route('finance.invoices.show', $invoice)->with('status', __('finance.payment_success'));
+    }
+
+    public function checkout(Request $request, Invoice $invoice, PaymentService $payments): RedirectResponse
+    {
+        $data = $request->validate([
+            'wallet_money' => 'nullable|integer|min:0',
+            'wallet_points' => 'nullable|integer|min:0',
+            'gateway' => 'nullable|string',
+            'amount_minor' => 'nullable|integer|min:1',
+        ]);
+
+        $payments->checkout($request->user(), $invoice, [
+            'wallet_money' => (int) ($data['wallet_money'] ?? 0),
+            'wallet_points' => (int) ($data['wallet_points'] ?? 0),
+            'gateway' => $data['gateway'] ?? null,
+            'amount_minor' => isset($data['amount_minor']) ? (int) $data['amount_minor'] : $invoice->amountDue(),
         ]);
 
         return redirect()->route('finance.index')->with('status', __('finance.payment_success'));
