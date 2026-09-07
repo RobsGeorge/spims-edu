@@ -122,29 +122,7 @@
             <div class="col-md-1"><button class="btn btn-primary w-100">+</button></div>
         </form>
 
-        @foreach($offering->weeks as $week)
-            <div class="border rounded p-3 mb-3">
-                <h3 class="h6">Week {{ $week->number }} — {{ $week->title }}</h3>
-                <form method="POST" action="{{ route('admin.weeks.items', $week) }}" class="row g-2 mb-2">
-                    @csrf
-                    <div class="col-md-2">
-                        <select name="type" class="form-select form-select-sm" required>
-                            @foreach($contentTypes as $type)<option value="{{ $type->value }}">{{ $type->value }}</option>@endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-3"><input name="title" class="form-control form-control-sm" placeholder="{{ __('academics.title') }}" required></div>
-                    <div class="col-md-2"><input name="vimeo_id" class="form-control form-control-sm" placeholder="Vimeo ID"></div>
-                    <div class="col-md-3"><input name="file_url" class="form-control form-control-sm" placeholder="PDF URL"></div>
-                    <div class="col-md-2"><button class="btn btn-sm btn-outline-primary w-100">{{ __('offerings.add_item') }}</button></div>
-                    <div class="col-12"><textarea name="body" class="form-control form-control-sm" rows="2" placeholder="{{ __('offerings.text_body') }}"></textarea></div>
-                </form>
-                <ul class="mb-0 small">
-                    @foreach($week->items as $item)
-                        <li>{{ $item->type->value }}: {{ $item->title }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endforeach
+        @include('offerings.partials.week-content-builder', ['offering' => $offering, 'contentTypes' => $contentTypes])
     </div>
 </div>
 @endsection

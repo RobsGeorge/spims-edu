@@ -57,7 +57,12 @@ class CoursePlayerService
                 'unlocked' => $unlocked,
                 'completed' => in_array($week->number, $completed, true),
                 'items' => $unlocked
-                    ? $week->items->sortBy('order')->values()->map(fn ($item) => $this->mapItem($item, $offering, $offeringAssessments))->all()
+                    ? $week->items
+                        ->when(! $isStaff, fn ($items) => $items->filter(fn ($item) => $item->isPublished()))
+                        ->sortBy('order')
+                        ->values()
+                        ->map(fn ($item) => $this->mapItem($item, $offering, $offeringAssessments))
+                        ->all()
                     : [],
             ];
         })->all();

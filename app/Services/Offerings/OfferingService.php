@@ -224,14 +224,19 @@ class OfferingService
             $data['file_url'] = $this->storeItemFile($week, $file);
         }
 
+        $published = array_key_exists('published', $data) ? (bool) $data['published'] : false;
+
         return $this->audit->withAudit($actor, 'offerings.add_content', fn () => ContentItem::query()->create([
             'week_id' => $week->id,
             'type' => ContentItemType::from($data['type']),
             'title' => $data['title'],
             'order' => $data['order'] ?? (($week->items()->max('order') ?? 0) + 1),
             'vimeo_id' => $data['vimeo_id'] ?? null,
+            'video_provider' => $data['video_provider'] ?? null,
             'file_url' => $data['file_url'] ?? null,
             'body' => $data['body'] ?? null,
+            'published' => $published,
+            'published_at' => $published ? now() : null,
         ]), 'ContentItem');
     }
 
@@ -255,8 +260,33 @@ class OfferingService
             }
 
             $item->fill(array_intersect_key($data, array_flip([
-                'type', 'title', 'order', 'vimeo_id', 'file_url', 'body',
+                'type', 'title', 'order', 'vimeo_id', 'video_provider', 'file_url', 'body',
             ])));
+            $item->save();
+
+            return $item->fresh();
+        }, 'ContentItem');
+    }
+
+    public function publishContentItem(User $actor, ContentItem $item): ContentItem
+    {
+        $this->authorize->authorize($actor, 'offerings.content', $item);
+
+        return $this->audit->withAudit($actor, 'offerings.publish_content', function () use ($item) {
+            $item->published = true;
+            $item->published_at = $item->published_at ?? now();
+            $item->save();
+
+            return $item->fresh();
+        }, 'ContentItem');
+    }
+
+    public function unpublishContentItem(User $actor, ContentItem $item): ContentItem
+    {
+        $this->authorize->authorize($actor, 'offerings.content', $item);
+
+        return $this->audit->withAudit($actor, 'offerings.unpublish_content', function () use ($item) {
+            $item->published = false;
             $item->save();
 
             return $item->fresh();
