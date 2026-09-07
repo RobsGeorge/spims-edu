@@ -7,7 +7,7 @@
 @endphp
 @if($type === 'VIDEO' && $item->videoIframeUrl())
     <div class="ratio ratio-16x9 mb-3 player-video">
-        <iframe src="{{ $item->videoIframeUrl() }}" allowfullscreen allow="autoplay; fullscreen; picture-in-picture" title="{{ $item->title }}"></iframe>
+        <iframe src="{{ $item->videoIframeUrl() }}" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups" allowfullscreen allow="autoplay; fullscreen; picture-in-picture" title="{{ $item->title }}"></iframe>
     </div>
     @if($item->body)<div class="mb-0">{!! nl2br(e($item->body)) !!}</div>@endif
 @elseif(in_array($type, ['READING', 'FILE'], true))
@@ -16,7 +16,7 @@
     @if($item->isStoredFile())
         @if($item->isStoredPdf())
             <div class="ratio ratio-4x3 mb-3">
-                <iframe src="{{ $storedUrl }}" title="{{ $item->title }}"></iframe>
+                <iframe src="{{ $storedUrl }}" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups" title="{{ $item->title }}"></iframe>
             </div>
         @elseif($item->isStoredImage())
             <img src="{{ $storedUrl }}" alt="{{ $item->title }}" class="img-fluid rounded mb-3">
@@ -27,7 +27,7 @@
     @elseif($remote)
         @if($remote->embeddable)
             <div class="ratio ratio-4x3 mb-3">
-                <iframe src="{{ $remote->canonicalUrl }}" title="{{ $item->title }}"></iframe>
+                <iframe src="{{ $remote->canonicalUrl }}" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups" title="{{ $item->title }}"></iframe>
             </div>
             <a class="btn btn-outline-primary" href="{{ $remote->canonicalUrl }}" target="_blank" rel="noopener">{{ __('learn.reading_open') }}</a>
         @else
