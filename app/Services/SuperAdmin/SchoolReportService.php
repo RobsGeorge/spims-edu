@@ -262,9 +262,9 @@ class SchoolReportService
 
         foreach ($grouped as $row) {
             $rows[] = [
-                (string) $row->role,
-                (string) $row->status,
-                (string) ($row->locale ?: '—'),
+                $this->scalar($row->role),
+                $this->scalar($row->status),
+                $this->scalar($row->locale),
                 (string) (int) $row->total,
             ];
         }
@@ -487,8 +487,8 @@ class SchoolReportService
         $rows = [];
         foreach ($grouped as $row) {
             $rows[] = [
-                (string) ($row->form_name ?: '—'),
-                (string) $row->status,
+                $this->scalar($row->form_name),
+                $this->scalar($row->status),
                 (string) (int) $row->total,
             ];
         }
@@ -549,10 +549,10 @@ class SchoolReportService
         $rows = [];
         foreach ($grouped as $row) {
             $rows[] = [
-                (string) $row->course_code,
-                (string) $row->course_title,
-                (string) $row->offering_id,
-                (string) $row->status,
+                $this->scalar($row->course_code),
+                $this->scalar($row->course_title),
+                $this->scalar($row->offering_id),
+                $this->scalar($row->status),
                 (string) (int) $row->total,
             ];
         }
@@ -684,9 +684,11 @@ class SchoolReportService
         foreach ($grouped as $row) {
             $count = (int) $row->total;
             $total += $count;
-            $channel = is_object($row->channel) ? $row->channel->value : (string) $row->channel;
-            $status = is_object($row->status) ? $row->status->value : (string) $row->status;
-            $rows[] = [$channel, $status, (string) $count];
+            $rows[] = [
+                $this->scalar($row->channel),
+                $this->scalar($row->status),
+                (string) $count,
+            ];
         }
 
         return [
@@ -819,6 +821,18 @@ class SchoolReportService
         }
 
         return Money::fromMinor($minor, $enum)->format();
+    }
+
+    private function scalar(mixed $value, string $empty = '—'): string
+    {
+        if ($value instanceof \BackedEnum) {
+            return (string) $value->value;
+        }
+        if ($value === null || $value === '') {
+            return $empty;
+        }
+
+        return (string) $value;
     }
 
     private function isDate(string $value): bool

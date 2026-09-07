@@ -50,6 +50,14 @@ class SchoolReportTest extends TestCase
         $this->actingAs($adm)->get(route('superadmin.reports'))->assertForbidden();
         $this->actingAs($student)->get(route('superadmin.reports.show', 'census'))->assertForbidden();
         $this->actingAs($adm)->get(route('superadmin.reports.csv', 'finance'))->assertForbidden();
+
+        $service = app(SchoolReportService::class);
+        foreach (SchoolReportService::SLUGS as $slug) {
+            if (! $service->isAvailable($slug)) {
+                continue;
+            }
+            $this->actingAs($sa)->get(route('superadmin.reports.show', $slug))->assertOk();
+        }
     }
 
     #[Test]
