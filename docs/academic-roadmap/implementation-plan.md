@@ -4,6 +4,10 @@
 **Closes:** gaps G-01 … G-20 from [`gap-analysis.md`](gap-analysis.md)
 **Companion:** [`mobile-api-spec.md`](mobile-api-spec.md) defines the wire contract this plan builds.
 
+### Status vs this audit (2026-09-07)
+
+Against `main` @ `1c21d61`, S0–S8, S6 Wave E, and the S9 domain (events + live quiz on polling) are already on `main`. Headings for S4, S5, S6, S7, and S9 below still read as in-progress; that is docs drift, not missing code. Leftover `cursor/s4*`–`s8*` remotes are ancestors with nothing to cherry-pick — see [`s-branch-reconciliation.md`](s-branch-reconciliation.md). Still open: Reverb, WhatsApp driver, lockdown browser, native apps, and `gradebook.reopen` on the instructor API.
+
 ---
 
 ## 0. Ground rules

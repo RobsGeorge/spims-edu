@@ -6,6 +6,10 @@ sequence and the exit criteria.
 
 **Status:** S0–S8 and S6 Wave E are complete and verified — see [`README.md`](README.md). S9 domain (events + live quiz) shipped with polling; Reverb is still optional.
 
+### Status vs this audit (2026-09-07)
+
+Confirmed on `main` @ `1c21d61`. The `cursor/s4*`–`s8*` remotes listed in [`s-branch-reconciliation.md`](s-branch-reconciliation.md) are ancestors of main (0 commits ahead). Do not re-run S4–S8 or S6E as new implementation. Still open here: Reverb only.
+
 ---
 
 ## The rule that sets the order
