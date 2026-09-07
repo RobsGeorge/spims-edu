@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Program;
 use App\Services\Reports\AcademicStandingService;
 use App\Services\Reports\ReportService;
 use App\Support\AuthorizeService;
@@ -79,8 +80,14 @@ class ReportController extends Controller
     {
         $this->authorize->authorize($request->user(), 'academic_standing.manage');
 
+        $programs = Program::query()->where('active', true)->orderBy('code')->get();
+
         return view('admin.reports.standing-thresholds', [
             'thresholds' => $this->standing->thresholds(),
+            'programThresholds' => $programs->map(fn (Program $program) => [
+                'program' => $program,
+                'thresholds' => $this->standing->thresholdsFor($program),
+            ]),
         ]);
     }
 

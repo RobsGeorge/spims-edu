@@ -27,6 +27,8 @@ class Program extends Model
         'signatory_title',
         'grading_scheme_id',
         'active',
+        'standing_good_min',
+        'standing_suspension_below',
     ];
 
     protected $casts = [
@@ -37,6 +39,7 @@ class Program extends Model
         'max_semesters_to_graduate' => 'integer',
         'elective_credits_required' => 'integer',
         'active' => 'boolean',
+        // Nullable override columns stay uncast — Laravel's integer cast turns null into 0.
     ];
 
     public function gradingScheme(): BelongsTo
