@@ -90,4 +90,6 @@ return [
     'certificate_templates_desc' => 'Course and global certificate layouts.',
     'completion' => 'Completion',
     'completion_desc' => 'Criteria, closing workflow, and cohort results.',
+    'reports' => 'Reports',
+    'reports_desc' => 'Headcount, attendance, grades, finance aging, and standing.',
 ];

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AcademicStanding;
 use App\Enums\StudentProgramStatus;
 use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,7 @@ class StudentProgram extends Model
         'enrolled_at',
         'completed_at',
         'cached_gpa',
+        'academic_standing',
     ];
 
     protected $casts = [
@@ -28,6 +30,7 @@ class StudentProgram extends Model
         'enrolled_at' => 'datetime',
         'completed_at' => 'datetime',
         'cached_gpa' => 'float',
+        'academic_standing' => AcademicStanding::class,
     ];
 
     public function student(): BelongsTo

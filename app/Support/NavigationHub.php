@@ -111,7 +111,7 @@ class NavigationHub
                 'label' => __('hubs.nav_academic'),
                 'route' => 'hubs.academic',
                 'icon' => 'bi-mortarboard',
-                'active' => request()->routeIs('hubs.academic') || request()->routeIs('admin.programs.*') || request()->routeIs('admin.courses.*') || request()->routeIs('admin.offerings.*'),
+                'active' => request()->routeIs('hubs.academic') || request()->routeIs('admin.programs.*') || request()->routeIs('admin.courses.*') || request()->routeIs('admin.offerings.*') || request()->routeIs('admin.reports.*'),
             ];
         }
 
@@ -217,6 +217,7 @@ class NavigationHub
             self::link('admin.email-templates.index', 'hubs.email_templates', 'bi-file-earmark-text', 'hubs.email_templates_desc'),
             self::link('admin.certificate-templates.index', 'hubs.certificate_templates', 'bi-award', 'hubs.certificate_templates_desc'),
             self::link('admin.surveys.index', 'staff.surveys.hub', 'bi-clipboard-data', 'staff.surveys.hub_desc'),
+            self::link('admin.reports.index', 'hubs.reports', 'bi-file-earmark-bar-graph', 'hubs.reports_desc'),
         ]));
     }
 
@@ -237,6 +238,7 @@ class NavigationHub
             self::link('admin.applications.index', 'hubs.applications', 'bi-inbox', 'hubs.applications_desc'),
             self::link('admin.communications.report', 'hubs.communications', 'bi-envelope-paper', 'hubs.communications_desc'),
             self::link('admin.events.index', 'staff.events.hub', 'bi-calendar-event', 'staff.events.hub_desc'),
+            self::link('admin.reports.index', 'hubs.reports', 'bi-file-earmark-bar-graph', 'hubs.reports_desc'),
         ]));
     }
 
@@ -253,6 +255,7 @@ class NavigationHub
         if (self::hasFinanceAdmin($user)) {
             $links[] = self::link('admin.finance.index', 'hubs.finance_admin', 'bi-cash-stack', 'hubs.finance_admin_desc');
             $links[] = self::link('admin.finance.reports', 'hubs.finance_reports', 'bi-graph-up', 'hubs.finance_reports_desc');
+            $links[] = self::link('admin.reports.index', 'hubs.reports', 'bi-file-earmark-bar-graph', 'hubs.reports_desc');
         }
 
         return array_values(array_filter($links));

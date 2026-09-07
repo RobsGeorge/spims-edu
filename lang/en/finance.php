@@ -66,4 +66,9 @@ return [
     'refund_amount_invalid' => 'Refund amount must be a positive integer within the payment.',
     'refund_not_completed' => 'Only completed payments can be refunded.',
     'refund_already_requested' => 'A refund is already requested or completed for this payment.',
+    'aging_title' => 'Invoice aging',
+    'aging_0_14' => '0–14 days',
+    'aging_15_30' => '15–30 days',
+    'aging_31_plus' => '31+ days',
+    'download_aging_csv' => 'Download aging CSV',
 ];

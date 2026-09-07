@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\OfferingClosingController;
 use App\Http\Controllers\Admin\ContentItemController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SemesterController;
 use App\Http\Controllers\Admin\SurveyController as AdminSurveyController;
 use App\Http\Controllers\Admin\ThemeEditorController;
@@ -785,6 +786,25 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/finance/refunds/{refund}/approve', [FinanceAdminController::class, 'approveRefund'])
             ->middleware('permission:finance.refunds')
             ->name('finance.refunds.approve');
+
+        // #15 reports + standing
+        Route::get('/reports', [ReportController::class, 'index'])
+            ->name('reports.index');
+        Route::get('/reports/headcount', [ReportController::class, 'headcount'])
+            ->name('reports.headcount');
+        Route::get('/reports/admissions', [ReportController::class, 'admissions'])
+            ->name('reports.admissions');
+        Route::get('/reports/attendance', [ReportController::class, 'attendance'])
+            ->name('reports.attendance');
+        Route::get('/reports/grades', [ReportController::class, 'grades'])
+            ->name('reports.grades');
+        Route::get('/reports/finance', [ReportController::class, 'finance'])
+            ->name('reports.finance');
+        Route::get('/reports/standing', [ReportController::class, 'standing'])
+            ->name('reports.standing');
+        Route::get('/reports/{report}/csv', [ReportController::class, 'csv'])
+            ->where('report', 'headcount|admissions|attendance|grades|finance|standing')
+            ->name('reports.csv');
 
         Route::get('/courses/{course}/banks', [AssessmentAdminController::class, 'banksIndex'])
             ->middleware('permission:questions.manage')
