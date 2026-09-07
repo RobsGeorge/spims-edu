@@ -371,6 +371,7 @@ class OfferingService
     public function moveContentItemByDelta(User $actor, ContentItem $item, int $delta): void
     {
         $item->loadMissing('week');
+        $this->authorize->authorize($actor, 'offerings.content', $item);
         $week = $item->week;
         abort_unless($week !== null, 404);
 

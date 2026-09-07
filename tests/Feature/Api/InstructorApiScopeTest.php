@@ -89,6 +89,11 @@ class InstructorApiScopeTest extends TestCase
             'POST teach week items' => ['POST', '/api/v1/teach/weeks/{week}/items', 403],
             'PUT teach content item' => ['PUT', '/api/v1/teach/items/{contentItem}', 403],
             'DELETE teach content item' => ['DELETE', '/api/v1/teach/items/{contentItem}', 403],
+            'POST teach content publish' => ['POST', '/api/v1/teach/items/{contentItem}/publish', 403],
+            'POST teach content unpublish' => ['POST', '/api/v1/teach/items/{contentItem}/unpublish', 403],
+            'POST teach content move-up' => ['POST', '/api/v1/teach/items/{contentItem}/move-up', 403],
+            'POST teach content move-down' => ['POST', '/api/v1/teach/items/{contentItem}/move-down', 403],
+            'POST teach content move' => ['POST', '/api/v1/teach/items/{contentItem}/move', 403],
         ];
     }
 
@@ -267,6 +272,9 @@ class InstructorApiScopeTest extends TestCase
             ],
             '/api/v1/teach/items/{contentItem}' => [
                 'title' => 'Hijack',
+            ],
+            '/api/v1/teach/items/{contentItem}/move' => [
+                'week_id' => $ids['week'],
             ],
             default => in_array($method, ['POST', 'PUT'], true) ? [] : [],
         };

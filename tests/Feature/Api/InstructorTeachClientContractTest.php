@@ -85,6 +85,11 @@ class InstructorTeachClientContractTest extends TestCase
             'POST /api/v1/teach/weeks/{week}/items',
             'PUT /api/v1/teach/items/{contentItem}',
             'DELETE /api/v1/teach/items/{contentItem}',
+            'POST /api/v1/teach/items/{contentItem}/publish',
+            'POST /api/v1/teach/items/{contentItem}/unpublish',
+            'POST /api/v1/teach/items/{contentItem}/move-up',
+            'POST /api/v1/teach/items/{contentItem}/move-down',
+            'POST /api/v1/teach/items/{contentItem}/move',
         ];
     }
 

@@ -310,6 +310,16 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
                 ->name('items.update');
             Route::delete('/items/{contentItem}', [TeachContentController::class, 'destroyItem'])
                 ->name('items.destroy');
+            Route::post('/items/{contentItem}/publish', [TeachContentController::class, 'publishItem'])
+                ->name('items.publish');
+            Route::post('/items/{contentItem}/unpublish', [TeachContentController::class, 'unpublishItem'])
+                ->name('items.unpublish');
+            Route::post('/items/{contentItem}/move-up', [TeachContentController::class, 'moveItemUp'])
+                ->name('items.move-up');
+            Route::post('/items/{contentItem}/move-down', [TeachContentController::class, 'moveItemDown'])
+                ->name('items.move-down');
+            Route::post('/items/{contentItem}/move', [TeachContentController::class, 'moveItem'])
+                ->name('items.move');
         });
     });
 });
