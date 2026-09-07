@@ -76,6 +76,9 @@ class ThemeStudioController extends Controller
         }
 
         $data = $request->validate($rules);
+        if ($request->exists('tokens')) {
+            $data['tokens'] = $request->input('tokens');
+        }
         unset($data['is_active']);
         $themes->update($request->user(), $theme, $data);
 
