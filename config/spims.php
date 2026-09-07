@@ -25,7 +25,7 @@ return [
             ))
         ))),
         'allow_unknown_reading_urls' => filter_var(
-            env('SPIMS_ALLOW_UNKNOWN_READING_URLS', true),
+            env('SPIMS_ALLOW_UNKNOWN_READING_URLS', false),
             FILTER_VALIDATE_BOOLEAN
         ),
         'upload_max_mb' => (int) env('SPIMS_UPLOAD_MAX_MB', 20),

@@ -21,7 +21,7 @@ Superadmin env (defaults; no settings screen):
 
 - `SPIMS_VIDEO_PROVIDERS=VIMEO,YOUTUBE`
 - `SPIMS_READING_EMBED_HOSTS=...`
-- `SPIMS_ALLOW_UNKNOWN_READING_URLS=true`
+- `SPIMS_ALLOW_UNKNOWN_READING_URLS=false` — unknown HTTPS hosts are rejected; Drive, Dropbox, and OneDrive remain embeddable via `reading_embed_hosts`
 - `SPIMS_UPLOAD_MAX_MB=20`
 - `SPIMS_UPLOAD_MIMES=pdf,jpg,jpeg,png,webp,gif`
 - `SPIMS_STUDENT_FILE_DOWNLOAD=true`
