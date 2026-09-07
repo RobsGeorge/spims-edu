@@ -33,9 +33,9 @@ else
   echo "No .env — skipping key:generate (tests use .env.testing)" >&2
 fi
 
-# SQLite test DB
-touch database/database.sqlite
-php artisan migrate --seed --env=testing >&2
+# Tests use in-memory SQLite configured in phpunit.xml — RefreshDatabase handles migration per test.
+# Only create the SQLite file if a persistent test DB is needed (it is not needed here).
+touch database/database.sqlite 2>/dev/null || true
 
 # Write the step ID so verify-step.sh knows what to validate
 mkdir -p .claude
