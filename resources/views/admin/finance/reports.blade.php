@@ -39,35 +39,35 @@
     </div>
 
     <h2 class="h5 mb-3">{{ __('finance.aging_title') }}</h2>
-    @if(empty($aging))
-        <p class="text-muted-theme">{{ __('finance.reports_empty') }}</p>
-    @else
-        <div class="table-responsive">
-            <table class="table align-middle">
-                <thead>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>{{ __('reports.col_currency') }}</th>
+                    <th>{{ __('finance.aging_0_14') }}</th>
+                    <th>{{ __('finance.aging_15_30') }}</th>
+                    <th>{{ __('finance.aging_31_plus') }}</th>
+                    <th>{{ __('reports.col_outstanding') }}</th>
+                    <th>{{ __('reports.col_paid') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($aging as $row)
                     <tr>
-                        <th>{{ __('reports.col_currency') }}</th>
-                        <th>{{ __('finance.aging_0_14') }}</th>
-                        <th>{{ __('finance.aging_15_30') }}</th>
-                        <th>{{ __('finance.aging_31_plus') }}</th>
-                        <th>{{ __('reports.col_outstanding') }}</th>
-                        <th>{{ __('reports.col_paid') }}</th>
+                        <td>{{ $row['currency'] }}</td>
+                        <td>{{ $row['bucket_0_14'] }}</td>
+                        <td>{{ $row['bucket_15_30'] }}</td>
+                        <td>{{ $row['bucket_31_plus'] }}</td>
+                        <td>{{ $row['outstanding'] }}</td>
+                        <td>{{ $row['paid'] }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach($aging as $row)
-                        <tr>
-                            <td>{{ $row['currency'] }}</td>
-                            <td>{{ $row['bucket_0_14'] }}</td>
-                            <td>{{ $row['bucket_15_30'] }}</td>
-                            <td>{{ $row['bucket_31_plus'] }}</td>
-                            <td>{{ $row['outstanding'] }}</td>
-                            <td>{{ $row['paid'] }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    @endif
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-muted-theme">{{ __('finance.reports_empty') }}</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection
