@@ -54,4 +54,8 @@ return [
     'back_to_offering' => 'Back to offering',
     'back_to_users' => 'Back to users',
     'no_students' => 'No students yet',
+    'max_semesters' => 'Maximum semesters to graduate reached.',
+    'sequence_warning' => 'Warning: enrolling before completing earlier year-level courses. Enrollment was saved.',
+    'sequence_blocked' => 'Earlier year-level courses must be completed before enrolling in this course.',
+    'already_passed' => 'You have already passed this course.',
 ];

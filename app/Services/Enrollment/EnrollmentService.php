@@ -42,10 +42,13 @@ class EnrollmentService
             $this->authorize->authorize($actor, 'enrollment.override');
         } else {
             $this->authorize->authorize($student, 'enrollment.register');
-            $this->assertCanRegister($student, $offering, $studentProgramId);
         }
 
         return DB::transaction(function () use ($student, $offering, $studentProgramId, $adminOverride, $actor, $isAudit) {
+            if (! $adminOverride) {
+                $this->assertCanRegister($student, $offering, $studentProgramId, $actor);
+            }
+
             $enrolledCount = Enrollment::query()
                 ->where('offering_id', $offering->id)
                 ->where('status', EnrollmentStatus::Enrolled)
@@ -84,7 +87,7 @@ class EnrollmentService
         });
     }
 
-    public function assertCanRegister(User $student, CourseOffering $offering, ?string $studentProgramId = null): void
+    public function assertCanRegister(User $student, CourseOffering $offering, ?string $studentProgramId = null, ?User $actor = null): void
     {
         $offering->load(['course.prerequisites', 'semester', 'course']);
 
@@ -118,6 +121,12 @@ class EnrollmentService
                     'enrollment' => [__('enrollment.prerequisite_missing', ['code' => $prereq->code])],
                 ]);
             }
+        }
+
+        // 6d: Block re-enrollment of a passed course. Admin override bypasses this via the
+        // caller skipping assertCanRegister entirely.
+        if (in_array($offering->course_id, $passedIds, true)) {
+            throw ValidationException::withMessages(['enrollment' => [__('enrollment.already_passed')]]);
         }
 
         if ($offering->course->is_standalone) {
@@ -164,6 +173,69 @@ class EnrollmentService
         if ($active->count() >= $program->max_courses_per_semester) {
             throw ValidationException::withMessages(['enrollment' => [__('enrollment.max_courses')]]);
         }
+
+        // 6a: Hard block when enrolling would exceed max_semesters_to_graduate.
+        // Only semester-based (Cohort) offerings consume a semester slot.
+        if ($offering->semester_id !== null) {
+            $usedSemesterIds = Enrollment::query()
+                ->where('student_id', $student->id)
+                ->where('student_program_id', $studentProgram->id)
+                ->join('course_offerings', 'enrollments.offering_id', '=', 'course_offerings.id')
+                ->whereNotNull('course_offerings.semester_id')
+                ->distinct()
+                ->pluck('course_offerings.semester_id')
+                ->all();
+
+            $projectedCount = count($usedSemesterIds);
+            if (! in_array($offering->semester_id, $usedSemesterIds, true)) {
+                $projectedCount++;
+            }
+
+            if ($projectedCount > $program->max_semesters_to_graduate) {
+                throw ValidationException::withMessages(['enrollment' => [__('enrollment.max_semesters')]]);
+            }
+        }
+
+        // 6c: year_level sequencing.
+        // year_level is a curriculum PLAN, not a dependency. Real dependencies are course
+        // prerequisites (enforced above). Sequence enforcement is a program-level flag.
+        $targetYearLevel = $programCourse->year_level;
+        if ($targetYearLevel !== null && $targetYearLevel > 1) {
+            $lowerYearCourses = ProgramCourse::query()
+                ->where('program_id', $studentProgram->program_id)
+                ->whereNotNull('year_level')
+                ->where('year_level', '<', $targetYearLevel)
+                ->get(['course_id', 'year_level']);
+
+            $incompleteYearLevels = $lowerYearCourses
+                ->filter(fn (ProgramCourse $pc) => ! in_array($pc->course_id, $passedIds, true))
+                ->pluck('year_level')
+                ->all();
+
+            if (! empty($incompleteYearLevels)) {
+                $highestIncomplete = max($incompleteYearLevels);
+                $auditActor = $actor ?? $student;
+
+                $this->audit->write(
+                    $auditActor,
+                    'enrollment.year_level_sequence_warning',
+                    null,
+                    null,
+                    null,
+                    [
+                        'student_id' => $student->id,
+                        'program_id' => $studentProgram->program_id,
+                        'course_id' => $offering->course_id,
+                        'attempted_year_level' => $targetYearLevel,
+                        'highest_incomplete_year_level' => $highestIncomplete,
+                    ]
+                );
+
+                if ($program->enforce_year_sequence) {
+                    throw ValidationException::withMessages(['enrollment' => [__('enrollment.sequence_blocked')]]);
+                }
+            }
+        }
     }
 
     public function drop(User $actor, Enrollment $enrollment, bool $adminOverride = false): Enrollment
@@ -189,7 +261,7 @@ class EnrollmentService
             throw ValidationException::withMessages(['enrollment' => [__('enrollment.add_drop_closed')]]);
         }
 
-        return DB::transaction(function () use ($actor, $enrollment, $offering) {
+        return DB::transaction(function () use ($actor, $enrollment, $offering, $adminOverride) {
             $enrollment->update([
                 'status' => EnrollmentStatus::Dropped,
                 'dropped_at' => now(),
@@ -197,31 +269,36 @@ class EnrollmentService
 
             $this->payments->refundEnrollment($actor, $enrollment, 100, 'drop');
             $this->promoteWaitlist($offering);
-            $this->audit->write($actor, 'enrollment.drop', 'Enrollment', $enrollment->id);
+            $this->audit->write($actor, $adminOverride ? 'enrollment.override_drop' : 'enrollment.drop', 'Enrollment', $enrollment->id);
 
             return $enrollment->fresh();
         });
     }
 
-    public function withdraw(User $actor, Enrollment $enrollment): Enrollment
+    public function withdraw(User $actor, Enrollment $enrollment, bool $adminOverride = false): Enrollment
     {
-        if ($enrollment->student_id !== $actor->id) {
+        if (! $adminOverride && $enrollment->student_id !== $actor->id) {
             throw ValidationException::withMessages(['enrollment' => [__('enrollment.not_owner')]]);
+        }
+
+        if ($adminOverride) {
+            $this->authorize->authorize($actor, 'enrollment.override');
         }
 
         $enrollment->load('offering.semester');
         $offering = $enrollment->offering;
 
         $refundPercent = 0;
-        if ($offering->mode === OfferingMode::Cohort && $offering->semester) {
+        if (! $adminOverride && $offering->mode === OfferingMode::Cohort && $offering->semester) {
             $weekNumber = $this->currentSemesterWeek($offering);
             if ($weekNumber > $offering->semester->last_withdrawal_week) {
                 throw ValidationException::withMessages(['enrollment' => [__('enrollment.withdrawal_closed')]]);
             }
             $refundPercent = (int) $offering->semester->withdrawal_refund_percent;
         }
+        // Admin override past the withdrawal window: refundPercent stays 0 (no refund issued).
 
-        return DB::transaction(function () use ($actor, $enrollment, $offering, $refundPercent) {
+        return DB::transaction(function () use ($actor, $enrollment, $offering, $refundPercent, $adminOverride) {
             $enrollment->update([
                 'status' => EnrollmentStatus::Withdrawn,
                 'dropped_at' => now(),
@@ -231,7 +308,7 @@ class EnrollmentService
 
             $this->payments->refundEnrollment($actor, $enrollment, $refundPercent, 'withdraw');
             $this->promoteWaitlist($offering);
-            $this->audit->write($actor, 'enrollment.withdraw', 'Enrollment', $enrollment->id);
+            $this->audit->write($actor, $adminOverride ? 'enrollment.override_withdraw' : 'enrollment.withdraw', 'Enrollment', $enrollment->id);
 
             return $enrollment->fresh();
         });
