@@ -92,4 +92,6 @@ return [
     'completion_desc' => 'Critères, clôture et résultats de cohorte.',
     'reports' => 'Rapports',
     'reports_desc' => 'Effectifs, assiduité, notes, vieillissement financier et statut.',
+    'advising' => 'Conseil académique',
+    'advising_desc' => 'Affectations, liste d’étudiants et holds d’inscription.',
 ];

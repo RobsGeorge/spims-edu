@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Enums\OfferingStatus;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
+use App\Models\ProgramCourse;
 use App\Models\StudentProgram;
+use App\Services\Enrollment\AdvisingService;
 use App\Services\Enrollment\DegreeAuditService;
 use App\Services\Enrollment\EnrollmentService;
 use Illuminate\Http\RedirectResponse;
@@ -72,13 +74,34 @@ class EnrollmentController extends Controller
         return back()->with('status', __('enrollment.withdrawn'));
     }
 
-    public function audit(Request $request, StudentProgram $studentProgram, DegreeAuditService $audit): View
+    public function audit(Request $request, StudentProgram $studentProgram, DegreeAuditService $audit, AdvisingService $advising): View
     {
-        abort_unless($studentProgram->student_id === $request->user()->id || $request->user()->isSuperAdmin(), 403);
+        $studentProgram->load(['program', 'student']);
+        $advising->assertCanViewStudentProgram($request->user(), $studentProgram);
+
+        $hypothetical = array_values(array_filter(
+            (array) $request->input('hypothetical_course_ids', []),
+            fn ($id) => is_string($id) || is_int($id)
+        ));
+        $hypothetical = array_map(fn ($id) => (string) $id, $hypothetical);
+
+        $baseline = $audit->audit($studentProgram->student, $studentProgram);
+        $result = $hypothetical === []
+            ? $baseline
+            : $audit->whatIf($studentProgram, $hypothetical);
+
+        $metCodes = collect($baseline['met'])->pluck('code')->all();
+        $remainingCourses = ProgramCourse::query()
+            ->where('program_id', $studentProgram->program_id)
+            ->with('course')
+            ->get()
+            ->filter(fn (ProgramCourse $pc) => ! in_array($pc->course->code, $metCodes, true));
 
         return view('enrollments.audit', [
-            'audit' => $audit->audit($request->user(), $studentProgram),
-            'studentProgram' => $studentProgram->load('program'),
+            'audit' => $result,
+            'studentProgram' => $studentProgram,
+            'remainingCourses' => $remainingCourses,
+            'selectedHypothetical' => $hypothetical,
         ]);
     }
 }

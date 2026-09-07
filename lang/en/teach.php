@@ -3,6 +3,7 @@
 return array (
   'title' => 'Teach',
   'subtitle' => 'Offerings you instruct or assist.',
+  'advising' => 'Advisees',
   'workspace' => 'Teach workspace',
   'workspace_sub' => 'Content, assessments, gradebook, live, and discussions in one place.',
   'back' => 'All offerings',

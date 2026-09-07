@@ -123,6 +123,24 @@ return [
         'ACADEMIC_ADMIN' => 'R',
         'ADMINISTRATIVE_ADMIN' => 'F',
     ],
+    /*
+     * Advising-lite. These keys are NOT offering-scoped — do not add them to
+     * `permission_scopes.offering_scoped`. Instructor O is assigned-advisee
+     * only and is enforced in AdvisingService (fail closed without a student).
+     */
+    'advising.assign' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'advising.hold' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+    ],
+    'advising.view' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
+        'STUDENT' => 'O',
+    ],
     'finance.invoices' => [
         'FINANCIAL_ADMIN' => 'F',
         'ADMINISTRATIVE_ADMIN' => 'R',

@@ -1,7 +1,11 @@
 @extends('layouts.app')
 @section('title', __('teach.title'))
 @section('content')
-<x-page-header :title="__('teach.title')" :subtitle="__('teach.subtitle')" />
+<x-page-header :title="__('teach.title')" :subtitle="__('teach.subtitle')">
+    <x-slot:actions>
+        <a class="btn btn-outline-primary" href="{{ route('advising.index') }}">{{ __('teach.advising') }}</a>
+    </x-slot:actions>
+</x-page-header>
 
 @if($offerings->isEmpty())
     <x-empty-state

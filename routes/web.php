@@ -51,6 +51,7 @@ use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\AdvisingController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\Events\StudentEventController;
 use App\Http\Controllers\ExamAttemptController;
@@ -430,6 +431,13 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:enrollment.register')
         ->name('enrollments.withdraw');
     Route::get('/degree-audit/{studentProgram}', [EnrollmentController::class, 'audit'])->name('enrollments.audit');
+
+    // #16 advising + what-if
+    Route::get('/advising', [AdvisingController::class, 'index'])->name('advising.index');
+    Route::post('/advising/assign', [AdvisingController::class, 'assign'])->name('advising.assign');
+    Route::get('/advising/students/{student}', [AdvisingController::class, 'show'])->name('advising.show');
+    Route::post('/advising/students/{student}/holds', [AdvisingController::class, 'placeHold'])->name('advising.holds.store');
+    Route::post('/advising/holds/{hold}/release', [AdvisingController::class, 'releaseHold'])->name('advising.holds.release');
 
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::get('/finance/invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');

@@ -17,6 +17,7 @@ return [
     'override_done' => 'Override enrollment completed.',
     'hold_updated' => 'Financial hold updated.',
     'financial_hold' => 'Registration blocked by financial hold.',
+    'advising_hold' => 'Registration blocked by an advising hold.',
     'window_closed' => 'Registration window is closed.',
     'offering_not_open' => 'This offering is not open for registration.',
     'prerequisite_missing' => 'Missing prerequisite :code.',

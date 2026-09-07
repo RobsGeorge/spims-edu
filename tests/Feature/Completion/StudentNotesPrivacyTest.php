@@ -16,6 +16,22 @@ class StudentNotesPrivacyTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
+    public function a_student_cannot_read_another_students_notes(): void
+    {
+        $offering = $this->offering('NOTE0');
+        $instructor = $this->instructorOn($offering);
+        $owner = User::factory()->withRole(RoleType::Student)->create();
+        $other = User::factory()->withRole(RoleType::Student)->create();
+        $this->enroll($owner, $offering);
+
+        $notes = app(StudentNoteService::class);
+        $notes->add($instructor, $offering, $owner, 'Keep private');
+
+        $this->expectException(AuthorizationException::class);
+        $notes->forStudent($other, $offering, $owner);
+    }
+
+    #[Test]
     public function a_student_cannot_read_notes_about_themselves(): void
     {
         $offering = $this->offering('NOTE1');

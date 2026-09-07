@@ -67,6 +67,7 @@ return [
     'nav_applications' => 'File d\'attente',
     'nav_my_applications' => 'Mes candidatures',
     'nav_enrollments' => 'Mes inscriptions',
+    'nav_advising' => 'Conseil académique',
     'nav_finance' => 'Mes finances',
     'nav_finance_admin' => 'Admin finance',
     'nav_live' => 'Sessions en direct',

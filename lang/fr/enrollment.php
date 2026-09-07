@@ -17,6 +17,7 @@ return [
     'override_done' => 'Inscription forcée effectuée.',
     'hold_updated' => 'Blocage financier mis à jour.',
     'financial_hold' => 'Inscription bloquée par un hold financier.',
+    'advising_hold' => 'Inscription bloquée par un hold de conseil.',
     'window_closed' => 'La fenêtre d\'inscription est fermée.',
     'offering_not_open' => 'Cette offre n’est pas ouverte aux inscriptions.',
     'prerequisite_missing' => 'Prérequis manquant :code.',

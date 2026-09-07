@@ -67,6 +67,7 @@ return [
     'nav_applications' => 'Applications queue',
     'nav_my_applications' => 'My applications',
     'nav_enrollments' => 'My enrollments',
+    'nav_advising' => 'Advising',
     'nav_finance' => 'My finance',
     'nav_finance_admin' => 'Finance admin',
     'nav_live' => 'Live sessions',

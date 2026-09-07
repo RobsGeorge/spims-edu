@@ -92,4 +92,6 @@ return [
     'completion_desc' => 'Criteria, closing workflow, and cohort results.',
     'reports' => 'Reports',
     'reports_desc' => 'Headcount, attendance, grades, finance aging, and standing.',
+    'advising' => 'Advising',
+    'advising_desc' => 'Advisor assignments, advisee roster, and registration holds.',
 ];

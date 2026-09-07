@@ -71,6 +71,12 @@ class AuthorizeService
             return;
         }
 
+        // Advising keys (`advising.assign` / `advising.hold` / `advising.view`)
+        // are deliberately not offering-scoped. Instructor "O" means assigned
+        // advisee only and is enforced in AdvisingService, which fails closed
+        // if no student resource is passed. Do not add those keys to
+        // permission_scopes.offering_scoped.
+
         // Fail closed. A scoped action reached without a resource is a missing argument
         // at the call site, not a permission the actor happens to hold everywhere.
         if ($resource === null || ! $this->scope->scopedTo($user, $resource)) {
