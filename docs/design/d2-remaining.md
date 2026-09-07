@@ -10,7 +10,7 @@
 
 - Still one headline (`ui.home_heading`) and one CTA group (register/sign-in for guests; dashboard/catalog when signed in).
 - Adds a **secondary band** (not a second hero): three typographic “how it works” beats plus a catalog teaser link.
-- Copy lives in `lang/{ar,en,fr}/home.php`. No clipart; type + hairline only.
+- Copy lives in `lang/{ar,en,fr}/home.php`. Landing hero now uses local liturgical photography at low opacity (`landing-hero.jpg`) plus the existing type/card chrome.
 - `spims-landing` class is unchanged for existing tests.
 
 ### Auth (`resources/views/auth/*.blade.php`)
@@ -22,7 +22,7 @@
 
 - Sort `sort=interest` (“Most flagged”) orders by `interest_flags_count`.
 - Authenticated `interest=flagged` limits to the current user’s flags. Guests may pass the param; it is ignored (no 500).
-- Results wrap in `#catalog-results` with static `aria-busy="false"`.
+- Results wrap in `#catalog-results`. Loading uses real skeletons via `catalog-loading.js` + `?fragment=1` (see `docs/design/d2-skeletons-photo-contrast.md`).
 - Empty hint is unchanged. `price=free` / `q=` filters still apply. Guest catalog → offering preview is intact.
 
 ## CSS

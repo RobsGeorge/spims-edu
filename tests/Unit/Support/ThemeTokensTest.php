@@ -104,4 +104,23 @@ class ThemeTokensTest extends TestCase
         $this->assertSame('#f8f9ff', $resolved['light']['bg1']);
         $this->assertSame('#ffb1c0', $resolved['dark']['primary']);
     }
+
+    #[Test]
+    public function contrast_ratio_matches_wcag_reference_pair(): void
+    {
+        $this->assertEqualsWithDelta(21.0, ThemeTokens::contrastRatio('#000000', '#ffffff'), 0.01);
+        $this->assertEqualsWithDelta(21.0, ThemeTokens::contrastRatio('#ffffff', '#000000'), 0.01);
+    }
+
+    #[Test]
+    public function locked_token_pairs_meet_wcag_aa(): void
+    {
+        foreach (ThemeTokens::aaPairs() as [$foreground, $background, $minimum, $label]) {
+            $this->assertGreaterThanOrEqual(
+                $minimum,
+                ThemeTokens::contrastRatio($foreground, $background),
+                $label.' ('.$foreground.' on '.$background.')'
+            );
+        }
+    }
 }

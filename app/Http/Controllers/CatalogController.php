@@ -64,7 +64,7 @@ class CatalogController extends Controller
             $query->orderBy('code');
         }
 
-        $courses = $query->paginate(12)->withQueryString();
+        $courses = $query->paginate(12)->appends($request->except(['fragment', 'skeleton', 'page']));
 
         $courseIds = $courses->getCollection()->pluck('id')->all();
         $offerings = CourseOffering::query()
@@ -86,7 +86,7 @@ class CatalogController extends Controller
             $featured = $courses->first();
         }
 
-        return view('catalog.index', [
+        $payload = [
             'courses' => $courses,
             'offeringsByCourse' => $offerings,
             'featured' => $featured,
@@ -99,7 +99,13 @@ class CatalogController extends Controller
                 'sort' => $sort,
             ],
             'programs' => Program::query()->where('active', true)->orderBy('code')->get(),
-        ]);
+        ];
+
+        if ($request->boolean('fragment')) {
+            return view('catalog.partials.results', $payload);
+        }
+
+        return view('catalog.index', $payload);
     }
 
     public function flagInterest(Request $request, Course $course, CourseService $service): RedirectResponse

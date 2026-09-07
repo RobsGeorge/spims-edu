@@ -32,7 +32,8 @@ class DesignReferenceParityTest extends TestCase
             ->assertSee('spims-landing-featured', false)
             ->assertSee('spims-landing-band', false)
             ->assertSee('spims-landing-footer', false)
-            ->assertSee('img/landing-atmosphere.svg', false)
+            ->assertSee('img/landing-hero.jpg', false)
+            ->assertSee('spims-landing-atmosphere--photo', false)
             ->assertSee(__('ui.home_heading'))
             ->assertSee(__('ui.home_cta_primary'))
             ->assertSee(__('home.hero_display'))
@@ -127,6 +128,8 @@ class DesignReferenceParityTest extends TestCase
             ->assertSee('catalog-card-media', false)
             ->assertSee('catalog-skeletons', false)
             ->assertSee('aria-busy="false"', false)
+            ->assertSee('data-catalog-loading', false)
+            ->assertSee('js/catalog-loading.js', false)
             ->assertSee(__('catalog.featured_chip'));
 
         $this->get(route('catalog.index', ['skeleton' => 1]))
@@ -134,6 +137,14 @@ class DesignReferenceParityTest extends TestCase
             ->assertSee('catalog-skeleton-card', false)
             ->assertSee('aria-busy="true"', false)
             ->assertSee(__('catalog.loading'));
+
+        $fragment = $this->get(route('catalog.index', ['fragment' => 1, 'q' => 'PARITY1']))
+            ->assertOk()
+            ->assertSee('PARITY1')
+            ->assertDontSee('<html', false)
+            ->assertDontSee('catalog-filters', false)
+            ->getContent();
+        $this->assertStringContainsString('catalog-card', $fragment);
 
         $this->get(route('catalog.index', ['q' => 'NOMATCHXYZ']))
             ->assertOk()
@@ -145,41 +156,12 @@ class DesignReferenceParityTest extends TestCase
     #[Test]
     public function sacred_academic_text_pairs_meet_wcag_aa(): void
     {
-        $light = ThemeTokens::defaults()['light'];
-        $dark = ThemeTokens::defaults()['dark'];
-
-        $this->assertGreaterThanOrEqual(4.5, $this->contrastRatio($light['text'], $light['bg1']));
-        $this->assertGreaterThanOrEqual(4.5, $this->contrastRatio($light['title'], $light['bg1']));
-        $this->assertGreaterThanOrEqual(4.5, $this->contrastRatio($light['textMuted'], $light['bg1']));
-        $this->assertGreaterThanOrEqual(4.5, $this->contrastRatio($light['primaryText'], $light['primary']));
-        $this->assertGreaterThanOrEqual(4.5, $this->contrastRatio('#f8f9ff', '#380014'));
-
-        $this->assertGreaterThanOrEqual(4.5, $this->contrastRatio($dark['text'], $dark['bg1']));
-        $this->assertGreaterThanOrEqual(4.5, $this->contrastRatio($dark['title'], $dark['bg1']));
-        $this->assertGreaterThanOrEqual(3.0, $this->contrastRatio($light['accent'], '#380014'));
-    }
-
-    private function contrastRatio(string $foreground, string $background): float
-    {
-        $l1 = $this->relativeLuminance($foreground);
-        $l2 = $this->relativeLuminance($background);
-        $lighter = max($l1, $l2);
-        $darker = min($l1, $l2);
-
-        return ($lighter + 0.05) / ($darker + 0.05);
-    }
-
-    private function relativeLuminance(string $hex): float
-    {
-        $hex = ltrim($hex, '#');
-        $r = hexdec(substr($hex, 0, 2)) / 255;
-        $g = hexdec(substr($hex, 2, 2)) / 255;
-        $b = hexdec(substr($hex, 4, 2)) / 255;
-
-        $channel = static function (float $c): float {
-            return $c <= 0.04045 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
-        };
-
-        return 0.2126 * $channel($r) + 0.7152 * $channel($g) + 0.0722 * $channel($b);
+        foreach (ThemeTokens::aaPairs() as [$foreground, $background, $minimum, $label]) {
+            $this->assertGreaterThanOrEqual(
+                $minimum,
+                ThemeTokens::contrastRatio($foreground, $background),
+                $label
+            );
+        }
     }
 }

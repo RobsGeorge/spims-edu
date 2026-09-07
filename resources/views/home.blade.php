@@ -5,7 +5,7 @@
 @section('content')
 <section class="spims-landing animate-in">
     <div class="spims-landing-hero">
-        <img class="spims-landing-atmosphere" src="{{ asset('img/landing-atmosphere.svg') }}" alt="" decoding="async">
+        <img class="spims-landing-atmosphere spims-landing-atmosphere--photo" src="{{ asset('img/landing-hero.jpg') }}" alt="" decoding="async">
         <div class="spims-landing-hero-inner">
             <p class="spims-landing-chip">{{ __('home.hero_chip') }}</p>
             <p class="spims-landing-heading">{{ __('ui.home_heading') }}</p>
@@ -63,7 +63,7 @@
                         </a>
                     @else
                         <a class="spims-landing-program" href="{{ $href }}">
-                            <div class="spims-landing-program-media {{ $index === 1 ? 'spims-landing-program-media--2' : '' }}"></div>
+                            <div class="spims-landing-program-media {{ $index === 1 ? 'spims-landing-program-media--2' : '' }}" aria-hidden="true"></div>
                             <div class="spims-landing-program-body">
                                 <h3 class="spims-landing-program-title">{{ $course->title }}</h3>
                                 <p class="spims-landing-program-blurb">

@@ -2,7 +2,7 @@
 
 Source of truth: `RobsGeorge/Spims` `design-reference/*` (`code.html` + `screen.png`). PNGs in that repo are Git LFS pointers and are not vendored here. Parity is taken from the HTML structure and Sacred Academic tokens already in `public/css/spims-theme.css`.
 
-Atmosphere is local SVG (`public/img/landing-atmosphere.svg`) at low opacity — no liturgical photography CDN, no parchment, no gold-as-primary.
+Atmosphere is local liturgical photography (`public/img/landing-hero.jpg` and featured stills) at low opacity under a cool-field wash — no CDN, no parchment, no gold-as-primary. SVG motif remains as a fallback asset.
 
 ## Landing (`/`)
 

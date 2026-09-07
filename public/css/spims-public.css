@@ -95,9 +95,29 @@ body.spims-public-catalog .spims-public-nav {
     pointer-events: none;
 }
 
+.spims-landing-atmosphere--photo {
+    opacity: 0.28;
+}
+
+.spims-landing-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(248, 249, 255, 0.58), rgba(248, 249, 255, 0.78));
+    pointer-events: none;
+}
+
 body.theme-dark .spims-landing-atmosphere {
     opacity: 0.12;
-    filter: invert(1) hue-rotate(180deg);
+}
+
+body.theme-dark .spims-landing-atmosphere--photo {
+    opacity: 0.18;
+    filter: none;
+}
+
+body.theme-dark .spims-landing-hero::after {
+    background: linear-gradient(180deg, rgba(13, 19, 34, 0.55), rgba(13, 19, 34, 0.78));
 }
 
 .spims-landing-hero-inner {
@@ -273,14 +293,14 @@ html[dir='rtl'] .spims-landing-featured-title {
 .spims-landing-program-media {
     height: 10rem;
     background:
-        linear-gradient(160deg, rgba(93, 3, 38, 0.18), rgba(234, 193, 103, 0.12)),
-        url('../img/landing-atmosphere.svg') center / cover;
+        linear-gradient(160deg, rgba(93, 3, 38, 0.28), rgba(248, 249, 255, 0.35)),
+        url('../img/landing-featured-1.jpg') center / cover;
 }
 
 .spims-landing-program-media--2 {
     background:
-        linear-gradient(200deg, rgba(56, 0, 20, 0.22), rgba(239, 244, 255, 0.4)),
-        url('../img/landing-atmosphere.svg') 30% 40% / cover;
+        linear-gradient(200deg, rgba(56, 0, 20, 0.28), rgba(239, 244, 255, 0.35)),
+        url('../img/landing-featured-2.jpg') center / cover;
 }
 
 .spims-landing-program-body {
@@ -656,8 +676,8 @@ html[dir='rtl'] .catalog-featured-title {
     min-height: 10rem;
     border-radius: var(--radius-md);
     background:
-        linear-gradient(160deg, rgba(93, 3, 38, 0.2), rgba(234, 193, 103, 0.14)),
-        url('../img/landing-atmosphere.svg') center / cover;
+        linear-gradient(160deg, rgba(93, 3, 38, 0.28), rgba(248, 249, 255, 0.28)),
+        url('../img/landing-featured-1.jpg') center / cover;
 }
 
 @media (min-width: 768px) {
@@ -675,14 +695,14 @@ html[dir='rtl'] .catalog-featured-title {
     height: 8.5rem;
     margin: -1rem -1rem 1rem;
     background:
-        linear-gradient(165deg, rgba(93, 3, 38, 0.16), rgba(230, 238, 255, 0.7)),
-        url('../img/landing-atmosphere.svg') center / cover;
+        linear-gradient(165deg, rgba(93, 3, 38, 0.22), rgba(230, 238, 255, 0.45)),
+        url('../img/landing-featured-1.jpg') center / cover;
 }
 
 .catalog-card-media--alt {
     background:
-        linear-gradient(200deg, rgba(56, 0, 20, 0.2), rgba(239, 244, 255, 0.55)),
-        url('../img/landing-atmosphere.svg') 70% 30% / cover;
+        linear-gradient(200deg, rgba(56, 0, 20, 0.24), rgba(239, 244, 255, 0.4)),
+        url('../img/landing-featured-2.jpg') 70% 30% / cover;
 }
 
 .catalog-results[aria-busy='true'] {
