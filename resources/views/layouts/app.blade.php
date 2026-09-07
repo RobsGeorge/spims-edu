@@ -262,6 +262,12 @@
                                         </a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="{{ route('superadmin.status') }}">
+                                            <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+                                            {{ __('status.nav_status') }}
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="{{ route('superadmin.audit.index') }}">
                                             <i class="bi bi-journal-text" aria-hidden="true"></i>
                                             {{ __('audit.nav_audit') }}

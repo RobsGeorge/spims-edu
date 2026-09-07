@@ -40,6 +40,7 @@
         <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.features') }}">{{ __('theme_studio.open_features') }}</a>
         <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.reports') }}">{{ __('school_reports.nav_reports') }}</a>
         <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.ops') }}">{{ __('ops.nav_ops') }}</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.status') }}">{{ __('status.nav_status') }}</a>
     </div>
     <p class="small text-muted-theme mb-4">{{ __('theme_studio.open_staff_help') }}</p>
 

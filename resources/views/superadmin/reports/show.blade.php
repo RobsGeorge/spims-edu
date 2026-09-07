@@ -17,6 +17,7 @@
     @if($report === 'queue')
         @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_reports')])
     @endif
+    @include('partials.status-entrance-banner')
 
     <header class="mb-3">
         <h1 class="page-title mb-2">{{ __('school_reports.reports.'.$report.'.title') }}</h1>

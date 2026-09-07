@@ -19,6 +19,7 @@
         </div>
     </aside>
     @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_tests')])
+    @include('partials.status-entrance-banner', ['caption' => __('status.entrance_from_tests')])
 
     <div class="row g-3">
         @foreach($suites as $suite)

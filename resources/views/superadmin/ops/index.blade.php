@@ -250,8 +250,11 @@
         </div>
     </section>
 
+    @include('partials.status-entrance-banner', ['caption' => __('status.entrance_from_ops')])
+
     <p class="small text-muted-theme mb-0">
-        <a href="{{ route('superadmin.observability.index') }}">{{ __('ops.open_observability') }}</a>
+        <a href="{{ route('superadmin.status') }}">{{ __('status.nav_status') }}</a>
+        · <a href="{{ route('superadmin.observability.index') }}">{{ __('ops.open_observability') }}</a>
         · <a href="{{ route('superadmin.security') }}">{{ __('ops.open_security') }}</a>
         · @if(\Illuminate\Support\Facades\Route::has('superadmin.reports.show'))
             <a href="{{ route('superadmin.reports.show', 'queue') }}">{{ __('ops.open_reports_queue') }}</a>

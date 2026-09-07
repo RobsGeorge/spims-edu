@@ -16,6 +16,7 @@
     @include('partials.config-entrance-banner')
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_scheduled')])
     @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_scheduled')])
+    @include('partials.status-entrance-banner', ['caption' => __('status.entrance_from_ops')])
 
     <div class="table-responsive app-card card shadow-sm">
         <table class="table mb-0">

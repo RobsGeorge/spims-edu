@@ -22,6 +22,7 @@
         <p class="text-muted-theme mb-2">{{ __('school_reports.page_lead') }}</p>
         <p class="small text-muted-theme mb-0">{{ __('school_reports.page_help') }}</p>
     </header>
+    @include('partials.status-entrance-banner')
 
     <aside class="sa-callout sa-callout-danger mb-3" role="note">
         <i class="bi bi-info-circle-fill" aria-hidden="true"></i>

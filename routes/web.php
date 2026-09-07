@@ -78,6 +78,7 @@ use App\Http\Controllers\SuperAdmin\FeatureFlagController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
 use App\Http\Controllers\SuperAdmin\OpsDeskController;
+use App\Http\Controllers\SuperAdmin\PlatformStatusController;
 use App\Http\Controllers\SuperAdmin\SchoolReportController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\SystemSettingController;
@@ -404,6 +405,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/ops/backup', [OpsDeskController::class, 'backup'])
             ->middleware('permission:ops.backup')
             ->name('ops.backup');
+        Route::get('/status', [PlatformStatusController::class, 'index'])
+            ->middleware('permission:status.platform')
+            ->name('status');
         Route::get('/observability', [SuperAdminController::class, 'observability'])->name('observability.index');
         Route::get('/scheduled-tasks', [SuperAdminController::class, 'scheduledTasks'])->name('scheduled-tasks.index');
         Route::get('/system-tests', [SuperAdminController::class, 'systemTests'])->name('system-tests.index');

@@ -1,6 +1,6 @@
 # Super Admin control-plane plan
 
-**Status:** SA0–SA6 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio, school reports hub, ops desk).  
+**Status:** SA0–SA7 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio, school reports hub, ops desk, platform status).  
 **Audience:** implementers building Super Admin to the same depth as Learn / Teach.  
 **Traces to:** spec v0.2 Super Admin role (“everything; admin-role grants; cross-system audit”), `AuthorizeService` bypass, Roles Hub, unused `settings` table.
 
@@ -17,11 +17,12 @@ Super Admin today is a **thin ops hub**. Student Learn and instructor Teach are 
 | `/superadmin` | Tile grid. Most tiles open the same UIs `adm` / `aca` / `fin` already use. |
 | Roles Hub `/roles-hub` | The one real unique feature: rewrite every permission key for every non–Super Admin role. |
 | Audit | Explorer at `/superadmin/audit`: filters, before/after detail, CSV export, prune command. Schema already had `before`, `after`, `ip`, `user_agent`, `request_id`. |
-| Observability | Counts + queue name + last backup mtime. Failed-job retry and backup now live on `/superadmin/ops`. |
+| Observability | Counts + queue name + last backup mtime. Failed-job retry and backup now live on `/superadmin/ops`. Health probes + integrations live on `/superadmin/status`. |
 | Security | Flush *other* sessions — only if `SESSION_DRIVER=database`. Driver limits documented. |
 | Scheduled tasks | Live Kernel schedule (not a hard-coded checklist). |
 | System tests | Prints `php artisan test --testsuite=…`. Does not run tests. |
 | Ops desk | `/superadmin/ops` — retry/delete failed jobs, kick `spims:backup-database`, live schedule, session-flush limits. |
+| Platform status | `/superadmin/status` — embeds `/health` probes, integrations configured/missing, runtime drivers, queue/backup snapshot, reveal counts, demo-console note. Read-only. Never dumps secrets. |
 | Theme tile | Deep-link to `/admin/theme` (name, site name, 3 token colors × 2 modes, logo *URLs*). |
 | People tile | Deep-link to `/admin/users` (create, paginated list, suspend). No search, unsuspend, edit, role revoke, impersonate, or password reset. |
 
@@ -72,6 +73,7 @@ Restructure `NavigationHub::superadminSections()` from one flat “exclusive” 
 /superadmin/security                Sessions + driver-limit copy (SA1/SA6)
 /superadmin/observability           Counts; failed-jobs card links to ops (SA6)
 /superadmin/ops                     Failed jobs retry/delete, backup now, live schedule (SA6)
+/superadmin/status                  Health probes, integrations configured/missing, runtime (SA7)
 /superadmin/scheduled-tasks         Live Kernel schedule (SA6)
 /superadmin/system-tests            Keep as runbook (no execute)
 /superadmin/feedback-reveals        Keep when that route exists (later branch)
@@ -100,6 +102,7 @@ Add keys with **empty role maps** (Super Admin bypass only), unless noted.
 | `reports.school` | SA only | School-wide reports hub |
 | `ops.failed_jobs` | SA only | Retry / delete failed jobs |
 | `ops.backup` | SA only | Trigger on-demand dump |
+| `status.platform` | SA only | Read-only platform status desk |
 
 Keep existing:
 
@@ -122,6 +125,8 @@ Controllers stay thin. New services:
 - `App\Services\SuperAdmin\ImpersonationService`
 - `App\Services\SuperAdmin\AuditExplorerService`
 - `App\Services\SuperAdmin\SchoolReportService`
+- `App\Services\SuperAdmin\OpsDeskService`
+- `App\Services\SuperAdmin\PlatformStatusService`
 - `App\Services\Admin\UserAdminService` (extend — unsuspend, update, revoke role, reset password)
 
 `UserAdminService` already authorizes `users.manage` / `roles.assign`. Keep that. Impersonation is a separate service so ADM cannot reach it by sharing the user form.
@@ -276,7 +281,7 @@ UI gaps (SA2):
 | Failed jobs | Count only | SA6 retry / delete, audited — **shipped** (`/superadmin/ops`) |
 | Backups | mtime only | SA6 “run backup now” → `spims:backup-database`, audited — **shipped** |
 | Schedule | Hard-coded 3 rows; Kernel may have more | SA6 read `Illuminate\Console\Scheduling\Schedule` — **shipped** |
-| Health | Public JSON `/health` | Keep public; Super Admin page embeds status |
+| Health | Public JSON `/health` | Keep public; Super Admin page embeds status — **shipped** (`/superadmin/status`) |
 | System tests | Print commands | Keep; do not execute |
 | Feedback identity reveals | Exclusive on later branch | Keep; tile already Super Admin only |
 
@@ -367,6 +372,22 @@ Each phase is one PR-sized slice: tests first, `pint` on owned files, no `migrat
 
 **Done when:** Super Admin can clear a stuck job and kick a backup without SSH. **Shipped.**
 
+### SA7 — Platform status
+
+**Goal:** Super Admin can answer “is the school connected and healthy?” without SSH or dumping `.env`.
+
+- Dedicated desk at `/superadmin/status` (`status.platform`, empty map). **Shipped.**
+- Embed the same probes as public `/health` (`app`, `database`, `cache`) with explanation labels. Overall `ok` only when app + database pass (cache fail does not 503). **Shipped** (`HealthProbe`).
+- Integrations: configured / missing only — reuse `SystemSettingService::integrations()`. Secrets never appear, not even masked (D5). **Shipped.**
+- Runtime drivers: queue, session, cache, mailer, filesystem, timezone (read-only). **Shipped.**
+- Queue + last-backup snapshot (counts / mtime only) → link to Ops desk. **Shipped.**
+- Feedback identity reveal counts → link to the decide page. **Shipped.**
+- Demo console: show “not routed” on this branch; never list Super Admin as a persona. **Shipped.**
+- Read-only — no new mutations. Does not write `.env`, rotate `SUPERADMIN_PASSWORD`, run PHPUnit, or restore backups.
+- Tests: Super Admin sees health + integrations; HTML never contains secret values; student/ADM 403; dashboard/hub/nav entrances. **Shipped** in `PlatformStatusTest`.
+
+**Done when:** Super Admin can see health + integration slots from the control plane. **Shipped.**
+
 ---
 
 ## 7. Data & migrations
@@ -409,6 +430,7 @@ New suite: `tests/Feature/SuperAdmin/`.
 | `ThemeStudioTest` | SA4 | Activate / reset / tokens applied |
 | `SchoolReportTest` | SA5 | Census + finance integers |
 | `OpsDeskTest` | SA6 | Failed job retry audited |
+| `PlatformStatusTest` | SA7 | Health + integrations; secrets absent from HTML |
 
 Also extend `UserAdminTest`, `ThemeEditorTest`, `RolesHubTest`, `PortalHubsTest`.
 
@@ -442,7 +464,7 @@ If this plan lands on `feat/authz-scope-and-api-foundation` before other slices 
 
 ## 12. Explicitly out of scope
 
-Move or keep in `PARKING-LOT.md` — do not build in SA0–SA6:
+Move or keep in `PARKING-LOT.md` — do not build in SA0–SA7:
 
 - Run PHPUnit or `migrate` from the browser
 - Edit `.env` or rotate Super Admin password in the UI
@@ -464,6 +486,7 @@ SA0 safety + IA
               ├── SA4 theme studio        (parallel with SA3)
               └── SA5 reports             (after SA2; reads audit + finance)
                     └── SA6 ops desk
+                          └── SA7 platform status
 ```
 
 If only three phases ship: **SA0, SA1, SA2**. They turn Super Admin from a tile page into the role the spec describes (grants, people, cross-system audit). SA3 is the next highest leverage (features + config). Theme and reports are visibility; ops is convenience.

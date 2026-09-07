@@ -30,6 +30,7 @@
         <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.features') }}">{{ __('system_settings.open_features') }}</a>
         <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.reports') }}">{{ __('school_reports.nav_reports') }}</a>
         <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.ops') }}">{{ __('ops.nav_ops') }}</a>
+        <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.status') }}">{{ __('status.nav_status') }}</a>
         <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.audit.index', ['action' => 'system_settings.']) }}">{{ __('system_settings.open_audit') }}</a>
     </div>
     <p class="small text-muted-theme mb-4">{{ __('system_settings.open_features_help') }}</p>
@@ -102,6 +103,9 @@
                 </li>
             @endforeach
         </ul>
+        <p class="form-text mb-0 mt-3">{{ __('status.entrance_from_config') }}
+            <a href="{{ route('superadmin.status') }}">{{ __('status.entrance_cta') }}</a>
+        </p>
     </section>
 </div>
 @endsection

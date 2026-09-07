@@ -529,4 +529,5 @@ return [
     'reports.school' => [],
     'ops.failed_jobs' => [],
     'ops.backup' => [],
+    'status.platform' => [],
 ];

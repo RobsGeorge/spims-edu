@@ -35,6 +35,7 @@
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_observability')])
     @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_observability')])
     @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_observability')])
+    @include('partials.status-entrance-banner', ['caption' => __('status.entrance_from_observability')])
 
     <div class="row g-3 mb-4">
         @foreach($stats as $key => $value)
@@ -77,10 +78,14 @@
         </dd>
     </dl>
 
-    <div class="mt-4">
+    <div class="mt-4 d-flex flex-wrap gap-2">
         <a href="{{ route('health') }}" class="btn btn-outline-primary" target="_blank" rel="noopener">
             <i class="bi bi-heart-pulse"></i> /health
         </a>
+        <a href="{{ route('superadmin.status') }}" class="btn btn-outline-primary">
+            <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i> {{ __('status.nav_status') }}
+        </a>
     </div>
+    <p class="form-text mt-2 mb-0">{{ __('status.entrance_from_observability') }}</p>
 </div>
 @endsection

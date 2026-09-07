@@ -14,6 +14,7 @@
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_admin')])
     @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_admin')])
     @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_admin')])
+    @include('partials.status-entrance-banner', ['caption' => __('status.entrance_from_admin')])
     <div class="row g-3">
         @forelse($links as $link)
             @include('partials.hub-link-tile', ['link' => $link])

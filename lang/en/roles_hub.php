@@ -49,6 +49,7 @@ return [
     'group_system_settings' => 'School settings',
     'group_reports' => 'School reports',
     'group_ops' => 'Operations',
+    'group_status' => 'Platform status',
     'role_ADMINISTRATIVE_ADMIN' => 'Administrative admin',
     'role_ACADEMIC_ADMIN' => 'Academic admin',
     'role_FINANCIAL_ADMIN' => 'Financial admin',

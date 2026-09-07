@@ -1359,7 +1359,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 .config-entrance-banner,
 .theme-entrance-banner,
 .reports-entrance-banner,
-.ops-entrance-banner {
+.ops-entrance-banner,
+.status-entrance-banner {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1391,11 +1392,17 @@ html[dir='rtl'] .sa-impersonation-stop {
     background: color-mix(in srgb, var(--color-danger) 8%, var(--color-surface));
 }
 
+.status-entrance-banner {
+    border-color: color-mix(in srgb, var(--color-primary) 18%, color-mix(in srgb, var(--color-success, #2e7d32) 26%, var(--color-surface-border)));
+    background: color-mix(in srgb, var(--color-primary) 4%, color-mix(in srgb, var(--color-success, #2e7d32) 7%, var(--color-surface)));
+}
+
 .features-entrance-icon,
 .config-entrance-icon,
 .theme-entrance-icon,
 .reports-entrance-icon,
-.ops-entrance-icon {
+.ops-entrance-icon,
+.status-entrance-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1426,11 +1433,17 @@ html[dir='rtl'] .sa-impersonation-stop {
     color: var(--color-danger);
 }
 
+.status-entrance-icon {
+    background: color-mix(in srgb, var(--color-success, #2e7d32) 16%, var(--color-surface));
+    color: var(--color-success, var(--color-primary));
+}
+
 .features-entrance-title,
 .config-entrance-title,
 .theme-entrance-title,
 .reports-entrance-title,
-.ops-entrance-title {
+.ops-entrance-title,
+.status-entrance-title {
     display: block;
     font-weight: 700;
     color: var(--color-title);
@@ -1440,7 +1453,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 .config-entrance-body,
 .theme-entrance-body,
 .reports-entrance-body,
-.ops-entrance-body {
+.ops-entrance-body,
+.status-entrance-body {
     display: block;
     font-size: 0.85rem;
     color: var(--color-text-muted);
@@ -1450,7 +1464,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 .config-entrance-cta,
 .theme-entrance-cta,
 .reports-entrance-cta,
-.ops-entrance-cta {
+.ops-entrance-cta,
+.status-entrance-cta {
     margin-inline-start: auto;
     font-weight: 600;
     color: var(--color-primary);
@@ -1645,7 +1660,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 }
 
 .reports-entrance-kicker,
-.ops-entrance-kicker {
+.ops-entrance-kicker,
+.status-entrance-kicker {
     display: block;
     font-size: 0.72rem;
     font-weight: 700;
