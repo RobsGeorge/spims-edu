@@ -36,7 +36,7 @@ class ContentFileViewerTest extends TestCase
             ->post(route('admin.weeks.items', $week), [
                 'type' => ContentItemType::Reading->value,
                 'title' => 'Notes PDF',
-                'file' => UploadedFile::fake()->create('notes.pdf', 20, 'application/pdf'),
+                'file' => UploadedFile::fake()->createWithContent('notes.pdf', "%PDF-1.4\n%%EOF"),
             ])
             ->assertRedirect();
 
@@ -111,7 +111,7 @@ class ContentFileViewerTest extends TestCase
         $this->actingAs($instructor)->post(route('admin.weeks.items', $week), [
             'type' => ContentItemType::Reading->value,
             'title' => 'Gated PDF',
-            'file' => UploadedFile::fake()->create('unit.pdf', 12, 'application/pdf'),
+            'file' => UploadedFile::fake()->createWithContent('unit.pdf', "%PDF-1.4\n%%EOF"),
         ]);
         $item = ContentItem::query()->where('title', 'Gated PDF')->firstOrFail();
 
@@ -131,12 +131,21 @@ class ContentFileViewerTest extends TestCase
             ->get(route('learn.item.file', $item))
             ->assertOk()
             ->assertHeader('Content-Type', 'application/pdf')
-            ->assertHeader('Content-Disposition', 'inline; filename="'.basename($item->file_url).'"');
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
 
-        $this->actingAs($student)
+        $inline = (string) $this->actingAs($student)
+            ->get(route('learn.item.file', $item))
+            ->headers->get('Content-Disposition');
+        $this->assertStringStartsWith('inline', $inline);
+        $this->assertStringContainsString('filename', $inline);
+        $this->assertStringNotContainsString('../', $inline);
+        $this->assertStringNotContainsString((string) $item->file_url, $inline);
+
+        $attachment = (string) $this->actingAs($student)
             ->get(route('learn.item.file', ['item' => $item, 'download' => 1]))
-            ->assertOk()
-            ->assertHeader('Content-Disposition', 'attachment; filename="'.basename($item->file_url).'"');
+            ->headers->get('Content-Disposition');
+        $this->assertStringStartsWith('attachment', $attachment);
+        $this->assertStringContainsString('filename', $attachment);
 
         $this->actingAs($other)
             ->get(route('learn.item.file', $item))

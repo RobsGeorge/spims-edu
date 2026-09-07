@@ -86,7 +86,7 @@ class ContentSettingsTest extends TestCase
         $this->actingAs($instructor)->post(route('admin.weeks.items', $week), [
             'type' => ContentItemType::Reading->value,
             'title' => 'Locked PDF',
-            'file' => UploadedFile::fake()->create('a.pdf', 10, 'application/pdf'),
+            'file' => UploadedFile::fake()->createWithContent('a.pdf', "%PDF-1.4\n%%EOF"),
         ]);
         $item = ContentItem::query()->where('title', 'Locked PDF')->firstOrFail();
         $this->actingAs($instructor)->post(route('admin.content-items.publish', $item));

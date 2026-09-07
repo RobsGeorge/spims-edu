@@ -103,6 +103,7 @@ Route::get('/verify/{token}', CredentialVerifyController::class)->name('credenti
 Route::get('/communications/open/{log}', CommunicationOpenController::class)->name('communications.open');
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
 Route::get('/offerings/{offering}/preview/items/{item}/file', [ContentItemFileController::class, 'publicPreview'])
+    ->middleware('throttle:catalog-preview-file')
     ->name('offerings.preview.item.file');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
