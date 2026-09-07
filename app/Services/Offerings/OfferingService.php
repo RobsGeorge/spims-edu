@@ -457,9 +457,28 @@ class OfferingService
         $path = $this->storage->signedUploadPath('uploads', $week->id, $ext);
         $real = $file->getRealPath();
         $contents = ($real && is_readable($real)) ? (string) file_get_contents($real) : (string) $file->get();
+        $this->assertStoredFileMagic($ext, $contents);
         $this->storage->store($path, $contents);
 
         return $path;
+    }
+
+    private function assertStoredFileMagic(string $ext, string $contents): void
+    {
+        $ok = match ($ext) {
+            'pdf' => str_starts_with($contents, '%PDF'),
+            'jpg', 'jpeg' => str_starts_with($contents, "\xFF\xD8\xFF"),
+            'png' => str_starts_with($contents, "\x89PNG"),
+            'gif' => str_starts_with($contents, 'GIF87a') || str_starts_with($contents, 'GIF89a'),
+            'webp' => str_starts_with($contents, 'RIFF') && substr($contents, 8, 4) === 'WEBP',
+            default => false,
+        };
+
+        if (! $ok) {
+            throw ValidationException::withMessages([
+                'file' => [__('offerings.upload_type_blocked')],
+            ]);
+        }
     }
 
     public function previewPayload(CourseOffering $offering): array

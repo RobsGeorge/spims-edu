@@ -40,6 +40,10 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(120)->by($request->ip());
         });
 
+        RateLimiter::for('catalog-preview-file', function (Request $request) {
+            return Limit::perMinute(30)->by($request->ip());
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')
