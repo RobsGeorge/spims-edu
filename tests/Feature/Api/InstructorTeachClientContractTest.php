@@ -70,6 +70,7 @@ class InstructorTeachClientContractTest extends TestCase
             'POST /api/v1/teach/project-assessments/{projectAssessment}/announce',
             'POST /api/v1/teach/offerings/{offering}/gradebook/submit',
             'POST /api/v1/teach/offerings/{offering}/gradebook/lock',
+            'POST /api/v1/teach/offerings/{offering}/gradebook/reopen',
             'POST /api/v1/teach/submissions/{assignmentSubmission}/grade',
             'POST /api/v1/teach/submissions/{assignmentSubmission}/mark-received',
             'POST /api/v1/teach/assignments/{assignment}/remind-unsubmitted',

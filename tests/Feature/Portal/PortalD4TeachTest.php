@@ -104,7 +104,26 @@ class PortalD4TeachTest extends TestCase
             ->assertOk()
             ->assertSee('lockGradesModal', false)
             ->assertSee(__('teach.lock_confirm_title'))
-            ->assertSee(__('teach.reopen_confirm_title'));
+            ->assertSee(__('teach.reopen_confirm_title'))
+            ->assertSee(__('teach.enrollment'));
+    }
+
+    #[Test]
+    public function academic_admin_sees_gradebook_reopen_on_teach_tab(): void
+    {
+        $this->seed(ThemeSeeder::class);
+        $admin = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $offering = $this->staffedOffering($admin);
+
+        $this->actingAs($admin)
+            ->get(route('teach.show', ['offering' => $offering, 'tab' => 'gradebook']))
+            ->assertOk()
+            ->assertSee('reopenGradesModal', false)
+            ->assertSee(__('teach.reopen_confirm_title'))
+            ->assertSee(__('teach.reopen_confirm_body'))
+            ->assertSee(__('assessment.reopen_grades'))
+            ->assertSee(__('teach.open_gradebook'))
+            ->assertSee(__('teach.gradebook_open'));
     }
 
     #[Test]

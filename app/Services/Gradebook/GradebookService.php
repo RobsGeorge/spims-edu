@@ -414,16 +414,26 @@ class GradebookService
     {
         $this->authorize->authorize($actor, 'gradebook.reopen');
 
-        Enrollment::query()
-            ->where('offering_id', $offering->id)
-            ->where('grade_status', GradeStatus::Locked)
-            ->update([
-                'grade_status' => GradeStatus::InProgress,
-                'grade_locked_by_id' => null,
-                'grade_locked_at' => null,
-            ]);
+        DB::transaction(function () use ($actor, $offering) {
+            Enrollment::query()
+                ->where('offering_id', $offering->id)
+                ->where('grade_status', GradeStatus::Locked)
+                ->where('status', EnrollmentStatus::Completed)
+                ->update([
+                    'status' => EnrollmentStatus::Enrolled,
+                ]);
 
-        $this->audit->write($actor, 'gradebook.reopen', 'CourseOffering', $offering->id);
+            Enrollment::query()
+                ->where('offering_id', $offering->id)
+                ->where('grade_status', GradeStatus::Locked)
+                ->update([
+                    'grade_status' => GradeStatus::InProgress,
+                    'grade_locked_by_id' => null,
+                    'grade_locked_at' => null,
+                ]);
+
+            $this->audit->write($actor, 'gradebook.reopen', 'CourseOffering', $offering->id);
+        });
     }
 
     public function componentPercent(GradebookComponent $component, User $student): ?float

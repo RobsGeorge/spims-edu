@@ -252,12 +252,13 @@ class InstructorHardeningTest extends TestCase
     }
 
     #[Test]
-    public function gradebook_reopen_is_not_on_the_instructor_api(): void
+    public function gradebook_reopen_is_forbidden_for_an_instructor(): void
     {
         $bundle = $this->gradingBundle('S8H9');
 
         $this->asApi($bundle['instructor'], 'INSTRUCTOR')
-            ->postJson('/api/v1/teach/offerings/'.$bundle['offering']->id.'/gradebook/reopen')
-            ->assertNotFound();
+            ->postJson(route('api.v1.teach.offerings.gradebook.reopen', $bundle['offering']))
+            ->assertForbidden()
+            ->assertJsonPath('code', 'FORBIDDEN');
     }
 }

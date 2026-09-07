@@ -2,8 +2,11 @@
 
 namespace Tests\Feature\Api;
 
+use App\Enums\EnrollmentStatus;
 use App\Enums\GradeStatus;
+use App\Enums\RoleType;
 use App\Models\Enrollment;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -120,5 +123,61 @@ class InstructorGradingApiTest extends TestCase
         $this->assertSame(1, $row['submitted_count']);
         $this->assertSame(0, $row['ungraded_count']);
         $this->assertSame(0, $row['overdue_count']);
+    }
+
+    #[Test]
+    public function academic_admin_can_reopen_a_locked_gradebook_with_confirmation(): void
+    {
+        $bundle = $this->gradingBundle('S8GR1');
+        $admin = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+
+        $confirmation = $this->lockToken($bundle['instructor'], $bundle['offering']);
+        $this->asApi($bundle['instructor'], 'INSTRUCTOR')
+            ->postJson(route('api.v1.teach.offerings.gradebook.lock', $bundle['offering']), [
+                'confirmation' => $confirmation,
+            ])
+            ->assertOk();
+
+        $enrollment = Enrollment::query()->find($bundle['enrollment']->id);
+        $this->assertSame(GradeStatus::Locked, $enrollment->grade_status);
+
+        $token = $this->asApi($admin, 'ACADEMIC_ADMIN')
+            ->getJson(route('api.v1.teach.offerings.gradebook', $bundle['offering']))
+            ->assertOk()
+            ->json('data.reopen_confirmation.confirmation_token');
+
+        $this->assertIsString($token);
+        $this->assertSame(32, strlen($token));
+
+        $this->asApi($admin, 'ACADEMIC_ADMIN')
+            ->postJson(route('api.v1.teach.offerings.gradebook.reopen', $bundle['offering']), [
+                'confirmation' => $token,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.reopened', true);
+
+        $reopened = Enrollment::query()->find($bundle['enrollment']->id);
+        $this->assertSame(GradeStatus::InProgress, $reopened->grade_status);
+        $this->assertSame(EnrollmentStatus::Enrolled, $reopened->status);
+    }
+
+    #[Test]
+    public function instructor_and_student_cannot_reopen_the_gradebook(): void
+    {
+        $bundle = $this->gradingBundle('S8GR2');
+
+        $this->asApi($bundle['instructor'], 'INSTRUCTOR')
+            ->postJson(route('api.v1.teach.offerings.gradebook.reopen', $bundle['offering']), [
+                'confirmation' => 'deadbeefdeadbeefdeadbeefdeadbeef',
+            ])
+            ->assertForbidden()
+            ->assertJsonPath('code', 'FORBIDDEN');
+
+        $this->asApi($bundle['student'], 'STUDENT')
+            ->postJson(route('api.v1.teach.offerings.gradebook.reopen', $bundle['offering']), [
+                'confirmation' => 'deadbeefdeadbeefdeadbeefdeadbeef',
+            ])
+            ->assertForbidden()
+            ->assertJsonPath('code', 'FORBIDDEN');
     }
 }

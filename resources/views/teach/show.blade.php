@@ -45,7 +45,22 @@
         <a class="btn btn-primary" href="{{ route('teach.assignments.index', $offering) }}">{{ __('teach.open_assignments') }}</a>
     @elseif($tab === 'gradebook')
         <x-page-header :title="__('teach.tab_gradebook')" :subtitle="__('teach.tab_gradebook_help')" />
-        <a class="btn btn-primary" href="{{ route('admin.gradebook.show', $offering) }}">{{ __('teach.open_gradebook') }}</a>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <x-status-badge
+                        :status="$gradebookLocked ? 'LOCKED' : 'OPEN'"
+                        :label="$gradebookLocked ? __('teach.gradebook_locked') : __('teach.gradebook_open')"
+                    />
+                    <a class="btn btn-primary btn-sm" href="{{ route('admin.gradebook.show', $offering) }}">{{ __('teach.open_gradebook') }}</a>
+                    @include('admin.gradebook._lock_reopen', [
+                        'offering' => $offering,
+                        'showLock' => $canLockGrades ?? false,
+                        'showReopen' => $canReopenGrades ?? false,
+                    ])
+                </div>
+            </div>
+        </div>
     @elseif($tab === 'live')
         <x-page-header :title="__('teach.tab_live')" :subtitle="__('teach.tab_live_help')" />
         <a class="btn btn-primary" href="{{ route('teach.live.index', $offering) }}">{{ __('teach.open_live') }}</a>

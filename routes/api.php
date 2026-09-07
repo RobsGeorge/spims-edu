@@ -265,6 +265,8 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
                 ->name('offerings.gradebook.submit');
             Route::post('/offerings/{offering}/gradebook/lock', [TeachGradebookController::class, 'lock'])
                 ->name('offerings.gradebook.lock');
+            Route::post('/offerings/{offering}/gradebook/reopen', [TeachGradebookController::class, 'reopen']) // gradebook reopen
+                ->name('offerings.gradebook.reopen');
             Route::get('/offerings/{offering}/assignments', [TeachAssignmentController::class, 'index'])
                 ->name('offerings.assignments');
             Route::get('/assignments/{assignment}/submissions', [TeachAssignmentController::class, 'submissions'])

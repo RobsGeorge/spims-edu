@@ -68,6 +68,7 @@ class InstructorApiScopeTest extends TestCase
             'GET teach gradebook' => ['GET', '/api/v1/teach/offerings/{offering}/gradebook', 403],
             'POST teach gradebook submit' => ['POST', '/api/v1/teach/offerings/{offering}/gradebook/submit', 403],
             'POST teach gradebook lock' => ['POST', '/api/v1/teach/offerings/{offering}/gradebook/lock', 403],
+            'POST teach gradebook reopen' => ['POST', '/api/v1/teach/offerings/{offering}/gradebook/reopen', 403],
             'GET teach assignments' => ['GET', '/api/v1/teach/offerings/{offering}/assignments', 403],
             'GET teach assignment submissions' => ['GET', '/api/v1/teach/assignments/{assignment}/submissions', 403],
             'POST teach submission grade' => ['POST', '/api/v1/teach/submissions/{assignmentSubmission}/grade', 403],
@@ -230,6 +231,7 @@ class InstructorApiScopeTest extends TestCase
                 'confirmation' => 'deadbeefdeadbeefdeadbeefdeadbeef',
             ],
             '/api/v1/teach/offerings/{offering}/gradebook/lock',
+            '/api/v1/teach/offerings/{offering}/gradebook/reopen',
             '/api/v1/teach/assessments/{assessment}/announce-results' => [
                 'confirmation' => 'deadbeefdeadbeefdeadbeefdeadbeef',
             ],

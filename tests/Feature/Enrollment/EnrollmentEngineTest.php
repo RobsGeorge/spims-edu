@@ -515,9 +515,31 @@ class EnrollmentEngineTest extends TestCase
             'grade_type' => GradeType::Standard,
         ]);
 
+        $dropped = Enrollment::query()->create([
+            'student_id' => User::factory()->withRole(RoleType::Student)->create()->id,
+            'offering_id' => $offering->id,
+            'status' => EnrollmentStatus::Dropped,
+            'enrolled_at' => now(),
+            'final_percent' => 95,
+            'final_letter' => 'A',
+            'final_gpa_points' => 4,
+            'grade_status' => GradeStatus::Locked,
+            'grade_type' => GradeType::Standard,
+        ]);
+
         app(GradebookService::class)->lockGrades($instructor, $offering);
 
         $this->assertSame(EnrollmentStatus::Completed, $passing->fresh()->status);
         $this->assertSame(EnrollmentStatus::Enrolled, $failing->fresh()->status);
+        $this->assertSame(EnrollmentStatus::Dropped, $dropped->fresh()->status);
+
+        $admin = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        app(GradebookService::class)->reopen($admin, $offering);
+
+        $this->assertSame(EnrollmentStatus::Enrolled, $passing->fresh()->status);
+        $this->assertSame(GradeStatus::InProgress, $passing->fresh()->grade_status);
+        $this->assertSame(EnrollmentStatus::Enrolled, $failing->fresh()->status);
+        $this->assertSame(GradeStatus::InProgress, $failing->fresh()->grade_status);
+        $this->assertSame(EnrollmentStatus::Dropped, $dropped->fresh()->status);
     }
 }

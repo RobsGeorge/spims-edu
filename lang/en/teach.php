@@ -49,6 +49,8 @@ return array (
   'lock_confirm_body' => 'Locked grades become official for this offering. Reopening requires Academic Admin.',
   'reopen_confirm_title' => 'Reopen gradebook?',
   'reopen_confirm_body' => 'Students may see changes after reopening. Proceed only if corrections are required.',
+  'gradebook_locked' => 'Locked',
+  'gradebook_open' => 'Open',
   'staff' => 'Staff',
   'students' => 'Students',
   'empty_roster' => 'No students enrolled yet',

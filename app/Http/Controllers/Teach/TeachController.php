@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Teach;
 
+use App\Enums\GradeStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Teach\Concerns\IssuesOfferingCloseConfirmation;
 use App\Models\Announcement;
@@ -76,6 +77,12 @@ class TeachController extends Controller
                 $this->confirm,
                 $this->closing,
             ),
+            'gradebookLocked' => Enrollment::query()
+                ->where('offering_id', $offering->id)
+                ->where('grade_status', GradeStatus::Locked)
+                ->exists(),
+            'canLockGrades' => $this->authorize->allows($user, 'gradebook.lock', $offering),
+            'canReopenGrades' => $this->authorize->allows($user, 'gradebook.reopen'),
         ]);
     }
 

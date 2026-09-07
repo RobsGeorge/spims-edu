@@ -16,7 +16,8 @@
                 @endforeach
                 <th scope="col">{{ __('assessment.final_percent') }}</th>
                 <th scope="col">{{ __('assessment.letter') }}</th>
-                <th scope="col">{{ __('ui.status') }}</th>
+                <th scope="col">{{ __('teach.enrollment') }}</th>
+                <th scope="col">{{ __('teach.grade_status') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -42,10 +43,11 @@
                 @endforeach
                 <td>{{ $computed['percent'] }}</td>
                 <td>{{ $computed['letter'] ?? $enrollment->final_letter }}</td>
+                <td><x-status-badge :status="$enrollment->status->value" :label="$enrollment->status->value" /></td>
                 <td><x-status-badge :status="$enrollment->grade_status->value" :label="$enrollment->grade_status->value" /></td>
             </tr>
         @empty
-            <tr><td colspan="{{ 4 + $components->count() }}"><x-empty-state :title="__('teach.empty_roster')" icon="bi-people" /></td></tr>
+            <tr><td colspan="{{ 5 + $components->count() }}"><x-empty-state :title="__('teach.empty_roster')" icon="bi-people" /></td></tr>
         @endforelse
         </tbody>
     </table>

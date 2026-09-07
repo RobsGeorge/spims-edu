@@ -3413,6 +3413,35 @@ paths:
           description: TA or not staffed
         '422':
           description: Missing, invalid, or replayed confirmation
+  /teach/offerings/{offering}/gradebook/reopen:
+    post:
+      operationId: teachGradebookReopen
+      summary: Reopen a locked gradebook. Academic Admin only. Confirmation token required. Instructor and student are 403. Restores COMPLETED enrollments this lock posted to ENROLLED. Idempotency-Key returns the original success on retry.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: offering
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirmation:
+                  type: string
+      responses:
+        '200':
+          description: Reopened
+        '403':
+          description: Instructor, TA, student, or not allowed to reopen
+        '422':
+          description: Missing, invalid, or replayed confirmation
   /teach/offerings/{offering}/assignments:
     get:
       operationId: teachAssignmentDashboard
