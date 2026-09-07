@@ -24,6 +24,7 @@
     @endif
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <link href="{{ asset('css/spims-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/spims-shell.css') }}" rel="stylesheet">
     @if(!empty($themeCssBlock))
         <style id="spims-theme-tokens">{!! $themeCssBlock !!}</style>
     @endif
@@ -46,6 +47,15 @@
             : ($activeTheme->logo_light_url ?: $activeTheme->logo_dark_url);
     }
     $shellLess = request()->routeIs('home') || request()->routeIs('auth.*') || !auth()->check();
+    $userInitials = '';
+    if ($navUser) {
+        $firstInitial = mb_substr(trim((string) $navUser->first_name), 0, 1);
+        $lastInitial = mb_substr(trim((string) $navUser->last_name), 0, 1);
+        $userInitials = mb_strtoupper($firstInitial.$lastInitial);
+        if ($userInitials === '') {
+            $userInitials = mb_strtoupper(mb_substr((string) $navUser->email, 0, 1));
+        }
+    }
 @endphp
 <body class="theme-{{ $themeClass }} {{ $shellLess ? 'shell-guest' : 'shell-app' }}">
     <a class="spims-skip-link" href="#main-content">{{ __('ui.skip_to_content') }}</a>
@@ -130,17 +140,27 @@
                             aria-label="{{ __('ui.open_menu') }}">
                         <i class="bi bi-list" aria-hidden="true"></i>
                     </button>
+                    <form method="GET" action="{{ route('catalog.index') }}" class="app-topbar-search" role="search">
+                        <label class="visually-hidden" for="app-shell-search">{{ __('ui.search') }}</label>
+                        <input id="app-shell-search" type="search" name="q" value="{{ request('q') }}"
+                               class="form-control app-topbar-search-input"
+                               placeholder="{{ __('catalog.search_placeholder') }}"
+                               autocomplete="off">
+                    </form>
                     <div class="app-topbar-spacer"></div>
                     <div class="d-flex flex-wrap align-items-center gap-2">
-                        <a href="{{ route('notifications.index') }}" class="btn btn-sm btn-outline-secondary position-relative app-icon-btn" title="{{ __('ui.nav_notifications') }}">
+                        <a href="{{ route('notifications.index') }}" class="btn btn-sm btn-outline-secondary position-relative app-icon-btn" title="{{ __('ui.nav_notifications') }}" aria-label="{{ __('ui.nav_notifications') }}">
                             <i class="bi bi-bell" aria-hidden="true"></i>
                             @if($unreadCount > 0)
                                 <span class="app-unread-dot" aria-label="{{ __('ui.unread_count', ['count' => $unreadCount]) }}"></span>
                             @endif
                         </a>
                         <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                {{ auth()->user()->first_name }}
+                            <button class="btn btn-outline-secondary dropdown-toggle app-user-menu-btn" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false"
+                                    aria-label="{{ __('ui.user_menu', ['name' => $navUser->first_name]) }}">
+                                <span class="app-avatar" aria-hidden="true">{{ $userInitials }}</span>
+                                <span class="app-user-firstname">{{ $navUser->first_name }}</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="{{ route('dashboard') }}">{{ __('ui.nav_dashboard') }}</a></li>
@@ -160,7 +180,7 @@
                         <form method="POST" action="{{ route('locale.update') }}" class="d-inline">
                             @csrf
                             <label class="visually-hidden" for="locale-select">{{ __('ui.locale') }}</label>
-                            <select id="locale-select" name="locale" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <select id="locale-select" name="locale" class="form-select form-select-sm app-topbar-select" onchange="this.form.submit()">
                                 @foreach(['ar' => 'العربية', 'en' => 'English', 'fr' => 'Français'] as $code => $label)
                                     <option value="{{ $code }}" @selected(app()->getLocale() === $code)>{{ $label }}</option>
                                 @endforeach
@@ -169,7 +189,7 @@
                         <form method="POST" action="{{ route('theme.update') }}" class="d-inline">
                             @csrf
                             <label class="visually-hidden" for="theme-select">{{ __('ui.theme') }}</label>
-                            <select id="theme-select" name="theme" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <select id="theme-select" name="theme" class="form-select form-select-sm app-topbar-select" onchange="this.form.submit()">
                                 <option value="light" @selected(($cookieTheme ?? 'system') === 'light')>{{ __('ui.theme_light') }}</option>
                                 <option value="dark" @selected(($cookieTheme ?? 'system') === 'dark')>{{ __('ui.theme_dark') }}</option>
                                 <option value="system" @selected(($cookieTheme ?? 'system') === 'system')>{{ __('ui.theme_system') }}</option>

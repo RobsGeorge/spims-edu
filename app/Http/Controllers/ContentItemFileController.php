@@ -9,6 +9,7 @@ use App\Services\Offerings\LearningAccessService;
 use App\Services\Offerings\LearningProgressService;
 use App\Services\Storage\ObjectStorageService;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -61,8 +62,12 @@ class ContentItemFileController extends Controller
         abort_unless($this->storage->exists((string) $item->file_url), 404);
 
         $mime = $this->mimeFor($item);
-        $name = basename((string) $item->file_url);
-        $disposition = ($download ? 'attachment' : 'inline').'; filename="'.$name.'"';
+        [$filename, $fallback] = $this->dispositionFilenames($item);
+        $disposition = HeaderUtils::makeDisposition(
+            $download ? HeaderUtils::DISPOSITION_ATTACHMENT : HeaderUtils::DISPOSITION_INLINE,
+            $filename,
+            $fallback,
+        );
 
         return response()->stream(function () use ($item) {
             echo $this->storage->disk()->get($item->file_url);
@@ -72,6 +77,44 @@ class ContentItemFileController extends Controller
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'private, no-store',
         ]);
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function dispositionFilenames(ContentItem $item): array
+    {
+        $ext = $item->storedFileExtension() ?: 'bin';
+        $base = $this->safeDispositionBase((string) $item->title);
+        $ascii = preg_replace('/[^A-Za-z0-9._-]+/', '_', $base) ?? 'file';
+        $ascii = trim($ascii, '._-');
+        if ($ascii === '') {
+            $ascii = 'file';
+        }
+
+        return [$this->withDispositionExtension($base, $ext), $this->withDispositionExtension($ascii, $ext)];
+    }
+
+    private function safeDispositionBase(string $title): string
+    {
+        $base = str_replace(["\0", '/', '\\', '%'], '-', $title);
+        while (str_contains($base, '..')) {
+            $base = str_replace('..', '', $base);
+        }
+        $base = trim($base, " \t.-");
+
+        return $base !== '' ? $base : 'file';
+    }
+
+    private function withDispositionExtension(string $base, string $ext): string
+    {
+        $ext = ltrim(strtolower($ext), '.');
+        $suffix = $ext !== '' ? '.'.$ext : '';
+        if ($suffix !== '' && str_ends_with(strtolower($base), $suffix)) {
+            return $base;
+        }
+
+        return $base.$suffix;
     }
 
     private function mimeFor(ContentItem $item): string

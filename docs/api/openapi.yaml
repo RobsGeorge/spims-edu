@@ -3884,7 +3884,7 @@ paths:
   /teach/weeks/{week}/items:
     post:
       operationId: teachCreateWeekItem
-      summary: Create a content item. Multipart for FILE items.
+      summary: Create a content item. Multipart when uploading a file. FILE/READING may use file_url instead of an upload. New items are drafts unless published is true.
       security:
       - bearerAuth: []
       parameters:
@@ -3912,6 +3912,15 @@ paths:
                   type: string
                 vimeo_id:
                   type: string
+                  maxLength: 256
+                video_url:
+                  type: string
+                  maxLength: 2048
+                file_url:
+                  type: string
+                  maxLength: 2048
+                published:
+                  type: boolean
                 file:
                   type: string
                   format: binary
@@ -3926,6 +3935,19 @@ paths:
                   type: string
                 title:
                   type: string
+                body:
+                  type: string
+                vimeo_id:
+                  type: string
+                  maxLength: 256
+                video_url:
+                  type: string
+                  maxLength: 2048
+                file_url:
+                  type: string
+                  maxLength: 2048
+                published:
+                  type: boolean
       responses:
         '201':
           description: Created
@@ -3934,7 +3956,7 @@ paths:
   /teach/items/{contentItem}:
     put:
       operationId: teachUpdateContentItem
-      summary: Update a content item.
+      summary: Update a content item. Accepts video_url / vimeo_id and optional file_url or file upload.
       security:
       - bearerAuth: []
       parameters:
@@ -3956,6 +3978,17 @@ paths:
                   type: string
                 body:
                   type: string
+                vimeo_id:
+                  type: string
+                  maxLength: 256
+                video_url:
+                  type: string
+                  maxLength: 2048
+                file_url:
+                  type: string
+                  maxLength: 2048
+                published:
+                  type: boolean
                 file:
                   type: string
                   format: binary
@@ -3969,6 +4002,17 @@ paths:
                   type: string
                 body:
                   type: string
+                vimeo_id:
+                  type: string
+                  maxLength: 256
+                video_url:
+                  type: string
+                  maxLength: 2048
+                file_url:
+                  type: string
+                  maxLength: 2048
+                published:
+                  type: boolean
       responses:
         '200':
           description: Updated
@@ -3991,3 +4035,106 @@ paths:
           description: Deleted
         '403':
           description: Not staffed or missing offerings.content
+  /teach/items/{contentItem}/publish:
+    post:
+      operationId: teachPublishContentItem
+      summary: Publish a content item so enrolled students can see it.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: contentItem
+        required: true
+        schema:
+          type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        '200':
+          description: Published
+        '403':
+          description: Not staffed or missing offerings.content
+  /teach/items/{contentItem}/unpublish:
+    post:
+      operationId: teachUnpublishContentItem
+      summary: Unpublish a content item (students and catalog omit it).
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: contentItem
+        required: true
+        schema:
+          type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        '200':
+          description: Unpublished
+        '403':
+          description: Not staffed or missing offerings.content
+  /teach/items/{contentItem}/move-up:
+    post:
+      operationId: teachMoveContentItemUp
+      summary: Swap the item one position earlier in its week.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: contentItem
+        required: true
+        schema:
+          type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        '200':
+          description: Reordered
+        '403':
+          description: Not staffed or missing offerings.content
+  /teach/items/{contentItem}/move-down:
+    post:
+      operationId: teachMoveContentItemDown
+      summary: Swap the item one position later in its week.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: contentItem
+        required: true
+        schema:
+          type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        '200':
+          description: Reordered
+        '403':
+          description: Not staffed or missing offerings.content
+  /teach/items/{contentItem}/move:
+    post:
+      operationId: teachMoveContentItem
+      summary: Move a content item to another week on the same offering.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: contentItem
+        required: true
+        schema:
+          type: string
+      - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - week_id
+              properties:
+                week_id:
+                  type: string
+      responses:
+        '200':
+          description: Moved
+        '403':
+          description: Not staffed or missing offerings.content
+        '422':
+          description: Target week is on a different offering

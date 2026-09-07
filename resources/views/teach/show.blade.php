@@ -158,6 +158,7 @@
                 <button class="btn btn-outline-secondary btn-sm">{{ __('offerings.view_as_student') }}</button>
             </form>
         </div>
+        @include('offerings.partials.add-week-form', ['offering' => $offering])
         @if($offering->weeks->isEmpty())
             <x-empty-state :title="__('teach.no_weeks')" :message="__('teach.no_weeks_help')" icon="bi-calendar-week" />
         @else

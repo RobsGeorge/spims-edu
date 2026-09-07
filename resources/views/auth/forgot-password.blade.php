@@ -4,19 +4,21 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-6 col-lg-5">
         <div class="card border-0 auth-card">
-            <div class="card-body p-4">
-                <h1 class="h4 spims-title mb-3">{{ __('ui.forgot_password') }}</h1>
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h3 spims-title mb-2">{{ __('ui.forgot_password') }}</h1>
+                <p class="text-muted-theme auth-help mb-4">{{ __('ui.auth_help_forgot') }}</p>
                 <form method="POST" action="{{ url('/forgot-password') }}">
                     @csrf
                     <div class="mb-3">
-                        <label class="form-label">{{ __('ui.email') }}</label>
-                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" required>
+                        <label class="form-label" for="forgot-email">{{ __('ui.email') }}</label>
+                        <input id="forgot-email" type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autocomplete="username">
                         @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <button type="submit" class="btn btn-primary w-100">{{ __('ui.send_otp') }}</button>
                 </form>
+                <p class="auth-footer-links mb-0"><a href="{{ route('auth.login') }}">{{ __('ui.auth_back_to_login') }}</a></p>
             </div>
         </div>
     </div>

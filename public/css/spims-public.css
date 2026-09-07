@@ -1,0 +1,100 @@
+/**
+ * SPIMS public surfaces (landing, auth, catalog).
+ * Typographic atmosphere only — no clipart. Tokens come from spims-theme.css.
+ */
+
+.spims-landing {
+    min-height: calc(100vh - 8rem);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 3.5rem;
+    padding: 2.5rem 0 3.5rem;
+}
+
+.spims-landing-band {
+    max-width: 48rem;
+    width: 100%;
+    margin-inline: auto;
+    padding-top: 2.25rem;
+    border-top: 1px solid var(--color-surface-border);
+    text-align: center;
+}
+
+.spims-landing-band-title {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 1.75rem;
+}
+
+html[dir='rtl'] .spims-landing-band-title {
+    font-family: var(--font-arabic);
+    letter-spacing: 0.04em;
+}
+
+.spims-landing-beats {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .spims-landing-beats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.75rem;
+        text-align: start;
+    }
+}
+
+.spims-landing-beat-num {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-title);
+    margin-bottom: 0.35rem;
+    line-height: 1;
+}
+
+html[dir='rtl'] .spims-landing-beat-num {
+    font-family: var(--font-arabic);
+}
+
+.spims-landing-beat-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-title);
+    margin-bottom: 0.35rem;
+}
+
+.spims-landing-beat-body {
+    font-size: 0.925rem;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+    margin: 0;
+}
+
+.spims-landing-teaser {
+    margin-top: 1.75rem;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+.auth-card .auth-help {
+    font-size: 0.95rem;
+}
+
+.auth-card .auth-footer-links {
+    margin-top: 1.5rem;
+}
+
+.catalog-results[aria-busy='true'] {
+    opacity: 0.72;
+}

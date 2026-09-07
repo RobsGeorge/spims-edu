@@ -2,6 +2,10 @@
  * SPIMS — Sacred Academic Design System
  * Cool near-white field + liturgical burgundy spine + academic gold accent.
  * Explicitly rejects warm parchment / cream skeuomorphism.
+ *
+ * One-Burgundy: gold (#eac167 / #e9c16d) is accent only — never --color-primary
+ * or body text (--color-text). Soft Lift: --shadow-soft plus slightly stronger
+ * --shadow-lift. Hairline rose: --color-hairline on card borders.
  */
 
 :root {
@@ -14,7 +18,9 @@
     --radius-full: 9999px;
     --transition-base: 220ms cubic-bezier(0.4, 0, 0.2, 1);
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.08);
     --shadow-floating: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --color-hairline: rgba(219, 192, 196, 0.65);
 
     /* Bootstrap brand bridge */
     --bs-primary: var(--color-primary);
@@ -36,6 +42,7 @@ body.theme-system {
     --color-surface: #ffffff;
     --color-surface-low: #eff4ff;
     --color-surface-border: rgba(219, 192, 196, 0.55);
+    --color-hairline: rgba(219, 192, 196, 0.65);
     --color-title: #5d0326;
     --color-title-accent: #380014;
     --color-text: #0b1c30;
@@ -44,7 +51,7 @@ body.theme-system {
     --color-primary: #5d0326;
     --color-primary-hover: #380014;
     --color-primary-text: #ffffff;
-    --color-accent: #eac167;
+    --color-accent: #eac167; /* gold: accent only, never primary or body text */
     --color-accent-text: #251a00;
     --color-nav-bg: rgba(248, 249, 255, 0.92);
     --color-nav-border: rgba(219, 192, 196, 0.45);
@@ -55,6 +62,7 @@ body.theme-system {
     --color-warning: #f59e0b;
     --color-danger: #ef4444;
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.08);
     --bs-primary-rgb: 93, 3, 38;
 }
 
@@ -66,15 +74,16 @@ body.theme-dark {
     --color-surface: #191f2f;
     --color-surface-low: #151b2b;
     --color-surface-border: rgba(85, 66, 69, 0.85);
+    --color-hairline: rgba(219, 192, 196, 0.28);
     --color-title: #ffb1c0;
-    --color-title-accent: #e9c16d;
+    --color-title-accent: #e9c16d; /* gold: title accent only */
     --color-text: #dde2f8;
     --color-text-muted: #dbc0c4;
     --color-link: #ffb1c0;
     --color-primary: #ffb1c0;
     --color-primary-hover: #ffd9df;
     --color-primary-text: #380014;
-    --color-accent: #e9c16d;
+    --color-accent: #e9c16d; /* gold: accent only, never primary or body text */
     --color-accent-text: #251a00;
     --color-nav-bg: rgba(13, 19, 34, 0.92);
     --color-nav-border: rgba(85, 66, 69, 0.7);
@@ -85,9 +94,11 @@ body.theme-dark {
     --color-warning: #f59e0b;
     --color-danger: #ef4444;
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.38);
     --bs-primary-rgb: 255, 177, 192;
 }
 
+/* SYSTEM theme: body.theme-system follows OS dark via prefers-color-scheme */
 @media (prefers-color-scheme: dark) {
     body.theme-system {
         --color-bg-1: #0d1322;
@@ -97,15 +108,16 @@ body.theme-dark {
         --color-surface: #191f2f;
         --color-surface-low: #151b2b;
         --color-surface-border: rgba(85, 66, 69, 0.85);
+        --color-hairline: rgba(219, 192, 196, 0.28);
         --color-title: #ffb1c0;
-        --color-title-accent: #e9c16d;
+        --color-title-accent: #e9c16d; /* gold: title accent only */
         --color-text: #dde2f8;
         --color-text-muted: #dbc0c4;
         --color-link: #ffb1c0;
         --color-primary: #ffb1c0;
         --color-primary-hover: #ffd9df;
         --color-primary-text: #380014;
-        --color-accent: #e9c16d;
+        --color-accent: #e9c16d; /* gold: accent only, never primary or body text */
         --color-accent-text: #251a00;
         --color-nav-bg: rgba(13, 19, 34, 0.92);
         --color-nav-border: rgba(85, 66, 69, 0.7);
@@ -116,6 +128,7 @@ body.theme-dark {
         --color-warning: #f59e0b;
         --color-danger: #ef4444;
         --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+        --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.38);
         --bs-primary-rgb: 255, 177, 192;
     }
 }
@@ -177,9 +190,9 @@ html[dir='rtl'] .display-6 {
 .card,
 .app-card {
     background: var(--color-surface);
-    border: 1px solid var(--color-surface-border) !important;
+    border: 1px solid var(--color-hairline) !important;
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-lift);
 }
 
 .form-control,

@@ -1,0 +1,96 @@
+/**
+ * SPIMS D1 remaining shell chrome (search, touch targets, avatar menu).
+ * Tokens and D0 theme live in spims-theme.css — do not duplicate palettes here.
+ * Use logical properties only so RTL (dir=rtl) mirrors without physical left/right.
+ */
+
+.app-icon-btn,
+.app-menu-btn,
+.app-user-menu-btn,
+.app-bottom-link {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.app-topbar .app-topbar-select {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.app-topbar-search {
+    display: flex;
+    align-items: center;
+    flex: 1 1 8rem;
+    min-width: 0;
+    max-width: 16rem;
+    margin-inline-end: 0.5rem;
+}
+
+.app-topbar-search-input {
+    min-height: 44px;
+    width: 100%;
+    padding-inline: 0.75rem;
+}
+
+.app-user-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding-inline: 0.45rem 0.7rem;
+}
+
+.app-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    background: var(--color-primary);
+    color: var(--color-primary-text);
+    flex-shrink: 0;
+}
+
+.app-user-firstname {
+    max-width: 8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 991.98px) {
+    /* Compact topbar: keep catalog search in the a11y tree, hide visually. */
+    .app-topbar-search {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin-inline: -1px;
+        margin-block: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+        inset-inline-start: 0;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .app-user-firstname {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin-inline: -1px;
+        margin-block: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+    }
+}

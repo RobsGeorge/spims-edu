@@ -43,7 +43,7 @@ class InstructorOpsContentTest extends TestCase
             ->assertJsonPath('data.title', 'Week 1')
             ->json('data.id');
 
-        $file = UploadedFile::fake()->create('notes.pdf', 20, 'application/pdf');
+        $file = UploadedFile::fake()->createWithContent('notes.pdf', "%PDF-1.4\n%%EOF");
         $itemId = $this->asInstructor($instructor)
             ->post(route('api.v1.teach.weeks.items.store', $weekId), [
                 'type' => ContentItemType::File->value,
