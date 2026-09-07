@@ -79,4 +79,11 @@ class ApplicationController extends Controller
 
         return redirect()->route('applications.index')->with('status', __('admissions.application_saved'));
     }
+
+    public function withdraw(Request $request, Application $application, ApplicationService $service): RedirectResponse
+    {
+        $service->withdraw($request->user(), $application);
+
+        return redirect()->route('applications.index')->with('status', __('admissions.withdrawn'));
+    }
 }

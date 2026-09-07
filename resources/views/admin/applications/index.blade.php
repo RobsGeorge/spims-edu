@@ -37,20 +37,11 @@
                 </thead>
                 <tbody>
                 @foreach($applications as $application)
-                    @php
-                        $badgeStatus = match ($application->status) {
-                            \App\Enums\ApplicationStatus::Accepted => 'success',
-                            \App\Enums\ApplicationStatus::Rejected => 'danger',
-                            \App\Enums\ApplicationStatus::Waitlisted => 'waitlist',
-                            \App\Enums\ApplicationStatus::UnderReview, \App\Enums\ApplicationStatus::Submitted => 'pending',
-                            default => 'neutral',
-                        };
-                    @endphp
                     <tr>
                         <td>{{ $application->applicant->email }}</td>
                         <td>{{ $application->program->code }}</td>
                         <td>
-                            <x-status-badge :status="$badgeStatus" :label="$application->status->value" />
+                            <x-status-badge :status="$application->status->badgeTone()" :label="$application->status->value" />
                         </td>
                         <td>
                             <a href="{{ route('admin.applications.show', $application) }}">{{ __('admissions.review') }}</a>

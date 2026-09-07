@@ -263,4 +263,162 @@ class AdmissionsFlowTest extends TestCase
 
         $this->assertSame(ApplicationStatus::UnderReview, $application->fresh()->status);
     }
+
+    #[Test]
+    public function applicant_withdraws_under_review_and_can_start_again(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create([
+            'is_reviewer' => true,
+        ]);
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $form = $this->seedProgramAndForm($adm);
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $first = Application::query()->first();
+        $fieldId = $form->fields()->where('label', 'Motivation')->value('id');
+
+        $this->actingAs($student)->post(route('applications.store', $first), [
+            'answers' => [$fieldId => 'Withdraw later'],
+            'submit' => '1',
+        ])->assertRedirect(route('applications.index'));
+
+        $this->assertSame(ApplicationStatus::UnderReview, $first->fresh()->status);
+
+        $this->actingAs($student)
+            ->post(route('applications.withdraw', $first))
+            ->assertRedirect(route('applications.index'));
+
+        $first->refresh();
+        $this->assertSame(ApplicationStatus::Withdrawn, $first->status);
+        $this->assertNotNull($first->decided_at);
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'admissions.withdraw',
+            'entity_type' => 'Application',
+            'entity_id' => $first->id,
+        ]);
+
+        $this->actingAs($student)->postJson(route('applications.store', $first), [
+            'answers' => [$fieldId => 'After withdraw'],
+        ])->assertStatus(422);
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $second = Application::query()
+            ->where('applicant_id', $student->id)
+            ->where('id', '!=', $first->id)
+            ->first();
+
+        $this->assertNotNull($second);
+        $this->assertSame(ApplicationStatus::Draft, $second->status);
+        $this->assertSame($form->program_id, $second->program_id);
+        $this->assertSame(ApplicationStatus::Withdrawn, $first->fresh()->status);
+
+        $this->actingAs($student)
+            ->get(route('applications.index'))
+            ->assertOk()
+            ->assertSee(ApplicationStatus::Withdrawn->value)
+            ->assertSee('THEO');
+    }
+
+    #[Test]
+    public function applicant_cannot_withdraw_accepted_application(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create([
+            'is_reviewer' => true,
+        ]);
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $form = $this->seedProgramAndForm($adm);
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $application = Application::query()->first();
+        $fieldId = $form->fields()->where('label', 'Motivation')->value('id');
+
+        $this->actingAs($student)->post(route('applications.store', $application), [
+            'answers' => [$fieldId => 'Please accept'],
+            'submit' => '1',
+        ])->assertRedirect();
+
+        $this->actingAs($adm)->post(route('admin.applications.decide', $application), [
+            'decision' => ApplicationStatus::Accepted->value,
+        ])->assertRedirect();
+
+        $this->assertSame(ApplicationStatus::Accepted, $application->fresh()->status);
+
+        $this->actingAs($student)
+            ->postJson(route('applications.withdraw', $application))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('application');
+
+        $this->assertSame(ApplicationStatus::Accepted, $application->fresh()->status);
+    }
+
+    #[Test]
+    public function other_student_cannot_withdraw_someone_elses_application(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create([
+            'is_reviewer' => true,
+        ]);
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $other = User::factory()->withRole(RoleType::Student)->create();
+        $form = $this->seedProgramAndForm($adm);
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $application = Application::query()->first();
+        $fieldId = $form->fields()->where('label', 'Motivation')->value('id');
+
+        $this->actingAs($student)->post(route('applications.store', $application), [
+            'answers' => [$fieldId => 'Mine'],
+            'submit' => '1',
+        ])->assertRedirect();
+
+        $response = $this->actingAs($other)->postJson(route('applications.withdraw', $application));
+        $this->assertContains($response->status(), [403, 422]);
+
+        $this->assertSame(ApplicationStatus::UnderReview, $application->fresh()->status);
+    }
+
+    #[Test]
+    public function student_applications_index_shows_withdraw_control_for_open_app(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $form = $this->seedProgramAndForm($adm);
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $application = Application::query()->first();
+
+        $this->actingAs($student)
+            ->get(route('applications.index'))
+            ->assertOk()
+            ->assertSee(__('admissions.withdraw'), false)
+            ->assertSee('withdraw-'.$application->id, false)
+            ->assertSee(ApplicationStatus::Draft->value);
+    }
+
+    #[Test]
+    public function admin_filter_lists_withdrawn_applications(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create([
+            'is_reviewer' => true,
+        ]);
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $form = $this->seedProgramAndForm($adm);
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $application = Application::query()->first();
+        $fieldId = $form->fields()->where('label', 'Motivation')->value('id');
+
+        $this->actingAs($student)->post(route('applications.store', $application), [
+            'answers' => [$fieldId => 'Will withdraw'],
+            'submit' => '1',
+        ])->assertRedirect();
+
+        $this->actingAs($student)->post(route('applications.withdraw', $application))->assertRedirect();
+
+        $this->actingAs($adm)
+            ->get(route('admin.applications.index', ['status' => ApplicationStatus::Withdrawn->value]))
+            ->assertOk()
+            ->assertSee($student->email)
+            ->assertSee(ApplicationStatus::Withdrawn->value)
+            ->assertSee('value="'.ApplicationStatus::Withdrawn->value.'"', false);
+    }
 }

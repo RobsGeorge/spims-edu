@@ -32,4 +32,10 @@ return [
     'current_document' => 'المستند الحالي',
     'upload_failed' => 'فشل رفع المستند.',
     'no_applications' => 'لم تبدأ أي طلبات بعد.',
+    'my_applications_subtitle' => 'متابعة طلباتك وحالة المراجعة.',
+    'withdraw' => 'سحب الطلب',
+    'withdraw_confirm_title' => 'سحب هذا الطلب؟',
+    'withdraw_confirm_body' => 'يمكنك بدء طلب جديد لهذا البرنامج بعد ذلك.',
+    'withdrawn' => 'تم سحب الطلب.',
+    'not_withdrawable' => 'لا يمكن سحب هذا الطلب.',
 ];

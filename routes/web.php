@@ -379,6 +379,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/applications/{application}', [ApplicationController::class, 'store'])
         ->middleware('permission:admissions.apply')
         ->name('applications.store');
+    Route::post('/applications/{application}/withdraw', [ApplicationController::class, 'withdraw'])
+        ->middleware('permission:admissions.apply')
+        ->name('applications.withdraw'); // application withdraw
 
     Route::get('/projects', [StudentProjectController::class, 'mine'])
         ->middleware('permission:projects.view')

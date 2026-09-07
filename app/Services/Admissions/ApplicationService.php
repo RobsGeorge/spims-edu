@@ -158,6 +158,10 @@ class ApplicationService
             throw ValidationException::withMessages(['application' => [__('admissions.not_owner')]]);
         }
 
+        if ($application->status === ApplicationStatus::Withdrawn) {
+            throw ValidationException::withMessages(['application' => [__('admissions.not_editable')]]);
+        }
+
         $application->load('form.fields', 'values');
         foreach ($application->form->fields->where('active', true) as $field) {
             if ($field->required && ! $application->values->firstWhere('field_id', $field->id)) {
@@ -210,6 +214,28 @@ class ApplicationService
 
             return $application->fresh();
         });
+    }
+
+    public function withdraw(User $actor, Application $application): Application
+    {
+        $this->authorize->authorize($actor, 'admissions.apply');
+
+        if ($application->applicant_id !== $actor->id) {
+            throw ValidationException::withMessages(['application' => [__('admissions.not_owner')]]);
+        }
+
+        if (! $application->status->isWithdrawable()) {
+            throw ValidationException::withMessages(['application' => [__('admissions.not_withdrawable')]]);
+        }
+
+        return $this->audit->withAudit($actor, 'admissions.withdraw', function () use ($application) {
+            $application->update([
+                'status' => ApplicationStatus::Withdrawn,
+                'decided_at' => now(),
+            ]);
+
+            return $application->fresh();
+        }, 'Application');
     }
 
     public function matriculate(Application $application): StudentProgram

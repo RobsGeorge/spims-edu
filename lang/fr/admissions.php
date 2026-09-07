@@ -32,4 +32,10 @@ return [
     'current_document' => 'Document actuel',
     'upload_failed' => 'Échec du téléversement du document.',
     'no_applications' => 'Vous n’avez encore commencé aucune candidature.',
+    'my_applications_subtitle' => 'Suivre vos candidatures et leur état d’examen.',
+    'withdraw' => 'Retirer la candidature',
+    'withdraw_confirm_title' => 'Retirer cette candidature ?',
+    'withdraw_confirm_body' => 'Vous pourrez ensuite commencer une nouvelle candidature pour ce programme.',
+    'withdrawn' => 'Candidature retirée.',
+    'not_withdrawable' => 'Cette candidature ne peut pas être retirée.',
 ];
