@@ -28,16 +28,23 @@ class ApplicationService
     {
         $this->authorize->authorize($applicant, 'admissions.apply');
 
-        return Application::query()->firstOrCreate(
-            [
-                'applicant_id' => $applicant->id,
-                'program_id' => $form->program_id,
-            ],
-            [
-                'form_id' => $form->id,
-                'status' => ApplicationStatus::Draft,
-            ]
-        );
+        $open = Application::query()
+            ->where('applicant_id', $applicant->id)
+            ->where('program_id', $form->program_id)
+            ->whereIn('status', ApplicationStatus::openCases())
+            ->latest()
+            ->first();
+
+        if ($open) {
+            return $open;
+        }
+
+        return Application::query()->create([
+            'applicant_id' => $applicant->id,
+            'program_id' => $form->program_id,
+            'form_id' => $form->id,
+            'status' => ApplicationStatus::Draft,
+        ]);
     }
 
     /**
@@ -183,12 +190,6 @@ class ApplicationService
 
         if (! in_array($decision, [ApplicationStatus::Accepted, ApplicationStatus::Rejected, ApplicationStatus::Waitlisted], true)) {
             throw ValidationException::withMessages(['status' => [__('admissions.invalid_decision')]]);
-        }
-
-        if (! $actor->isSuperAdmin() && ! $actor->hasRole(\App\Enums\RoleType::AdministrativeAdmin)) {
-            if ($application->reviewer_id !== $actor->id) {
-                throw ValidationException::withMessages(['application' => [__('admissions.not_assigned_reviewer')]]);
-            }
         }
 
         return DB::transaction(function () use ($actor, $application, $decision, $note) {

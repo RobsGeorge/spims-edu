@@ -15,4 +15,7 @@ return [
     'pinned' => 'Épinglé',
     'no_threads' => 'Aucun fil de discussion',
     'no_threads_help' => 'Ouvrez le forum pour créer un fil, puis revenez ici pour noter les étudiants.',
+    'thread_title' => 'Titre du fil',
+    'opening_post' => 'Premier message',
+    'new_thread' => 'Nouveau fil',
 ];

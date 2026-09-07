@@ -31,4 +31,5 @@ return [
     'document' => 'Document',
     'current_document' => 'Document actuel',
     'upload_failed' => 'Échec du téléversement du document.',
+    'no_applications' => 'Vous n’avez encore commencé aucune candidature.',
 ];

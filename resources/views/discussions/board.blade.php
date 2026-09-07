@@ -11,21 +11,26 @@
 @if($board)
 <form method="POST" action="{{ route('discussions.threads.store', $offering) }}" class="card border-0 shadow-sm mb-4">@csrf
     <div class="card-body row g-2">
-        <div class="col-md-6"><input name="title" class="form-control" placeholder="Thread title" required></div>
-        <div class="col-md-6"><input name="body" class="form-control" placeholder="Opening post"></div>
-        <div class="col-12"><button class="btn btn-primary">New thread</button></div>
+        <div class="col-md-6"><input name="title" class="form-control" placeholder="{{ __('discussions.thread_title') }}" required></div>
+        <div class="col-md-6"><input name="body" class="form-control" placeholder="{{ __('discussions.opening_post') }}"></div>
+        <div class="col-12"><button class="btn btn-primary">{{ __('discussions.new_thread') }}</button></div>
     </div>
 </form>
-<ul>
-@foreach($threads as $thread)
-    <li>
-        @if($thread->pinned)📌@endif
-        <a href="{{ route('discussions.thread', $thread) }}">{{ $thread->title }}</a>
-        — {{ $thread->author->email }}
-        @if($thread->locked)(locked)@endif
-    </li>
-@endforeach
-</ul>
+@if($threads->isEmpty())
+    <p class="text-muted-theme">{{ __('discussions.no_threads') }}</p>
+@else
+    <ul>
+    @foreach($threads as $thread)
+        <li>
+            @if($thread->pinned)📌@endif
+            <a href="{{ route('discussions.thread', $thread) }}">{{ $thread->title }}</a>
+            — {{ $thread->author->email }}
+            @if($thread->locked)({{ __('discussions.locked') }})@endif
+        </li>
+    @endforeach
+    </ul>
+    {{ $threads->links() }}
+@endif
 @else
 <div class="alert alert-info">{{ __('live.board_not_yet_configured') }}</div>
 @endif

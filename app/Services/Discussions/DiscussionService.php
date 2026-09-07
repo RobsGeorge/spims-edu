@@ -13,9 +13,11 @@ use App\Models\DiscussionPost;
 use App\Models\DiscussionThread;
 use App\Models\Enrollment;
 use App\Models\User;
+use App\Services\Learning\OfferingAccessService;
 use App\Services\Notifications\NotificationService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -25,6 +27,7 @@ class DiscussionService
         private readonly AuthorizeService $authorize,
         private readonly AuditLogWriter $audit,
         private readonly NotificationService $notifications,
+        private readonly OfferingAccessService $access,
     ) {}
 
     public function ensureBoard(CourseOffering $offering): ?DiscussionBoard
@@ -107,9 +110,35 @@ class DiscussionService
         });
     }
 
+    /**
+     * Threads a viewer may list on a board. Staff/admins see private-to-instructor
+     * threads; other students see only their own private threads plus open ones.
+     *
+     * @return Builder<DiscussionThread>
+     */
+    public function visibleThreadsQuery(User $actor, DiscussionBoard $board): Builder
+    {
+        $board->loadMissing('offering');
+
+        $query = DiscussionThread::query()
+            ->where('board_id', $board->id)
+            ->orderByDesc('pinned')
+            ->latest('created_at');
+
+        if ($board->offering && $this->access->isStaffOrAdmin($actor, $board->offering)) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $inner) use ($actor) {
+            $inner->where('visibility', '!=', ThreadVisibility::PrivateToInstructor)
+                ->orWhere('author_id', $actor->id);
+        });
+    }
+
     public function post(User $actor, DiscussionThread $thread, string $body, ?string $parentPostId = null, ?array $attachments = null): DiscussionPost
     {
         $this->authorize->authorize($actor, 'discussions.post');
+        $this->access->assertCanAccessThread($actor, $thread);
 
         if ($thread->locked) {
             throw ValidationException::withMessages(['post' => [__('live.thread_locked')]]);

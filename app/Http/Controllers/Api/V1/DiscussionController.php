@@ -7,6 +7,7 @@ use App\Models\CourseOffering;
 use App\Models\DiscussionPost;
 use App\Models\DiscussionThread;
 use App\Services\Discussions\DiscussionService;
+use App\Services\Learning\OfferingAccessService;
 use App\Support\Api\PaginatedEnvelope;
 use App\Support\Api\StudentPayload;
 use App\Support\Api\StudentRecordGuard;
@@ -18,6 +19,7 @@ class DiscussionController extends Controller
     public function __construct(
         private readonly StudentRecordGuard $guard,
         private readonly DiscussionService $discussions,
+        private readonly OfferingAccessService $access,
     ) {}
 
     public function index(Request $request, CourseOffering $offering): JsonResponse
@@ -26,15 +28,9 @@ class DiscussionController extends Controller
         $board = $this->discussions->ensureBoard($offering);
         $perPage = PaginatedEnvelope::perPage($request->integer('per_page') ?: null);
 
-        $query = DiscussionThread::query()
-            ->where('board_id', $board?->id)
-            ->orderByDesc('pinned')
-            ->latest('created_at')
-            ->with('author');
-
-        if ($board === null) {
-            $query->whereRaw('0 = 1');
-        }
+        $query = $board === null
+            ? DiscussionThread::query()->whereRaw('0 = 1')
+            : $this->discussions->visibleThreadsQuery($request->user(), $board)->with('author');
 
         $page = $query->paginate($perPage);
         $page->setCollection($page->getCollection()->map(fn (DiscussionThread $thread) => $this->threadPayload($thread, false)));
@@ -52,6 +48,7 @@ class DiscussionController extends Controller
         $thread->loadMissing('board');
         $offering = CourseOffering::query()->findOrFail($thread->board->offering_id);
         $this->guard->enrollmentForRead($request->user(), $offering);
+        $this->access->assertCanAccessThread($request->user(), $thread);
 
         $perPage = PaginatedEnvelope::perPage($request->integer('per_page') ?: null);
         $page = DiscussionPost::query()
@@ -73,6 +70,7 @@ class DiscussionController extends Controller
         $thread->loadMissing('board');
         $offering = CourseOffering::query()->findOrFail($thread->board->offering_id);
         $this->guard->enrollmentForWrite($request->user(), $offering);
+        $this->access->assertCanAccessThread($request->user(), $thread);
 
         $data = $request->validate([
             'body' => 'required|string',

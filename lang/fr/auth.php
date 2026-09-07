@@ -14,4 +14,7 @@ return [
     'cannot_assign_role' => 'Vous ne pouvez pas attribuer ce rôle.',
     'user_created' => 'Utilisateur créé avec succès.',
     'user_suspended' => 'Utilisateur suspendu.',
+    'user_updated' => 'Utilisateur mis à jour.',
+    'role_assigned' => 'Rôle attribué.',
+    'role_removed' => 'Rôle retiré.',
 ];

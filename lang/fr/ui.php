@@ -91,4 +91,9 @@ return [
     'go_home' => 'Accueil',
     'save_changes' => 'Enregistrer',
     'edit' => 'Modifier',
+    'edit_user' => 'Modifier l’utilisateur',
+    'is_reviewer' => 'Rapporteur des admissions',
+    'country_code' => 'Code pays',
+    'assign_role' => 'Attribuer un rôle',
+    'remove_role' => 'Retirer le rôle',
 ];

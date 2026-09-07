@@ -19,7 +19,7 @@ class ApplicationController extends Controller
                 ->where('applicant_id', $request->user()->id)
                 ->with('program')
                 ->latest()
-                ->get(),
+                ->paginate(20),
             'programs' => Program::query()->where('active', true)->with(['applicationForms' => fn ($q) => $q->where('active', true)])->get(),
         ]);
     }

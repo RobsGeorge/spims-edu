@@ -43,6 +43,26 @@ class UserAdminService
         }, 'User');
     }
 
+    public function updateUser(User $actor, User $target, array $data): User
+    {
+        $this->authorize->authorize($actor, 'users.manage');
+
+        return $this->audit->withAudit($actor, 'users.update', function () use ($target, $data) {
+            $target->update([
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'phone' => $data['phone'] ?? null,
+                'preferred_locale' => $data['preferred_locale'] ?? $target->preferred_locale,
+                'country_code' => $data['country_code'] ?? null,
+                'date_of_birth' => $data['date_of_birth'] ?? null,
+                'notify_email' => (bool) ($data['notify_email'] ?? false),
+                'is_reviewer' => (bool) ($data['is_reviewer'] ?? false),
+            ]);
+
+            return $target->fresh();
+        }, 'User');
+    }
+
     public function assignRole(User $actor, User $target, RoleType $role, bool $skipAuth = false): void
     {
         if (! $skipAuth) {
@@ -59,6 +79,22 @@ class UserAdminService
         );
 
         $this->audit->write($actor, 'roles.assign', 'User', $target->id, null, ['role' => $role->value]);
+    }
+
+    public function removeRole(User $actor, User $target, RoleType $role): void
+    {
+        $this->authorize->authorize($actor, 'roles.assign');
+
+        if (! $this->authorize->canAssignRole($actor, $role)) {
+            throw ValidationException::withMessages(['role' => [__('auth.cannot_assign_role')]]);
+        }
+
+        UserRole::query()
+            ->where('user_id', $target->id)
+            ->where('role', $role)
+            ->delete();
+
+        $this->audit->write($actor, 'roles.remove', 'User', $target->id, null, ['role' => $role->value]);
     }
 
     public function suspend(User $actor, User $target): void

@@ -27,13 +27,10 @@ class DiscussionController extends Controller
             'board' => $board,
             'canGrade' => $teachAccess->canGradeDiscussions(auth()->user(), $offering),
             'threads' => $board
-                ? DiscussionThread::query()
-                    ->where('board_id', $board->id)
-                    ->orderByDesc('pinned')
-                    ->latest('created_at')
+                ? $discussions->visibleThreadsQuery(auth()->user(), $board)
                     ->with('author')
-                    ->get()
-                : collect(),
+                    ->paginate(20)
+                : null,
         ]);
     }
 
@@ -64,13 +61,14 @@ class DiscussionController extends Controller
     ): View {
         $access->assertCanAccessThread(auth()->user(), $thread);
 
-        $thread->load(['board.offering.course', 'posts.author', 'grades.student']);
+        $thread->load(['board.offering.course', 'grades.student']);
         $offering = $thread->board?->offering;
         $canGrade = $offering !== null && $teachAccess->canGradeDiscussions(auth()->user(), $thread);
 
         return view('discussions.thread', [
             'thread' => $thread,
             'offering' => $offering,
+            'posts' => $thread->posts()->with('author')->orderBy('created_at')->paginate(20),
             'canGrade' => $canGrade,
             'students' => $canGrade && $offering !== null
                 ? $discussions->enrolledStudents($offering)

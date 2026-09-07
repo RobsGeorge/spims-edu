@@ -4,6 +4,7 @@ namespace App\Services\Learning;
 
 use App\Enums\EnrollmentStatus;
 use App\Enums\RoleType;
+use App\Enums\ThreadVisibility;
 use App\Exceptions\AuthorizationException;
 use App\Models\Assignment;
 use App\Models\Assessment;
@@ -104,5 +105,15 @@ class OfferingAccessService
         $thread->loadMissing('board');
         $offering = CourseOffering::query()->findOrFail($thread->board->offering_id);
         $this->assertCanAccessOffering($user, $offering);
+
+        if ($thread->visibility !== ThreadVisibility::PrivateToInstructor) {
+            return;
+        }
+
+        if ($thread->author_id === $user->id || $this->isStaffOrAdmin($user, $offering)) {
+            return;
+        }
+
+        throw new AuthorizationException(__('auth.forbidden'));
     }
 }
