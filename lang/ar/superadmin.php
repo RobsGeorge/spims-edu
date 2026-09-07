@@ -49,6 +49,7 @@ return [
     'schedule_every_minute' => 'كل دقيقة',
     'schedule_every_five' => 'كل خمس دقائق',
     'schedule_daily_0230' => 'يومياً الساعة 02:30',
+    'schedule_daily' => 'يومياً',
     'actor' => 'الفاعل',
     'action' => 'الإجراء',
     'entity' => 'الكيان',

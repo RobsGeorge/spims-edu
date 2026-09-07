@@ -17,6 +17,8 @@
 <p>{{ $invoice->status->value }} — {{ $invoice->total_minor }} {{ $invoice->currency->value }}</p>
 <p>{{ __('finance.paid') }}: {{ $invoice->amountPaid() }} · {{ __('finance.due') }}: {{ $invoice->amountDue() }}</p>
 
+@include('finance._payment-plan', ['invoice' => $invoice, 'showPayButtons' => true])
+
 @if($invoice->amountDue() > 0)
 <form method="POST" action="{{ route('finance.checkout', $invoice) }}" class="card border-0 shadow-sm">
     @csrf
@@ -38,7 +40,11 @@
                 <option value="CASHIER">Cashier</option>
             </select>
         </div>
-        <div class="col-12"><button class="btn btn-primary">{{ __('finance.checkout') }}</button></div>
+        <div class="col-12">
+            <button class="btn btn-primary">
+                {{ $invoice->openPaymentPlan() ? __('finance.pay_remaining') : __('finance.checkout') }}
+            </button>
+        </div>
     </div>
 </form>
 @endif

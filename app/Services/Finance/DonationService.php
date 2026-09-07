@@ -35,11 +35,14 @@ class DonationService
                 'currency' => $currency,
                 'amount_minor' => $amountMinor,
                 'method' => $method,
-                'status' => PaymentStatus::Completed,
-                'gateway_ref' => $this->gateways->charge($method, $amountMinor, $currency, 'donation'),
-                'receipt_serial' => $this->payments->allocateReceiptSerial(),
-                'receipt_url' => null,
+                'status' => PaymentStatus::Pending,
             ]);
+
+            $payment->update([
+                'gateway_ref' => $this->gateways->charge($method, $amountMinor, $currency, $payment->id),
+            ]);
+
+            $this->payments->completeIfMock($payment->fresh());
 
             $donation = Donation::query()->create([
                 'user_id' => $donor->id,

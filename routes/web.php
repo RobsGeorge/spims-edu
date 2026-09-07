@@ -437,6 +437,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/finance/invoices/{invoice}/checkout', [FinanceController::class, 'checkout'])
         ->middleware('permission:finance.pay')
         ->name('finance.checkout');
+    // #17 payment plans + gateways
+    Route::post('/finance/invoices/{invoice}/payment-plan', [FinanceController::class, 'storePaymentPlan'])
+        ->middleware('permission:finance.pay')
+        ->name('finance.payment-plan.store');
+    Route::post('/finance/invoices/{invoice}/installments/{installment}/pay', [FinanceController::class, 'payInstallment'])
+        ->middleware('permission:finance.pay')
+        ->name('finance.installments.pay');
     // #13 live recurrence + refund
     Route::post('/finance/payments/{payment}/refund-request', [FinanceController::class, 'requestRefund'])
         ->middleware('permission:finance.pay')
@@ -771,6 +778,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/finance/invoices', [FinanceAdminController::class, 'storeInvoice'])
             ->middleware('permission:finance.invoices')
             ->name('finance.invoices.store');
+        // #17 payment plans + gateways
+        Route::get('/finance/invoices/{invoice}', [FinanceAdminController::class, 'showInvoice'])
+            ->middleware('permission:finance.invoices')
+            ->name('finance.invoices.show');
+        Route::post('/finance/invoices/{invoice}/payment-plan', [FinanceAdminController::class, 'attachPaymentPlan'])
+            ->middleware('permission:finance.invoices')
+            ->name('finance.payment-plan.store');
         Route::post('/finance/invoices/{invoice}/manual', [FinanceAdminController::class, 'recordManual'])
             ->middleware('permission:finance.manual')
             ->name('finance.manual');
