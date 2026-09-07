@@ -5,7 +5,10 @@ namespace App\Models;
 use App\Enums\ContentItemType;
 use App\Enums\VideoProvider;
 use App\Models\Concerns\HasUlids;
+use App\Support\Content\ExternalReadingRef;
+use App\Support\Content\ExternalReadingUrl;
 use App\Support\Content\VideoUrlParser;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -72,6 +75,52 @@ class ContentItem extends Model
         $provider = $this->video_provider ?? VideoProvider::Vimeo;
 
         return VideoUrlParser::iframeUrl($provider, $this->vimeo_id);
+    }
+
+    public function isRemoteFile(): bool
+    {
+        $url = (string) $this->file_url;
+
+        return $url !== '' && (str_starts_with($url, 'https://') || str_starts_with($url, 'http://'));
+    }
+
+    public function isStoredFile(): bool
+    {
+        return is_string($this->file_url) && $this->file_url !== '' && ! $this->isRemoteFile();
+    }
+
+    public function storedFileExtension(): ?string
+    {
+        if (! $this->isStoredFile()) {
+            return null;
+        }
+
+        $ext = strtolower(pathinfo($this->file_url, PATHINFO_EXTENSION));
+
+        return $ext !== '' ? $ext : null;
+    }
+
+    public function isStoredImage(): bool
+    {
+        return in_array($this->storedFileExtension(), ['jpg', 'jpeg', 'png', 'webp', 'gif'], true);
+    }
+
+    public function isStoredPdf(): bool
+    {
+        return $this->storedFileExtension() === 'pdf';
+    }
+
+    public function remoteReading(): ?ExternalReadingRef
+    {
+        if (! $this->isRemoteFile()) {
+            return null;
+        }
+
+        try {
+            return ExternalReadingUrl::parse($this->file_url);
+        } catch (ValidationException) {
+            return new ExternalReadingRef((string) $this->file_url, false, ExternalReadingUrl::KIND_OTHER);
+        }
     }
 
     public function week(): BelongsTo

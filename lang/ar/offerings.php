@@ -72,4 +72,7 @@ return [
     'content_deleted' => 'تم حذف عنصر المحتوى.',
     'content_published' => 'تم نشر عنصر المحتوى.',
     'content_unpublished' => 'تم إخفاء العنصر عن الطلاب.',
+    'upload_type_blocked' => 'ارفع ملف PDF أو صورة فقط (JPG وPNG وWebP وGIF).',
+    'upload_too_large' => 'هذا الملف أكبر من :mb ميغابايت.',
+    'download_disabled' => 'التنزيل غير مسموح للطلاب.',
 ];

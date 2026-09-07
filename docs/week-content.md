@@ -41,9 +41,17 @@ Instructors paste a Vimeo URL/ID or a YouTube watch / youtu.be / Shorts / embed 
 
 Student item page and the staff builder preview use `youtube-nocookie.com` or `player.vimeo.com`. Playlists and Live are rejected. Draft videos stay hidden from students.
 
+## 4. Readings and files (shipped)
+
+`READING` and `FILE` accept an upload (PDF / JPG / PNG / WebP / GIF, default 20 MB) or an HTTPS link.
+
+- Drive view/open links become `/preview` embeds.
+- Unknown HTTPS hosts are link-only (no iframe).
+- Uploaded files stream from `GET /learn/items/{item}/file` after publish + enrollment + week unlock. Download uses `?download=1`.
+- Students never receive a public `/storage/` path.
+
 ## Later slices
 
-4. Readings, uploads, gated file viewer
 5. Reorder + move to another week
 6. View as student
 7. Public catalog Week 1 embeds

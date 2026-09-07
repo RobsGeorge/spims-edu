@@ -72,4 +72,7 @@ return [
     'content_deleted' => 'Élément de contenu supprimé.',
     'content_published' => 'Élément de contenu publié.',
     'content_unpublished' => 'Élément masqué pour les étudiants.',
+    'upload_type_blocked' => 'Téléversez uniquement un PDF ou une image (JPG, PNG, WebP, GIF).',
+    'upload_too_large' => 'Ce fichier dépasse :mb Mo.',
+    'download_disabled' => 'Les téléchargements sont désactivés pour les étudiants.',
 ];

@@ -117,6 +117,10 @@
                     <div class="ratio ratio-16x9 mt-2">
                         <iframe src="{{ $item->videoIframeUrl() }}" allowfullscreen allow="autoplay; fullscreen; picture-in-picture" title="{{ $item->title }}"></iframe>
                     </div>
+                @elseif($item->isStoredFile() || $item->remoteReading())
+                    <div class="mt-2">
+                        @include('learn.partials.item-media', ['item' => $item])
+                    </div>
                 @endif
             </article>
         @empty

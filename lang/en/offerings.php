@@ -72,4 +72,7 @@ return [
     'content_deleted' => 'Content item deleted.',
     'content_published' => 'Content item published.',
     'content_unpublished' => 'Content item hidden from students.',
+    'upload_type_blocked' => 'Upload a PDF or image (JPG, PNG, WebP, GIF) only.',
+    'upload_too_large' => 'That file is larger than :mb MB.',
+    'download_disabled' => 'Downloads are turned off for students.',
 ];
