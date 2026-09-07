@@ -12,6 +12,7 @@ Read them in this order:
 | [`implementation-plan.md`](implementation-plan.md) | The work. Schema, services, permissions, tests and acceptance criteria per phase, plus the corrections found while building S0 and S1. |
 | [`execution-order.md`](execution-order.md) | The sequence. Which phase may start when, how each is proved, and the four invariants that must stay green on every PR from now on. |
 | [`mobile-api-spec.md`](mobile-api-spec.md) | The wire contract for `/api/v1`, so the mobile client can be written against a fixed shape before every endpoint exists. |
+| [`s-branch-reconciliation.md`](s-branch-reconciliation.md) | Audit-only: leftover `s4`–`s8` remotes vs `main` @ `1c21d61`. All 14 tips are ancestors; do not re-implement those surfaces. |
 
 ## Status
 
