@@ -31,6 +31,7 @@ class DiscussionController extends Controller
             ? DiscussionThread::query()
                 ->where('board_id', $board->id)
                 ->with(['author', 'grades.student'])
+                ->withExists(['posts as has_attachments' => fn ($q) => $q->whereNotNull('attachments')])
                 ->orderByDesc('pinned')
                 ->latest('created_at')
                 ->get()

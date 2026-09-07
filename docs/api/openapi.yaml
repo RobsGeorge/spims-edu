@@ -1680,9 +1680,42 @@ paths:
         required: true
         schema:
           type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - body
+              properties:
+                body:
+                  type: string
+                parent_post_id:
+                  type: string
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - body
+              properties:
+                body:
+                  type: string
+                parent_post_id:
+                  type: string
+                attachment:
+                  type: string
+                  format: binary
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
       responses:
         '201':
           description: Created
+        '422':
+          description: Validation failed
   /offerings/{offering}/discussions/threads:
     post:
       operationId: createDiscussionThread
@@ -1695,9 +1728,42 @@ paths:
         required: true
         schema:
           type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - title
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - title
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                attachment:
+                  type: string
+                  format: binary
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
       responses:
         '201':
           description: Created
+        '422':
+          description: Validation failed
   /catalog:
     get:
       operationId: catalogIndex
