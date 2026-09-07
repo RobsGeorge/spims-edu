@@ -50,6 +50,11 @@ class HardeningReleaseTest extends TestCase
         $response->assertHeader('X-Content-Type-Options', 'nosniff');
         $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $csp = (string) $response->headers->get('Content-Security-Policy');
+        $this->assertStringContainsString('frame-src', $csp);
+        $this->assertStringContainsString('player.vimeo.com', $csp);
+        $this->assertStringContainsString('youtube-nocookie.com', $csp);
+        $this->assertStringContainsString('drive.google.com', $csp);
     }
 
     #[Test]
