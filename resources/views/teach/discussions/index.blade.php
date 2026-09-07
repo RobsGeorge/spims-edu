@@ -43,6 +43,9 @@
                     @if($thread->pinned)
                         <x-status-badge status="info" :label="__('discussions.pinned')" />
                     @endif
+                    @if($thread->has_attachments)
+                        <x-status-badge status="info" :label="__('discussions.attachments')" />
+                    @endif
                 </div>
             </div>
             @include('discussions.partials.grade-form', [

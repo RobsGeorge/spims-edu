@@ -18,4 +18,9 @@ return [
     'thread_title' => 'Titre du fil',
     'opening_post' => 'Premier message',
     'new_thread' => 'Nouveau fil',
+    'attach_file' => 'Joindre un fichier',
+    'attachments' => 'Pièces jointes',
+    'download' => 'Télécharger',
+    'invalid_attachment' => 'Cette pièce jointe n\'est pas valide.',
+    'file_type_not_allowed' => 'Ce type de fichier n\'est pas autorisé.',
 ];

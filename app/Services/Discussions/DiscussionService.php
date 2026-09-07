@@ -15,19 +15,29 @@ use App\Models\Enrollment;
 use App\Models\User;
 use App\Services\Learning\OfferingAccessService;
 use App\Services\Notifications\NotificationService;
+use App\Services\Storage\ObjectStorageService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class DiscussionService
 {
+    private const ATTACHMENT_PREFIX = 'discussion-attachments';
+
+    /** @var list<string> */
+    private const ALLOWED_EXTENSIONS = [
+        'pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'doc', 'docx',
+    ];
+
     public function __construct(
         private readonly AuthorizeService $authorize,
         private readonly AuditLogWriter $audit,
         private readonly NotificationService $notifications,
         private readonly OfferingAccessService $access,
+        private readonly ObjectStorageService $storage,
     ) {}
 
     public function ensureBoard(CourseOffering $offering): ?DiscussionBoard
@@ -67,9 +77,10 @@ class DiscussionService
     }
 
     /**
-     * @param  array{title: string, visibility?: string, is_graded?: bool, participation_min_words?: int, participation_min_posts?: int, participation_min_replies?: int, body?: string}  $data
+     * @param  array{title: string, visibility?: string, is_graded?: bool, participation_min_words?: int, participation_min_posts?: int, participation_min_replies?: int, body?: string, attachments?: list<array{path: string, name?: string, size?: int|null}>|null}  $data
+     * @param  list<UploadedFile>  $files
      */
-    public function createThread(User $actor, DiscussionBoard $board, array $data): DiscussionThread
+    public function createThread(User $actor, DiscussionBoard $board, array $data, array $files = []): DiscussionThread
     {
         $this->authorize->authorize($actor, 'discussions.thread');
 
@@ -82,7 +93,7 @@ class DiscussionService
             throw ValidationException::withMessages(['thread' => [__('live.threads_disabled')]]);
         }
 
-        return DB::transaction(function () use ($actor, $board, $data) {
+        return DB::transaction(function () use ($actor, $board, $data, $files) {
             $thread = DiscussionThread::query()->create([
                 'board_id' => $board->id,
                 'author_id' => $actor->id,
@@ -97,10 +108,16 @@ class DiscussionService
             ]);
 
             if (! empty($data['body'])) {
+                $attachments = $data['attachments'] ?? null;
+                if ($files !== []) {
+                    $attachments = $this->storeUploadedAttachments($actor, $thread, $files);
+                }
+
                 DiscussionPost::query()->create([
                     'thread_id' => $thread->id,
                     'author_id' => $actor->id,
                     'body' => $data['body'],
+                    'attachments' => $this->validatedStoredAttachments($actor, $attachments),
                 ]);
             }
 
@@ -149,7 +166,7 @@ class DiscussionService
             'author_id' => $actor->id,
             'parent_post_id' => $parentPostId,
             'body' => $body,
-            'attachments' => $attachments,
+            'attachments' => $this->validatedStoredAttachments($actor, $attachments),
         ]);
 
         if ($parentPostId) {
@@ -308,5 +325,210 @@ class DiscussionService
             ->pluck('student')
             ->filter()
             ->values();
+    }
+
+    public function storePostAttachment(User $actor, DiscussionThread $thread, UploadedFile $file): string
+    {
+        $this->authorize->authorize($actor, 'discussions.post');
+        $this->access->assertCanAccessThread($actor, $thread);
+        $this->assertAttachmentAllowed($file);
+
+        $path = $this->storage->signedUploadPath(
+            self::ATTACHMENT_PREFIX,
+            (string) $actor->id,
+            $file->getClientOriginalExtension() ?: $file->extension()
+        );
+
+        $realPath = $file->getRealPath() ?: $file->getPathname();
+        $contents = is_string($realPath) && is_readable($realPath)
+            ? (string) file_get_contents($realPath)
+            : ($file->get() ?: '');
+        $this->storage->store($path, $contents);
+
+        return $path;
+    }
+
+    /**
+     * @param  list<UploadedFile>  $files
+     * @return list<array{path: string, name: string, size: int}>
+     */
+    public function storeUploadedAttachments(User $actor, DiscussionThread $thread, array $files): array
+    {
+        $stored = [];
+        foreach ($files as $file) {
+            if (! $file instanceof UploadedFile) {
+                continue;
+            }
+            $path = $this->storePostAttachment($actor, $thread, $file);
+            $stored[] = [
+                'path' => $path,
+                'name' => $file->getClientOriginalName(),
+                'size' => (int) $file->getSize(),
+            ];
+        }
+
+        return $stored;
+    }
+
+    /**
+     * @return array{path: string, name: string, size: int|null}
+     */
+    public function attachmentForDownload(User $actor, DiscussionPost $post, int $index): array
+    {
+        $post->loadMissing('thread');
+        $thread = $post->thread;
+        if ($thread === null) {
+            abort(404);
+        }
+
+        $this->access->assertCanAccessThread($actor, $thread);
+
+        $attachments = $post->attachments ?? [];
+        if (! isset($attachments[$index]) || ! is_array($attachments[$index])) {
+            abort(404);
+        }
+
+        $path = ltrim((string) ($attachments[$index]['path'] ?? ''), '/');
+        if ($path === ''
+            || str_contains($path, '..')
+            || ! str_starts_with($path, self::ATTACHMENT_PREFIX.'/')
+            || ! $this->storage->exists($path)) {
+            abort(404);
+        }
+
+        $name = isset($attachments[$index]['name']) && is_string($attachments[$index]['name']) && $attachments[$index]['name'] !== ''
+            ? $attachments[$index]['name']
+            : basename($path);
+
+        return [
+            'path' => $path,
+            'name' => $name,
+            'size' => isset($attachments[$index]['size']) && is_numeric($attachments[$index]['size'])
+                ? (int) $attachments[$index]['size']
+                : null,
+        ];
+    }
+
+    /**
+     * Persist only objects we produced: [{path, name, size}]. Refuse URLs and foreign prefixes.
+     *
+     * @param  list<mixed>|null  $attachments
+     * @return list<array{path: string, name: string, size: int|null}>|null
+     */
+    private function validatedStoredAttachments(User $actor, ?array $attachments): ?array
+    {
+        if ($attachments === null || $attachments === []) {
+            return null;
+        }
+
+        $expectedPrefix = self::ATTACHMENT_PREFIX.'/'.$actor->id.'/';
+        $normalized = [];
+
+        foreach ($attachments as $item) {
+            if (is_string($item)) {
+                $this->rejectClientSuppliedUrl($item);
+                $path = ltrim($item, '/');
+                $name = basename($path);
+                $size = null;
+            } elseif (is_array($item)) {
+                foreach (['file_url', 'url', 'href'] as $banned) {
+                    if (isset($item[$banned])) {
+                        throw ValidationException::withMessages([
+                            'file_url' => [__('discussions.invalid_attachment')],
+                        ]);
+                    }
+                }
+                $path = isset($item['path']) && is_string($item['path']) ? ltrim($item['path'], '/') : '';
+                $this->rejectClientSuppliedUrl($path);
+                $name = isset($item['name']) && is_string($item['name']) && $item['name'] !== ''
+                    ? $item['name']
+                    : basename($path);
+                $size = isset($item['size']) && is_numeric($item['size']) ? (int) $item['size'] : null;
+            } else {
+                throw ValidationException::withMessages([
+                    'attachments' => [__('discussions.invalid_attachment')],
+                ]);
+            }
+
+            if ($path === '' || str_contains($path, '..') || ! str_starts_with($path, $expectedPrefix)) {
+                throw ValidationException::withMessages([
+                    'attachments' => [__('discussions.invalid_attachment')],
+                ]);
+            }
+
+            if (! $this->storage->exists($path)) {
+                throw ValidationException::withMessages([
+                    'attachments' => [__('discussions.invalid_attachment')],
+                ]);
+            }
+
+            $normalized[] = [
+                'path' => $path,
+                'name' => $name,
+                'size' => $size,
+            ];
+        }
+
+        return $normalized;
+    }
+
+    private function rejectClientSuppliedUrl(string $value): void
+    {
+        $trimmed = trim($value);
+        if ($trimmed === '') {
+            return;
+        }
+
+        if (str_contains($trimmed, '://') || str_starts_with($trimmed, '//') || str_starts_with(strtolower($trimmed), 'http')) {
+            throw ValidationException::withMessages([
+                'file_url' => [__('discussions.invalid_attachment')],
+            ]);
+        }
+    }
+
+    private function assertAttachmentAllowed(UploadedFile $file): void
+    {
+        $ext = strtolower((string) ($file->getClientOriginalExtension() ?: $file->extension() ?: ''));
+
+        if ($ext === '' || ! in_array($ext, self::ALLOWED_EXTENSIONS, true)) {
+            throw ValidationException::withMessages([
+                'attachments' => [__('discussions.file_type_not_allowed')],
+            ]);
+        }
+
+        $mime = strtolower((string) $file->getMimeType());
+        $expected = $this->mimesForExtension($ext);
+        if ($expected !== []
+            && $mime !== ''
+            && $mime !== 'application/octet-stream'
+            && ! in_array($mime, $expected, true)) {
+            throw ValidationException::withMessages([
+                'attachments' => [__('discussions.file_type_not_allowed')],
+            ]);
+        }
+
+        if ($file->getSize() > 10 * 1024 * 1024) {
+            throw ValidationException::withMessages([
+                'attachments' => [__('discussions.invalid_attachment')],
+            ]);
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function mimesForExtension(string $ext): array
+    {
+        return match ($ext) {
+            'pdf' => ['application/pdf'],
+            'doc' => ['application/msword'],
+            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+            'png' => ['image/png'],
+            'jpg', 'jpeg' => ['image/jpeg'],
+            'gif' => ['image/gif'],
+            'webp' => ['image/webp'],
+            'txt' => ['text/plain'],
+            default => [],
+        };
     }
 }
