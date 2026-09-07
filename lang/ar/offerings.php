@@ -47,4 +47,10 @@ return [
     'week_added' => 'تمت إضافة الأسبوع.',
     'content_added' => 'تمت إضافة عنصر المحتوى.',
     'cohort_requires_semester' => 'عروض المجموعة تتطلب فصلاً دراسياً.',
+    'video_url_invalid' => 'أدخل معرّف Vimeo أو رابط Vimeo أو رابط YouTube (مشاهدة / Shorts / تضمين).',
+    'video_url_unsupported' => 'قوائم التشغيل وبث YouTube المباشر غير مدعومين. الصق رابط فيديو واحد.',
+    'video_provider_disabled' => 'هذه المدرسة لا تسمح بفيديوهات :provider.',
+    'reading_url_invalid' => 'أدخل رابط HTTPS صالحاً للقراءة أو الملف.',
+    'reading_url_https' => 'يجب أن تستخدم القراءات الخارجية HTTPS.',
+    'reading_url_host_blocked' => 'هذا المضيف غير مسموح به لقراءات المدرسة.',
 ];
