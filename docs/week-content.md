@@ -50,9 +50,12 @@ Student item page and the staff builder preview use `youtube-nocookie.com` or `p
 - Uploaded files stream from `GET /learn/items/{item}/file` after publish + enrollment + week unlock. Download uses `?download=1`.
 - Students never receive a public `/storage/` path.
 
+## 5. Reorder and move (shipped)
+
+Both editors have Move up / Move down (POST, no JS required) and Move to another week on the same offering. `OfferingService` rewrites `order` 1..n and audits the change. Cross-offering moves are rejected.
+
 ## Later slices
 
-5. Reorder + move to another week
 6. View as student
 7. Public catalog Week 1 embeds
 8. CSP headers

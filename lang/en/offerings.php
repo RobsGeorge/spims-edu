@@ -75,4 +75,11 @@ return [
     'upload_type_blocked' => 'Upload a PDF or image (JPG, PNG, WebP, GIF) only.',
     'upload_too_large' => 'That file is larger than :mb MB.',
     'download_disabled' => 'Downloads are turned off for students.',
+    'move_up' => 'Move up',
+    'move_down' => 'Move down',
+    'move_to_week' => 'Move',
+    'content_reordered' => 'Item order updated.',
+    'content_moved' => 'Item moved to another week.',
+    'reorder_invalid' => 'Those items do not all belong to this week.',
+    'move_week_invalid' => 'You can only move an item to another week in the same offering.',
 ];

@@ -49,6 +49,31 @@ class ContentItemController extends Controller
         return back()->with('status', __('offerings.content_unpublished'));
     }
 
+    public function moveUp(Request $request, ContentItem $item, OfferingService $service): RedirectResponse
+    {
+        $service->moveContentItemByDelta($request->user(), $item, -1);
+
+        return back()->with('status', __('offerings.content_reordered'));
+    }
+
+    public function moveDown(Request $request, ContentItem $item, OfferingService $service): RedirectResponse
+    {
+        $service->moveContentItemByDelta($request->user(), $item, 1);
+
+        return back()->with('status', __('offerings.content_reordered'));
+    }
+
+    public function move(Request $request, ContentItem $item, OfferingService $service): RedirectResponse
+    {
+        $data = $request->validate([
+            'week_id' => 'required|exists:weeks,id',
+        ]);
+        $target = Week::query()->findOrFail($data['week_id']);
+        $service->moveContentItem($request->user(), $item, $target);
+
+        return back()->with('status', __('offerings.content_moved'));
+    }
+
     /**
      * @return array<string, mixed>
      */
