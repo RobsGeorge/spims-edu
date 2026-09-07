@@ -102,6 +102,8 @@ Route::post('/api/webhooks/zoom', ZoomWebhookController::class)
 Route::get('/verify/{token}', CredentialVerifyController::class)->name('credentials.verify');
 Route::get('/communications/open/{log}', CommunicationOpenController::class)->name('communications.open');
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
+Route::get('/offerings/{offering}/preview/items/{item}/file', [ContentItemFileController::class, 'publicPreview'])
+    ->name('offerings.preview.item.file');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');

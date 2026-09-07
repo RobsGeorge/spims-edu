@@ -11,9 +11,13 @@ class OfferingPreviewController extends Controller
 {
     public function show(CourseOffering $offering, OfferingService $service): View
     {
+        $offering->load(['weeks.items', 'course']);
+        $weekOne = $offering->weeks->firstWhere('number', 1);
+
         return view('offerings.preview', [
-            'preview' => $service->previewPayload($offering->load(['weeks.items', 'course'])),
+            'preview' => $service->previewPayload($offering),
             'offering' => $offering,
+            'weekOneItems' => $weekOne?->items->filter(fn ($item) => $item->isPublished())->values() ?? collect(),
         ]);
     }
 

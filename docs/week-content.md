@@ -58,7 +58,10 @@ Both editors have Move up / Move down (POST, no JS required) and Move to another
 
 Teach and admin have **View as student**. It opens the real learn player with student gating (cohort dates, self-paced week 1 only), drafts hidden, and writes blocked. Banner + Exit. No impersonation. Audited as `learning.student_preview`.
 
+## 7. Public catalog Week 1 embeds (shipped)
+
+`/offerings/{id}/preview` embeds published Week 1 video/PDF/image. Later weeks stay titles only. Stored files use `/offerings/{id}/preview/items/{item}/file` (Week 1 published only). Storage paths are not exposed in the public JSON.
+
 ## Later slices
 
-7. Public catalog Week 1 embeds
 8. CSP headers
