@@ -6,7 +6,7 @@
 
 ### Status vs this audit (2026-09-07)
 
-Against `main` @ `1c21d61`, S0–S8, S6 Wave E, and the S9 domain (events + live quiz on polling) are already on `main`. Headings for S4, S5, S6, S7, and S9 below still read as in-progress; that is docs drift, not missing code. Leftover `cursor/s4*`–`s8*` remotes are ancestors with nothing to cherry-pick — see [`s-branch-reconciliation.md`](s-branch-reconciliation.md). Still open: Reverb, WhatsApp driver, lockdown browser, native apps, and `gradebook.reopen` on the instructor API.
+Against `main` @ `acb20cb`, S0–S8, S6 Wave E, and the S9 domain (events + live quiz on polling) are already on `main`. Leftover `cursor/s4*`–`s8*` remotes are ancestors with nothing to cherry-pick — see [`s-branch-reconciliation.md`](s-branch-reconciliation.md). Still open: Reverb (optional), WhatsApp driver, lockdown browser, and native apps. `gradebook.reopen` on the instructor API and applicant `WITHDRAWN` already landed (`e50faa8` and after).
 
 ---
 
@@ -412,7 +412,7 @@ component reflects all three; the registrar exports a term report.
 
 ---
 
-## S4 — Course completion, criteria, and credentials (G-13, G-14, G-16)
+## S4 — Course completion, criteria, and credentials (G-13, G-14, G-16) ✅ **Done**
 
 ### Schema
 
@@ -491,7 +491,7 @@ their own result and nobody else's.
 
 ---
 
-## S5 — Assessment completion (G-17, G-18)
+## S5 — Assessment completion (G-17, G-18) ✅ **Done**
 
 Small, high-value, and mostly additive columns on existing tables.
 
@@ -549,7 +549,7 @@ Small, high-value, and mostly additive columns on existing tables.
 
 ---
 
-## S6 — Student mobile API (G-01, part 2)
+## S6 — Student mobile API (G-01, part 2) ✅ **Done**
 
 Ships the student surface in waves, mirroring Khedma's proven ordering from
 `docs/mobile/student-feature-matrix.md`. Each wave is a PR; a wave only ships once the domain phase
@@ -598,7 +598,7 @@ invoice.
 
 ---
 
-## S7 — Team projects (G-05)
+## S7 — Team projects (G-05) ✅ **Done**
 
 The largest new subsystem. Port the model, not the Khedma table names, and align it to
 `course_offerings` rather than Khedma's `course`.
@@ -728,7 +728,7 @@ gradebook from a phone; a TA performs the same session except locking, which is 
 
 ---
 
-## S9 — Realtime, live quiz, and events (G-06, G-08, G-19)
+## S9 — Realtime, live quiz, and events (G-06, G-08, G-19) ✅ **Done** (domain; Reverb still optional)
 
 Last because it introduces infrastructure SPIMS does not have.
 
