@@ -44,8 +44,12 @@ class AuditLogWriter
             $after = null;
 
             if (is_object($result) && method_exists($result, 'getKey')) {
-                $entityId = (string) $result->getKey();
+                $key = (string) $result->getKey();
+                // audit_logs.entity_id is a ULID column (char(26)); Setting string keys overflow on PostgreSQL.
+                $entityId = strlen($key) <= 26 ? $key : null;
                 $after = method_exists($result, 'toArray') ? $result->toArray() : null;
+            } elseif (is_array($result)) {
+                $after = $result;
             }
 
             $this->write(
