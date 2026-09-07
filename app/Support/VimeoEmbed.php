@@ -2,12 +2,13 @@
 
 namespace App\Support;
 
+use App\Enums\VideoProvider;
+use App\Support\Content\VideoUrlParser;
+
 final class VimeoEmbed
 {
     public static function iframeUrl(string $vimeoId): string
     {
-        $id = trim($vimeoId);
-
-        return 'https://player.vimeo.com/video/'.rawurlencode($id);
+        return VideoUrlParser::iframeUrl(VideoProvider::Vimeo, trim($vimeoId));
     }
 }

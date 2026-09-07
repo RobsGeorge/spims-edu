@@ -47,4 +47,10 @@ return [
     'week_added' => 'Week added.',
     'content_added' => 'Content item added.',
     'cohort_requires_semester' => 'Cohort offerings require a semester.',
+    'video_url_invalid' => 'Enter a Vimeo ID, a Vimeo URL, or a YouTube watch / Shorts / embed link.',
+    'video_url_unsupported' => 'YouTube playlists and Live links are not supported. Paste a single video link.',
+    'video_provider_disabled' => 'This school does not allow :provider videos.',
+    'reading_url_invalid' => 'Enter a valid HTTPS link to the reading or file.',
+    'reading_url_https' => 'External readings must use HTTPS.',
+    'reading_url_host_blocked' => 'That host is not on the school allow-list for readings.',
 ];

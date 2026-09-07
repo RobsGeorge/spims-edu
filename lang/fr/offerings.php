@@ -47,4 +47,10 @@ return [
     'week_added' => 'Semaine ajoutée.',
     'content_added' => 'Élément de contenu ajouté.',
     'cohort_requires_semester' => 'Les offres cohortes nécessitent un semestre.',
+    'video_url_invalid' => 'Saisissez un identifiant Vimeo, une URL Vimeo ou un lien YouTube (lecture / Shorts / intégration).',
+    'video_url_unsupported' => 'Les playlists et les directs YouTube ne sont pas pris en charge. Collez le lien d’une seule vidéo.',
+    'video_provider_disabled' => 'Cet établissement n’autorise pas les vidéos :provider.',
+    'reading_url_invalid' => 'Saisissez un lien HTTPS valide vers la lecture ou le fichier.',
+    'reading_url_https' => 'Les lectures externes doivent utiliser HTTPS.',
+    'reading_url_host_blocked' => 'Cet hôte n’est pas autorisé pour les lectures.',
 ];
