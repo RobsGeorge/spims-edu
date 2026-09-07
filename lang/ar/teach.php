@@ -49,6 +49,8 @@ return array (
   'lock_confirm_body' => 'تصبح الدرجات رسمية. إعادة الفتح تتطلب مشرفًا أكاديميًا.',
   'reopen_confirm_title' => 'إعادة فتح دفتر الدرجات؟',
   'reopen_confirm_body' => 'قد يرى الطلاب تغييرات بعد إعادة الفتح.',
+  'gradebook_locked' => 'مقفل',
+  'gradebook_open' => 'مفتوح',
   'staff' => 'الطاقم',
   'students' => 'الطلاب',
   'empty_roster' => 'لا طلاب مسجلين بعد',

@@ -16,34 +16,8 @@
 <div class="d-flex gap-2 mb-3 flex-wrap">
     <form method="POST" action="{{ route('admin.gradebook.seed', $offering) }}">@csrf<button class="btn btn-sm btn-outline-primary">{{ __('assessment.seed_template') }}</button></form>
     <form method="POST" action="{{ route('admin.gradebook.submit', $offering) }}">@csrf<button class="btn btn-sm btn-warning">{{ __('assessment.submit_grades') }}</button></form>
-    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#lockGradesModal">{{ __('assessment.lock_grades') }}</button>
-    <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#reopenGradesModal">{{ __('assessment.reopen_grades') }}</button>
+    @include('admin.gradebook._lock_reopen', ['offering' => $offering])
 </div>
-
-<form method="POST" action="{{ route('admin.gradebook.lock', $offering) }}" id="lockGradesForm">@csrf</form>
-<form method="POST" action="{{ route('admin.gradebook.reopen', $offering) }}" id="reopenGradesForm">@csrf</form>
-
-<x-confirm-dialog
-    id="lockGradesModal"
-    :title="__('teach.lock_confirm_title')"
-    :message="__('teach.lock_confirm_body')"
-    tone="danger"
->
-    <x-slot:confirm>
-        <button type="submit" form="lockGradesForm" class="btn btn-danger">{{ __('assessment.lock_grades') }}</button>
-    </x-slot:confirm>
-</x-confirm-dialog>
-
-<x-confirm-dialog
-    id="reopenGradesModal"
-    :title="__('teach.reopen_confirm_title')"
-    :message="__('teach.reopen_confirm_body')"
-    tone="primary"
->
-    <x-slot:confirm>
-        <button type="submit" form="reopenGradesForm" class="btn btn-primary">{{ __('assessment.reopen_grades') }}</button>
-    </x-slot:confirm>
-</x-confirm-dialog>
 
 <form method="POST" action="{{ route('admin.gradebook.components', $offering) }}" class="row g-2 mb-3">@csrf
     <div class="col-md-3"><input name="name" class="form-control" placeholder="{{ __('assessment.component') }}" required></div>

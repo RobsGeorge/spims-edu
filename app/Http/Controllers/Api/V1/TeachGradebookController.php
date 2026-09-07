@@ -78,6 +78,11 @@ class TeachGradebookController extends Controller
             $payload['confirmation'] = $lockConfirmation;
         }
 
+        $reopenConfirmation = $this->reopenConfirmation($actor, $offering);
+        if ($reopenConfirmation !== null) {
+            $payload['reopen_confirmation'] = $reopenConfirmation;
+        }
+
         return response()->json(['data' => $payload]);
     }
 
@@ -123,6 +128,32 @@ class TeachGradebookController extends Controller
         return response()->json(['data' => $payload]);
     }
 
+    public function reopen(Request $request, CourseOffering $offering): JsonResponse
+    {
+        $actor = $request->user();
+        $this->authorize->authorize($actor, 'gradebook.reopen');
+
+        $payload = $this->idempotency->remember(
+            $actor,
+            'teach.gradebook.reopen:'.$offering->id,
+            $request->header('Idempotency-Key'),
+            function () use ($request, $actor, $offering) {
+                $raw = $request->input('confirmation');
+                $this->confirmation->consume(
+                    $actor,
+                    'gradebook.reopen',
+                    $offering->id,
+                    is_string($raw) ? $raw : null,
+                );
+                $this->gradebook->reopen($actor, $offering);
+
+                return ['reopened' => true];
+            },
+        );
+
+        return response()->json(['data' => $payload]);
+    }
+
     /** @return array{confirmation_token: string, consequences: array<int, mixed>, expires_at: string}|null */
     private function lockConfirmation(User $actor, CourseOffering $offering): ?array
     {
@@ -139,6 +170,26 @@ class TeachGradebookController extends Controller
             [
                 __('teach.lock_confirm_title'),
                 __('teach.lock_confirm_body'),
+            ],
+        );
+    }
+
+    /** @return array{confirmation_token: string, consequences: array<int, mixed>, expires_at: string}|null */
+    private function reopenConfirmation(User $actor, CourseOffering $offering): ?array
+    {
+        try {
+            $this->authorize->authorize($actor, 'gradebook.reopen');
+        } catch (AuthorizationException) {
+            return null;
+        }
+
+        return $this->confirmation->issue(
+            $actor,
+            'gradebook.reopen',
+            $offering->id,
+            [
+                __('teach.reopen_confirm_title'),
+                __('teach.reopen_confirm_body'),
             ],
         );
     }

@@ -300,6 +300,7 @@ class AssessmentEngineTest extends TestCase
 
         $enrollment = Enrollment::query()->where('student_id', $student->id)->first();
         $this->assertSame(GradeStatus::Locked, $enrollment->fresh()->grade_status);
+        $this->assertSame(EnrollmentStatus::Completed, $enrollment->fresh()->status);
         $this->assertNotNull($enrollment->fresh()->final_letter);
 
         $record = AcademicRecord::query()->where('enrollment_id', $enrollment->id)->first();
@@ -311,6 +312,8 @@ class AssessmentEngineTest extends TestCase
 
         $this->actingAs($aca)->post(route('admin.gradebook.reopen', $bundle['offering']))->assertRedirect();
         $this->assertSame(GradeStatus::InProgress, $enrollment->fresh()->grade_status);
+        $this->assertSame(EnrollmentStatus::Enrolled, $enrollment->fresh()->status);
+        $this->assertNotNull(AcademicRecord::query()->where('enrollment_id', $enrollment->id)->first());
     }
 
     #[Test]

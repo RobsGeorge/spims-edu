@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Short-lived tokens for irreversible instructor API mutations:
- * gradebook.lock, offering.close, projects.announce, assessments.announce_results.
+ * gradebook.lock, gradebook.reopen, offering.close, projects.announce, assessments.announce_results.
  *
  * A repeated GET reuses the unexpired token so a client refresh cannot invalidate
  * the value sitting in a confirmation dialog.

@@ -49,6 +49,8 @@ return array (
   'lock_confirm_body' => 'Les notes deviennent officielles. La réouverture nécessite un admin académique.',
   'reopen_confirm_title' => 'Rouvrir le carnet ?',
   'reopen_confirm_body' => 'Les étudiants peuvent voir des changements après réouverture.',
+  'gradebook_locked' => 'Verrouillé',
+  'gradebook_open' => 'Ouvert',
   'staff' => 'Équipe',
   'students' => 'Étudiants',
   'empty_roster' => 'Aucun étudiant inscrit',

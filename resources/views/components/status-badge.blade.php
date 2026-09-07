@@ -6,9 +6,9 @@
 @php
     $tone = match (strtolower((string) $status)) {
         'success', 'active', 'enrolled', 'released', 'paid', 'open', 'present' => 'success',
-        'warning', 'pending', 'waitlist', 'draft', 'partial' => 'warning',
-        'danger', 'failed', 'rejected', 'suspended', 'locked', 'absent' => 'danger',
-        'info', 'processing' => 'info',
+        'warning', 'pending', 'waitlist', 'waitlisted', 'draft', 'partial' => 'warning',
+        'danger', 'failed', 'rejected', 'suspended', 'locked', 'absent', 'dropped', 'withdrawn' => 'danger',
+        'info', 'processing', 'completed' => 'info',
         default => 'neutral',
     };
 @endphp

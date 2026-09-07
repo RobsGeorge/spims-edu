@@ -5,6 +5,8 @@ namespace Tests\Feature\Assessment;
 use App\Enums\ComponentKind;
 use App\Enums\ContentItemType;
 use App\Enums\EnrollmentStatus;
+use App\Enums\GradeStatus;
+use App\Enums\GradeType;
 use App\Enums\OfferingMode;
 use App\Enums\RoleType;
 use App\Models\Assignment;
@@ -98,7 +100,48 @@ class GradebookGridTest extends TestCase
             ->assertSee(ComponentKind::Discussion->value, false)
             ->assertSee(__('assessment.kind_ATTENDANCE'))
             ->assertSee(__('assessment.kind_DISCUSSION'))
-            ->assertSee(__('assessment.export_csv'));
+            ->assertSee(__('assessment.export_csv'))
+            ->assertSee(__('teach.enrollment'))
+            ->assertSee(EnrollmentStatus::Enrolled->value);
+    }
+
+    #[Test]
+    public function grid_shows_completed_then_enrolled_after_gradebook_reopen(): void
+    {
+        $bundle = $this->staffedGradebook('REOP');
+        $instructor = $bundle['instructor'];
+        $offering = $bundle['offering'];
+        $enrollment = $bundle['enrollment'];
+        $admin = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+
+        $enrollment->update([
+            'final_percent' => 95,
+            'final_letter' => 'A',
+            'final_gpa_points' => 4,
+            'grade_status' => GradeStatus::Submitted,
+            'grade_type' => GradeType::Standard,
+        ]);
+
+        app(GradebookService::class)->lockGrades($instructor, $offering);
+        $this->assertSame(EnrollmentStatus::Completed, $enrollment->fresh()->status);
+
+        $this->actingAs($admin)
+            ->get(route('admin.gradebook.show', $offering))
+            ->assertOk()
+            ->assertSee(EnrollmentStatus::Completed->value);
+
+        $this->actingAs($admin)
+            ->post(route('admin.gradebook.reopen', $offering))
+            ->assertRedirect();
+
+        $this->assertSame(EnrollmentStatus::Enrolled, $enrollment->fresh()->status);
+        $this->assertSame(GradeStatus::InProgress, $enrollment->fresh()->grade_status);
+
+        $this->actingAs($admin)
+            ->get(route('admin.gradebook.show', $offering))
+            ->assertOk()
+            ->assertSee(EnrollmentStatus::Enrolled->value)
+            ->assertDontSee(EnrollmentStatus::Completed->value);
     }
 
     #[Test]
