@@ -4,11 +4,11 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-md-7 col-lg-6">
+    <div class="col-md-6 col-lg-5">
         <div class="card border-0 auth-card">
             <div class="card-body p-4 p-md-5">
                 <h1 class="h3 spims-title mb-2">{{ __('ui.register') }}</h1>
-                <p class="text-muted-theme mb-4">{{ __('ui.home_cta_primary') }}</p>
+                <p class="text-muted-theme auth-help mb-4">{{ __('ui.auth_help_register') }}</p>
                 <form method="POST" action="{{ route('auth.register') }}">
                     @csrf
                     <div class="row g-3">
@@ -43,7 +43,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary w-100 mt-4">{{ __('ui.continue') }}</button>
                 </form>
-                <p class="mt-3 mb-0"><a href="{{ route('auth.login') }}">{{ __('ui.login') }}</a></p>
+                <p class="auth-footer-links mb-0"><a href="{{ route('auth.login') }}">{{ __('ui.login') }}</a></p>
             </div>
         </div>
     </div>

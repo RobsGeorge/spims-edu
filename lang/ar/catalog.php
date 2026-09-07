@@ -18,4 +18,10 @@ return [
     'no_offering' => 'لا يوجد عرض مفتوح بعد',
     'flag_interest' => 'أبدِ اهتماماً',
     'programs' => 'البرامج',
+    'sort' => 'الترتيب',
+    'sort_code' => 'رمز المقرر',
+    'sort_interest' => 'الأكثر اهتماماً',
+    'interest_filter' => 'الاهتمام',
+    'interest_all' => 'كل المقررات',
+    'interest_flagged' => 'إشاراتي',
 ];

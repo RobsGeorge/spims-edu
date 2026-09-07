@@ -24,6 +24,9 @@
     @endif
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <link href="{{ asset('css/spims-theme.css') }}" rel="stylesheet">
+    @if(request()->routeIs('home', 'auth.*', 'catalog.*'))
+        <link href="{{ asset('css/spims-public.css') }}" rel="stylesheet">
+    @endif
     @if(!empty($themeCssBlock))
         <style id="spims-theme-tokens">{!! $themeCssBlock !!}</style>
     @endif
