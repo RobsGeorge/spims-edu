@@ -249,6 +249,8 @@ return [
         'TA' => 'O',
     ],
     'live.join' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+        'ACADEMIC_ADMIN' => 'F',
         'STUDENT' => 'O',
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
@@ -368,6 +370,14 @@ return [
         'ADMINISTRATIVE_ADMIN' => 'F',
         'ACADEMIC_ADMIN' => 'R',
         'FINANCIAL_ADMIN' => 'R',
+    ],
+    /*
+     * School-wide GPA cutoffs. Do not add to permission_scopes.offering_scoped.
+     * Financial admin keeps reports.view but cannot change standing thresholds.
+     */
+    'academic_standing.manage' => [
+        'ACADEMIC_ADMIN' => 'F',
+        'ADMINISTRATIVE_ADMIN' => 'F',
     ],
     'email_templates.manage' => [
         'ACADEMIC_ADMIN' => 'F',

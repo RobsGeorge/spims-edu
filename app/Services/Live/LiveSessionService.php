@@ -9,6 +9,7 @@ use App\Models\LiveSession;
 use App\Models\SessionRecurrence;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\Learning\OfferingAccessService;
 use App\Services\Notifications\NotificationService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
@@ -23,6 +24,7 @@ class LiveSessionService
         private readonly AuditLogWriter $audit,
         private readonly ZoomClient $zoom,
         private readonly NotificationService $notifications,
+        private readonly OfferingAccessService $access,
     ) {}
 
     /**
@@ -110,16 +112,18 @@ class LiveSessionService
             throw ValidationException::withMessages(['session' => [__('live.join_window_closed')]]);
         }
 
+        $session->loadMissing('offering');
+        $offering = $session->offering;
+
+        $isStaff = $offering !== null
+            && $this->access->isStaffOrAdmin($user, $offering)
+            && $this->authorize->allows($user, 'live.schedule', $offering);
+
         $enrolled = Enrollment::query()
             ->where('student_id', $user->id)
             ->where('offering_id', $session->offering_id)
             ->where('status', EnrollmentStatus::Enrolled)
             ->exists();
-
-        $isStaff = $user->isSuperAdmin()
-            || $user->hasRole(\App\Enums\RoleType::AdministrativeAdmin)
-            || $user->hasRole(\App\Enums\RoleType::Instructor)
-            || $user->hasRole(\App\Enums\RoleType::Ta);
 
         if (! $enrolled && ! $isStaff) {
             throw ValidationException::withMessages(['session' => [__('live.not_enrolled')]]);

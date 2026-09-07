@@ -35,7 +35,7 @@ class StudentGradesService
         $rows = [];
         foreach ($enrollments as $enrollment) {
             $offering = $enrollment->offering;
-            $computed = $this->gradebook->computeEnrollment($enrollment);
+            $computed = $this->gradebook->computeEnrollmentForStudent($enrollment, $student);
 
             $assessments = Assessment::query()
                 ->where('offering_id', $offering->id)
@@ -89,7 +89,7 @@ class StudentGradesService
                 'enrollment' => $enrollment,
                 'course_code' => $offering->course->code,
                 'course_title' => $offering->course->title,
-                'running_percent' => $computed['percent'] ?? null,
+                'running_percent' => $computed['percent'],
                 'final_letter' => $enrollment->final_letter,
                 'final_percent' => $enrollment->final_percent,
                 'grade_status' => $enrollment->grade_status?->value,
