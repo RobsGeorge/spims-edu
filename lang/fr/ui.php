@@ -78,6 +78,8 @@ return [
     'cancel' => 'Annuler',
     'confirm' => 'Confirmer',
     'open_menu' => 'Ouvrir le menu',
+    'search' => 'Rechercher dans le catalogue',
+    'user_menu' => 'Menu du compte :name',
     'unread_count' => ':count notifications non lues',
     'empty' => 'Rien pour le moment',
     'loading' => 'Chargement…',

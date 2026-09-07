@@ -78,6 +78,8 @@ return [
     'cancel' => 'إلغاء',
     'confirm' => 'تأكيد',
     'open_menu' => 'فتح القائمة',
+    'search' => 'بحث في الكتالوج',
+    'user_menu' => 'قائمة حساب :name',
     'unread_count' => ':count إشعارات غير مقروءة',
     'empty' => 'لا يوجد شيء بعد',
     'loading' => 'جارٍ التحميل…',
