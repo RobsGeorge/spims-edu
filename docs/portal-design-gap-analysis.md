@@ -170,6 +170,8 @@ Treat original Next.js repo as **reference only** — do not port React.
 
 **Status:** Implemented (2026-07-29).
 
+**Remaining D0 closed (2026-09-07):** Soft Lift `--shadow-lift`, rose `--color-hairline` on `.card`/`.app-card`, gold locked to accent, parchment/gold-primary regression tests. See `docs/design/d0-remaining.md`.
+
 **Goal:** Make Sacred Academic the active design language without rewriting every page yet.
 
 **Build:**

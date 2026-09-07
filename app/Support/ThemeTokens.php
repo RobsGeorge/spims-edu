@@ -5,6 +5,9 @@ namespace App\Support;
 /**
  * Sacred Academic design tokens — default SPIMS branding (DESIGN.md).
  * Cool near-white field + liturgical burgundy spine + academic gold accent.
+ *
+ * Gold (#eac167 / #e9c16d) is accent only — never primary or body text.
+ * Keep in sync with public/css/spims-theme.css.
  */
 final class ThemeTokens
 {
@@ -21,6 +24,7 @@ final class ThemeTokens
                 'surface' => '#ffffff',
                 'surfaceLow' => '#eff4ff',
                 'surfaceBorder' => 'rgba(219, 192, 196, 0.55)',
+                'hairline' => 'rgba(219, 192, 196, 0.65)',
                 'title' => '#5d0326',
                 'titleAccent' => '#380014',
                 'text' => '#0b1c30',
@@ -40,6 +44,7 @@ final class ThemeTokens
                 'warning' => '#f59e0b',
                 'danger' => '#ef4444',
                 'shadow' => '0 4px 20px rgba(0, 0, 0, 0.05)',
+                'shadowLift' => '0 6px 24px rgba(0, 0, 0, 0.08)',
             ],
             'dark' => [
                 'bg1' => '#0d1322',
@@ -48,6 +53,7 @@ final class ThemeTokens
                 'surface' => '#191f2f',
                 'surfaceLow' => '#151b2b',
                 'surfaceBorder' => 'rgba(85, 66, 69, 0.85)',
+                'hairline' => 'rgba(219, 192, 196, 0.28)',
                 'title' => '#ffb1c0',
                 'titleAccent' => '#e9c16d',
                 'text' => '#dde2f8',
@@ -67,6 +73,7 @@ final class ThemeTokens
                 'warning' => '#f59e0b',
                 'danger' => '#ef4444',
                 'shadow' => '0 4px 20px rgba(0, 0, 0, 0.3)',
+                'shadowLift' => '0 6px 24px rgba(0, 0, 0, 0.38)',
             ],
         ];
     }
@@ -86,6 +93,7 @@ final class ThemeTokens
             'surface' => '--color-surface',
             'surfaceLow' => '--color-surface-low',
             'surfaceBorder' => '--color-surface-border',
+            'hairline' => '--color-hairline',
             'title' => '--color-title',
             'titleAccent' => '--color-title-accent',
             'text' => '--color-text',
@@ -105,6 +113,7 @@ final class ThemeTokens
             'warning' => '--color-warning',
             'danger' => '--color-danger',
             'shadow' => '--shadow-soft',
+            'shadowLift' => '--shadow-lift',
         ];
 
         $vars = [];
@@ -162,6 +171,7 @@ final class ThemeTokens
             $lines[] = '    '.$prop.': '.$value.';';
         }
         $lines[] = '}';
+        // SYSTEM theme: body.theme-system follows OS via prefers-color-scheme: dark
         $lines[] = '@media (prefers-color-scheme: dark) {';
         $lines[] = '    body.theme-system {';
         foreach ($dark as $prop => $value) {

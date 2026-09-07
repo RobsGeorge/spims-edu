@@ -77,8 +77,12 @@ class SacredAcademicFoundationTest extends TestCase
         $this->assertStringContainsString('Sacred Academic', $css);
         $this->assertStringContainsString('#f8f9ff', $css);
         $this->assertStringContainsString('#5d0326', $css);
+        $this->assertStringContainsString('--shadow-lift', $css);
+        $this->assertStringContainsString('body.theme-system', $css);
+        $this->assertStringContainsString('@media (prefers-color-scheme: dark)', $css);
         $this->assertStringNotContainsString('#faf6ee', $css);
         $this->assertStringNotContainsString('#b8860b', $css);
         $this->assertStringNotContainsString('--color-bg-1: #faf6ee', $css);
+        $this->assertStringNotContainsString('--color-primary: #b8860b', $css);
     }
 }
