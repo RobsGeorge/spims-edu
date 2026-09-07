@@ -24,4 +24,7 @@ return [
     'interest_filter' => 'Interest',
     'interest_all' => 'All courses',
     'interest_flagged' => 'My flags',
+    'featured_chip' => 'Featured program',
+    'browse_all' => 'Browse courses',
+    'loading' => 'Loading courses',
 ];

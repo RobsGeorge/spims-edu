@@ -51,7 +51,7 @@ Original **Sacred Academic** system vs current `public/css/spims-theme.css`:
 | Theme tokens + logos from `/api/branding` | Theme editor: name + active only; logos unused | Branding incomplete |
 | SYSTEM theme follows OS | `system` cookie forced to `theme-dark` | Broken |
 | Skeletons / teaching empty states | Bare tables / empty text | Missing |
-| Auth / landing / catalog screens from design-reference | Compact Bootstrap forms | Visual mismatch across ~20 designed screens |
+| Auth / landing / catalog screens from design-reference | Marketing landing + split auth + catalog featured/skeletons (`docs/design/d2-screenshot-parity.md`) | Authenticated Teach/player screens still thinner than the ~62-pack |
 
 **Bottom line:** the shipped theme reads as warm parchment-gold (exactly the AI-default aesthetic
 PRODUCT.md rejects). Re-skinning to burgundy / cool-field is a prerequisite for all later UI work.
@@ -88,9 +88,9 @@ From `docs/frontend-architecture.md` route map → Laravel reality:
 
 | Surface | Issue |
 |---|---|
-| Landing | Minimal hero card — not design-reference landing |
-| Auth (login/register/OTP/reset) | Functional; not matching designed auth screens / suspended states |
-| Catalog | Simple card grid; no filters, empty/loading states, program browse, offering CTAs |
+| Landing | Design-reference marketing layout (hero/stats/featured/journey). Atmosphere is SVG, not photography. |
+| Auth (login/register/OTP/reset) | Split brand panel + `auth-card`. OTP stays one field. Suspended / wrong-credentials alerts exist. |
+| Catalog | Filters, featured banner, card media, empty + loading skeletons, preview / apply CTAs. |
 | Dashboard | Hub launchpad, not bento (enrolled courses / next live / due items / wallet) |
 | Degree audit | Raw progress numbers |
 | Wallet / billing | Tables; not four BalanceCards + ledger + split-pay allocator UX |
@@ -214,6 +214,8 @@ Treat original Next.js repo as **reference only** — do not port React.
 - Complete `lang/{ar,fr}/auth.php` keys.
 
 **Acceptance:** visual parity checklist against design-reference screenshots for light/dark/RTL auth + catalog; guest→student path unbroken.
+
+**Screenshot parity (2026-09-07):** landing / split auth / catalog featured+skeletons shipped. Checklist in `docs/design-reference/README.md`. Contrast AA measured on token pairs. LFS reference PNGs were not vendored (pointers only).
 
 ### Phase D3 — Student learning core ✅
 

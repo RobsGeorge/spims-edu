@@ -3,8 +3,6 @@
 @section('title', __('ui.reset_password'))
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
         <div class="card border-0 auth-card">
             <div class="card-body p-4 p-md-5">
                 <h1 class="h3 spims-title mb-2">{{ __('ui.reset_password') }}</h1>
@@ -16,7 +14,7 @@
                     @csrf
                     <div class="mb-3">
                         <label class="form-label" for="reset-code">{{ __('ui.otp_code') }}</label>
-                        <input id="reset-code" type="text" name="code" maxlength="6" class="form-control @error('code') is-invalid @enderror" required inputmode="numeric" autocomplete="one-time-code">
+                        <input id="reset-code" type="text" name="code" maxlength="6" class="form-control auth-otp-input @error('code') is-invalid @enderror" required inputmode="numeric" autocomplete="one-time-code">
                         @error('code')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
@@ -33,6 +31,4 @@
                 <p class="auth-footer-links mb-0"><a href="{{ route('auth.login') }}">{{ __('ui.auth_back_to_login') }}</a></p>
             </div>
         </div>
-    </div>
-</div>
 @endsection

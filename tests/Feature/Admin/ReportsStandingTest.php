@@ -405,9 +405,10 @@ class ReportsStandingTest extends TestCase
             ['good_min' => 200, 'suspension_below' => 160],
             Setting::query()->find(AcademicStandingService::SETTING_KEY)?->value
         );
-        $this->assertTrue(
-            AuditLog::query()->where('action', 'academic_standing.thresholds')->exists()
-        );
+        $log = AuditLog::query()->where('action', 'academic_standing.thresholds')->first();
+        $this->assertNotNull($log);
+        $this->assertNull($log->entity_id);
+        $this->assertSame(AcademicStandingService::SETTING_KEY, $log->after['key'] ?? null);
     }
 
     #[Test]

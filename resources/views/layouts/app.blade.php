@@ -25,6 +25,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <link href="{{ asset('css/spims-theme.css') }}" rel="stylesheet">
     <link href="{{ asset('css/spims-shell.css') }}" rel="stylesheet">
+    @if(request()->routeIs('home') || request()->routeIs('auth.*') || request()->routeIs('catalog.*'))
+        <link href="{{ asset('css/spims-public.css') }}" rel="stylesheet">
+    @endif
     @if(!empty($themeCssBlock))
         <style id="spims-theme-tokens">{!! $themeCssBlock !!}</style>
     @endif
@@ -40,6 +43,9 @@
     $themeClass = in_array($cookieTheme ?? 'system', ['light', 'dark', 'system'], true)
         ? $cookieTheme
         : 'system';
+    $isPublicHome = request()->routeIs('home');
+    $isPublicAuth = request()->routeIs('auth.*');
+    $isPublicCatalog = request()->routeIs('catalog.*');
     $logoUrl = null;
     if ($activeTheme) {
         $logoUrl = $themeClass === 'dark'
@@ -57,21 +63,34 @@
         }
     }
 @endphp
-<body class="theme-{{ $themeClass }} {{ $shellLess ? 'shell-guest' : 'shell-app' }}">
+<body class="theme-{{ $themeClass }} {{ $shellLess ? 'shell-guest' : 'shell-app' }}{{ $isPublicHome ? ' spims-public-home' : '' }}{{ $isPublicAuth ? ' spims-public-auth' : '' }}{{ $isPublicCatalog ? ' spims-public-catalog' : '' }}">
     <a class="spims-skip-link" href="#main-content">{{ __('ui.skip_to_content') }}</a>
 
     @if($shellLess)
-        <nav class="navbar navbar-expand-lg app-nav spims-nav sticky-top" aria-label="{{ __('ui.nav_dashboard') }}">
-            <div class="container">
+        <nav class="navbar navbar-expand-lg app-nav spims-nav spims-public-nav sticky-top" aria-label="{{ __('ui.nav_dashboard') }}">
+            <div class="container-xl d-flex flex-wrap align-items-center gap-2">
                 <a class="navbar-brand spims-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
                     @if($logoUrl)
                         <img src="{{ $logoUrl }}" alt="" class="spims-brand-logo" decoding="async">
                     @endif
                     <span>{{ $activeTheme?->site_name ?? 'SPIMS' }}</span>
                 </a>
+                @if($isPublicHome)
+                    <div class="spims-public-nav-links">
+                        <a href="#programs">{{ __('home.nav_programs') }}</a>
+                        <a href="#admissions">{{ __('home.nav_admissions') }}</a>
+                        <a href="#academics">{{ __('home.nav_academics') }}</a>
+                        <a href="#spiritual">{{ __('home.nav_spiritual') }}</a>
+                    </div>
+                @endif
                 <div class="d-flex align-items-center gap-2 ms-auto">
-                    <a href="{{ route('auth.login') }}" class="btn btn-sm btn-outline-primary">{{ __('ui.login') }}</a>
-                    <a href="{{ route('auth.register') }}" class="btn btn-sm btn-primary">{{ __('ui.register') }}</a>
+                    <a href="{{ route('catalog.index') }}" class="btn btn-sm btn-outline-primary d-none d-lg-inline-flex">{{ __('ui.home_cta_catalog') }}</a>
+                    @guest
+                        <a href="{{ route('auth.login') }}" class="btn btn-sm btn-outline-primary">{{ __('ui.login') }}</a>
+                        <a href="{{ route('auth.register') }}" class="btn btn-sm btn-primary">{{ __('ui.register') }}</a>
+                    @else
+                        <a href="{{ route('dashboard') }}" class="btn btn-sm btn-primary">{{ __('ui.home_cta_dashboard') }}</a>
+                    @endguest
                     <form method="POST" action="{{ route('locale.update') }}" class="d-inline">
                         @csrf
                         <label class="visually-hidden" for="locale-select">{{ __('ui.locale') }}</label>
@@ -84,9 +103,19 @@
                 </div>
             </div>
         </nav>
-        <main id="main-content" class="container py-4" tabindex="-1">
-            @include('partials.flash')
-            @yield('content')
+        <main id="main-content" class="{{ ($isPublicHome || $isPublicAuth) ? 'spims-public-main' : 'container py-4' }}" tabindex="-1">
+            @if($isPublicAuth)
+                <div class="spims-auth-split">
+                    @include('auth.partials.brand-panel')
+                    <div class="spims-auth-form-col">
+                        @include('partials.flash')
+                        @yield('content')
+                    </div>
+                </div>
+            @else
+                @include('partials.flash')
+                @yield('content')
+            @endif
         </main>
     @else
         <div class="app-shell" id="app-shell">

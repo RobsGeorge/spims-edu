@@ -1,7 +1,23 @@
 <?php
 
 return [
+    'hero_chip' => 'Now accepting applications',
+    'hero_display' => 'Deepening Coptic Orthodox Scholarship in a Modern Age',
+    'nav_programs' => 'Programs',
+    'nav_admissions' => 'Admissions',
+    'nav_academics' => 'Academics',
+    'nav_spiritual' => 'Spiritual Life',
+    'stat_students' => 'Active students',
+    'stat_courses' => 'Courses',
+    'stat_faculty' => 'Faculty network',
+    'stat_faculty_value' => 'Global',
+    'featured_title' => 'Featured programs',
+    'featured_lead' => 'Explore the core curriculum — language, theology, and the life of the Church.',
+    'featured_tile_badge' => 'Featured',
+    'featured_standalone_blurb' => 'A standalone course you can preview and begin without a full program application.',
+    'featured_program_blurb' => 'Part of a program path — apply when you are ready to study in sequence.',
     'how_title' => 'How it works',
+    'how_lead' => 'A streamlined process to begin your theological studies.',
     'how_1_title' => 'Create an account',
     'how_1_body' => 'Register with your email. We send a short code — nothing extra.',
     'how_2_title' => 'Choose a course',
@@ -9,4 +25,7 @@ return [
     'how_3_title' => 'Learn with care',
     'how_3_body' => 'Study at a calm pace. Credentials follow when you complete the work.',
     'catalog_teaser' => 'Browse the course catalog',
+    'auth_brand_line' => 'Academic excellence',
+    'auth_brand_quote' => 'Enter the hushed halls of knowledge.',
+    'footer_copy' => 'SPIMS Coptic Orthodox online school.',
 ];

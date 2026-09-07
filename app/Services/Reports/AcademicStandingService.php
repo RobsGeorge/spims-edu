@@ -70,7 +70,7 @@ class AcademicStandingService
         }
 
         $this->audit->withAudit($actor, 'academic_standing.thresholds', function () use ($actor, $goodMin, $suspensionBelow) {
-            $setting = Setting::query()->updateOrCreate(
+            Setting::query()->updateOrCreate(
                 ['key' => self::SETTING_KEY],
                 [
                     'value' => [
@@ -83,7 +83,12 @@ class AcademicStandingService
 
             $this->reapplyCached();
 
-            return $setting;
+            // Setting PK is a 29-char key, not a ULID — do not write it to audit_logs.entity_id.
+            return [
+                'key' => self::SETTING_KEY,
+                'good_min' => $goodMin,
+                'suspension_below' => $suspensionBelow,
+            ];
         }, 'Setting');
 
         return $this->thresholds();
