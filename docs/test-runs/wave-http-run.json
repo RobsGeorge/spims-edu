@@ -1,0 +1,590 @@
+[
+    {
+        "id": "D1",
+        "wave": "1",
+        "result": "PASS",
+        "evidence": "home 200 cta=yes"
+    },
+    {
+        "id": "D2",
+        "wave": "1",
+        "result": "PASS",
+        "evidence": "demo 200 featured=yes leak=no"
+    },
+    {
+        "id": "D3",
+        "wave": "1",
+        "result": "PASS",
+        "evidence": "seed modal markup"
+    },
+    {
+        "id": "D4",
+        "wave": "1",
+        "result": "PASS",
+        "evidence": "reset modal markup"
+    },
+    {
+        "id": "D6",
+        "wave": "1",
+        "result": "PASS",
+        "evidence": "enter John loc=http:\/\/127.0.0.1:8000\/learn\/01M1WMAJE0QDDBPXC9Z5HDVAZZ land=200"
+    },
+    {
+        "id": "D7",
+        "wave": "1",
+        "result": "PASS",
+        "evidence": "switch loc=http:\/\/127.0.0.1:8000\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ land=200"
+    },
+    {
+        "id": "D8",
+        "wave": "1",
+        "result": "PASS",
+        "evidence": "superadmin=404 nobody=404"
+    },
+    {
+        "id": "D9",
+        "wave": "1",
+        "result": "PASS",
+        "evidence": "ar status=200 rtl=yes"
+    },
+    {
+        "id": "D10",
+        "wave": "1",
+        "result": "PASS",
+        "evidence": "fr heading=yes"
+    },
+    {
+        "id": "D0",
+        "wave": "1",
+        "result": "PASS",
+        "evidence": "covered by DemoConsoleTest disabled_console_is_hidden_and_not_found"
+    },
+    {
+        "id": "G1",
+        "wave": "2",
+        "result": "PASS",
+        "evidence": "landing 200"
+    },
+    {
+        "id": "G2",
+        "wave": "2",
+        "result": "PASS",
+        "evidence": "catalog 200 th101=yes"
+    },
+    {
+        "id": "G3",
+        "wave": "2",
+        "result": "PASS",
+        "evidence": "preview 200"
+    },
+    {
+        "id": "G4",
+        "wave": "2",
+        "result": "PASS",
+        "evidence": "register 200"
+    },
+    {
+        "id": "G5",
+        "wave": "2",
+        "result": "PASS",
+        "evidence": "login 200"
+    },
+    {
+        "id": "G6",
+        "wave": "2",
+        "result": "PASS",
+        "evidence": "health=200 up=200"
+    },
+    {
+        "id": "G7",
+        "wave": "2",
+        "result": "PASS",
+        "evidence": "branding 200"
+    },
+    {
+        "id": "G8",
+        "wave": "2",
+        "result": "PASS",
+        "evidence": "layout wrap covered by CSS + prior screenshots; HTTP N\/A"
+    },
+    {
+        "id": "S1",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "learn 200"
+    },
+    {
+        "id": "S2",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "dash 200"
+    },
+    {
+        "id": "S3",
+        "wave": "3",
+        "result": "FAIL",
+        "evidence": "\/projects\/mine=404"
+    },
+    {
+        "id": "S4",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "player 200"
+    },
+    {
+        "id": "S5",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "item 200"
+    },
+    {
+        "id": "S6",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "ann 200"
+    },
+    {
+        "id": "S7",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "finance 200"
+    },
+    {
+        "id": "S8",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "invoice 200"
+    },
+    {
+        "id": "S9",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "attendance 200"
+    },
+    {
+        "id": "S10",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "enrollments 200"
+    },
+    {
+        "id": "S11",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "applications 200"
+    },
+    {
+        "id": "S12",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "grades 200"
+    },
+    {
+        "id": "S13",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "surveys 200"
+    },
+    {
+        "id": "S15",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "events 200"
+    },
+    {
+        "id": "S17",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "live-quiz join 200"
+    },
+    {
+        "id": "S18",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "projects 200"
+    },
+    {
+        "id": "S19",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "settings=200 notif=200 transcript=200 completion=200"
+    },
+    {
+        "id": "S20",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "hannah dash 200 rtl=yes"
+    },
+    {
+        "id": "S21",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "learn=200 att=200"
+    },
+    {
+        "id": "S22",
+        "wave": "3",
+        "result": "PASS",
+        "evidence": "bottom nav present"
+    },
+    {
+        "id": "T1",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "mina land 200 loc=http:\/\/127.0.0.1:8000\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ"
+    },
+    {
+        "id": "T2",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "teach index 200"
+    },
+    {
+        "id": "T3",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ 200"
+    },
+    {
+        "id": "T4",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ?tab=assessments 200"
+    },
+    {
+        "id": "T5",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ\/assignments 200"
+    },
+    {
+        "id": "T6",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ?tab=gradebook 200"
+    },
+    {
+        "id": "T7",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ\/live 200"
+    },
+    {
+        "id": "T8",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ\/attendance 200"
+    },
+    {
+        "id": "T9",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ\/discussions 200"
+    },
+    {
+        "id": "T10",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ?tab=announcements 200"
+    },
+    {
+        "id": "T11",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ?tab=roster 200"
+    },
+    {
+        "id": "T13",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ\/completion 200"
+    },
+    {
+        "id": "T14",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ\/projects 200"
+    },
+    {
+        "id": "T15",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ\/live-quiz 200"
+    },
+    {
+        "id": "T16",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "\/teach\/01M1WMAJE0QDDBPXC9Z5HDVAZZ\/surveys 200"
+    },
+    {
+        "id": "T12",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "dossier 200"
+    },
+    {
+        "id": "T17",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "ta teach=200 offering=200 completion=200"
+    },
+    {
+        "id": "T18",
+        "wave": "4",
+        "result": "FAIL",
+        "evidence": "mina admin\/programs 200"
+    },
+    {
+        "id": "T19",
+        "wave": "4",
+        "result": "PASS",
+        "evidence": "mobile teach tabs — CSS overflow-auto present in workspace tabs"
+    },
+    {
+        "id": "C1",
+        "wave": "5",
+        "result": "PASS",
+        "evidence": "aca programs 200"
+    },
+    {
+        "id": "C2",
+        "wave": "5",
+        "result": "PASS",
+        "evidence": "program show"
+    },
+    {
+        "id": "C3",
+        "wave": "5",
+        "result": "PASS",
+        "evidence": "courses 200"
+    },
+    {
+        "id": "C4",
+        "wave": "5",
+        "result": "PASS",
+        "evidence": "offerings 200"
+    },
+    {
+        "id": "C5",
+        "wave": "5",
+        "result": "FAIL",
+        "evidence": "\/admin\/communications\/report=404"
+    },
+    {
+        "id": "C6",
+        "wave": "5",
+        "result": "PASS",
+        "evidence": "aca users 403"
+    },
+    {
+        "id": "O1",
+        "wave": "5",
+        "result": "FAIL",
+        "evidence": "adm applications 0"
+    },
+    {
+        "id": "O2",
+        "wave": "5",
+        "result": "PASS",
+        "evidence": "users 200"
+    },
+    {
+        "id": "O3",
+        "wave": "5",
+        "result": "FAIL",
+        "evidence": "\/admin\/communications\/report=404"
+    },
+    {
+        "id": "O4",
+        "wave": "5",
+        "result": "PASS",
+        "evidence": "theme 200"
+    },
+    {
+        "id": "O5",
+        "wave": "5",
+        "result": "FAIL",
+        "evidence": "adm programs 200"
+    },
+    {
+        "id": "O6",
+        "wave": "5",
+        "result": "FAIL",
+        "evidence": "adm finance 200"
+    },
+    {
+        "id": "F1",
+        "wave": "5",
+        "result": "FAIL",
+        "evidence": "fin admin 0 loc="
+    },
+    {
+        "id": "F2",
+        "wave": "5",
+        "result": "PASS",
+        "evidence": "hub=200 reports=200"
+    },
+    {
+        "id": "F3",
+        "wave": "5",
+        "result": "PASS",
+        "evidence": "own finance 200"
+    },
+    {
+        "id": "F4",
+        "wave": "5",
+        "result": "FAIL",
+        "evidence": "fin applications 200"
+    },
+    {
+        "id": "F5",
+        "wave": "5",
+        "result": "FAIL",
+        "evidence": "finance html 0"
+    },
+    {
+        "id": "P1",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "dual loc= land=0 name=no"
+    },
+    {
+        "id": "P2",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "ins2 loc= land=0 name=no"
+    },
+    {
+        "id": "P3",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "student2 loc= land=0 name=no"
+    },
+    {
+        "id": "P4",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "student3 loc= land=0 name=no"
+    },
+    {
+        "id": "P5",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "student4 loc= land=0 name=no"
+    },
+    {
+        "id": "P6",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "student5 loc= land=0 name=no"
+    },
+    {
+        "id": "P7",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "student7 loc= land=0 name=no"
+    },
+    {
+        "id": "P8",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "student8 loc= land=0 name=no"
+    },
+    {
+        "id": "P9",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "student9 loc= land=0 name=no"
+    },
+    {
+        "id": "P10",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "student10 loc= land=0 name=no"
+    },
+    {
+        "id": "P1b",
+        "wave": "6",
+        "result": "FAIL",
+        "evidence": "dual teach=200 learning=200"
+    },
+    {
+        "id": "X1",
+        "wave": "7",
+        "result": "PASS",
+        "evidence": "theme post 302 dash=200"
+    },
+    {
+        "id": "X2",
+        "wave": "7",
+        "result": "PASS",
+        "evidence": "locale ar rtl=yes"
+    },
+    {
+        "id": "X3",
+        "wave": "7",
+        "result": "PASS",
+        "evidence": "settings 200"
+    },
+    {
+        "id": "X4",
+        "wave": "7",
+        "result": "PASS",
+        "evidence": "skip target"
+    },
+    {
+        "id": "X5",
+        "wave": "7",
+        "result": "PASS",
+        "evidence": "logged-in catalog 200"
+    },
+    {
+        "id": "X6",
+        "wave": "7",
+        "result": "PASS",
+        "evidence": "john teach 200"
+    },
+    {
+        "id": "X7",
+        "wave": "7",
+        "result": "FAIL",
+        "evidence": "john users 200"
+    },
+    {
+        "id": "X8",
+        "wave": "7",
+        "result": "FAIL",
+        "evidence": "john superadmin 200"
+    },
+    {
+        "id": "X9",
+        "wave": "7",
+        "result": "FAIL",
+        "evidence": "mina finance 200"
+    },
+    {
+        "id": "X10",
+        "wave": "7",
+        "result": "PASS",
+        "evidence": "guest dash 302 loc=http:\/\/127.0.0.1:8000\/login"
+    },
+    {
+        "id": "X11",
+        "wave": "7",
+        "result": "PASS",
+        "evidence": "foundation.demo 419"
+    },
+    {
+        "id": "A0",
+        "wave": "0",
+        "result": "PASS",
+        "evidence": "PHPUnit 15 tests 98 assertions OK"
+    },
+    {
+        "id": "A1",
+        "wave": "0",
+        "result": "PASS",
+        "evidence": "PHPUnit output did not print password in assertions"
+    }
+]
