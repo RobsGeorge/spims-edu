@@ -23,6 +23,7 @@
     <p class="small text-muted-theme mb-3">{{ __('people.directory_help') }}</p>
 
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_users')])
+    @include('partials.features-entrance-banner')
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_directory')])
 
     <div class="card border-0 shadow-sm mb-4">

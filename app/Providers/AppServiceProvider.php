@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\Ai\AiClient;
 use App\Services\Ai\GeminiAiClient;
 use App\Services\Communications\AnnouncementService;
+use App\Services\SuperAdmin\FeatureFlagService;
 use App\Services\SuperAdmin\ImpersonationService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
@@ -22,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(AuthorizeService::class);
         $this->app->singleton(AuditLogWriter::class);
         $this->app->singleton(AiClient::class, GeminiAiClient::class);
+        $this->app->singleton(FeatureFlagService::class);
+        $this->app->singleton(SystemSettingService::class);
     }
 
     public function boot(): void
@@ -51,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
                 ? User::query()->find($impersonatorId)
                 : null;
 
-            $view->with([
+            $view->with(array_merge([
                 'activeTheme' => $activeTheme,
                 'cookieTheme' => $cookieTheme,
                 'themeCssBlock' => ThemeTokens::inlineStyleBlock($activeTheme?->tokens),
@@ -59,7 +62,28 @@ class AppServiceProvider extends ServiceProvider
                 'localeDir' => $isRtl ? 'rtl' : 'ltr',
                 'activeBanner' => $activeBanner,
                 'impersonator' => $impersonator,
-            ]);
+            ], $this->featureFlagViewData()));
         });
+
+        View::composer(['home', 'auth.login', 'dashboard'], function ($view): void {
+            $view->with($this->featureFlagViewData());
+        });
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    private function featureFlagViewData(): array
+    {
+        $flags = app(FeatureFlagService::class);
+
+        return [
+            'featurePublicCatalog' => $flags->enabled('public_catalog'),
+            'featureRegistration' => $flags->enabled('registration'),
+            'featureLearn' => $flags->enabled('learn'),
+            'featureEvents' => $flags->enabled('events'),
+            'featureSurveys' => $flags->enabled('surveys'),
+            'featureLive' => $flags->enabled('live'),
+        ];
     }
 }

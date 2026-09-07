@@ -26,6 +26,8 @@
     </div>
     <h1 class="page-title">{{ __('superadmin.observability_title') }}</h1>
     <p class="text-muted-theme mb-4">{{ __('superadmin.observability_desc') }}</p>
+    @include('partials.features-entrance-banner')
+    @include('partials.config-entrance-banner')
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_observability')])
 
     <div class="row g-3 mb-4">

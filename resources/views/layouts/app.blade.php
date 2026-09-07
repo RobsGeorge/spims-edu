@@ -84,10 +84,14 @@
                     </div>
                 @endif
                 <div class="d-flex align-items-center gap-2 ms-auto">
-                    <a href="{{ route('catalog.index') }}" class="btn btn-sm btn-outline-primary d-none d-lg-inline-flex">{{ __('ui.home_cta_catalog') }}</a>
+                    @if($featurePublicCatalog ?? true)
+                        <a href="{{ route('catalog.index') }}" class="btn btn-sm btn-outline-primary d-none d-lg-inline-flex">{{ __('ui.home_cta_catalog') }}</a>
+                    @endif
                     @guest
                         <a href="{{ route('auth.login') }}" class="btn btn-sm btn-outline-primary">{{ __('ui.login') }}</a>
-                        <a href="{{ route('auth.register') }}" class="btn btn-sm btn-primary">{{ __('ui.register') }}</a>
+                        @if($featureRegistration ?? true)
+                            <a href="{{ route('auth.register') }}" class="btn btn-sm btn-primary">{{ __('ui.register') }}</a>
+                        @endif
                     @else
                         <a href="{{ route('dashboard') }}" class="btn btn-sm btn-primary">{{ __('ui.home_cta_dashboard') }}</a>
                     @endguest
@@ -173,13 +177,17 @@
                             aria-label="{{ __('ui.open_menu') }}">
                         <i class="bi bi-list" aria-hidden="true"></i>
                     </button>
-                    <form method="GET" action="{{ route('catalog.index') }}" class="app-topbar-search" role="search">
-                        <label class="visually-hidden" for="app-shell-search">{{ __('ui.search') }}</label>
-                        <input id="app-shell-search" type="search" name="q" value="{{ request('q') }}"
-                               class="form-control app-topbar-search-input"
-                               placeholder="{{ __('catalog.search_placeholder') }}"
-                               autocomplete="off">
-                    </form>
+                    @if($featurePublicCatalog ?? true)
+                        <form method="GET" action="{{ route('catalog.index') }}" class="app-topbar-search" role="search">
+                            <label class="visually-hidden" for="app-shell-search">{{ __('ui.search') }}</label>
+                            <input id="app-shell-search" type="search" name="q" value="{{ request('q') }}"
+                                   class="form-control app-topbar-search-input"
+                                   placeholder="{{ __('catalog.search_placeholder') }}"
+                                   autocomplete="off">
+                        </form>
+                    @else
+                        <div class="app-topbar-search" aria-hidden="true"></div>
+                    @endif
                     <div class="app-topbar-spacer"></div>
                     <div class="d-flex flex-wrap align-items-center gap-2">
                         @if($hasSuperadminNav)
@@ -205,8 +213,12 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="{{ route('dashboard') }}">{{ __('ui.nav_dashboard') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ route('catalog.index') }}">{{ __('ui.nav_catalog') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ route('grades.index') }}">{{ __('ui.nav_grades') }}</a></li>
+                                @if($featurePublicCatalog ?? true)
+                                    <li><a class="dropdown-item" href="{{ route('catalog.index') }}">{{ __('ui.nav_catalog') }}</a></li>
+                                @endif
+                                @if($featureLearn ?? true)
+                                    <li><a class="dropdown-item" href="{{ route('grades.index') }}">{{ __('ui.nav_grades') }}</a></li>
+                                @endif
                                 <li><a class="dropdown-item" href="{{ route('settings.edit') }}">{{ __('ui.nav_settings') }}</a></li>
                                 <li><a class="dropdown-item" href="{{ route('transcript.show') }}">{{ __('ui.nav_transcript') }}</a></li>
                                 @if(app(\App\Support\AuthorizeService::class)->allows(auth()->user(), 'users.manage'))
@@ -219,6 +231,18 @@
                                 @endif
                                 @if($hasSuperadminNav)
                                     <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('superadmin.features') }}">
+                                            <i class="bi bi-toggles" aria-hidden="true"></i>
+                                            {{ __('features.nav_features') }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('superadmin.config') }}">
+                                            <i class="bi bi-sliders2" aria-hidden="true"></i>
+                                            {{ __('system_settings.nav_config') }}
+                                        </a>
+                                    </li>
                                     <li>
                                         <a class="dropdown-item" href="{{ route('superadmin.audit.index') }}">
                                             <i class="bi bi-journal-text" aria-hidden="true"></i>

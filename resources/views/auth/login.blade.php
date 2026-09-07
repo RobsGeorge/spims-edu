@@ -39,7 +39,9 @@
                     <button type="submit" class="btn btn-primary w-100">{{ __('ui.login') }}</button>
                 </form>
                 <div class="auth-footer-links d-flex justify-content-between flex-wrap gap-2">
-                    <a href="{{ route('auth.register') }}">{{ __('ui.register') }}</a>
+                    @if($featureRegistration ?? true)
+                        <a href="{{ route('auth.register') }}">{{ __('ui.register') }}</a>
+                    @endif
                     <a href="{{ route('auth.password.request') }}">{{ __('ui.forgot_password') }}</a>
                 </div>
             </div>

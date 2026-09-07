@@ -6,6 +6,8 @@
         <h1 class="spims-title mb-3">{{ __('learning.settings') }}</h1>
         @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
         @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_settings')])
+        @include('partials.features-entrance-banner', ['caption' => __('features.entrance_from_settings')])
+        @include('partials.config-entrance-banner', ['caption' => __('system_settings.entrance_from_settings')])
         @include('partials.people-entrance-banner')
 
         <form method="POST" action="{{ route('settings.picture') }}" enctype="multipart/form-data" class="app-card p-4 mb-4">

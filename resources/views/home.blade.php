@@ -13,12 +13,18 @@
             <p class="spims-landing-lead">{{ __('ui.home_subheading') }}</p>
             <div class="spims-landing-actions">
                 @guest
-                    <a href="{{ route('auth.register') }}" class="btn btn-primary">{{ __('ui.home_cta_primary') }}</a>
-                    <a href="{{ route('catalog.index') }}" class="btn btn-outline-primary">{{ __('ui.home_cta_catalog') }}</a>
+                    @if($featureRegistration ?? true)
+                        <a href="{{ route('auth.register') }}" class="btn btn-primary">{{ __('ui.home_cta_primary') }}</a>
+                    @endif
+                    @if($featurePublicCatalog ?? true)
+                        <a href="{{ route('catalog.index') }}" class="btn btn-outline-primary">{{ __('ui.home_cta_catalog') }}</a>
+                    @endif
                     <a href="{{ route('auth.login') }}" class="btn btn-outline-primary">{{ __('ui.home_cta_secondary') }}</a>
                 @else
                     <a href="{{ route('dashboard') }}" class="btn btn-primary">{{ __('ui.home_cta_dashboard') }}</a>
-                    <a href="{{ route('catalog.index') }}" class="btn btn-outline-primary">{{ __('ui.home_cta_catalog') }}</a>
+                    @if($featurePublicCatalog ?? true)
+                        <a href="{{ route('catalog.index') }}" class="btn btn-outline-primary">{{ __('ui.home_cta_catalog') }}</a>
+                    @endif
                 @endguest
             </div>
         </div>
@@ -48,10 +54,16 @@
             <div class="spims-landing-featured-grid">
                 @foreach($featured as $index => $course)
                     @php
-                        $href = route('catalog.index', ['q' => $course->code]);
+                        $catalogUrl = ($featurePublicCatalog ?? true)
+                            ? route('catalog.index', ['q' => $course->code])
+                            : null;
                     @endphp
                     @if($index === 2)
-                        <a class="spims-landing-program spims-landing-program--feature" href="{{ $href }}">
+                        @if($catalogUrl)
+                            <a class="spims-landing-program spims-landing-program--feature" href="{{ $catalogUrl }}">
+                        @else
+                            <div class="spims-landing-program spims-landing-program--feature">
+                        @endif
                             <div>
                                 <p class="spims-landing-chip mb-3">{{ __('home.featured_tile_badge') }}</p>
                                 <h3 class="spims-landing-program-title">{{ $course->title }}</h3>
@@ -60,9 +72,17 @@
                                 </p>
                             </div>
                             <p class="spims-landing-program-meta mb-0">{{ __('catalog.credits', ['count' => $course->credit_hours]) }}</p>
-                        </a>
+                        @if($catalogUrl)
+                            </a>
+                        @else
+                            </div>
+                        @endif
                     @else
-                        <a class="spims-landing-program" href="{{ $href }}">
+                        @if($catalogUrl)
+                            <a class="spims-landing-program" href="{{ $catalogUrl }}">
+                        @else
+                            <div class="spims-landing-program">
+                        @endif
                             <div class="spims-landing-program-media {{ $index === 1 ? 'spims-landing-program-media--2' : '' }}" aria-hidden="true"></div>
                             <div class="spims-landing-program-body">
                                 <h3 class="spims-landing-program-title">{{ $course->title }}</h3>
@@ -71,7 +91,11 @@
                                 </p>
                                 <p class="spims-landing-program-meta mb-0">{{ __('catalog.credits', ['count' => $course->credit_hours]) }}</p>
                             </div>
-                        </a>
+                        @if($catalogUrl)
+                            </a>
+                        @else
+                            </div>
+                        @endif
                     @endif
                 @endforeach
             </div>
@@ -98,17 +122,23 @@
                 <p class="spims-landing-beat-body">{{ __('home.how_3_body') }}</p>
             </li>
         </ol>
-        <p class="spims-landing-teaser">
-            <a href="{{ route('catalog.index') }}">{{ __('home.catalog_teaser') }}</a>
-        </p>
+        @if($featurePublicCatalog ?? true)
+            <p class="spims-landing-teaser">
+                <a href="{{ route('catalog.index') }}">{{ __('home.catalog_teaser') }}</a>
+            </p>
+        @endif
     </div>
 </section>
 
 <footer id="spiritual" class="spims-landing-footer">
     <div class="spims-landing-footer-brand">{{ __('ui.home_heading') }}</div>
     <div class="d-flex flex-wrap justify-content-center gap-3">
-        <a href="{{ route('catalog.index') }}">{{ __('ui.nav_catalog') }}</a>
-        <a href="{{ route('auth.register') }}">{{ __('ui.register') }}</a>
+        @if($featurePublicCatalog ?? true)
+            <a href="{{ route('catalog.index') }}">{{ __('ui.nav_catalog') }}</a>
+        @endif
+        @if($featureRegistration ?? true)
+            <a href="{{ route('auth.register') }}">{{ __('ui.register') }}</a>
+        @endif
     </div>
     <div>{{ __('home.footer_copy') }}</div>
 </footer>

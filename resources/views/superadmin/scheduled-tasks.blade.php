@@ -12,6 +12,7 @@
     <h1 class="page-title">{{ __('superadmin.scheduled_title') }}</h1>
     <p class="text-muted-theme mb-3">{{ __('superadmin.scheduled_desc') }}</p>
     <p class="small text-muted-theme mb-4">{{ __('superadmin.scheduled_prune_help') }}</p>
+    @include('partials.config-entrance-banner')
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_scheduled')])
 
     <div class="table-responsive app-card card shadow-sm">

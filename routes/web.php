@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AttendanceAdminController;
 use App\Http\Controllers\Admin\CertificateTemplateController;
 use App\Http\Controllers\Admin\CommunicationAdminController;
 use App\Http\Controllers\Admin\CompletionCriteriaController;
+use App\Http\Controllers\Admin\ContentItemController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\CredentialAdminController;
 use App\Http\Controllers\Admin\DiscussionAdminController;
@@ -19,7 +20,6 @@ use App\Http\Controllers\Admin\GradebookController;
 use App\Http\Controllers\Admin\GradingSchemeController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
 use App\Http\Controllers\Admin\OfferingClosingController;
-use App\Http\Controllers\Admin\ContentItemController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\ReportController;
@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\SurveyController as AdminSurveyController;
 use App\Http\Controllers\Admin\ThemeEditorController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AdvisingController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\Api\BrandingController;
 use App\Http\Controllers\Api\PaymentWebhookController;
@@ -45,13 +46,11 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CommunicationOpenController;
 use App\Http\Controllers\ContentItemFileController;
 use App\Http\Controllers\CoursePlayerController;
-use App\Http\Controllers\StudentPreviewController;
 use App\Http\Controllers\CredentialDownloadController;
 use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\DonationController;
-use App\Http\Controllers\AdvisingController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\Events\StudentEventController;
 use App\Http\Controllers\ExamAttemptController;
@@ -73,11 +72,14 @@ use App\Http\Controllers\ProjectController as StudentProjectController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentCompletionController;
-use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\StudentPreviewController;
 use App\Http\Controllers\SuperAdmin\AuditExplorerController;
+use App\Http\Controllers\SuperAdmin\FeatureFlagController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\SuperAdmin\SystemSettingController;
+use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\Teach\AssessmentController as TeachAssessmentController;
 use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController;
 use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController;
@@ -103,7 +105,9 @@ Route::post('/api/webhooks/payments', PaymentWebhookController::class)
 Route::post('/api/webhooks/zoom', ZoomWebhookController::class)
     ->middleware('throttle:webhooks')
     ->name('api.webhooks.zoom');
-Route::get('/verify/{token}', CredentialVerifyController::class)->name('credentials.verify');
+Route::get('/verify/{token}', CredentialVerifyController::class)
+    ->middleware('feature:credentials_public')
+    ->name('credentials.verify');
 Route::get('/communications/open/{log}', CommunicationOpenController::class)->name('communications.open');
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
 Route::get('/offerings/{offering}/preview/items/{item}/file', [ContentItemFileController::class, 'publicPreview'])
@@ -111,11 +115,16 @@ Route::get('/offerings/{offering}/preview/items/{item}/file', [ContentItemFileCo
     ->name('offerings.preview.item.file');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
-Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/catalog', [CatalogController::class, 'index'])
+    ->middleware('feature:public_catalog')
+    ->name('catalog.index');
 
 Route::middleware('guest')->group(function () {
-    Route::get('/register', [RegisterController::class, 'create'])->name('auth.register');
-    Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:auth');
+    Route::get('/register', [RegisterController::class, 'create'])
+        ->middleware('feature:registration')
+        ->name('auth.register');
+    Route::post('/register', [RegisterController::class, 'store'])
+        ->middleware(['throttle:auth', 'feature:registration']);
     Route::get('/login', [LoginController::class, 'create'])->name('auth.login');
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:login');
     Route::get('/verify-email', [VerifyEmailController::class, 'show'])->name('auth.verify');
@@ -141,27 +150,33 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/hubs/admin', [HubController::class, 'admin'])->name('hubs.admin');
     Route::get('/hubs/finance', [HubController::class, 'finance'])->name('hubs.finance');
 
-    Route::get('/teach', [TeachController::class, 'index'])->name('teach.index');
-    Route::get('/teach/{offering}', [TeachController::class, 'show'])->name('teach.show');
-    Route::get('/teach/{offering}/students/{student}', [TeachStudentController::class, 'show'])
-        ->name('teach.students.show');
-    Route::post('/teach/{offering}/announcements', [TeachController::class, 'storeAnnouncement'])
-        ->name('teach.announcements.store');
-    Route::put('/teach/announcements/{announcement}', [TeachController::class, 'updateAnnouncement'])
-        ->name('teach.announcements.update');
-    Route::post('/teach/announcements/{announcement}/publish', [TeachController::class, 'publishAnnouncement'])
-        ->name('teach.announcements.publish');
-    Route::post('/teach/announcements/{announcement}/resend', [TeachController::class, 'resendAnnouncement'])
-        ->name('teach.announcements.resend');
+    Route::get('/teach', [TeachController::class, 'index'])
+        ->middleware('feature:teach')
+        ->name('teach.index');
+    Route::get('/teach/{offering}', [TeachController::class, 'show'])
+        ->middleware('feature:teach')
+        ->name('teach.show');
+    Route::middleware('feature:teach')->group(function () {
+        Route::get('/teach/{offering}/students/{student}', [TeachStudentController::class, 'show'])
+            ->name('teach.students.show');
+        Route::post('/teach/{offering}/announcements', [TeachController::class, 'storeAnnouncement'])
+            ->name('teach.announcements.store');
+        Route::put('/teach/announcements/{announcement}', [TeachController::class, 'updateAnnouncement'])
+            ->name('teach.announcements.update');
+        Route::post('/teach/announcements/{announcement}/publish', [TeachController::class, 'publishAnnouncement'])
+            ->name('teach.announcements.publish');
+        Route::post('/teach/announcements/{announcement}/resend', [TeachController::class, 'resendAnnouncement'])
+            ->name('teach.announcements.resend');
+    });
 
     Route::get('/surveys', [SurveyController::class, 'index'])
-        ->middleware('permission:feedback.view')
+        ->middleware(['feature:surveys', 'permission:feedback.view'])
         ->name('student.surveys.index');
     Route::get('/surveys/{survey}', [SurveyController::class, 'show'])
-        ->middleware('permission:feedback.view')
+        ->middleware(['feature:surveys', 'permission:feedback.view'])
         ->name('student.surveys.show');
     Route::post('/surveys/{survey}', [SurveyController::class, 'submit'])
-        ->middleware('permission:feedback.view')
+        ->middleware(['feature:surveys', 'permission:feedback.view'])
         ->name('student.surveys.submit');
 
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
@@ -169,144 +184,146 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/announcements/{announcement}/dismiss-banner', [AnnouncementController::class, 'dismissBanner'])
         ->name('announcements.dismiss-banner');
 
-    Route::get('/teach/{offering}/completion', [TeachCompletionController::class, 'show'])
-        ->middleware('permission:completion.view')
-        ->name('teach.completion.show');
-    Route::post('/teach/{offering}/close', [TeachCompletionController::class, 'close'])
-        ->name('teach.offerings.close');
-    Route::post('/teach/{offering}/students/{student}/notes', [TeachCompletionController::class, 'storeNote'])
-        ->middleware('permission:student_notes.manage')
-        ->name('teach.completion.notes.store');
-    Route::post('/teach/{offering}/weeks/{week}/students/{student}/assessment', [TeachCompletionController::class, 'rate'])
-        ->middleware('permission:module_assessment.manage')
-        ->name('teach.completion.assess');
+    Route::middleware('feature:teach')->group(function () {
+        Route::get('/teach/{offering}/completion', [TeachCompletionController::class, 'show'])
+            ->middleware('permission:completion.view')
+            ->name('teach.completion.show');
+        Route::post('/teach/{offering}/close', [TeachCompletionController::class, 'close'])
+            ->name('teach.offerings.close');
+        Route::post('/teach/{offering}/students/{student}/notes', [TeachCompletionController::class, 'storeNote'])
+            ->middleware('permission:student_notes.manage')
+            ->name('teach.completion.notes.store');
+        Route::post('/teach/{offering}/weeks/{week}/students/{student}/assessment', [TeachCompletionController::class, 'rate'])
+            ->middleware('permission:module_assessment.manage')
+            ->name('teach.completion.assess');
 
-    Route::get('/teach/{offering}/attendance', [TeachAttendanceController::class, 'index'])->name('teach.attendance.index');
-    Route::post('/teach/{offering}/attendance/sessions', [TeachAttendanceController::class, 'store'])->name('teach.attendance.store');
-    Route::get('/teach/{offering}/attendance/report.csv', [TeachAttendanceController::class, 'reportCsv'])->name('teach.attendance.report.csv');
-    Route::get('/teach/{offering}/roster.csv', [TeachAttendanceController::class, 'rosterCsv'])->name('teach.attendance.roster.csv');
-    Route::post('/teach/{offering}/roster/announce', [TeachAttendanceController::class, 'announce'])->name('teach.attendance.announce');
-    Route::get('/teach/{offering}/sessions/{session}', [TeachAttendanceController::class, 'show'])->name('teach.attendance.show');
-    Route::post('/teach/{offering}/sessions/{session}/attendance', [TeachAttendanceController::class, 'mark'])->name('teach.attendance.mark');
-    Route::post('/teach/{offering}/sessions/{session}/fill-missing', [TeachAttendanceController::class, 'fillMissing'])->name('teach.attendance.fill-missing');
-    Route::post('/teach/{offering}/sessions/{session}/close', [TeachAttendanceController::class, 'close'])->name('teach.attendance.close');
-    Route::post('/teach/{offering}/sessions/{session}/reopen', [TeachAttendanceController::class, 'reopen'])->name('teach.attendance.reopen');
-    Route::post('/teach/{offering}/sessions/{session}/excuse', [TeachAttendanceController::class, 'excuse'])->name('teach.attendance.excuse');
-    Route::post('/teach/{offering}/sessions/{session}/check-in-code', [TeachAttendanceController::class, 'issueCode'])->name('teach.attendance.code');
+        Route::get('/teach/{offering}/attendance', [TeachAttendanceController::class, 'index'])->name('teach.attendance.index');
+        Route::post('/teach/{offering}/attendance/sessions', [TeachAttendanceController::class, 'store'])->name('teach.attendance.store');
+        Route::get('/teach/{offering}/attendance/report.csv', [TeachAttendanceController::class, 'reportCsv'])->name('teach.attendance.report.csv');
+        Route::get('/teach/{offering}/roster.csv', [TeachAttendanceController::class, 'rosterCsv'])->name('teach.attendance.roster.csv');
+        Route::post('/teach/{offering}/roster/announce', [TeachAttendanceController::class, 'announce'])->name('teach.attendance.announce');
+        Route::get('/teach/{offering}/sessions/{session}', [TeachAttendanceController::class, 'show'])->name('teach.attendance.show');
+        Route::post('/teach/{offering}/sessions/{session}/attendance', [TeachAttendanceController::class, 'mark'])->name('teach.attendance.mark');
+        Route::post('/teach/{offering}/sessions/{session}/fill-missing', [TeachAttendanceController::class, 'fillMissing'])->name('teach.attendance.fill-missing');
+        Route::post('/teach/{offering}/sessions/{session}/close', [TeachAttendanceController::class, 'close'])->name('teach.attendance.close');
+        Route::post('/teach/{offering}/sessions/{session}/reopen', [TeachAttendanceController::class, 'reopen'])->name('teach.attendance.reopen');
+        Route::post('/teach/{offering}/sessions/{session}/excuse', [TeachAttendanceController::class, 'excuse'])->name('teach.attendance.excuse');
+        Route::post('/teach/{offering}/sessions/{session}/check-in-code', [TeachAttendanceController::class, 'issueCode'])->name('teach.attendance.code');
 
-    Route::get('/teach/{offering}/assessments/{assessment}/attempts', [TeachAssessmentController::class, 'attempts'])
-        ->middleware('permission:assessments.grade')
-        ->name('teach.assessments.attempts');
-    Route::post('/teach/{offering}/assessments/{assessment}/answers/{attemptAnswer}/grade', [TeachAssessmentController::class, 'gradeAnswer'])
-        ->middleware('permission:assessments.grade')
-        ->name('teach.assessments.grade');
-    Route::post('/teach/{offering}/assessments/{assessment}/announce-results', [TeachAssessmentController::class, 'announceResults'])
-        ->middleware('permission:assessments.announce_results')
-        ->name('teach.assessments.announce');
+        Route::get('/teach/{offering}/assessments/{assessment}/attempts', [TeachAssessmentController::class, 'attempts'])
+            ->middleware('permission:assessments.grade')
+            ->name('teach.assessments.attempts');
+        Route::post('/teach/{offering}/assessments/{assessment}/answers/{attemptAnswer}/grade', [TeachAssessmentController::class, 'gradeAnswer'])
+            ->middleware('permission:assessments.grade')
+            ->name('teach.assessments.grade');
+        Route::post('/teach/{offering}/assessments/{assessment}/announce-results', [TeachAssessmentController::class, 'announceResults'])
+            ->middleware('permission:assessments.announce_results')
+            ->name('teach.assessments.announce');
 
-    Route::get('/teach/{offering}/assignments', [TeachAssignmentController::class, 'index'])->name('teach.assignments.index');
-    Route::post('/teach/{offering}/assignments/{assignment}/remind', [TeachAssignmentController::class, 'remind'])->name('teach.assignments.remind');
-    Route::post('/teach/{offering}/assignments/{assignment}/mark-received', [TeachAssignmentController::class, 'markReceived'])->name('teach.assignments.mark-received');
-    Route::post('/teach/{offering}/assignments/{assignment}/bulk-grade', [TeachAssignmentController::class, 'bulkGradeOffline'])->name('teach.assignments.bulk-grade');
+        Route::get('/teach/{offering}/assignments', [TeachAssignmentController::class, 'index'])->name('teach.assignments.index');
+        Route::post('/teach/{offering}/assignments/{assignment}/remind', [TeachAssignmentController::class, 'remind'])->name('teach.assignments.remind');
+        Route::post('/teach/{offering}/assignments/{assignment}/mark-received', [TeachAssignmentController::class, 'markReceived'])->name('teach.assignments.mark-received');
+        Route::post('/teach/{offering}/assignments/{assignment}/bulk-grade', [TeachAssignmentController::class, 'bulkGradeOffline'])->name('teach.assignments.bulk-grade');
 
-    Route::get('/teach/{offering}/discussions', [TeachDiscussionController::class, 'index'])
-        ->name('teach.discussions.index');
-    Route::post('/teach/{offering}/discussions/threads/{thread}/grade', [TeachDiscussionController::class, 'grade'])
-        ->name('teach.discussions.grade');
+        Route::get('/teach/{offering}/discussions', [TeachDiscussionController::class, 'index'])
+            ->name('teach.discussions.index');
+        Route::post('/teach/{offering}/discussions/threads/{thread}/grade', [TeachDiscussionController::class, 'grade'])
+            ->name('teach.discussions.grade');
 
-    Route::get('/teach/{offering}/surveys', [TeachSurveyController::class, 'index'])
-        ->middleware('permission:feedback.manage')
-        ->name('teach.surveys.index');
-    Route::post('/teach/{offering}/surveys', [TeachSurveyController::class, 'store'])
-        ->middleware('permission:feedback.manage')
-        ->name('teach.surveys.store');
-    Route::get('/teach/{offering}/surveys/{survey}', [TeachSurveyController::class, 'show'])
-        ->middleware('permission:feedback.manage')
-        ->name('teach.surveys.show');
-    Route::post('/teach/{offering}/surveys/{survey}/questions', [TeachSurveyController::class, 'addQuestion'])
-        ->middleware('permission:feedback.manage')
-        ->name('teach.surveys.questions.store');
-    Route::post('/teach/{offering}/surveys/{survey}/publish', [TeachSurveyController::class, 'publish'])
-        ->middleware('permission:feedback.manage')
-        ->name('teach.surveys.publish');
-    Route::post('/teach/{offering}/surveys/{survey}/close', [TeachSurveyController::class, 'close'])
-        ->middleware('permission:feedback.manage')
-        ->name('teach.surveys.close');
-    Route::get('/teach/{offering}/surveys/{survey}/report', [TeachSurveyController::class, 'report'])
-        ->middleware('permission:feedback.report')
-        ->name('teach.surveys.report');
-    Route::post('/teach/{offering}/surveys/{survey}/submissions/{submission}/reveal', [TeachSurveyController::class, 'requestReveal'])
-        ->middleware('permission:feedback.identity.request')
-        ->name('teach.surveys.reveals.store');
+        Route::get('/teach/{offering}/surveys', [TeachSurveyController::class, 'index'])
+            ->middleware('permission:feedback.manage')
+            ->name('teach.surveys.index');
+        Route::post('/teach/{offering}/surveys', [TeachSurveyController::class, 'store'])
+            ->middleware('permission:feedback.manage')
+            ->name('teach.surveys.store');
+        Route::get('/teach/{offering}/surveys/{survey}', [TeachSurveyController::class, 'show'])
+            ->middleware('permission:feedback.manage')
+            ->name('teach.surveys.show');
+        Route::post('/teach/{offering}/surveys/{survey}/questions', [TeachSurveyController::class, 'addQuestion'])
+            ->middleware('permission:feedback.manage')
+            ->name('teach.surveys.questions.store');
+        Route::post('/teach/{offering}/surveys/{survey}/publish', [TeachSurveyController::class, 'publish'])
+            ->middleware('permission:feedback.manage')
+            ->name('teach.surveys.publish');
+        Route::post('/teach/{offering}/surveys/{survey}/close', [TeachSurveyController::class, 'close'])
+            ->middleware('permission:feedback.manage')
+            ->name('teach.surveys.close');
+        Route::get('/teach/{offering}/surveys/{survey}/report', [TeachSurveyController::class, 'report'])
+            ->middleware('permission:feedback.report')
+            ->name('teach.surveys.report');
+        Route::post('/teach/{offering}/surveys/{survey}/submissions/{submission}/reveal', [TeachSurveyController::class, 'requestReveal'])
+            ->middleware('permission:feedback.identity.request')
+            ->name('teach.surveys.reveals.store');
 
-    Route::get('/teach/{offering}/projects', [TeachProjectController::class, 'index'])
-        ->middleware('permission:projects.view')
-        ->name('teach.projects.index');
-    Route::post('/teach/{offering}/projects', [TeachProjectController::class, 'store'])
-        ->middleware('permission:projects.manage')
-        ->name('teach.projects.store');
-    Route::get('/teach/{offering}/projects/{assessment}', [TeachProjectController::class, 'show'])
-        ->middleware('permission:projects.view')
-        ->name('teach.projects.show');
-    Route::post('/teach/{offering}/projects/{assessment}/publish', [TeachProjectController::class, 'publish'])
-        ->middleware('permission:projects.manage')
-        ->name('teach.projects.publish');
-    Route::post('/teach/{offering}/projects/{assessment}/move', [TeachProjectController::class, 'move'])
-        ->middleware('permission:projects.manage')
-        ->name('teach.projects.move');
-    Route::post('/teach/{offering}/projects/{assessment}/merge', [TeachProjectController::class, 'merge'])
-        ->middleware('permission:projects.manage')
-        ->name('teach.projects.merge');
-    Route::post('/teach/{offering}/projects/{assessment}/team-score', [TeachProjectController::class, 'teamScore'])
-        ->middleware('permission:projects.grade')
-        ->name('teach.projects.team-score');
-    Route::post('/teach/{offering}/projects/{assessment}/student-score', [TeachProjectController::class, 'studentScore'])
-        ->middleware('permission:projects.grade')
-        ->name('teach.projects.student-score');
-    Route::post('/teach/{offering}/projects/{assessment}/announce', [TeachProjectController::class, 'announce'])
-        ->middleware('permission:projects.announce')
-        ->name('teach.projects.announce');
-    Route::get('/teach/{offering}/projects/{assessment}/submissions/{submission}', [TeachProjectController::class, 'showSubmission'])
-        ->middleware('permission:projects.grade')
-        ->name('teach.projects.submissions.show');
-    Route::post('/teach/{offering}/projects/{assessment}/submissions/{submission}/review', [TeachProjectController::class, 'reviewSubmission'])
-        ->middleware('permission:projects.grade')
-        ->name('teach.projects.submissions.review');
+        Route::get('/teach/{offering}/projects', [TeachProjectController::class, 'index'])
+            ->middleware('permission:projects.view')
+            ->name('teach.projects.index');
+        Route::post('/teach/{offering}/projects', [TeachProjectController::class, 'store'])
+            ->middleware('permission:projects.manage')
+            ->name('teach.projects.store');
+        Route::get('/teach/{offering}/projects/{assessment}', [TeachProjectController::class, 'show'])
+            ->middleware('permission:projects.view')
+            ->name('teach.projects.show');
+        Route::post('/teach/{offering}/projects/{assessment}/publish', [TeachProjectController::class, 'publish'])
+            ->middleware('permission:projects.manage')
+            ->name('teach.projects.publish');
+        Route::post('/teach/{offering}/projects/{assessment}/move', [TeachProjectController::class, 'move'])
+            ->middleware('permission:projects.manage')
+            ->name('teach.projects.move');
+        Route::post('/teach/{offering}/projects/{assessment}/merge', [TeachProjectController::class, 'merge'])
+            ->middleware('permission:projects.manage')
+            ->name('teach.projects.merge');
+        Route::post('/teach/{offering}/projects/{assessment}/team-score', [TeachProjectController::class, 'teamScore'])
+            ->middleware('permission:projects.grade')
+            ->name('teach.projects.team-score');
+        Route::post('/teach/{offering}/projects/{assessment}/student-score', [TeachProjectController::class, 'studentScore'])
+            ->middleware('permission:projects.grade')
+            ->name('teach.projects.student-score');
+        Route::post('/teach/{offering}/projects/{assessment}/announce', [TeachProjectController::class, 'announce'])
+            ->middleware('permission:projects.announce')
+            ->name('teach.projects.announce');
+        Route::get('/teach/{offering}/projects/{assessment}/submissions/{submission}', [TeachProjectController::class, 'showSubmission'])
+            ->middleware('permission:projects.grade')
+            ->name('teach.projects.submissions.show');
+        Route::post('/teach/{offering}/projects/{assessment}/submissions/{submission}/review', [TeachProjectController::class, 'reviewSubmission'])
+            ->middleware('permission:projects.grade')
+            ->name('teach.projects.submissions.review');
 
-    Route::get('/teach/{offering}/live', [TeachLiveSessionController::class, 'index'])
-        ->middleware('permission:live.schedule')
-        ->name('teach.live.index');
-    Route::post('/teach/{offering}/live/{liveSession}/attendance/import', [TeachLiveSessionController::class, 'importAttendance'])
-        ->middleware('permission:attendance.manage')
-        ->name('teach.live.attendance.import');
+        Route::get('/teach/{offering}/live', [TeachLiveSessionController::class, 'index'])
+            ->middleware('permission:live.schedule')
+            ->name('teach.live.index');
+        Route::post('/teach/{offering}/live/{liveSession}/attendance/import', [TeachLiveSessionController::class, 'importAttendance'])
+            ->middleware('permission:attendance.manage')
+            ->name('teach.live.attendance.import');
 
-    Route::get('/teach/{offering}/live-quiz', [TeachLiveQuizController::class, 'index'])
-        ->middleware('permission:live_quiz.manage')
-        ->name('teach.live-quiz.index');
-    Route::post('/teach/{offering}/live-quiz', [TeachLiveQuizController::class, 'store'])
-        ->middleware('permission:live_quiz.manage')
-        ->name('teach.live-quiz.store');
-    Route::post('/teach/{offering}/live-quiz/{quiz}/questions', [TeachLiveQuizController::class, 'addQuestion'])
-        ->middleware('permission:live_quiz.manage')
-        ->name('teach.live-quiz.questions.store');
-    Route::post('/teach/{offering}/live-quiz/{quiz}/start', [TeachLiveQuizController::class, 'start'])
-        ->middleware('permission:live_quiz.host')
-        ->name('teach.live-quiz.start');
-    Route::get('/teach/{offering}/live-quiz/sessions/{session}', [TeachLiveQuizController::class, 'session'])
-        ->middleware('permission:live_quiz.host')
-        ->name('teach.live-quiz.session');
-    Route::post('/teach/{offering}/live-quiz/sessions/{session}/launch', [TeachLiveQuizController::class, 'launch'])
-        ->middleware('permission:live_quiz.host')
-        ->name('teach.live-quiz.launch');
-    Route::post('/teach/{offering}/live-quiz/sessions/{session}/close', [TeachLiveQuizController::class, 'closeQuestion'])
-        ->middleware('permission:live_quiz.host')
-        ->name('teach.live-quiz.close');
-    Route::post('/teach/{offering}/live-quiz/sessions/{session}/results', [TeachLiveQuizController::class, 'results'])
-        ->middleware('permission:live_quiz.host')
-        ->name('teach.live-quiz.results');
-    Route::post('/teach/{offering}/live-quiz/sessions/{session}/end', [TeachLiveQuizController::class, 'end'])
-        ->middleware('permission:live_quiz.host')
-        ->name('teach.live-quiz.end');
+        Route::get('/teach/{offering}/live-quiz', [TeachLiveQuizController::class, 'index'])
+            ->middleware('permission:live_quiz.manage')
+            ->name('teach.live-quiz.index');
+        Route::post('/teach/{offering}/live-quiz', [TeachLiveQuizController::class, 'store'])
+            ->middleware('permission:live_quiz.manage')
+            ->name('teach.live-quiz.store');
+        Route::post('/teach/{offering}/live-quiz/{quiz}/questions', [TeachLiveQuizController::class, 'addQuestion'])
+            ->middleware('permission:live_quiz.manage')
+            ->name('teach.live-quiz.questions.store');
+        Route::post('/teach/{offering}/live-quiz/{quiz}/start', [TeachLiveQuizController::class, 'start'])
+            ->middleware('permission:live_quiz.host')
+            ->name('teach.live-quiz.start');
+        Route::get('/teach/{offering}/live-quiz/sessions/{session}', [TeachLiveQuizController::class, 'session'])
+            ->middleware('permission:live_quiz.host')
+            ->name('teach.live-quiz.session');
+        Route::post('/teach/{offering}/live-quiz/sessions/{session}/launch', [TeachLiveQuizController::class, 'launch'])
+            ->middleware('permission:live_quiz.host')
+            ->name('teach.live-quiz.launch');
+        Route::post('/teach/{offering}/live-quiz/sessions/{session}/close', [TeachLiveQuizController::class, 'closeQuestion'])
+            ->middleware('permission:live_quiz.host')
+            ->name('teach.live-quiz.close');
+        Route::post('/teach/{offering}/live-quiz/sessions/{session}/results', [TeachLiveQuizController::class, 'results'])
+            ->middleware('permission:live_quiz.host')
+            ->name('teach.live-quiz.results');
+        Route::post('/teach/{offering}/live-quiz/sessions/{session}/end', [TeachLiveQuizController::class, 'end'])
+            ->middleware('permission:live_quiz.host')
+            ->name('teach.live-quiz.end');
+    });
 
     Route::get('/attendance', [AttendanceController::class, 'index'])
         ->middleware('permission:attendance.view_own')
@@ -320,6 +337,18 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware('superadmin')->prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/', [SuperAdminController::class, 'index'])->name('index');
+        Route::get('/features', [FeatureFlagController::class, 'index'])
+            ->middleware('permission:features.manage')
+            ->name('features');
+        Route::put('/features/{key}', [FeatureFlagController::class, 'update'])
+            ->middleware('permission:features.manage')
+            ->name('features.update');
+        Route::get('/config', [SystemSettingController::class, 'index'])
+            ->middleware('permission:system_settings.manage')
+            ->name('config');
+        Route::put('/config', [SystemSettingController::class, 'update'])
+            ->middleware('permission:system_settings.manage')
+            ->name('config.update');
         Route::get('/security', [SuperAdminController::class, 'security'])->name('security');
         Route::post('/sessions/flush', [SuperAdminController::class, 'flushSessions'])->name('sessions.flush');
         Route::get('/audit', [AuditExplorerController::class, 'index'])->name('audit.index');
@@ -348,7 +377,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/me', [MeController::class, 'show'])->name('api.me');
     Route::post('/api/uploads', [UploadController::class, 'store'])->name('api.uploads.store');
     Route::post('/catalog/{course}/interest', [CatalogController::class, 'flagInterest'])
-        ->middleware('permission:courses.flag_interest')
+        ->middleware(['feature:public_catalog', 'permission:courses.flag_interest'])
         ->name('catalog.interest');
 
     Route::post('/offerings/{offering}/view-as-student', [StudentPreviewController::class, 'start'])
@@ -358,14 +387,14 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:offerings.view')
         ->name('offerings.preview.stop');
     Route::get('/courses/{offering}', [CoursePlayerController::class, 'show'])
-        ->middleware('permission:offerings.view')
+        ->middleware(['feature:learn', 'permission:offerings.view'])
         ->name('courses.player');
     Route::post('/courses/{offering}/weeks/{week}/complete', [CoursePlayerController::class, 'completeWeek'])
-        ->middleware('permission:offerings.view')
+        ->middleware(['feature:learn', 'permission:offerings.view'])
         ->name('courses.weeks.complete');
 
     Route::get('/grades', [GradesController::class, 'index'])
-        ->middleware('permission:transcript.view')
+        ->middleware(['feature:learn', 'permission:transcript.view'])
         ->name('grades.index');
 
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
@@ -384,61 +413,63 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/settings/reminders/{reminder}', [NotificationSettingsController::class, 'cancelReminder'])
         ->name('settings.reminders.cancel');
 
-    Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
+    Route::get('/applications', [ApplicationController::class, 'index'])
+        ->middleware('feature:admissions')
+        ->name('applications.index');
     Route::get('/applications/forms/{form}', [ApplicationController::class, 'create'])
-        ->middleware('permission:admissions.apply')
+        ->middleware(['feature:admissions', 'permission:admissions.apply'])
         ->name('applications.create');
     Route::post('/applications/{application}', [ApplicationController::class, 'store'])
-        ->middleware('permission:admissions.apply')
+        ->middleware(['feature:admissions', 'permission:admissions.apply'])
         ->name('applications.store');
     Route::post('/applications/{application}/withdraw', [ApplicationController::class, 'withdraw'])
-        ->middleware('permission:admissions.apply')
+        ->middleware(['feature:admissions', 'permission:admissions.apply'])
         ->name('applications.withdraw'); // application withdraw
 
     Route::get('/projects', [StudentProjectController::class, 'mine'])
-        ->middleware('permission:projects.view')
+        ->middleware(['feature:projects', 'permission:projects.view'])
         ->name('student.projects.mine');
     Route::get('/offerings/{offering}/projects', [StudentProjectController::class, 'index'])
-        ->middleware('permission:projects.view')
+        ->middleware(['feature:projects', 'permission:projects.view'])
         ->name('student.projects.index');
     Route::post('/offerings/{offering}/projects/{assessment}/join', [StudentProjectController::class, 'join'])
-        ->middleware('permission:projects.join')
+        ->middleware(['feature:projects', 'permission:projects.join'])
         ->name('student.projects.join');
     Route::post('/offerings/{offering}/projects/{assessment}/leave', [StudentProjectController::class, 'leave'])
-        ->middleware('permission:projects.join')
+        ->middleware(['feature:projects', 'permission:projects.join'])
         ->name('student.projects.leave');
     Route::get('/projects/{project}', [StudentProjectController::class, 'show'])
-        ->middleware('permission:projects.view')
+        ->middleware(['feature:projects', 'permission:projects.view'])
         ->name('student.projects.show');
     Route::post('/projects/{project}/deliverables/{deliverable}', [StudentProjectController::class, 'submit'])
-        ->middleware('permission:projects.join')
+        ->middleware(['feature:projects', 'permission:projects.join'])
         ->name('student.projects.submit');
     Route::delete('/projects/{project}/submission-files/{file}', [StudentProjectController::class, 'destroyFile'])
-        ->middleware('permission:projects.join')
+        ->middleware(['feature:projects', 'permission:projects.join'])
         ->name('student.projects.files.destroy');
     Route::post('/projects/{project}/peer-evaluations', [StudentProjectController::class, 'storePeerEvaluation'])
-        ->middleware('permission:projects.peer_eval')
+        ->middleware(['feature:projects', 'permission:projects.peer_eval'])
         ->name('student.projects.peer.store');
 
     Route::get('/learn/{offering}', [LearnController::class, 'offering'])
-        ->middleware('permission:offerings.view')
+        ->middleware(['feature:learn', 'permission:offerings.view'])
         ->name('learn.offering');
     Route::get('/learn/{offering}/weeks/{week}', [LearnController::class, 'week'])
-        ->middleware('permission:offerings.view')
+        ->middleware(['feature:learn', 'permission:offerings.view'])
         ->name('learn.week');
     Route::get('/learn/{offering}/items/{item}', [LearnController::class, 'item'])
-        ->middleware('permission:offerings.view')
+        ->middleware(['feature:learn', 'permission:offerings.view'])
         ->name('learn.item');
     Route::get('/learn/items/{item}/file', [ContentItemFileController::class, 'show'])
-        ->middleware('permission:offerings.view')
+        ->middleware(['feature:learn', 'permission:offerings.view'])
         ->name('learn.item.file');
     Route::post('/learn/{offering}/items/{item}/complete', [LearnController::class, 'complete'])
-        ->middleware('permission:offerings.view')
+        ->middleware(['feature:learn', 'permission:offerings.view'])
         ->name('learn.item.complete');
 
     Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
     Route::post('/enrollments', [EnrollmentController::class, 'store'])
-        ->middleware('permission:enrollment.register')
+        ->middleware(['feature:enrollment', 'permission:enrollment.register'])
         ->name('enrollments.store');
     Route::post('/enrollments/{enrollment}/drop', [EnrollmentController::class, 'drop'])
         ->middleware('permission:enrollment.register')
@@ -459,93 +490,102 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/finance/invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');
     Route::get('/finance/receipts/{payment}', [FinanceController::class, 'showReceipt'])->name('finance.receipts.show');
     Route::post('/finance/invoices/{invoice}/checkout', [FinanceController::class, 'checkout'])
-        ->middleware('permission:finance.pay')
+        ->middleware(['feature:finance_checkout', 'permission:finance.pay'])
         ->name('finance.checkout');
     // #17 payment plans + gateways
     Route::post('/finance/invoices/{invoice}/payment-plan', [FinanceController::class, 'storePaymentPlan'])
-        ->middleware('permission:finance.pay')
+        ->middleware(['feature:finance_checkout', 'permission:finance.pay'])
         ->name('finance.payment-plan.store');
     Route::post('/finance/invoices/{invoice}/installments/{installment}/pay', [FinanceController::class, 'payInstallment'])
-        ->middleware('permission:finance.pay')
+        ->middleware(['feature:finance_checkout', 'permission:finance.pay'])
         ->name('finance.installments.pay');
     // #13 live recurrence + refund
     Route::post('/finance/payments/{payment}/refund-request', [FinanceController::class, 'requestRefund'])
         ->middleware('permission:finance.pay')
         ->name('finance.refund-request');
     Route::get('/donate', [DonationController::class, 'create'])
-        ->middleware('permission:finance.donate')
+        ->middleware(['feature:finance_checkout', 'permission:finance.donate'])
         ->name('donate.create');
     Route::post('/donate', [DonationController::class, 'store'])
-        ->middleware('permission:finance.donate')
+        ->middleware(['feature:finance_checkout', 'permission:finance.donate'])
         ->name('donate.store');
 
-    Route::get('/assessments/{assessment}', [ExamAttemptController::class, 'show'])->name('assessments.show');
-    Route::post('/assessments/{assessment}/start', [ExamAttemptController::class, 'start'])
-        ->middleware('permission:assessments.take')
-        ->name('assessments.start');
-    Route::get('/attempts/{attempt}', [ExamAttemptController::class, 'runner'])->name('assessments.runner');
-    Route::post('/attempts/{attempt}/save', [ExamAttemptController::class, 'save'])
-        ->middleware('permission:assessments.take')
-        ->name('assessments.save');
-    Route::post('/attempts/{attempt}/submit', [ExamAttemptController::class, 'submit'])
-        ->middleware('permission:assessments.take')
-        ->name('assessments.submit');
-    Route::post('/attempts/{attempt}/upload', [ExamAttemptController::class, 'upload'])
-        ->middleware('permission:assessments.take')
-        ->name('assessments.upload');
-    Route::post('/attempts/{attempt}/focus-loss', [ExamAttemptController::class, 'focusLoss'])
-        ->middleware('permission:assessments.take')
-        ->name('assessments.focus-loss');
-    Route::get('/attempts/{attempt}/timer', [ExamAttemptController::class, 'timer'])->name('assessments.timer');
+    Route::middleware('feature:learn')->group(function () {
+        Route::get('/assessments/{assessment}', [ExamAttemptController::class, 'show'])->name('assessments.show');
+        Route::post('/assessments/{assessment}/start', [ExamAttemptController::class, 'start'])
+            ->middleware('permission:assessments.take')
+            ->name('assessments.start');
+        Route::get('/attempts/{attempt}', [ExamAttemptController::class, 'runner'])->name('assessments.runner');
+        Route::post('/attempts/{attempt}/save', [ExamAttemptController::class, 'save'])
+            ->middleware('permission:assessments.take')
+            ->name('assessments.save');
+        Route::post('/attempts/{attempt}/submit', [ExamAttemptController::class, 'submit'])
+            ->middleware('permission:assessments.take')
+            ->name('assessments.submit');
+        Route::post('/attempts/{attempt}/upload', [ExamAttemptController::class, 'upload'])
+            ->middleware('permission:assessments.take')
+            ->name('assessments.upload');
+        Route::post('/attempts/{attempt}/focus-loss', [ExamAttemptController::class, 'focusLoss'])
+            ->middleware('permission:assessments.take')
+            ->name('assessments.focus-loss');
+        Route::get('/attempts/{attempt}/timer', [ExamAttemptController::class, 'timer'])->name('assessments.timer');
 
-    Route::get('/assignments/{assignment}', [AssignmentController::class, 'show'])->name('assignments.show');
-    Route::post('/assignments/{assignment}/submit', [AssignmentController::class, 'submit'])
-        ->middleware('permission:assignments.submit')
-        ->name('assignments.submit');
+        Route::get('/assignments/{assignment}', [AssignmentController::class, 'show'])->name('assignments.show');
+        Route::post('/assignments/{assignment}/submit', [AssignmentController::class, 'submit'])
+            ->middleware('permission:assignments.submit')
+            ->name('assignments.submit');
+    });
 
-    Route::get('/live', [LiveSessionController::class, 'index'])->name('live.index');
+    Route::get('/live', [LiveSessionController::class, 'index'])
+        ->middleware('feature:live')
+        ->name('live.index');
     Route::post('/live/{session}/join', [LiveSessionController::class, 'join'])
-        ->middleware('permission:live.join')
+        ->middleware(['feature:live', 'permission:live.join'])
         ->name('live.join');
 
     Route::get('/live-quiz/join', [LiveQuizController::class, 'create'])
-        ->middleware('permission:live_quiz.play')
+        ->middleware(['feature:live_quiz', 'permission:live_quiz.play'])
         ->name('live-quiz.join');
     Route::post('/live-quiz/join', [LiveQuizController::class, 'join'])
-        ->middleware('permission:live_quiz.play')
+        ->middleware(['feature:live_quiz', 'permission:live_quiz.play'])
         ->name('live-quiz.join.store');
     Route::get('/live-quiz/sessions/{session}', [LiveQuizController::class, 'show'])
-        ->middleware('permission:live_quiz.play')
+        ->middleware(['feature:live_quiz', 'permission:live_quiz.play'])
         ->name('live-quiz.sessions.show');
     Route::post('/live-quiz/sessions/{session}/questions/{question}/answer', [LiveQuizController::class, 'answer'])
-        ->middleware('permission:live_quiz.play')
+        ->middleware(['feature:live_quiz', 'permission:live_quiz.play'])
         ->name('live-quiz.sessions.answer');
 
     Route::get('/events', [StudentEventController::class, 'index'])
-        ->middleware('permission:events.view')
+        ->middleware(['feature:events', 'permission:events.view'])
         ->name('events.index');
     Route::get('/events/mine', [StudentEventController::class, 'mine'])
-        ->middleware('permission:events.view')
+        ->middleware(['feature:events', 'permission:events.view'])
         ->name('events.mine');
     Route::get('/events/{event}', [StudentEventController::class, 'show'])
-        ->middleware('permission:events.view')
+        ->middleware(['feature:events', 'permission:events.view'])
         ->name('events.show');
     Route::post('/events/{event}/reserve', [StudentEventController::class, 'reserve'])
-        ->middleware('permission:events.reserve')
+        ->middleware(['feature:events', 'permission:events.reserve'])
         ->name('events.reserve');
     Route::post('/events/{event}/cancel', [StudentEventController::class, 'cancel'])
-        ->middleware('permission:events.reserve')
+        ->middleware(['feature:events', 'permission:events.reserve'])
         ->name('events.cancel');
 
-    Route::get('/offerings/{offering}/discussions', [DiscussionController::class, 'showBoard'])->name('discussions.board');
+    Route::get('/offerings/{offering}/discussions', [DiscussionController::class, 'showBoard'])
+        ->middleware('feature:discussions')
+        ->name('discussions.board');
     Route::post('/offerings/{offering}/discussions/threads', [DiscussionController::class, 'storeThread'])
-        ->middleware('permission:discussions.thread')
+        ->middleware(['feature:discussions', 'permission:discussions.thread'])
         ->name('discussions.threads.store');
-    Route::get('/discussions/threads/{thread}', [DiscussionController::class, 'showThread'])->name('discussions.thread');
+    Route::get('/discussions/threads/{thread}', [DiscussionController::class, 'showThread'])
+        ->middleware('feature:discussions')
+        ->name('discussions.thread');
     Route::post('/discussions/threads/{thread}/posts', [DiscussionController::class, 'storePost'])
-        ->middleware('permission:discussions.post')
+        ->middleware(['feature:discussions', 'permission:discussions.post'])
         ->name('discussions.posts.store');
     Route::get('/discussions/posts/{post}/attachments/{index}', [DiscussionController::class, 'downloadAttachment'])
+        ->middleware('feature:discussions')
         ->whereNumber('index')
         ->name('discussions.posts.attachment');
 

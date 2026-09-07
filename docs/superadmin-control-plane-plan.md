@@ -1,6 +1,6 @@
 # Super Admin control-plane plan
 
-**Status:** SA0, SA1, and SA2 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer). SA3–SA6 remain plan only.  
+**Status:** SA0, SA1, SA2, and SA3 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config). SA4–SA6 remain plan only.  
 **Audience:** implementers building Super Admin to the same depth as Learn / Teach.  
 **Traces to:** spec v0.2 Super Admin role (“everything; admin-role grants; cross-system audit”), `AuthorizeService` bypass, Roles Hub, unused `settings` table.
 
@@ -339,13 +339,13 @@ Each phase is one PR-sized slice: tests first, `pint` on owned files, no `migrat
 
 **Goal:** Complete control of features and safe configs.
 
-- `config/features.php`, `FeatureFlagService`, `EnsureFeatureEnabled`.
-- Wire 4–6 flags that exist on this branch first (`registration`, `public_catalog`, `learn`, `teach`, `finance_checkout`, `live`). Add S6E flags when those routes exist.
-- `SystemSettingService` + allowlist form. Validation per type. Audit before/after values (never secrets).
-- Integrations panel: configured/missing for payment, Zoom, mail, Vimeo, Gemini.
-- Tests: turning `features.learn` off 404s course player for a student and hides the Learning hub link; Super Admin still opens `/superadmin`; setting attendance threshold is read by `AttendanceService`; unknown setting key 422.
+- `config/features.php`, `FeatureFlagService`, `EnsureFeatureEnabled`. **Shipped** (`/superadmin/features`, `settings.features.{key}`).
+- Wire flags that exist (`registration`, `public_catalog`, `learn`, `teach`, `finance_checkout`, `live`) plus S6E when routed (`surveys`, `events`, `live_quiz`, `projects`, `discussions`, `admissions`, `credentials_public`). **Shipped.**
+- `SystemSettingService` + allowlist form. Validation per type. Audit before/after values (never secrets). **Shipped** (`/superadmin/config`).
+- Integrations panel: configured/missing for payment, Zoom, mail, Vimeo, Gemini, `SUPERADMIN_*`. **Shipped.**
+- Tests: turning `learn` off 404s course player for a student and hides the Learning hub link; Super Admin still opens `/superadmin`; setting attendance threshold is read by `AttendanceService`; unknown setting key 422; secrets absent from HTML. **Shipped** in `FeatureFlagTest` + `SystemSettingTest`.
 
-**Done when:** Super Admin can close registration and hide Learn without a deploy, and cannot see `MAIL_PASSWORD`.
+**Done when:** Super Admin can close registration and hide Learn without a deploy, and cannot see `MAIL_PASSWORD`. **Shipped.**
 
 ### SA4 — Theme studio
 

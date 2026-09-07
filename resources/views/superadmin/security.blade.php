@@ -14,6 +14,7 @@
     </h1>
     <p class="text-muted-theme mb-4">{{ __('superadmin.security_desc') }}</p>
     @include('partials.people-entrance-banner', ['caption' => __('superadmin.entrance_from_security')])
+    @include('partials.features-entrance-banner')
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_security')])
 
     @if(session('status'))

@@ -7,6 +7,7 @@
     <h1 class="page-title">{{ __('hubs.learning_title') }}</h1>
     <p class="text-muted-theme mb-4">{{ __('hubs.learning_desc') }}</p>
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_learning')])
+    @include('partials.features-entrance-banner', ['caption' => __('features.entrance_from_learning')])
     @include('partials.people-entrance-banner')
     @include('partials.people-entrance-banner')
     <div class="row g-3">

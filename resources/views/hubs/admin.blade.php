@@ -8,6 +8,8 @@
     <p class="text-muted-theme mb-4">{{ __('hubs.admin_desc') }}</p>
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_admin')])
     @include('partials.people-entrance-banner')
+    @include('partials.features-entrance-banner')
+    @include('partials.config-entrance-banner')
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_admin')])
     <div class="row g-3">
         @forelse($links as $link)

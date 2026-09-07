@@ -5,6 +5,7 @@
 @section('content')
 <x-page-header :title="__('ui.nav_theme')" :subtitle="__('hubs.theme_desc')" />
 @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_theme')])
+@include('partials.config-entrance-banner', ['caption' => __('system_settings.entrance_from_theme')])
 
 @if(session('status'))
     <div class="alert alert-success">{{ session('status') }}</div>

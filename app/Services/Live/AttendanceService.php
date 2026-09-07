@@ -823,11 +823,15 @@ class AttendanceService
         return round(($present / $sessionIds->count()) * 100, 2);
     }
 
+    public function defaultThresholdPercent(): int
+    {
+        return (int) (\App\Models\Setting::query()->find('attendance.default_threshold')?->value['value'] ?? 60);
+    }
+
     private function thresholdPercent(CourseOffering $offering): float
     {
         return (float) ($offering->attendance_threshold_percent
-            ?? \App\Models\Setting::query()->find('attendance.default_threshold')?->value['value']
-            ?? 60);
+            ?? $this->defaultThresholdPercent());
     }
 
     /**
