@@ -11,4 +11,16 @@ return [
         'path' => env('BACKUP_PATH', storage_path('app/backups')),
         'retention_days' => (int) env('BACKUP_RETENTION_DAYS', 14),
     ],
+
+    'audit' => [
+        'retention_days' => 365,
+        'export_cap' => 10000,
+        'protected_prefixes' => [
+            'users.impersonate.',
+            'roles.hub.',
+            'rbac.',
+            'features.',
+            'system_settings.',
+        ],
+    ],
 ];

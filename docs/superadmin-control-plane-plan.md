@@ -1,6 +1,6 @@
 # Super Admin control-plane plan
 
-**Status:** SA0 and SA1 implemented (control-plane hub, safety lock, People directory + dossier + impersonation). SA2–SA6 remain plan only.  
+**Status:** SA0, SA1, and SA2 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer). SA3–SA6 remain plan only.  
 **Audience:** implementers building Super Admin to the same depth as Learn / Teach.  
 **Traces to:** spec v0.2 Super Admin role (“everything; admin-role grants; cross-system audit”), `AuthorizeService` bypass, Roles Hub, unused `settings` table.
 
@@ -16,7 +16,7 @@ Super Admin today is a **thin ops hub**. Student Learn and instructor Teach are 
 |---|---|
 | `/superadmin` | Tile grid. Most tiles open the same UIs `adm` / `aca` / `fin` already use. |
 | Roles Hub `/roles-hub` | The one real unique feature: rewrite every permission key for every non–Super Admin role. |
-| Audit | Newest 40 rows. No filters, no before/after, no export. Schema already has `before`, `after`, `ip`, `user_agent`, `request_id`. |
+| Audit | Explorer at `/superadmin/audit`: filters, before/after detail, CSV export, prune command. Schema already had `before`, `after`, `ip`, `user_agent`, `request_id`. |
 | Observability | Counts + queue name + last backup mtime. No actions. |
 | Security | Flush *other* sessions — only if `SESSION_DRIVER=database`. |
 | Scheduled tasks | Hard-coded list of 3 commands (matches `Kernel` on this branch). Later slices add more (e.g. `communications:fire-reminders`). |
@@ -329,9 +329,9 @@ Each phase is one PR-sized slice: tests first, `pint` on owned files, no `migrat
 
 **Goal:** Cross-system audit is usable.
 
-- Filters + detail + export.
-- Prune command + retention setting (read default if SA3 not landed).
-- Tests: filter by action prefix; export CSV headers; prune keeps control-plane actions; student 403.
+- Filters + detail + export. **Shipped** on `/superadmin/audit` (no second list).
+- Prune command + retention setting (read default if SA3 not landed). **Shipped** (`spims:prune-audit-logs`, `audit.retention_days`, 3× floor for control-plane prefixes).
+- Tests: filter by action prefix; export CSV headers; prune keeps control-plane actions; student 403. **Shipped** in `AuditExplorerTest`.
 
 **Done when:** Super Admin can answer “who changed this offering yesterday?” from the UI.
 

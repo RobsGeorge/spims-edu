@@ -170,6 +170,12 @@
                                 @if($hasSuperadminNav)
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
+                                        <a class="dropdown-item" href="{{ route('superadmin.audit.index') }}">
+                                            <i class="bi bi-journal-text" aria-hidden="true"></i>
+                                            {{ __('audit.nav_audit') }}
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item text-danger" href="{{ route('superadmin.index') }}">
                                             <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
                                             {{ __('superadmin.entrance_title') }}

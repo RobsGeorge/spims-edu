@@ -49,7 +49,7 @@
         <p class="text-muted-theme small mb-3">{{ __('superadmin.roadmap_desc') }}</p>
         <ul class="sa-roadmap-list mb-0">
             <li class="is-done"><span class="sa-phase">SA1</span> {{ __('superadmin.roadmap_sa1_done') }}</li>
-            <li><span class="sa-phase">SA2</span> {{ __('superadmin.roadmap_sa2') }}</li>
+            <li class="is-done"><span class="sa-phase">SA2</span> {{ __('superadmin.roadmap_sa2_done') }}</li>
             <li><span class="sa-phase">SA3</span> {{ __('superadmin.roadmap_sa3') }}</li>
             <li><span class="sa-phase">SA4</span> {{ __('superadmin.roadmap_sa4') }}</li>
             <li><span class="sa-phase">SA5</span> {{ __('superadmin.roadmap_sa5') }}</li>

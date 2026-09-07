@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('assessments:auto-submit-expired')->everyMinute();
         $schedule->command('live:send-reminders')->everyFiveMinutes();
         $schedule->command('spims:backup-database')->dailyAt('02:30');
+        $schedule->command('spims:prune-audit-logs')->dailyAt('03:15');
     }
 
     /**

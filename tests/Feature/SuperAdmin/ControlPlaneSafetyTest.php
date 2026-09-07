@@ -27,7 +27,8 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertOk()
             ->assertDontSee(__('dashboard.superadmin_hub'))
             ->assertDontSee(__('superadmin.entrance_title'), false)
-            ->assertDontSee(__('people.dashboard_tile'));
+            ->assertDontSee(__('people.dashboard_tile'))
+            ->assertDontSee(__('audit.dashboard_tile'));
     }
 
     #[Test]
@@ -104,7 +105,9 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee(route('superadmin.index'), false)
             ->assertSee(__('hubs.nav_superadmin'))
             ->assertSee(__('people.dashboard_tile'))
-            ->assertSee(route('admin.users.index'), false);
+            ->assertSee(route('admin.users.index'), false)
+            ->assertSee(__('audit.dashboard_tile'))
+            ->assertSee(route('superadmin.audit.index'), false);
 
         $this->actingAs($sa)->get(route('hubs.admin'))
             ->assertOk()

@@ -315,17 +315,30 @@
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.audit_title') }}</h2>
                 <p class="small text-muted-theme">{{ __('people.audit_help') }}</p>
+                @include('partials.audit-entrance-banner', [
+                    'caption' => __('audit.entrance_from_people'),
+                    'url' => route('superadmin.audit.index', ['actor' => $person->email]),
+                ])
                 @if($recentAudit->isEmpty())
                     <p class="text-muted-theme mb-0">{{ __('people.audit_empty') }}</p>
                 @else
-                    <ul class="list-unstyled small mb-0">
+                    <ul class="list-unstyled small mb-2">
                         @foreach($recentAudit as $log)
                             <li class="py-1 border-bottom border-opacity-25">
-                                <code>{{ $log->action }}</code>
+                                @if(\App\Support\NavigationHub::hasSuperadmin(auth()->user()))
+                                    <a href="{{ route('superadmin.audit.show', $log) }}"><code>{{ $log->action }}</code></a>
+                                @else
+                                    <code>{{ $log->action }}</code>
+                                @endif
                                 · {{ $log->created_at?->timezone(config('app.timezone'))->format('Y-m-d H:i') }}
                             </li>
                         @endforeach
                     </ul>
+                    @if(\App\Support\NavigationHub::hasSuperadmin(auth()->user()))
+                        <a class="small" href="{{ route('superadmin.audit.index', ['actor' => $person->email]) }}">
+                            {{ __('people.audit_open_explorer') }}
+                        </a>
+                    @endif
                 @endif
             </section>
         </div>

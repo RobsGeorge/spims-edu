@@ -51,6 +51,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SuperAdmin\AuditExplorerController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\Teach\TeachController;
@@ -111,7 +112,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [SuperAdminController::class, 'index'])->name('index');
         Route::get('/security', [SuperAdminController::class, 'security'])->name('security');
         Route::post('/sessions/flush', [SuperAdminController::class, 'flushSessions'])->name('sessions.flush');
-        Route::get('/audit', [SuperAdminController::class, 'audit'])->name('audit.index');
+        Route::get('/audit', [AuditExplorerController::class, 'index'])->name('audit.index');
+        Route::get('/audit/export', [AuditExplorerController::class, 'export'])
+            ->middleware('permission:audit.export')
+            ->name('audit.export');
+        Route::get('/audit/{auditLog}', [AuditExplorerController::class, 'show'])->name('audit.show');
         Route::get('/observability', [SuperAdminController::class, 'observability'])->name('observability.index');
         Route::get('/scheduled-tasks', [SuperAdminController::class, 'scheduledTasks'])->name('scheduled-tasks.index');
         Route::get('/system-tests', [SuperAdminController::class, 'systemTests'])->name('system-tests.index');

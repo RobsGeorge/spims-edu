@@ -123,6 +123,7 @@
                 <div class="accordion-body">
                     <p class="text-muted-theme mb-3">{{ __('roles_hub.assignments_hint') }}</p>
                     @include('partials.people-entrance-banner')
+                    @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_roles')])
                     <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary btn-sm">
                         <i class="bi bi-people"></i> {{ __('people.directory_title') }}
                     </a>

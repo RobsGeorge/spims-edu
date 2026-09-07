@@ -13,6 +13,7 @@ class SettingsSeeder extends Seeder
             'attendance.default_threshold' => ['value' => 60],
             'late_penalty.escalating' => ['value' => [0, 10, 20, 30]],
             'zoom.concurrent_hosts' => ['value' => 1],
+            'audit.retention_days' => ['value' => 365],
         ];
 
         foreach ($defaults as $key => $value) {
