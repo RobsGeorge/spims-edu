@@ -279,6 +279,8 @@ class ContentTeachApiParityTest extends TestCase
             ->postJson(route('api.v1.teach.items.publish', $itemId))
             ->assertForbidden();
 
+        Auth::forgetGuards();
+        $this->flushHeaders();
         $this->postJson(route('api.v1.teach.items.publish', $itemId))
             ->assertUnauthorized();
 
