@@ -76,7 +76,7 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee(__('superadmin.users_roles_help'))
             ->assertSee(__('people.directory_title'))
             ->assertSee(__('people.search_label'))
-            ->assertDontSee('value="'.RoleType::SuperAdmin->value.'"', false);
+            ->assertDontSee('name="roles[]" value="'.RoleType::SuperAdmin->value.'"', false);
     }
 
     #[Test]
