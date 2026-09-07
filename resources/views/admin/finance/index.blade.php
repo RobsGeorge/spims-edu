@@ -2,6 +2,7 @@
 @section('title', __('finance.admin_title'))
 @section('content')
 <h1 class="spims-title mb-3">{{ __('finance.admin_title') }}</h1>
+@include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_finance')])
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
 @php

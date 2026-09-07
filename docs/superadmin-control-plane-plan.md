@@ -1,6 +1,6 @@
 # Super Admin control-plane plan
 
-**Status:** SA0–SA4 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio). SA5–SA6 remain plan only.  
+**Status:** SA0–SA5 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio, school reports hub). SA6 remains plan only.  
 **Audience:** implementers building Super Admin to the same depth as Learn / Teach.  
 **Traces to:** spec v0.2 Super Admin role (“everything; admin-role grants; cross-system audit”), `AuthorizeService` bypass, Roles Hub, unused `settings` table.
 
@@ -239,35 +239,19 @@ Public `/demo` impersonation (later branch) stays guest-only and `@spims.test` o
 
 `settings.manage` remains unused by the Super Admin form on purpose (D9). A later ADM “school calendar knobs” page can reuse it for attendance threshold only.
 
-### 5.5 Reporting — Thin / fragmented
+### 5.5 Reporting — Present (SA5)
 
 Present on this base or later branches:
 
-- Finance: outstanding + paid by currency (no date range, no CSV).
+- Super Admin **school reports hub** at `/superadmin/reports` (census, finance rollup with date range, audit volume; admissions / enrollment / attendance / communications / queue when tables exist). CSV with UTF-8 BOM. Money via `Money` integer minor units.
+- Finance: outstanding + paid by currency (bursar desk, no date range).
 - Communications: report + CSV (later).
 - Attendance: per-offering report + roster CSV (later).
 - Surveys: per-survey report (later).
 - Gradebook: CSV export.
 - Observability: raw counts.
 
-**Absent:** one Super Admin place that answers “how is the school doing?”
-
-SA5 reports hub (`reports.school`):
-
-| Report | Source | Export |
-|---|---|---|
-| Census | Users by role × status × locale | CSV |
-| Admissions funnel | Applications by status / form | CSV |
-| Enrollment | Active / waitlist / dropped by offering | CSV |
-| Finance rollup | Reuse outstanding/paid; add date range | CSV |
-| Attendance school-wide | Rates by offering (when S3 present) | CSV |
-| Communications volume | Delivery log counts (when S2 present) | Link + CSV |
-| Audit volume | Actions per day / top actors | CSV |
-| Queue health | Failed jobs, pending jobs | — |
-
-Each report is a service method, not a live SQL string in a Blade file. Date range default: current semester if one is marked current, else last 90 days. Money formatted via `Money`, never floats.
-
-Deep-link out to existing FIN/ACA reports rather than forking them.
+SA5 reports hub (`reports.school`) is the Super Admin place that answers “how is the school doing?” Deep-links out to existing FIN/ACA reports rather than forking them.
 
 ### 5.6 Auditing — Thin UI, Present ledger
 
@@ -363,11 +347,11 @@ Each phase is one PR-sized slice: tests first, `pint` on owned files, no `migrat
 
 **Goal:** One evidence desk.
 
-- Hub + census + finance rollup (date range) + audit volume. Add admissions/enrollment/attendance/communications when tables exist.
-- CSV download, locale-aware headers, money via `Money`.
-- Tests: census counts match factories; finance totals are integers; student 403.
+- Hub + census + finance rollup (date range) + audit volume. Add admissions/enrollment/attendance/communications when tables exist. **Shipped** (`/superadmin/reports`).
+- CSV download, locale-aware headers, money via `Money`. **Shipped** (UTF-8 BOM; Arabic headers when locale is `ar`).
+- Tests: census counts match factories; finance totals are integers; student 403. **Shipped** in `SchoolReportTest`.
 
-**Done when:** Super Admin can export a census and a finance snapshot for a date range.
+**Done when:** Super Admin can export a census and a finance snapshot for a date range. **Shipped.**
 
 ### SA6 — Ops desk
 

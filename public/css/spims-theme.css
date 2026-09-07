@@ -1357,7 +1357,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 
 .features-entrance-banner,
 .config-entrance-banner,
-.theme-entrance-banner {
+.theme-entrance-banner,
+.reports-entrance-banner {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1379,9 +1380,15 @@ html[dir='rtl'] .sa-impersonation-stop {
     background: color-mix(in srgb, var(--color-title) 6%, var(--color-surface));
 }
 
+.reports-entrance-banner {
+    border-color: color-mix(in srgb, var(--color-success, var(--color-primary)) 34%, var(--color-surface-border));
+    background: color-mix(in srgb, var(--color-success, var(--color-primary)) 8%, var(--color-surface));
+}
+
 .features-entrance-icon,
 .config-entrance-icon,
-.theme-entrance-icon {
+.theme-entrance-icon,
+.reports-entrance-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1402,9 +1409,15 @@ html[dir='rtl'] .sa-impersonation-stop {
     color: var(--color-title);
 }
 
+.reports-entrance-icon {
+    background: color-mix(in srgb, var(--color-success, var(--color-primary)) 18%, var(--color-surface));
+    color: var(--color-title);
+}
+
 .features-entrance-title,
 .config-entrance-title,
-.theme-entrance-title {
+.theme-entrance-title,
+.reports-entrance-title {
     display: block;
     font-weight: 700;
     color: var(--color-title);
@@ -1412,7 +1425,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 
 .features-entrance-body,
 .config-entrance-body,
-.theme-entrance-body {
+.theme-entrance-body,
+.reports-entrance-body {
     display: block;
     font-size: 0.85rem;
     color: var(--color-text-muted);
@@ -1420,7 +1434,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 
 .features-entrance-cta,
 .config-entrance-cta,
-.theme-entrance-cta {
+.theme-entrance-cta,
+.reports-entrance-cta {
     margin-inline-start: auto;
     font-weight: 600;
     color: var(--color-primary);
@@ -1614,6 +1629,66 @@ html[dir='rtl'] .sa-impersonation-stop {
     margin-inline-start: 0.4rem;
 }
 
+.reports-entrance-kicker {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-title);
+}
+
+.sa-report-card.is-ready {
+    border-inline-start: 4px solid var(--color-success, var(--color-primary));
+}
+
+.sa-report-card.is-gated {
+    border-inline-start: 4px solid var(--color-text-muted);
+    opacity: 0.92;
+}
+
+.sa-report-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface));
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.sa-report-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+    color: var(--color-title);
+}
+
+.sa-report-badge-snapshot {
+    background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
+}
+
+.sa-report-badge-range {
+    background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface));
+}
+
+.sa-report-badge-mixed {
+    background: color-mix(in srgb, var(--color-success, var(--color-primary)) 16%, var(--color-surface));
+}
+
+.sa-report-table th {
+    white-space: nowrap;
+}
+
+.sa-reports .form-text {
+    color: var(--color-text-muted);
+}
+
 @media (max-width: 575.98px) {
     .sa-entrance-cta,
     .people-entrance-cta,
@@ -1621,6 +1696,7 @@ html[dir='rtl'] .sa-impersonation-stop {
     .features-entrance-cta,
     .config-entrance-cta,
     .theme-entrance-cta,
+    .reports-entrance-cta,
     .sa-impersonation-stop {
         width: 100%;
         margin-inline-start: 0;

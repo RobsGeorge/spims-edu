@@ -38,6 +38,7 @@
         <a class="btn btn-outline-secondary btn-sm" href="{{ route('admin.theme.edit') }}">{{ __('theme_studio.open_staff') }}</a>
         <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.audit.index', ['action' => 'theme.']) }}">{{ __('theme_studio.open_audit') }}</a>
         <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.features') }}">{{ __('theme_studio.open_features') }}</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.reports') }}">{{ __('school_reports.nav_reports') }}</a>
     </div>
     <p class="small text-muted-theme mb-4">{{ __('theme_studio.open_staff_help') }}</p>
 

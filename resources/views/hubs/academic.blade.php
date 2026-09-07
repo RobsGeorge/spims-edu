@@ -10,6 +10,7 @@
     @include('partials.features-entrance-banner')
     @include('partials.config-entrance-banner')
     @include('partials.theme-entrance-banner', ['caption' => __('theme_studio.entrance_from_academic')])
+    @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_academic')])
     @include('partials.people-entrance-banner')
     <div class="row g-3">
         @forelse($links as $link)

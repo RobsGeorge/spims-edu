@@ -77,6 +77,7 @@ use App\Http\Controllers\SuperAdmin\AuditExplorerController;
 use App\Http\Controllers\SuperAdmin\FeatureFlagController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
+use App\Http\Controllers\SuperAdmin\SchoolReportController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\SystemSettingController;
 use App\Http\Controllers\SuperAdmin\ThemeStudioController;
@@ -374,6 +375,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/theme/{theme}/assets', [ThemeStudioController::class, 'asset'])
             ->middleware('permission:theme.manage')
             ->name('theme.assets');
+        Route::get('/reports', [SchoolReportController::class, 'index'])
+            ->middleware('permission:reports.school')
+            ->name('reports');
+        Route::get('/reports/{report}/csv', [SchoolReportController::class, 'csv'])
+            ->middleware('permission:reports.school')
+            ->name('reports.csv');
+        Route::get('/reports/{report}', [SchoolReportController::class, 'show'])
+            ->middleware('permission:reports.school')
+            ->name('reports.show');
         Route::get('/security', [SuperAdminController::class, 'security'])->name('security');
         Route::post('/sessions/flush', [SuperAdminController::class, 'flushSessions'])->name('sessions.flush');
         Route::get('/audit', [AuditExplorerController::class, 'index'])->name('audit.index');

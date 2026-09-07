@@ -344,6 +344,7 @@ class NavigationHub
                 'title' => __('superadmin.section_evidence'),
                 'description' => __('superadmin.section_evidence_desc'),
                 'links' => array_values(array_filter([
+                    self::superadminTile('superadmin.reports', 'superadmin.tile_reports', 'bi-bar-chart-line', 'superadmin.tile_reports_desc', 'superadmin.tile_reports_hint'),
                     self::superadminTile('superadmin.audit.index', 'superadmin.tile_audit', 'bi-journal-text', 'superadmin.tile_audit_desc', 'superadmin.tile_audit_hint'),
                     self::superadminTile('superadmin.observability.index', 'superadmin.tile_observability', 'bi-activity', 'superadmin.tile_observability_desc', 'superadmin.tile_observability_hint'),
                     self::superadminTile('health', 'superadmin.tile_health', 'bi-heart-pulse', 'superadmin.tile_health_desc', 'superadmin.tile_health_hint'),

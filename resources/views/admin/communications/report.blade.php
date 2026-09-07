@@ -2,6 +2,7 @@
 @section('title', __('communications.report_title'))
 @section('content')
 <x-page-header :title="__('communications.report_title')" :subtitle="__('communications.report_sub')" />
+@include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_communications')])
 
 <form method="GET" class="row g-2 mb-3">
     <div class="col-md-2"><input name="type" value="{{ $filters['type'] ?? '' }}" class="form-control" placeholder="{{ __('communications.filter_type') }}"></div>

@@ -11,6 +11,7 @@
             <a href="{{ route('admin.reports.csv', $report) }}" class="btn btn-primary">{{ __('reports.download_csv') }}</a>
         </x-slot:actions>
     </x-page-header>
+    @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_reports')])
 
     @if($rows->isEmpty())
         <x-empty-state :title="__('reports.empty')" icon="bi-table" />

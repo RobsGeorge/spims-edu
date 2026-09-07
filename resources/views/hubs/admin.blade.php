@@ -12,6 +12,7 @@
     @include('partials.config-entrance-banner')
     @include('partials.theme-entrance-banner', ['caption' => __('theme_studio.entrance_from_admin')])
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_admin')])
+    @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_admin')])
     <div class="row g-3">
         @forelse($links as $link)
             @include('partials.hub-link-tile', ['link' => $link])

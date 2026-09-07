@@ -12,6 +12,7 @@
             <a href="{{ route('admin.reports.csv', 'finance') }}" class="btn btn-primary">{{ __('finance.download_aging_csv') }}</a>
         </x-slot:actions>
     </x-page-header>
+    @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_finance')])
 
     <div class="row g-4 mb-4">
         <div class="col-md-6">

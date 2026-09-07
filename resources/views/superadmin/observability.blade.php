@@ -29,6 +29,7 @@
     @include('partials.features-entrance-banner')
     @include('partials.config-entrance-banner')
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_observability')])
+    @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_observability')])
 
     <div class="row g-3 mb-4">
         @foreach($stats as $key => $value)

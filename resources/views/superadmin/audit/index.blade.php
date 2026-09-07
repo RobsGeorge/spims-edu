@@ -23,6 +23,7 @@
         </div>
         <span class="audit-append-badge">{{ __('audit.append_only') }}</span>
     </header>
+    @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_audit')])
 
     <aside class="sa-callout sa-callout-danger mb-4" role="note">
         <i class="bi bi-info-circle-fill" aria-hidden="true"></i>

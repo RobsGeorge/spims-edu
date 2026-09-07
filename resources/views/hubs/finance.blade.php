@@ -8,7 +8,7 @@
     <p class="text-muted-theme mb-4">{{ __('hubs.finance_desc') }}</p>
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_finance')])
     @include('partials.people-entrance-banner')
-    @include('partials.people-entrance-banner')
+    @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_finance')])
     <div class="row g-3">
         @foreach($links as $link)
             @include('partials.hub-link-tile', ['link' => $link])

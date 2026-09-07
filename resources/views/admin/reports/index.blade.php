@@ -3,6 +3,7 @@
 @section('content')
 <div class="hub-page animate-in" style="max-width:920px;margin:0 auto;">
     <x-page-header :title="__('reports.hub_title')" :subtitle="__('reports.hub_desc')" />
+    @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_reports')])
 
     <div class="row g-3">
         @foreach([

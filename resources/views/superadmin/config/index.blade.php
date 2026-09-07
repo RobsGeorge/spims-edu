@@ -28,6 +28,7 @@
 
     <div class="d-flex flex-wrap gap-2 mb-4">
         <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.features') }}">{{ __('system_settings.open_features') }}</a>
+        <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.reports') }}">{{ __('school_reports.nav_reports') }}</a>
         <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.audit.index', ['action' => 'system_settings.']) }}">{{ __('system_settings.open_audit') }}</a>
     </div>
     <p class="small text-muted-theme mb-4">{{ __('system_settings.open_features_help') }}</p>

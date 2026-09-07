@@ -250,6 +250,12 @@
                                         </a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="{{ route('superadmin.reports') }}">
+                                            <i class="bi bi-bar-chart-line" aria-hidden="true"></i>
+                                            {{ __('school_reports.nav_reports') }}
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="{{ route('superadmin.audit.index') }}">
                                             <i class="bi bi-journal-text" aria-hidden="true"></i>
                                             {{ __('audit.nav_audit') }}
