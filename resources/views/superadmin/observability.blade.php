@@ -33,7 +33,7 @@
             @php $meta = $statCopy[$key] ?? ['label' => $key, 'help' => null]; @endphp
             <div class="col-6 col-md-4">
                 @if(!empty($meta['url']))
-                    <a href="{{ $meta['url'] }}" class="app-card card shadow-sm h-100 text-decoration-none">
+                    <a href="{{ $meta['url'] }}" class="app-card card shadow-sm h-100 text-decoration-none" data-stat="{{ $key }}">
                         <div class="card-body text-center">
                             <div class="display-6 fw-bold page-title">{{ number_format($value) }}</div>
                             <div class="text-muted-theme text-uppercase small">{{ $meta['label'] }}</div>
@@ -43,7 +43,7 @@
                         </div>
                     </a>
                 @else
-                    <div class="app-card card shadow-sm h-100">
+                    <div class="app-card card shadow-sm h-100" data-stat="{{ $key }}">
                         <div class="card-body text-center">
                             <div class="display-6 fw-bold page-title">{{ number_format($value) }}</div>
                             <div class="text-muted-theme text-uppercase small">{{ $meta['label'] }}</div>
