@@ -78,6 +78,8 @@ return [
     'cancel' => 'Cancel',
     'confirm' => 'Confirm',
     'open_menu' => 'Open menu',
+    'search' => 'Search catalog',
+    'user_menu' => 'Account menu for :name',
     'unread_count' => ':count unread notifications',
     'empty' => 'Nothing here yet',
     'loading' => 'Loading…',
