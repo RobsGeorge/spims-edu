@@ -13,7 +13,6 @@ use App\Models\User;
 use App\Models\Week;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
@@ -175,8 +174,6 @@ class ContentFileHardeningTest extends TestCase
     {
         $ip = request()->ip() ?: '127.0.0.1';
 
-        return ThrottleRequests::$shouldHashKeys
-            ? md5('catalog-preview-file'.$ip)
-            : 'catalog-preview-file:'.$ip;
+        return md5('catalog-preview-file'.$ip);
     }
 }
