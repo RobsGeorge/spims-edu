@@ -13,7 +13,6 @@ use App\Models\Enrollment;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Refund;
-use App\Models\Setting;
 use App\Models\User;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
@@ -171,16 +170,35 @@ class PaymentService
             $this->authorize->authorize($actor, 'finance.refunds');
         }
 
-        return Refund::query()->create([
-            'payment_id' => $payment->id,
-            'student_id' => $payment->student_id,
-            'amount_minor' => $amountMinor,
-            'currency' => $payment->currency,
-            'as_points' => $asPoints,
-            'status' => RefundStatus::Requested,
-            'reason' => $reason,
-            'requested_by_id' => $actor->id,
-        ]);
+        if ($amountMinor < 1 || $amountMinor > $payment->amount_minor) {
+            throw ValidationException::withMessages(['amount_minor' => [__('finance.refund_amount_invalid')]]);
+        }
+
+        if ($payment->status !== PaymentStatus::Completed) {
+            throw ValidationException::withMessages(['payment' => [__('finance.refund_not_completed')]]);
+        }
+
+        $alreadyOpen = Refund::query()
+            ->where('payment_id', $payment->id)
+            ->whereIn('status', [RefundStatus::Requested, RefundStatus::Approved, RefundStatus::Completed])
+            ->exists();
+
+        if ($alreadyOpen || $payment->status === PaymentStatus::Refunded) {
+            throw ValidationException::withMessages(['payment' => [__('finance.refund_already_requested')]]);
+        }
+
+        return $this->audit->withAudit($actor, 'finance.refund_request', function () use ($actor, $payment, $amountMinor, $asPoints, $reason) {
+            return Refund::query()->create([
+                'payment_id' => $payment->id,
+                'student_id' => $payment->student_id,
+                'amount_minor' => $amountMinor,
+                'currency' => $payment->currency,
+                'as_points' => $asPoints,
+                'status' => RefundStatus::Requested,
+                'reason' => $reason,
+                'requested_by_id' => $actor->id,
+            ]);
+        }, 'Refund');
     }
 
     public function approveRefund(User $actor, Refund $refund): Refund
@@ -323,20 +341,7 @@ class PaymentService
 
     public function allocateReceiptSerial(): string
     {
-        $year = now()->format('Y');
-        $setting = Setting::query()->lockForUpdate()->find('finance.receipt_counter');
-        if ($setting === null) {
-            $setting = new Setting(['key' => 'finance.receipt_counter']);
-        }
-
-        $value = $setting->value ?? [];
-        $counters = $value['years'] ?? [];
-        $next = ((int) ($counters[$year] ?? 0)) + 1;
-        $counters[$year] = $next;
-        $setting->value = ['years' => $counters];
-        $setting->save();
-
-        return sprintf('SPIMS-%s-%05d', $year, $next);
+        return $this->receipts->allocateSerial();
     }
 
     /**

@@ -3,9 +3,13 @@
 @section('content')
 @php
     use App\Enums\Currency;
+    use App\Enums\PaymentStatus;
     use App\Enums\WalletKind;
     use App\Support\Money;
 @endphp
+@if(session('status'))
+    <div class="alert alert-success">{{ session('status') }}</div>
+@endif
 <h1 class="spims-title mb-3">{{ __('finance.my_finance') }}</h1>
 
 <div class="row g-3 mb-4 wallet-balance-cards">
@@ -51,6 +55,9 @@
                         <li>{{ __('ui.empty') }}</li>
                     @endforelse
                 </ul>
+                @if($transactions->hasPages())
+                    <div class="mt-3">{{ $transactions->links() }}</div>
+                @endif
             </div>
         </div>
     </div>
@@ -67,10 +74,21 @@
             <td>{{ $invoice->total_minor }} {{ $invoice->currency->value }}</td>
             <td>{{ $invoice->status->value }}</td>
             <td>{{ $invoice->amountDue() }}</td>
-            <td><a href="{{ route('finance.invoices.show', $invoice) }}">{{ __('finance.pay') }}</a></td>
+            <td>
+                <a href="{{ route('finance.invoices.show', $invoice) }}">{{ __('finance.pay') }}</a>
+                @foreach($invoice->payments as $payment)
+                    @if($payment->status === PaymentStatus::Completed || $payment->receipt_serial)
+                        <a href="{{ route('finance.receipts.show', $payment) }}" class="ms-2">{{ __('finance.view_receipt') }}</a>
+                    @endif
+                    @include('finance._refund-request-form', ['payment' => $payment])
+                @endforeach
+            </td>
         </tr>
     @endforeach
     </tbody>
 </table>
 </div>
+@if($invoices->hasPages())
+    <div class="mt-3">{{ $invoices->links() }}</div>
+@endif
 @endsection

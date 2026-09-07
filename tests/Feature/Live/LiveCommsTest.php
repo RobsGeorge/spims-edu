@@ -223,4 +223,51 @@ class LiveCommsTest extends TestCase
 
         $this->assertSame('https://zoom.test/rec/1', $session->fresh()->recording_url);
     }
+
+    #[Test]
+    public function recurrence_creates_weekly_sessions_and_overlap_returns_422(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $offering = $this->offeringWithStudent($student);
+
+        $this->actingAs($adm)
+            ->get(route('admin.live.index', $offering))
+            ->assertOk()
+            ->assertSee(__('live.schedule_recurrence'), false);
+
+        $this->actingAs($adm)->post(route('admin.live.recurrence', $offering), [
+            'days_of_week' => [1, 3],
+            'start_time' => '10:00',
+            'duration_minutes' => 60,
+            'start_date' => '2026-09-07',
+            'end_date' => '2026-09-20',
+            'title_prefix' => 'Weekly',
+        ])->assertRedirect();
+
+        $sessions = LiveSession::query()->where('offering_id', $offering->id)->orderBy('scheduled_start')->get();
+        $this->assertCount(4, $sessions);
+        $this->assertSame('Weekly 2026-09-07', $sessions[0]->title);
+        $this->assertSame('Weekly 2026-09-09', $sessions[1]->title);
+        $this->assertSame('Weekly 2026-09-14', $sessions[2]->title);
+        $this->assertSame('Weekly 2026-09-16', $sessions[3]->title);
+
+        $this->actingAs($adm)->postJson(route('admin.live.recurrence', $offering), [
+            'days_of_week' => [1],
+            'start_time' => '10:00',
+            'duration_minutes' => 60,
+            'start_date' => '2026-09-07',
+            'end_date' => '2026-09-14',
+            'title_prefix' => 'Conflict',
+        ])->assertStatus(422);
+
+        $this->actingAs($adm)->postJson(route('admin.live.store', $offering), [
+            'title' => 'Overlap session',
+            'scheduled_start' => '2026-09-07 10:30:00',
+            'duration_minutes' => 60,
+        ])->assertStatus(422);
+
+        $this->assertSame(4, LiveSession::query()->where('offering_id', $offering->id)->count());
+        $this->assertDatabaseHas('audit_logs', ['action' => 'live.recurrence']);
+    }
 }

@@ -58,4 +58,12 @@ return [
     'outstanding_by_currency' => 'Outstanding invoices',
     'paid_revenue_by_currency' => 'Paid revenue',
     'reports_empty' => 'No amounts in this category.',
+    'request_refund' => 'Request refund',
+    'refund_requested' => 'Refund request submitted.',
+    'refund_amount' => 'Refund amount (minor units)',
+    'refund_reason' => 'Reason (optional)',
+    'refund_as_points' => 'Credit as points',
+    'refund_amount_invalid' => 'Refund amount must be a positive integer within the payment.',
+    'refund_not_completed' => 'Only completed payments can be refunded.',
+    'refund_already_requested' => 'A refund is already requested or completed for this payment.',
 ];

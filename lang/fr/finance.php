@@ -58,4 +58,12 @@ return [
     'outstanding_by_currency' => 'Factures en souffrance',
     'paid_revenue_by_currency' => 'Revenus encaissés',
     'reports_empty' => 'Aucun montant dans cette catégorie.',
+    'request_refund' => 'Demander un remboursement',
+    'refund_requested' => 'Demande de remboursement envoyée.',
+    'refund_amount' => 'Montant du remboursement (unités mineures)',
+    'refund_reason' => 'Motif (facultatif)',
+    'refund_as_points' => 'Créditer en points',
+    'refund_amount_invalid' => 'Le montant doit être un entier positif dans la limite du paiement.',
+    'refund_not_completed' => 'Seuls les paiements terminés peuvent être remboursés.',
+    'refund_already_requested' => 'Un remboursement est déjà demandé ou effectué pour ce paiement.',
 ];

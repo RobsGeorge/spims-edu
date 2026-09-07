@@ -436,6 +436,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/finance/invoices/{invoice}/checkout', [FinanceController::class, 'checkout'])
         ->middleware('permission:finance.pay')
         ->name('finance.checkout');
+    // #13 live recurrence + refund
+    Route::post('/finance/payments/{payment}/refund-request', [FinanceController::class, 'requestRefund'])
+        ->middleware('permission:finance.pay')
+        ->name('finance.refund-request');
     Route::get('/donate', [DonationController::class, 'create'])
         ->middleware('permission:finance.donate')
         ->name('donate.create');
@@ -843,6 +847,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/offerings/{offering}/live', [LiveSessionAdminController::class, 'store'])
             ->middleware('permission:live.schedule')
             ->name('live.store');
+        // #13 live recurrence + refund
+        Route::post('/offerings/{offering}/live/recurrence', [LiveSessionAdminController::class, 'storeRecurrence'])
+            ->middleware('permission:live.schedule')
+            ->name('live.recurrence');
         Route::post('/live/{session}/attendance/import', [LiveSessionAdminController::class, 'importAttendance'])
             ->middleware('permission:attendance.manage')
             ->name('live.attendance.import');

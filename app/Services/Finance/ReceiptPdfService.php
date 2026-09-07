@@ -2,10 +2,13 @@
 
 namespace App\Services\Finance;
 
+use App\Enums\PaymentStatus;
 use App\Models\Payment;
+use App\Models\Setting;
 use App\Services\Pdf\PdfRenderService;
 use App\Services\Storage\ObjectStorageService;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 
 class ReceiptPdfService
 {
@@ -61,9 +64,18 @@ class ReceiptPdfService
 
     /**
      * Ensure a stored receipt exists; generate on demand when missing.
+     * Completed payments without a serial get one here so the HTML receipt link can render.
      */
     public function ensure(Payment $payment): string
     {
+        if ($payment->receipt_serial === null && $payment->status === PaymentStatus::Completed) {
+            $payment->update([
+                'receipt_serial' => $this->allocateSerial(),
+                'receipt_url' => $payment->receipt_url ?: 'receipts/'.$payment->id.'.html',
+            ]);
+            $payment->refresh();
+        }
+
         $path = $payment->receipt_url ?: ('receipts/'.$payment->id.'.html');
 
         if (! $this->storage->exists($path)) {
@@ -71,5 +83,25 @@ class ReceiptPdfService
         }
 
         return $path;
+    }
+
+    public function allocateSerial(): string
+    {
+        return DB::transaction(function () {
+            $year = now()->format('Y');
+            $setting = Setting::query()->lockForUpdate()->find('finance.receipt_counter');
+            if ($setting === null) {
+                $setting = new Setting(['key' => 'finance.receipt_counter']);
+            }
+
+            $value = $setting->value ?? [];
+            $counters = $value['years'] ?? [];
+            $next = ((int) ($counters[$year] ?? 0)) + 1;
+            $counters[$year] = $next;
+            $setting->value = ['years' => $counters];
+            $setting->save();
+
+            return sprintf('SPIMS-%s-%05d', $year, $next);
+        });
     }
 }

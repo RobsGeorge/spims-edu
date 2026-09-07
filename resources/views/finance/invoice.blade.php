@@ -1,6 +1,18 @@
 @extends('layouts.app')
 @section('title', __('finance.checkout'))
 @section('content')
+@if(session('status'))
+    <div class="alert alert-success">{{ session('status') }}</div>
+@endif
+@if($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 <h1 class="spims-title mb-3">{{ __('finance.checkout') }}</h1>
 <p>{{ $invoice->status->value }} — {{ $invoice->total_minor }} {{ $invoice->currency->value }}</p>
 <p>{{ __('finance.paid') }}: {{ $invoice->amountPaid() }} · {{ __('finance.due') }}: {{ $invoice->amountDue() }}</p>
@@ -34,12 +46,15 @@
 @if($invoice->payments->isNotEmpty())
 <ul class="mt-3 list-unstyled">
 @foreach($invoice->payments as $payment)
-    <li class="mb-1">
+    <li class="mb-3">
         {{ $payment->status->value }} · {{ $payment->amount_minor }}
-        @if($payment->receipt_serial)
-            · {{ $payment->receipt_serial }}
+        @if($payment->status === \App\Enums\PaymentStatus::Completed || $payment->receipt_serial)
+            @if($payment->receipt_serial)
+                · {{ $payment->receipt_serial }}
+            @endif
             <a href="{{ route('finance.receipts.show', $payment) }}" class="ms-1">{{ __('finance.view_receipt') }}</a>
         @endif
+        @include('finance._refund-request-form', ['payment' => $payment])
     </li>
 @endforeach
 </ul>

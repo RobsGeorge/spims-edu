@@ -5,9 +5,11 @@ namespace App\Models;
 use App\Enums\Currency;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Enums\RefundStatus;
 use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Payment extends Model
 {
@@ -46,5 +48,25 @@ class Payment extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(Refund::class);
+    }
+
+    public function isRefundable(): bool
+    {
+        if ($this->status !== PaymentStatus::Completed) {
+            return false;
+        }
+
+        return ! $this->refunds->contains(function (Refund $refund) {
+            return in_array($refund->status, [
+                RefundStatus::Requested,
+                RefundStatus::Approved,
+                RefundStatus::Completed,
+            ], true);
+        });
     }
 }
