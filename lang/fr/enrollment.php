@@ -54,4 +54,8 @@ return [
     'back_to_offering' => 'Retour à l’offre',
     'back_to_users' => 'Retour aux utilisateurs',
     'no_students' => 'Aucun étudiant pour le moment',
+    'max_semesters' => 'Le nombre maximum de semestres pour l\'obtention du diplôme est atteint.',
+    'sequence_warning' => 'Attention : inscription avant d\'avoir terminé les cours des niveaux inférieurs. L\'inscription a été enregistrée.',
+    'sequence_blocked' => 'Les cours des niveaux inférieurs doivent être complétés avant de s\'inscrire à ce cours.',
+    'already_passed' => 'Vous avez déjà réussi ce cours.',
 ];

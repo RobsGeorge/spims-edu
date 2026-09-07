@@ -29,6 +29,7 @@ class Program extends Model
         'active',
         'standing_good_min',
         'standing_suspension_below',
+        'enforce_year_sequence',
     ];
 
     protected $casts = [
@@ -40,6 +41,7 @@ class Program extends Model
         'elective_credits_required' => 'integer',
         'active' => 'boolean',
         // Nullable override columns stay uncast — Laravel's integer cast turns null into 0.
+        'enforce_year_sequence' => 'boolean',
     ];
 
     public function gradingScheme(): BelongsTo
