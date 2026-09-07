@@ -17,6 +17,7 @@ return [
     'override_done' => 'تم تجاوز قواعد التسجيل.',
     'hold_updated' => 'تم تحديث الحجز المالي.',
     'financial_hold' => 'التسجيل محظور بسبب حجز مالي.',
+    'advising_hold' => 'التسجيل محظور بسبب حجز إرشاد.',
     'window_closed' => 'نافذة التسجيل مغلقة.',
     'offering_not_open' => 'هذا العرض غير مفتوح للتسجيل.',
     'prerequisite_missing' => 'متطلب سابق ناقص :code.',

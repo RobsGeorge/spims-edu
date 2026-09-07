@@ -9,6 +9,7 @@ use App\Enums\OfferingMode;
 use App\Enums\OfferingStatus;
 use App\Enums\StudentProgramStatus;
 use App\Models\AcademicRecord;
+use App\Models\AdvisingHold;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\Invoice;
@@ -93,6 +94,10 @@ class EnrollmentService
 
         if ($this->hasFinancialHold($student)) {
             throw ValidationException::withMessages(['enrollment' => [__('enrollment.financial_hold')]]);
+        }
+
+        if ($this->hasAdvisingHold($student)) {
+            throw ValidationException::withMessages(['enrollment' => [__('enrollment.advising_hold')]]);
         }
 
         if ($offering->mode === OfferingMode::Cohort) {
@@ -284,14 +289,22 @@ class EnrollmentService
         return in_array($student->id, $holds, true);
     }
 
+    public function hasAdvisingHold(User $student): bool
+    {
+        return AdvisingHold::query()
+            ->where('student_id', $student->id)
+            ->active()
+            ->exists();
+    }
+
     /**
-     * API-facing conflict check: closed window, financial hold, or overlapping live sessions.
+     * API-facing conflict check: closed window, financial/advising hold, or overlapping live sessions.
      *
      * @return 'hold'|'window'|'schedule'|null
      */
     public function registrationConflict(User $student, CourseOffering $offering): ?string
     {
-        if ($this->hasFinancialHold($student)) {
+        if ($this->hasFinancialHold($student) || $this->hasAdvisingHold($student)) {
             return 'hold';
         }
 

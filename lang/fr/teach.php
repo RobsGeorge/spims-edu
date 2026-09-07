@@ -3,6 +3,7 @@
 return array (
   'title' => 'Enseigner',
   'subtitle' => 'Offres que vous enseignez ou assistez.',
+  'advising' => 'Étudiants conseillés',
   'workspace' => 'Espace enseignant',
   'workspace_sub' => 'Contenu, évaluations, carnet, live et discussions au même endroit.',
   'back' => 'Toutes les offres',

@@ -91,6 +91,12 @@ class AuthorizeService
         return in_array($role->value, (array) config('permission_scopes.scoped_roles', []), true);
     }
 
+    /**
+     * Advising keys (`advising.assign` / `advising.hold` / `advising.view`) are
+     * deliberately absent from `permission_scopes.offering_scoped`. Instructor
+     * "O" means assigned advisee only and is enforced in AdvisingService, which
+     * fails closed if no student resource is passed.
+     */
     private function isOfferingScoped(string $action): bool
     {
         return in_array($action, (array) config('permission_scopes.offering_scoped', []), true);

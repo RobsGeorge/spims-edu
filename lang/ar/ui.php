@@ -74,6 +74,7 @@ return [
     'nav_applications' => 'قائمة الطلبات',
     'nav_my_applications' => 'طلباتي',
     'nav_enrollments' => 'تسجيلاتي',
+    'nav_advising' => 'الإرشاد الأكاديمي',
     'nav_finance' => 'ماليتي',
     'nav_finance_admin' => 'إدارة المالية',
     'nav_live' => 'الجلسات المباشرة',
