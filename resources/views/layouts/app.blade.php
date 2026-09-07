@@ -126,6 +126,7 @@
             </div>
 
             <div class="app-main-column">
+                @include('partials.impersonation-banner')
                 <header class="app-topbar sticky-top" aria-label="{{ __('ui.nav_dashboard') }}">
                     <button class="btn btn-outline-secondary app-menu-btn d-lg-none" type="button"
                             data-bs-toggle="offcanvas" data-bs-target="#appDrawer" aria-controls="appDrawer"
@@ -158,6 +159,14 @@
                                 <li><a class="dropdown-item" href="{{ route('grades.index') }}">{{ __('ui.nav_grades') }}</a></li>
                                 <li><a class="dropdown-item" href="{{ route('settings.edit') }}">{{ __('ui.nav_settings') }}</a></li>
                                 <li><a class="dropdown-item" href="{{ route('transcript.show') }}">{{ __('ui.nav_transcript') }}</a></li>
+                                @if(app(\App\Support\AuthorizeService::class)->allows(auth()->user(), 'users.manage'))
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.users.index') }}">
+                                            <i class="bi bi-people" aria-hidden="true"></i>
+                                            {{ __('people.nav_people') }}
+                                        </a>
+                                    </li>
+                                @endif
                                 @if($hasSuperadminNav)
                                     <li><hr class="dropdown-divider"></li>
                                     <li>

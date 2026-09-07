@@ -14,4 +14,5 @@ return [
     'cannot_assign_role' => 'You cannot assign this role.',
     'user_created' => 'User created successfully.',
     'user_suspended' => 'User suspended.',
+    'user_unsuspended' => 'User unsuspended.',
 ];

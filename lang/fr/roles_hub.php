@@ -6,7 +6,7 @@ return [
     'section_templates' => 'Modèles de permissions',
     'templates_hint' => 'Cochez les clés de chaque rôle. Les clés vides du plan de contrôle restent visibles.',
     'section_assignments' => 'Affectations utilisateur',
-    'assignments_hint' => 'Affectez les rôles statiques via l’administration des utilisateurs. Super Admin ne s’y assigne pas.',
+    'assignments_hint' => 'Affectez les rôles statiques depuis le dossier d’une personne dans l’annuaire. Super Admin ne s’y assigne pas. Ouvrez un nom pour révoquer ou usurper.',
     'save_role' => 'Enregistrer',
     'saved' => 'Permissions enregistrées pour :role.',
     'safety_title' => 'Un grant ici est à l’échelle de l’école',

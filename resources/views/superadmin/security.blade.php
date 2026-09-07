@@ -13,6 +13,7 @@
         <i class="bi bi-shield-lock text-danger"></i> {{ __('superadmin.security_title') }}
     </h1>
     <p class="text-muted-theme mb-4">{{ __('superadmin.security_desc') }}</p>
+    @include('partials.people-entrance-banner', ['caption' => __('superadmin.entrance_from_security')])
 
     @if(session('status'))
         <div class="alert alert-success">{{ session('status') }}</div>

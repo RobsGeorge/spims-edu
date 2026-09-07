@@ -26,7 +26,8 @@ class ControlPlaneSafetyTest extends TestCase
         $this->actingAs($student)->get(route('dashboard'))
             ->assertOk()
             ->assertDontSee(__('dashboard.superadmin_hub'))
-            ->assertDontSee(__('superadmin.entrance_title'), false);
+            ->assertDontSee(__('superadmin.entrance_title'), false)
+            ->assertDontSee(__('people.dashboard_tile'));
     }
 
     #[Test]
@@ -73,6 +74,8 @@ class ControlPlaneSafetyTest extends TestCase
         $this->actingAs($sa)->get(route('admin.users.index'))
             ->assertOk()
             ->assertSee(__('superadmin.users_roles_help'))
+            ->assertSee(__('people.directory_title'))
+            ->assertSee(__('people.search_label'))
             ->assertDontSee('value="'.RoleType::SuperAdmin->value.'"', false);
     }
 
@@ -99,7 +102,9 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertOk()
             ->assertSee(__('dashboard.superadmin_hub'))
             ->assertSee(route('superadmin.index'), false)
-            ->assertSee(__('hubs.nav_superadmin'));
+            ->assertSee(__('hubs.nav_superadmin'))
+            ->assertSee(__('people.dashboard_tile'))
+            ->assertSee(route('admin.users.index'), false);
 
         $this->actingAs($sa)->get(route('hubs.admin'))
             ->assertOk()

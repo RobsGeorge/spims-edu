@@ -51,6 +51,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfferingPreviewController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SuperAdmin\ImpersonationController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
@@ -114,7 +115,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/observability', [SuperAdminController::class, 'observability'])->name('observability.index');
         Route::get('/scheduled-tasks', [SuperAdminController::class, 'scheduledTasks'])->name('scheduled-tasks.index');
         Route::get('/system-tests', [SuperAdminController::class, 'systemTests'])->name('system-tests.index');
+        Route::post('/people/{user}/impersonate', [ImpersonationController::class, 'start'])
+            ->middleware('permission:users.impersonate')
+            ->name('people.impersonate');
     });
+
+    Route::post('/impersonation/stop', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
 
     Route::middleware('superadmin')->prefix('roles-hub')->group(function () {
         Route::get('/', [RolesHubController::class, 'index'])->name('roles.hub');
@@ -236,9 +242,33 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/users', [UserController::class, 'store'])
             ->middleware('permission:users.manage')
             ->name('users.store');
+        Route::get('/users/{user}', [UserController::class, 'show'])
+            ->middleware('permission:users.manage')
+            ->name('users.show');
+        Route::put('/users/{user}', [UserController::class, 'update'])
+            ->middleware('permission:users.manage')
+            ->name('users.update');
         Route::post('/users/{user}/suspend', [UserController::class, 'suspend'])
             ->middleware('permission:users.manage')
             ->name('users.suspend');
+        Route::post('/users/{user}/unsuspend', [UserController::class, 'unsuspend'])
+            ->middleware('permission:users.unsuspend')
+            ->name('users.unsuspend');
+        Route::post('/users/{user}/activate', [UserController::class, 'activate'])
+            ->middleware('permission:users.manage')
+            ->name('users.activate');
+        Route::post('/users/{user}/roles', [UserController::class, 'assignRole'])
+            ->middleware('permission:roles.assign')
+            ->name('users.roles.store');
+        Route::delete('/users/{user}/roles/{role}', [UserController::class, 'revokeRole'])
+            ->middleware('permission:roles.assign')
+            ->name('users.roles.destroy');
+        Route::post('/users/{user}/password-reset', [UserController::class, 'passwordReset'])
+            ->middleware('permission:users.reset_password')
+            ->name('users.password-reset');
+        Route::post('/users/{user}/sessions/revoke', [UserController::class, 'revokeSessions'])
+            ->middleware('permission:users.manage')
+            ->name('users.sessions.revoke');
 
         Route::get('/theme', [ThemeEditorController::class, 'edit'])
             ->middleware('permission:theme.manage')

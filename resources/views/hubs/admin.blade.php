@@ -7,6 +7,7 @@
     <h1 class="page-title">{{ __('hubs.admin_title') }}</h1>
     <p class="text-muted-theme mb-4">{{ __('hubs.admin_desc') }}</p>
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_admin')])
+    @include('partials.people-entrance-banner')
     <div class="row g-3">
         @forelse($links as $link)
             @include('partials.hub-link-tile', ['link' => $link])

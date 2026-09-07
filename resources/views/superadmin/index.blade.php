@@ -48,7 +48,7 @@
         <h2 class="h6 page-title mb-2">{{ __('superadmin.roadmap_title') }}</h2>
         <p class="text-muted-theme small mb-3">{{ __('superadmin.roadmap_desc') }}</p>
         <ul class="sa-roadmap-list mb-0">
-            <li><span class="sa-phase">SA1</span> {{ __('superadmin.roadmap_sa1') }}</li>
+            <li class="is-done"><span class="sa-phase">SA1</span> {{ __('superadmin.roadmap_sa1_done') }}</li>
             <li><span class="sa-phase">SA2</span> {{ __('superadmin.roadmap_sa2') }}</li>
             <li><span class="sa-phase">SA3</span> {{ __('superadmin.roadmap_sa3') }}</li>
             <li><span class="sa-phase">SA4</span> {{ __('superadmin.roadmap_sa4') }}</li>

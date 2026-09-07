@@ -122,8 +122,9 @@
             <div id="assignmentsSection" class="accordion-collapse collapse" data-bs-parent="#rolesHubAccordion">
                 <div class="accordion-body">
                     <p class="text-muted-theme mb-3">{{ __('roles_hub.assignments_hint') }}</p>
+                    @include('partials.people-entrance-banner')
                     <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-people"></i> {{ __('hubs.users') }}
+                        <i class="bi bi-people"></i> {{ __('people.directory_title') }}
                     </a>
                 </div>
             </div>

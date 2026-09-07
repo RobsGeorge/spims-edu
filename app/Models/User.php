@@ -18,6 +18,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens;
+
     use HasFactory;
     use HasUlids;
     use Notifiable;
@@ -53,9 +54,41 @@ class User extends Authenticatable
         'deleted_at' => 'datetime',
     ];
 
+    public function displayName(): string
+    {
+        return trim($this->first_name.' '.$this->last_name);
+    }
+
+    public function isSeededSuperAdmin(): bool
+    {
+        $email = strtolower((string) env('SUPERADMIN_EMAIL', 'robeir.george@outlook.com'));
+
+        return $this->isSuperAdmin() && strtolower((string) $this->email) === $email;
+    }
+
     public function roles(): HasMany
     {
         return $this->hasMany(UserRole::class);
+    }
+
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class, 'student_id');
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class, 'student_id');
+    }
+
+    public function studentPrograms(): HasMany
+    {
+        return $this->hasMany(StudentProgram::class, 'student_id');
+    }
+
+    public function identitySessions(): HasMany
+    {
+        return $this->hasMany(Session::class);
     }
 
     public function hasRole(RoleType $role): bool

@@ -6,7 +6,7 @@ return [
     'section_templates' => 'Role permission templates',
     'templates_hint' => 'Check the keys each static role should hold. Empty Super Admin–only keys (features, impersonation, ops) stay visible so you can see what the control plane owns.',
     'section_assignments' => 'User role assignments',
-    'assignments_hint' => 'Assign ADMINISTRATIVE_ADMIN and other static roles via Users admin. Super Admin cannot be granted there.',
+    'assignments_hint' => 'Assign ADMINISTRATIVE_ADMIN and other static roles from a person dossier in the People directory. Super Admin cannot be granted there. Open a name to revoke a role or impersonate.',
     'save_role' => 'Save role permissions',
     'saved' => 'Permissions saved for :role.',
     'safety_title' => 'A grant here is school-wide',

@@ -14,4 +14,5 @@ return [
     'cannot_assign_role' => 'لا يمكنك تعيين هذا الدور.',
     'user_created' => 'تم إنشاء المستخدم بنجاح.',
     'user_suspended' => 'تم إيقاف المستخدم.',
+    'user_unsuspended' => 'تم إلغاء إيقاف المستخدم.',
 ];
