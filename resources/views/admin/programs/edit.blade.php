@@ -1,8 +1,17 @@
 @extends('layouts.app')
 @section('title', __('academics.edit_program'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('academics.edit_program') }}</h1>
-<form method="POST" action="{{ route('admin.programs.update', $program) }}" class="card border-0 shadow-sm">
+<x-page-header :title="__('academics.edit_program')" :subtitle="$program->code.' — '.$program->name">
+    <x-slot:actions>
+        <a href="{{ route('admin.programs.show', $program) }}" class="btn btn-outline-secondary">{{ __('ui.cancel') }}</a>
+    </x-slot:actions>
+</x-page-header>
+
+@if(session('status'))
+    <div class="alert alert-success">{{ session('status') }}</div>
+@endif
+
+<form method="POST" action="{{ route('admin.programs.update', $program) }}" class="card border-0 shadow-sm app-card mb-4">
     @csrf
     @method('PUT')
     <div class="card-body row g-3">
@@ -50,4 +59,6 @@
         </div>
     </div>
 </form>
+
+@include('admin.programs._standing')
 @endsection

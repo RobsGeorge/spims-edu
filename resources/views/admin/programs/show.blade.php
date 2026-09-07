@@ -1,16 +1,21 @@
 @extends('layouts.app')
 @section('title', $program->name)
 @section('content')
-<div class="d-flex justify-content-between align-items-start mb-1">
-    <div>
-        <h1 class="spims-title mb-1">{{ $program->code }} — {{ $program->name }}</h1>
-        <p class="text-muted-theme mb-0">{{ $program->type->value }} · {{ __('academics.passing_threshold') }}: {{ $program->passing_threshold }}% · {{ $program->active ? __('academics.active') : __('academics.inactive') }}</p>
-    </div>
-    <a href="{{ route('admin.programs.edit', $program) }}" class="btn btn-outline-primary">{{ __('ui.edit') }}</a>
-</div>
+<x-page-header
+    :title="$program->code.' — '.$program->name"
+    :subtitle="$program->type->value.' · '.__('academics.passing_threshold').': '.$program->passing_threshold.'% · '.($program->active ? __('academics.active') : __('academics.inactive'))"
+>
+    <x-slot:actions>
+        @if(!empty($canManageProgram))
+            <a href="{{ route('admin.programs.edit', $program) }}" class="btn btn-outline-primary">{{ __('ui.edit') }}</a>
+        @endif
+    </x-slot:actions>
+</x-page-header>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
-<div class="card border-0 shadow-sm mb-4">
+@include('admin.programs._standing')
+
+<div class="card border-0 shadow-sm app-card mb-4">
     <div class="card-body">
         <h2 class="h6">{{ __('academics.attach_course') }}</h2>
         <form method="POST" action="{{ route('admin.programs.attach-course', $program) }}" class="row g-2">
@@ -31,7 +36,7 @@
     </div>
 </div>
 
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm app-card">
     <div class="table-responsive">
         <table class="table mb-0">
             <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('academics.title') }}</th><th>{{ __('academics.requirement') }}</th><th>{{ __('academics.year_level') }}</th><th></th></tr></thead>

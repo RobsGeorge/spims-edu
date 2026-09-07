@@ -604,6 +604,9 @@ Route::middleware(['auth'])->group(function () {
         Route::match(['put', 'patch'], '/programs/{program}', [ProgramController::class, 'update'])
             ->middleware('permission:programs.manage')
             ->name('programs.update');
+        Route::post('/programs/{program}/standing', [ProgramController::class, 'updateStanding'])
+            ->middleware('permission:academic_standing.manage')
+            ->name('programs.standing.update');
         Route::post('/programs/{program}/courses', [ProgramController::class, 'attachCourse'])
             ->middleware('permission:programs.manage')
             ->name('programs.attach-course');

@@ -432,4 +432,219 @@ class ReportsStandingTest extends TestCase
             'suspension_below' => 160,
         ])->assertForbidden();
     }
+
+    #[Test]
+    public function program_override_puts_mid_gpa_on_probation_while_inherit_stays_good(): void
+    {
+        $this->seed(\Database\Seeders\SettingsSeeder::class);
+        $dean = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $programA = $this->makeProgram('DIPA', 'Diploma A');
+        $programB = $this->makeProgram('DIPB', 'Diploma B');
+
+        $spA = StudentProgram::query()->create([
+            'student_id' => User::factory()->withRole(RoleType::Student)->create()->id,
+            'program_id' => $programA->id,
+            'status' => StudentProgramStatus::Active,
+            'enrolled_at' => now(),
+            'cached_gpa' => 2.20,
+        ]);
+        $spB = StudentProgram::query()->create([
+            'student_id' => User::factory()->withRole(RoleType::Student)->create()->id,
+            'program_id' => $programB->id,
+            'status' => StudentProgramStatus::Active,
+            'enrolled_at' => now(),
+            'cached_gpa' => 2.20,
+        ]);
+
+        $service = app(AcademicStandingService::class);
+        $service->apply($spA);
+        $service->apply($spB);
+        $this->assertSame(AcademicStanding::Good, $spA->fresh()->academic_standing);
+        $this->assertSame(AcademicStanding::Good, $spB->fresh()->academic_standing);
+
+        $service->updateProgramOverrides($dean, $programA, 250, 150);
+
+        $this->assertSame(250, $programA->fresh()->standing_good_min);
+        $this->assertSame(150, $programA->fresh()->standing_suspension_below);
+        $this->assertSame(AcademicStanding::Probation, $spA->fresh()->academic_standing);
+        $this->assertSame(AcademicStanding::Good, $spB->fresh()->academic_standing);
+        $this->assertSame('program', $service->thresholdsFor($programA->fresh())['source']);
+        $this->assertSame('school', $service->thresholdsFor($programB->fresh())['source']);
+
+        $service->apply($spA->fresh());
+        $this->assertSame(AcademicStanding::Probation, $spA->fresh()->academic_standing);
+    }
+
+    #[Test]
+    public function academic_admin_can_get_program_standing_section_and_post_override(): void
+    {
+        $this->seed(\Database\Seeders\SettingsSeeder::class);
+        $dean = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $program = $this->makeProgram('DEAN', 'Dean Diploma');
+
+        $this->actingAs($dean)
+            ->get(route('admin.programs.show', $program))
+            ->assertOk()
+            ->assertSee(__('reports.program_thresholds_title'))
+            ->assertSee(__('reports.program_thresholds_help'));
+
+        $this->actingAs($dean)
+            ->get(route('admin.programs.edit', $program))
+            ->assertOk()
+            ->assertSee(__('reports.program_thresholds_title'))
+            ->assertSee(__('academics.edit_program'));
+
+        $this->actingAs($dean)
+            ->post(route('admin.programs.standing.update', $program), [
+                'good_min' => 250,
+                'suspension_below' => 150,
+            ])
+            ->assertRedirect(route('admin.programs.show', $program).'#standing');
+
+        $program->refresh();
+        $this->assertSame(250, $program->standing_good_min);
+        $this->assertSame(150, $program->standing_suspension_below);
+
+        $log = AuditLog::query()->where('action', 'academic_standing.program_thresholds')->first();
+        $this->assertNotNull($log);
+        $this->assertSame($program->id, $log->entity_id);
+        $this->assertSame('Program', $log->entity_type);
+    }
+
+    #[Test]
+    public function administrative_admin_can_post_program_override_without_programs_manage(): void
+    {
+        $this->seed(\Database\Seeders\SettingsSeeder::class);
+        $admin = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+        $program = $this->makeProgram('ADMN', 'Admin Diploma');
+
+        $this->actingAs($admin)
+            ->get(route('admin.programs.show', $program))
+            ->assertOk()
+            ->assertSee(__('reports.program_thresholds_title'));
+
+        $this->actingAs($admin)
+            ->get(route('admin.programs.edit', $program))
+            ->assertForbidden();
+
+        $this->actingAs($admin)
+            ->post(route('admin.programs.standing.update', $program), [
+                'good_min' => 280,
+                'suspension_below' => 120,
+            ])
+            ->assertRedirect(route('admin.programs.show', $program).'#standing');
+
+        $this->assertSame(280, $program->fresh()->standing_good_min);
+        $this->assertSame(120, $program->fresh()->standing_suspension_below);
+        $this->assertTrue(
+            AuditLog::query()->where('action', 'academic_standing.program_thresholds')->where('entity_id', $program->id)->exists()
+        );
+    }
+
+    #[Test]
+    public function student_is_forbidden_on_program_standing_override_post(): void
+    {
+        $program = $this->makeProgram('NOPE', 'Student Locked');
+        $student = User::factory()->withRole(RoleType::Student)->create();
+
+        $this->actingAs($student)
+            ->post(route('admin.programs.standing.update', $program), [
+                'good_min' => 250,
+                'suspension_below' => 150,
+            ])
+            ->assertForbidden();
+
+        $this->assertNull($program->fresh()->standing_good_min);
+        $this->assertNull($program->fresh()->standing_suspension_below);
+    }
+
+    #[Test]
+    public function clearing_program_override_returns_student_to_school_wide_good(): void
+    {
+        $this->seed(\Database\Seeders\SettingsSeeder::class);
+        $dean = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $program = $this->makeProgram('CLR1', 'Clear Diploma');
+        $sp = StudentProgram::query()->create([
+            'student_id' => User::factory()->withRole(RoleType::Student)->create()->id,
+            'program_id' => $program->id,
+            'status' => StudentProgramStatus::Active,
+            'enrolled_at' => now(),
+            'cached_gpa' => 2.20,
+        ]);
+
+        $service = app(AcademicStandingService::class);
+        $service->updateProgramOverrides($dean, $program, 250, 150);
+        $this->assertSame(AcademicStanding::Probation, $sp->fresh()->academic_standing);
+        $this->assertSame('program', $service->thresholdsFor($program->fresh())['source']);
+
+        $this->actingAs($dean)
+            ->post(route('admin.programs.standing.update', $program), [
+                'good_min' => null,
+                'suspension_below' => null,
+            ])
+            ->assertRedirect(route('admin.programs.show', $program).'#standing');
+
+        $program->refresh();
+        $this->assertNull($program->standing_good_min);
+        $this->assertNull($program->standing_suspension_below);
+        $this->assertSame(AcademicStanding::Good, $sp->fresh()->academic_standing);
+        $this->assertSame('school', $service->thresholdsFor($program->fresh())['source']);
+    }
+
+    #[Test]
+    public function program_override_rejects_half_filled_and_inverted_cutoffs(): void
+    {
+        $this->seed(\Database\Seeders\SettingsSeeder::class);
+        $dean = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $program = $this->makeProgram('BAD1', 'Invalid Diploma');
+
+        $this->actingAs($dean)
+            ->postJson(route('admin.programs.standing.update', $program), [
+                'good_min' => 250,
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['good_min', 'suspension_below']);
+
+        $this->actingAs($dean)
+            ->postJson(route('admin.programs.standing.update', $program), [
+                'good_min' => 150,
+                'suspension_below' => 200,
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('suspension_below');
+
+        $this->assertNull($program->fresh()->standing_good_min);
+        $this->assertNull($program->fresh()->standing_suspension_below);
+    }
+
+    #[Test]
+    public function school_wide_thresholds_page_lists_program_override_entrance(): void
+    {
+        $bundle = $this->lockedCohort();
+        $dean = $bundle['dean'];
+        $program = $bundle['program'];
+
+        app(AcademicStandingService::class)->updateProgramOverrides($dean, $program, 250, 150);
+
+        $this->actingAs($dean)
+            ->get(route('admin.reports.standing.thresholds'))
+            ->assertOk()
+            ->assertSee(__('reports.program_overrides_title'))
+            ->assertSee('DIP1')
+            ->assertSee(__('reports.program_thresholds_source_program'))
+            ->assertSee(__('reports.edit_program_thresholds'));
+    }
+
+    private function makeProgram(string $code, string $name): Program
+    {
+        return Program::query()->create([
+            'code' => $code,
+            'name' => $name,
+            'type' => ProgramType::Diploma,
+            'max_credits_per_semester' => 18,
+            'max_courses_per_semester' => 6,
+            'max_semesters_to_graduate' => 8,
+            'active' => true,
+        ]);
+    }
 }
