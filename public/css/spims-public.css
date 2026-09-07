@@ -575,6 +575,15 @@ html[dir='rtl'] .spims-auth-brand-quote {
     margin-top: 1.5rem;
 }
 
+.auth-card .auth-footer-links a {
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+.auth-card .auth-footer-links a:hover {
+    color: var(--color-primary-hover);
+}
+
 .auth-otp-input {
     letter-spacing: 0.45em;
     font-size: 1.35rem;
