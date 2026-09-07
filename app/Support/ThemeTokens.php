@@ -182,4 +182,58 @@ final class ThemeTokens
 
         return implode("\n", $lines);
     }
+
+    /**
+     * WCAG 2 relative luminance for a 6-digit hex color.
+     */
+    public static function relativeLuminance(string $hex): float
+    {
+        $hex = ltrim($hex, '#');
+        if (strlen($hex) !== 6 || ! ctype_xdigit($hex)) {
+            throw new \InvalidArgumentException('Hex color required.');
+        }
+
+        $channel = static function (float $c): float {
+            return $c <= 0.04045 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
+        };
+
+        return 0.2126 * $channel(hexdec(substr($hex, 0, 2)) / 255)
+            + 0.7152 * $channel(hexdec(substr($hex, 2, 2)) / 255)
+            + 0.0722 * $channel(hexdec(substr($hex, 4, 2)) / 255);
+    }
+
+    /**
+     * WCAG 2 contrast ratio between two 6-digit hex colors.
+     */
+    public static function contrastRatio(string $foreground, string $background): float
+    {
+        $l1 = self::relativeLuminance($foreground);
+        $l2 = self::relativeLuminance($background);
+        $lighter = max($l1, $l2);
+        $darker = min($l1, $l2);
+
+        return ($lighter + 0.05) / ($darker + 0.05);
+    }
+
+    /**
+     * Locked Sacred Academic pairs that must meet WCAG AA (4.5:1 text, 3:1 large/accent).
+     *
+     * @return list<array{0: string, 1: string, 2: float, 3: string}>
+     */
+    public static function aaPairs(): array
+    {
+        $light = self::defaults()['light'];
+        $dark = self::defaults()['dark'];
+
+        return [
+            [$light['text'], $light['bg1'], 4.5, 'light text on field'],
+            [$light['title'], $light['bg1'], 4.5, 'light title on field'],
+            [$light['textMuted'], $light['bg1'], 4.5, 'light muted on field'],
+            [$light['primaryText'], $light['primary'], 4.5, 'light button label'],
+            ['#f8f9ff', '#380014', 4.5, 'field on deep burgundy'],
+            [$dark['text'], $dark['bg1'], 4.5, 'dark text on field'],
+            [$dark['title'], $dark['bg1'], 4.5, 'dark title on field'],
+            [$light['accent'], '#380014', 3.0, 'gold accent on burgundy (large)'],
+        ];
+    }
 }

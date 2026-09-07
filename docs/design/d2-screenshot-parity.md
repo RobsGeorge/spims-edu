@@ -10,7 +10,7 @@
 - Split auth (burgundy brand panel + gold rule + existing `auth-card`)
 - Catalog featured banner, card media headers, and real loading skeletons
 - `spims-public.css` actually linked from `layouts/app.blade.php` on `home`, `auth.*`, and `catalog.*`
-- Local SVG atmosphere (no hotlinked photography)
+- Local liturgical photography (`landing-hero.jpg`, featured stills) at low opacity under a cool-field wash; SVG remains as a fallback asset
 - Contrast AA assertions on Sacred Academic token pairs
 - Light / dark / RTL structure hooks in `DesignReferenceParityTest`
 
