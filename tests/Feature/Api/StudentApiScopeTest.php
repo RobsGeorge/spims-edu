@@ -62,6 +62,7 @@ class StudentApiScopeTest extends TestCase
             'week complete' => ['POST', '/api/v1/offerings/{offering}/weeks/{week}/complete', 403],
             'offering grades' => ['GET', '/api/v1/offerings/{offering}/grades', 404],
             'degree audit' => ['GET', '/api/v1/degree-audit/{studentProgram}', 404],
+            'degree audit what-if' => ['POST', '/api/v1/degree-audit/{studentProgram}/what-if', 404],
             'assignments list' => ['GET', '/api/v1/offerings/{offering}/assignments', 404],
             'assignment show' => ['GET', '/api/v1/assignments/{assignment}', 404],
             'assignment submit' => ['POST', '/api/v1/assignments/{assignment}/submit', 403],

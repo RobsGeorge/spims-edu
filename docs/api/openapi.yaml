@@ -1434,6 +1434,37 @@ paths:
           description: OK
         '404':
           description: Another student's program
+  /degree-audit/{studentProgram}/what-if:
+    post:
+      operationId: degreeAuditWhatIf
+      summary: Hypothetical degree-audit. Compute only; nothing is saved.
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: studentProgram
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hypothetical_course_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Catalog course ULIDs treated as fulfilled. Empty returns baseline numbers with what_if true.
+      responses:
+        '200':
+          description: Same shape as GET degree-audit, with what_if true
+        '404':
+          description: Another student's program
+        '422':
+          description: Unknown course id
   /offerings/{offering}/assignments:
     get:
       operationId: listOfferingAssignments

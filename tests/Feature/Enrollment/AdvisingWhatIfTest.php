@@ -300,6 +300,44 @@ class AdvisingWhatIfTest extends TestCase
     }
 
     #[Test]
+    public function student_what_if_audit_page_drops_elective_from_remaining_without_writes(): void
+    {
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $bundle = $this->diplomaWithElective($student);
+
+        $records = AcademicRecord::query()->count();
+        $fulfillments = ProgramRequirementFulfillment::query()->count();
+
+        $this->actingAs($student)
+            ->get(route('enrollments.audit', $bundle['sp']).'?'.http_build_query([
+                'hypothetical_course_ids' => [$bundle['elective']->id],
+            ]))
+            ->assertOk()
+            ->assertSee(__('advising.what_if_active'), false)
+            ->assertDontSee('data-audit-remaining-code="ET101"', false)
+            ->assertSee('data-what-if-course="ET101"', false)
+            ->assertSee('data-audit-met-code="ET101"', false);
+
+        $this->assertSame($records, AcademicRecord::query()->count());
+        $this->assertSame($fulfillments, ProgramRequirementFulfillment::query()->count());
+    }
+
+    #[Test]
+    public function student_enrollments_index_shows_degree_audit_what_if_entrance(): void
+    {
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $bundle = $this->diplomaWithElective($student);
+
+        $this->actingAs($student)
+            ->get(route('enrollments.index'))
+            ->assertOk()
+            ->assertSee(__('enrollment.degree_audit'), false)
+            ->assertSee(__('advising.what_if_hint'), false)
+            ->assertSee($bundle['program']->code, false)
+            ->assertSee(route('enrollments.audit', $bundle['sp']), false);
+    }
+
+    #[Test]
     public function student_cannot_open_advising_show_for_notes(): void
     {
         $student = User::factory()->withRole(RoleType::Student)->create();

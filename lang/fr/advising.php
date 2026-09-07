@@ -34,5 +34,6 @@ return [
     'run_what_if' => 'Lancer l’hypothèse',
     'reset_what_if' => 'Réinitialiser',
     'what_if_active' => 'Scénario hypothétique',
+    'what_if_hint' => 'Inclut un planificateur hypothétique. Rien n’est enregistré.',
     'elective_remaining' => 'Crédits optionnels restants',
 ];

@@ -133,6 +133,7 @@ Route::prefix('v1')->name('api.v1.')->middleware(SetApiLocale::class)->group(fun
         Route::post('/items/{item}/complete', [ContentItemController::class, 'complete'])->name('items.complete');
         Route::get('/transcript', [TranscriptController::class, 'show'])->name('transcript');
         Route::get('/degree-audit/{studentProgram}', [DegreeAuditController::class, 'show'])->name('degree-audit.show');
+        Route::post('/degree-audit/{studentProgram}/what-if', [DegreeAuditController::class, 'whatIf'])->name('degree-audit.what-if');
 
         // --- S6 Wave C ---
         Route::get('/offerings/{offering}/assignments', [AssignmentController::class, 'index'])->name('offerings.assignments');

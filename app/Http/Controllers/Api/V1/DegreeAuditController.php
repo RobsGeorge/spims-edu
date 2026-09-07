@@ -23,4 +23,30 @@ class DegreeAuditController extends Controller
             'data' => $audit->audit($request->user(), $studentProgram),
         ]);
     }
+
+    /**
+     * Compute-only what-if. Does not persist academic_records or fulfillments.
+     */
+    public function whatIf(
+        Request $request,
+        StudentProgram $studentProgram,
+        DegreeAuditService $audit,
+        StudentRecordGuard $guard,
+    ): JsonResponse {
+        $guard->ownRead($request->user(), $studentProgram->student_id);
+
+        $data = $request->validate([
+            'hypothetical_course_ids' => ['array'],
+            'hypothetical_course_ids.*' => ['exists:courses,id'],
+        ]);
+
+        $courseIds = array_values(array_map(
+            static fn ($id) => (string) $id,
+            $data['hypothetical_course_ids'] ?? [],
+        ));
+
+        return response()->json([
+            'data' => $audit->whatIf($studentProgram, $courseIds),
+        ]);
+    }
 }
