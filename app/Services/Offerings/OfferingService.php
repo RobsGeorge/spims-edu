@@ -313,6 +313,95 @@ class OfferingService
     }
 
     /**
+     * @param  list<string>  $orderedIds
+     */
+    public function reorderContentItems(User $actor, Week $week, array $orderedIds): void
+    {
+        $this->authorize->authorize($actor, 'offerings.content', $week);
+
+        $ids = array_values(array_filter($orderedIds, fn ($id) => is_string($id) && $id !== ''));
+        $existing = $week->items()->orderBy('order')->pluck('id')->all();
+        sort($ids);
+        $expected = $existing;
+        sort($expected);
+        if ($ids !== $expected) {
+            throw ValidationException::withMessages([
+                'items' => [__('offerings.reorder_invalid')],
+            ]);
+        }
+
+        $this->audit->withAudit($actor, 'offerings.reorder_content', function () use ($week, $orderedIds) {
+            foreach (array_values($orderedIds) as $index => $id) {
+                ContentItem::query()->whereKey($id)->where('week_id', $week->id)->update(['order' => $index + 1]);
+            }
+
+            return $week->fresh();
+        }, 'Week');
+    }
+
+    public function moveContentItem(User $actor, ContentItem $item, Week $target): ContentItem
+    {
+        $item->loadMissing('week.offering');
+        $target->loadMissing('offering');
+        $this->authorize->authorize($actor, 'offerings.content', $item);
+
+        if ($item->week?->offering_id !== $target->offering_id) {
+            throw ValidationException::withMessages([
+                'week_id' => [__('offerings.move_week_invalid')],
+            ]);
+        }
+
+        if ($item->week_id === $target->id) {
+            return $item;
+        }
+
+        $fromWeekId = $item->week_id;
+
+        return $this->audit->withAudit($actor, 'offerings.move_content', function () use ($item, $target, $fromWeekId) {
+            $item->week_id = $target->id;
+            $item->order = ((int) $target->items()->max('order')) + 1;
+            $item->save();
+            $this->compactWeekOrder($target->id);
+            $this->compactWeekOrder($fromWeekId);
+
+            return $item->fresh();
+        }, 'ContentItem');
+    }
+
+    public function moveContentItemByDelta(User $actor, ContentItem $item, int $delta): void
+    {
+        $item->loadMissing('week');
+        $week = $item->week;
+        abort_unless($week !== null, 404);
+
+        $ids = $week->items()->orderBy('order')->pluck('id')->values()->all();
+        $index = array_search($item->id, $ids, true);
+        if ($index === false) {
+            return;
+        }
+        $swap = $index + $delta;
+        if ($swap < 0 || $swap >= count($ids)) {
+            return;
+        }
+        $tmp = $ids[$index];
+        $ids[$index] = $ids[$swap];
+        $ids[$swap] = $tmp;
+        $this->reorderContentItems($actor, $week, $ids);
+    }
+
+    private function compactWeekOrder(?string $weekId): void
+    {
+        if ($weekId === null || $weekId === '') {
+            return;
+        }
+
+        $ids = ContentItem::query()->where('week_id', $weekId)->orderBy('order')->pluck('id')->all();
+        foreach ($ids as $index => $id) {
+            ContentItem::query()->whereKey($id)->update(['order' => $index + 1]);
+        }
+    }
+
+    /**
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */

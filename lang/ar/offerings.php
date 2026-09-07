@@ -75,4 +75,11 @@ return [
     'upload_type_blocked' => 'ارفع ملف PDF أو صورة فقط (JPG وPNG وWebP وGIF).',
     'upload_too_large' => 'هذا الملف أكبر من :mb ميغابايت.',
     'download_disabled' => 'التنزيل غير مسموح للطلاب.',
+    'move_up' => 'أعلى',
+    'move_down' => 'أسفل',
+    'move_to_week' => 'نقل',
+    'content_reordered' => 'تم تحديث ترتيب العنصر.',
+    'content_moved' => 'تم نقل العنصر إلى أسبوع آخر.',
+    'reorder_invalid' => 'هذه العناصر لا تنتمي كلها إلى هذا الأسبوع.',
+    'move_week_invalid' => 'يمكن نقل العنصر فقط إلى أسبوع في نفس العرض.',
 ];

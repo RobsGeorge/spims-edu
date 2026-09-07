@@ -66,6 +66,25 @@
                         @endif
                     </div>
                     <div class="d-flex flex-wrap gap-1">
+                        <form method="POST" action="{{ route('admin.content-items.move-up', $item) }}">
+                            @csrf
+                            <button class="btn btn-sm btn-outline-secondary">{{ __('offerings.move_up') }}</button>
+                        </form>
+                        <form method="POST" action="{{ route('admin.content-items.move-down', $item) }}">
+                            @csrf
+                            <button class="btn btn-sm btn-outline-secondary">{{ __('offerings.move_down') }}</button>
+                        </form>
+                        @if($offering->weeks->count() > 1)
+                            <form method="POST" action="{{ route('admin.content-items.move', $item) }}" class="d-flex gap-1">
+                                @csrf
+                                <select name="week_id" class="form-select form-select-sm" aria-label="{{ __('offerings.move_to_week') }}">
+                                    @foreach($offering->weeks->sortBy('number') as $targetWeek)
+                                        <option value="{{ $targetWeek->id }}" @selected($targetWeek->id === $week->id)>{{ __('teach.week_n', ['n' => $targetWeek->number]) }}</option>
+                                    @endforeach
+                                </select>
+                                <button class="btn btn-sm btn-outline-secondary">{{ __('offerings.move_to_week') }}</button>
+                            </form>
+                        @endif
                         @if($item->isPublished())
                             <form method="POST" action="{{ route('admin.content-items.unpublish', $item) }}">
                                 @csrf

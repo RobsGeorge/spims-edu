@@ -75,4 +75,11 @@ return [
     'upload_type_blocked' => 'Téléversez uniquement un PDF ou une image (JPG, PNG, WebP, GIF).',
     'upload_too_large' => 'Ce fichier dépasse :mb Mo.',
     'download_disabled' => 'Les téléchargements sont désactivés pour les étudiants.',
+    'move_up' => 'Monter',
+    'move_down' => 'Descendre',
+    'move_to_week' => 'Déplacer',
+    'content_reordered' => 'Ordre des éléments mis à jour.',
+    'content_moved' => 'Élément déplacé vers une autre semaine.',
+    'reorder_invalid' => 'Ces éléments n’appartiennent pas tous à cette semaine.',
+    'move_week_invalid' => 'Vous ne pouvez déplacer un élément que vers une autre semaine de la même offre.',
 ];

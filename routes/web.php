@@ -687,6 +687,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/content-items/{item}/unpublish', [ContentItemController::class, 'unpublish'])
             ->middleware('permission:offerings.content')
             ->name('content-items.unpublish');
+        Route::post('/content-items/{item}/move-up', [ContentItemController::class, 'moveUp'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.move-up');
+        Route::post('/content-items/{item}/move-down', [ContentItemController::class, 'moveDown'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.move-down');
+        Route::post('/content-items/{item}/move', [ContentItemController::class, 'move'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.move');
 
         Route::get('/application-forms', [ApplicationFormController::class, 'index'])
             ->middleware('permission:admissions.forms')
