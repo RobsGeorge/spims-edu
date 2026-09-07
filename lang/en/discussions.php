@@ -15,4 +15,7 @@ return [
     'pinned' => 'Pinned',
     'no_threads' => 'No discussion threads yet',
     'no_threads_help' => 'Open the board to start a thread, then return here to score students.',
+    'thread_title' => 'Thread title',
+    'opening_post' => 'Opening post',
+    'new_thread' => 'New thread',
 ];

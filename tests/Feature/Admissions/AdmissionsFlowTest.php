@@ -160,4 +160,107 @@ class AdmissionsFlowTest extends TestCase
 
         $this->assertSame('THEO Apply', $form->fresh()->name);
     }
+
+    #[Test]
+    public function rejected_applicant_can_apply_again_next_cycle(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create([
+            'is_reviewer' => true,
+        ]);
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $form = $this->seedProgramAndForm($adm);
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $first = Application::query()->first();
+        $fieldId = $form->fields()->where('label', 'Motivation')->value('id');
+
+        $this->actingAs($student)->post(route('applications.store', $first), [
+            'answers' => [$fieldId => 'First cycle'],
+            'submit' => '1',
+        ])->assertRedirect(route('applications.index'));
+
+        $this->assertSame(ApplicationStatus::UnderReview, $first->fresh()->status);
+        $this->assertSame(1, Application::query()->where('applicant_id', $student->id)->count());
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $this->assertSame(1, Application::query()->where('applicant_id', $student->id)->count());
+
+        $this->actingAs($adm)->post(route('admin.applications.decide', $first), [
+            'decision' => ApplicationStatus::Rejected->value,
+            'decision_note' => 'Not this cycle',
+        ])->assertRedirect();
+
+        $this->assertSame(ApplicationStatus::Rejected, $first->fresh()->status);
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $second = Application::query()
+            ->where('applicant_id', $student->id)
+            ->where('id', '!=', $first->id)
+            ->first();
+
+        $this->assertNotNull($second);
+        $this->assertSame(ApplicationStatus::Draft, $second->status);
+        $this->assertSame($form->program_id, $second->program_id);
+        $this->assertSame(ApplicationStatus::Rejected, $first->fresh()->status);
+
+        $this->actingAs($student)
+            ->get(route('applications.index'))
+            ->assertOk()
+            ->assertSee('THEO');
+    }
+
+    #[Test]
+    public function save_answers_after_under_review_returns_422(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create([
+            'is_reviewer' => true,
+        ]);
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $form = $this->seedProgramAndForm($adm);
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $application = Application::query()->first();
+        $fieldId = $form->fields()->where('label', 'Motivation')->value('id');
+
+        $this->actingAs($student)->post(route('applications.store', $application), [
+            'answers' => [$fieldId => 'Ready'],
+            'submit' => '1',
+        ])->assertRedirect();
+
+        $this->assertSame(ApplicationStatus::UnderReview, $application->fresh()->status);
+
+        $this->actingAs($student)->postJson(route('applications.store', $application), [
+            'answers' => [$fieldId => 'Changed after review'],
+        ])->assertStatus(422);
+    }
+
+    #[Test]
+    public function reviewer_without_permission_key_is_forbidden(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create([
+            'is_reviewer' => true,
+        ]);
+        $flagged = User::factory()->withRole(RoleType::Instructor)->create([
+            'is_reviewer' => true,
+        ]);
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $form = $this->seedProgramAndForm($adm);
+
+        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $application = Application::query()->first();
+        $fieldId = $form->fields()->where('label', 'Motivation')->value('id');
+
+        $this->actingAs($student)->post(route('applications.store', $application), [
+            'answers' => [$fieldId => 'Please review'],
+            'submit' => '1',
+        ])->assertRedirect();
+
+        $this->actingAs($flagged)->get(route('admin.applications.index'))->assertForbidden();
+        $this->actingAs($flagged)->get(route('admin.applications.show', $application))->assertForbidden();
+        $this->actingAs($flagged)->post(route('admin.applications.decide', $application), [
+            'decision' => ApplicationStatus::Accepted->value,
+        ])->assertForbidden();
+
+        $this->assertSame(ApplicationStatus::UnderReview, $application->fresh()->status);
+    }
 }

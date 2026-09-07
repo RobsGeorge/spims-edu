@@ -20,6 +20,12 @@
                     <label class="me-3"><input type="checkbox" name="roles[]" value="{{ $role->value }}"> {{ $role->value }}</label>
                 @endforeach
             </div>
+            <div class="col-12">
+                <label class="form-check">
+                    <input type="checkbox" name="is_reviewer" value="1" class="form-check-input">
+                    <span class="form-check-label">{{ __('ui.is_reviewer') }}</span>
+                </label>
+            </div>
             <div class="col-12"><button class="btn btn-primary">{{ __('ui.create_user') }}</button></div>
         </form>
     </div>

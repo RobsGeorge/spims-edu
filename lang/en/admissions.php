@@ -31,4 +31,5 @@ return [
     'document' => 'Document',
     'current_document' => 'Current document',
     'upload_failed' => 'Document upload failed.',
+    'no_applications' => 'You have not started any applications yet.',
 ];

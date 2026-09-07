@@ -541,6 +541,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/users/{user}/suspend', [UserController::class, 'suspend'])
             ->middleware('permission:users.manage')
             ->name('users.suspend');
+        // #12 admissions/users/discussions
+        Route::match(['put', 'patch'], '/users/{user}', [UserController::class, 'update'])
+            ->middleware('permission:users.manage')
+            ->name('users.update');
+        Route::post('/users/{user}/roles', [UserController::class, 'assignRole'])
+            ->middleware('permission:roles.assign')
+            ->name('users.roles.assign');
+        Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole'])
+            ->middleware('permission:roles.assign')
+            ->name('users.roles.remove');
 
         Route::get('/theme', [ThemeEditorController::class, 'edit'])
             ->middleware('permission:theme.manage')

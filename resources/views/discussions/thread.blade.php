@@ -11,7 +11,7 @@
     </div>
 @endif
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
-@foreach($thread->posts as $post)
+@foreach($posts as $post)
     <div class="card border-0 shadow-sm mb-2">
         <div class="card-body">
             <div class="small text-muted">{{ $post->author->email }} · {{ $post->created_at }}</div>
@@ -19,6 +19,7 @@
         </div>
     </div>
 @endforeach
+{{ $posts->links() }}
 <form method="POST" action="{{ route('discussions.posts.store', $thread) }}">@csrf
     <textarea name="body" class="form-control mb-2" rows="3" required></textarea>
     <button class="btn btn-primary">{{ __('live.posted') }}</button>

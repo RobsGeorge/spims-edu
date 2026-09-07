@@ -31,4 +31,5 @@ return [
     'document' => 'مستند',
     'current_document' => 'المستند الحالي',
     'upload_failed' => 'فشل رفع المستند.',
+    'no_applications' => 'لم تبدأ أي طلبات بعد.',
 ];

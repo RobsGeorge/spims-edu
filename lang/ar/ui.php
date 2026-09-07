@@ -91,4 +91,9 @@ return [
     'go_home' => 'الصفحة الرئيسية',
     'save_changes' => 'حفظ التغييرات',
     'edit' => 'تعديل',
+    'edit_user' => 'تعديل المستخدم',
+    'is_reviewer' => 'مراجع القبول',
+    'country_code' => 'رمز الدولة',
+    'assign_role' => 'تعيين دور',
+    'remove_role' => 'إزالة الدور',
 ];

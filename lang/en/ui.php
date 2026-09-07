@@ -91,4 +91,9 @@ return [
     'go_home' => 'Go home',
     'save_changes' => 'Save changes',
     'edit' => 'Edit',
+    'edit_user' => 'Edit user',
+    'is_reviewer' => 'Admissions reviewer',
+    'country_code' => 'Country code',
+    'assign_role' => 'Assign role',
+    'remove_role' => 'Remove role',
 ];

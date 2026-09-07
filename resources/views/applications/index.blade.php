@@ -15,9 +15,16 @@
         </ul>
     </div>
 </div>
-<ul>
-@foreach($applications as $application)
-    <li>{{ $application->program->code }} — {{ $application->status->value }}</li>
-@endforeach
-</ul>
+@if($applications->isEmpty())
+    <p class="text-muted-theme">{{ __('admissions.no_applications') }}</p>
+@else
+    <div class="card border-0 shadow-sm">
+        <ul class="list-group list-group-flush">
+        @foreach($applications as $application)
+            <li class="list-group-item">{{ $application->program->code }} — {{ $application->status->value }}</li>
+        @endforeach
+        </ul>
+    </div>
+    {{ $applications->links() }}
+@endif
 @endsection

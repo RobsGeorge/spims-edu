@@ -6,15 +6,17 @@ use App\Enums\ApplicationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Services\Admissions\ApplicationService;
+use App\Support\AuthorizeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ApplicationReviewController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, AuthorizeService $authorize): View
     {
-        $user = $request->user();
+        $authorize->authorize($request->user(), 'admissions.review');
+
         $queueStatuses = [
             ApplicationStatus::Submitted,
             ApplicationStatus::UnderReview,
@@ -37,10 +39,6 @@ class ApplicationReviewController extends Controller
             $query->whereIn('status', $queueStatuses);
         }
 
-        if (! $user->isSuperAdmin() && ! $user->hasRole(\App\Enums\RoleType::AdministrativeAdmin)) {
-            $query->where('reviewer_id', $user->id);
-        }
-
         return view('admin.applications.index', [
             'applications' => $query->paginate(20),
             'statusOptions' => ApplicationStatus::cases(),
@@ -48,8 +46,10 @@ class ApplicationReviewController extends Controller
         ]);
     }
 
-    public function show(Application $application): View
+    public function show(Request $request, Application $application, AuthorizeService $authorize): View
     {
+        $authorize->authorize($request->user(), 'admissions.review');
+
         $application->load(['applicant', 'program', 'form.fields', 'values.field', 'reviewer']);
 
         return view('admin.applications.show', compact('application'));
