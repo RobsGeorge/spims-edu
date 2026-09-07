@@ -15,7 +15,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('ui.close') }}"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-0 text-muted-theme">{{ $message }}</p>
+                <p class="mb-0 spims-text-dim">{{ $message }}</p>
                 {{ $slot }}
             </div>
             <div class="modal-footer border-0">

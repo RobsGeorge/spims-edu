@@ -106,4 +106,9 @@ return [
     'country_code' => 'رمز الدولة',
     'assign_role' => 'تعيين دور',
     'remove_role' => 'إزالة الدور',
+    'no_results' => 'لا توجد نتائج',
+    'file_drop_hint' => 'اسحب ملفاً وأفلته هنا، أو انقر للاستعراض',
+    'file_drop_size_error' => 'الملف يتجاوز الحجم الأقصى: :max',
+    'file_drop_type_error' => 'نوع الملف غير مقبول. المسموح به: :accept',
+    'file_drop_browse' => 'استعراض الملفات',
 ];
