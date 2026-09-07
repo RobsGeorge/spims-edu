@@ -39,3 +39,19 @@ Out-of-phase ideas: PARKING-LOT.md.
 - `public/css/spims-theme.css` — liturgical theme (light + dark)
 - `tests/Feature/` — categorized test suites
 - `docs/academic-roadmap/` — S0–S9 roadmap: gap analysis, implementation plan, execution order, `/api/v1` contract
+
+## Working this repo with agents
+- Every UI change follows `prompts/GLOBAL-CONTRACT.md`. Read `docs/design-system.md` before any markup.
+- Never edit `layouts/`, `partials/`, or `components/` unless your step's scope says you own them.
+- Append routes at the anchor comment for your track in `routes/web.php`. Never reorder the file.
+- Add new lang keys to your step's own lang file where possible. Only APPEND to shared ones.
+  Every key goes into ALL THREE locales (ar, en, fr) — `LocaleParityTest` enforces this.
+- A step is not done until `./scripts/validate-step.sh <step-id>` exits 0.
+  Write your step ID to `.claude/current-step` first.
+- Design system reference: `docs/design-system.md` (created in Phase A).
+- Banned patterns are blocked at write time by the `guard-design.sh` hook — if a write is denied,
+  consult the migration table in `docs/design-system.md`.
+
+## Parity rule
+No new student or instructor API endpoint merges without shipping or explicitly deferring
+its web equivalent in `docs/api-web-parity-matrix.md`.

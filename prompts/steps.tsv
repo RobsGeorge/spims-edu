@@ -1,0 +1,42 @@
+# step	test-filter	scope-glob
+# W0
+0	PublicSurfacesSmokeTest	tests/Feature/Smoke
+6	ProgramRuleEnforcementTest|EnrollmentEngine	app/Services/Enrollment,tests/Feature/Enrollment
+# W1 — A1 substeps
+A1.1	DesignTokenTest	public/css/spims-theme.css
+A1.2	SurfaceTierTest	resources/views/components
+A1.3	CorrectnessPrimitiveTest	resources/views/components
+A1.4	ComponentLibraryTest	resources/views/components
+A1.5	DataTableTest	resources/views/components
+A1.6	DesignDocsTest	docs/design-system.md,routes/web.php
+# W1.5
+A3	DesignSystemAdoptionTest|ResponsiveContractTest|LocaleParityTest	tests/Feature/Design
+# W2 — migration lanes
+A2-a	Portal|Smoke	resources/views/layouts,resources/views/partials,resources/views/hubs,resources/views/roles-hub
+A2-b	Auth|Portal	resources/views/auth,resources/views/errors,resources/views/catalog,resources/views/announcements,resources/views/notifications,resources/views/settings
+A2-c	Portal|Smoke	resources/views/learn,resources/views/courses,resources/views/assessments,resources/views/assignments,resources/views/completion,resources/views/discussions,resources/views/attendance,resources/views/live
+A2-d	StaffUi|Portal	resources/views/teach,resources/views/offerings
+A2-e	Finance|Credentials|Enrollment|Portal	resources/views/finance,resources/views/credentials,resources/views/enrollments,resources/views/grades,resources/views/advising,resources/views/applications
+A2-f	Offerings|Assessment|Attendance	resources/views/admin/offerings,resources/views/admin/gradebook,resources/views/admin/assessments,resources/views/admin/assessment-templates,resources/views/admin/attendance,resources/views/admin/completion-criteria,resources/views/admin/offering-closing
+A2-g	Academics|Admin	resources/views/admin/programs,resources/views/admin/courses,resources/views/admin/semesters,resources/views/admin/academic-years,resources/views/admin/grading-schemes,resources/views/admin/users,resources/views/admin/translations,resources/views/admin/theme
+A2-h	Admissions|Communications|Events	resources/views/admin/applications,resources/views/admin/application-forms,resources/views/admin/enrollments,resources/views/admin/communications,resources/views/admin/credentials,resources/views/admin/certificate-templates,resources/views/admin/events,resources/views/staff
+A2-i	Admin|SuperAdmin	resources/views/admin/reports,resources/views/admin/finance,resources/views/admin/live,resources/views/superadmin
+# W3
+1	Portal|Smoke	resources/views/programs,routes/web.php,database/migrations
+5	Offerings|Academics	resources/views/admin/semesters,app/Services
+9	Events	resources/views/events,app/Http/Controllers
+10	Feedback	resources/views/surveys,app/Http/Controllers
+12	Projects	resources/views/projects,app/Http/Controllers
+13	Assessment|StaffUi	resources/views/teach,app/Http/Controllers/Teach,app/Services
+14	StaffUi|Offerings	resources/views/admin/gradebook,resources/views/teach,app/Http/Controllers
+# W4
+2	Portal|Smoke	resources/views/home.blade.php,resources/views/catalog
+3	Portal|Smoke	resources/views/catalog
+7	Academics|Admin	resources/views/admin/programs,app/Http/Controllers/Admin
+8A	Database	database/seeders
+11	LiveQuiz	resources/views/live-quiz,app/Http/Controllers
+# W5
+4	Portal|Smoke	resources/views/courses,app/Http/Controllers
+8B	Portal|Smoke	routes/web.php,app/Http/Controllers
+# W6
+15	RawEnumAndMinorUnitsGuardTest|Portal	tests/Feature,docs
