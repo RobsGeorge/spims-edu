@@ -211,6 +211,13 @@
                 </a>
             </div>
             <div class="col-md-6 col-lg-4">
+                <a href="{{ route('superadmin.ops') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
+                    <h3><i class="bi bi-hdd-network" aria-hidden="true"></i> {{ __('ops.dashboard_tile') }}</h3>
+                    <p class="text-muted-theme mb-0">{{ __('ops.dashboard_tile_desc') }}</p>
+                    <p class="sa-tile-hint small mb-0 mt-2">{{ __('ops.dashboard_tile_hint') }}</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-4">
                 <a href="{{ route('superadmin.audit.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                     <h3><i class="bi bi-journal-text" aria-hidden="true"></i> {{ __('audit.dashboard_tile') }}</h3>
                     <p class="text-muted-theme mb-0">{{ __('audit.dashboard_tile_desc') }}</p>

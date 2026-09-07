@@ -1358,7 +1358,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 .features-entrance-banner,
 .config-entrance-banner,
 .theme-entrance-banner,
-.reports-entrance-banner {
+.reports-entrance-banner,
+.ops-entrance-banner {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1385,10 +1386,16 @@ html[dir='rtl'] .sa-impersonation-stop {
     background: color-mix(in srgb, var(--color-success, var(--color-primary)) 8%, var(--color-surface));
 }
 
+.ops-entrance-banner {
+    border-color: color-mix(in srgb, var(--color-danger) 34%, var(--color-surface-border));
+    background: color-mix(in srgb, var(--color-danger) 8%, var(--color-surface));
+}
+
 .features-entrance-icon,
 .config-entrance-icon,
 .theme-entrance-icon,
-.reports-entrance-icon {
+.reports-entrance-icon,
+.ops-entrance-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1414,10 +1421,16 @@ html[dir='rtl'] .sa-impersonation-stop {
     color: var(--color-title);
 }
 
+.ops-entrance-icon {
+    background: color-mix(in srgb, var(--color-danger) 16%, var(--color-surface));
+    color: var(--color-danger);
+}
+
 .features-entrance-title,
 .config-entrance-title,
 .theme-entrance-title,
-.reports-entrance-title {
+.reports-entrance-title,
+.ops-entrance-title {
     display: block;
     font-weight: 700;
     color: var(--color-title);
@@ -1426,7 +1439,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 .features-entrance-body,
 .config-entrance-body,
 .theme-entrance-body,
-.reports-entrance-body {
+.reports-entrance-body,
+.ops-entrance-body {
     display: block;
     font-size: 0.85rem;
     color: var(--color-text-muted);
@@ -1435,7 +1449,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 .features-entrance-cta,
 .config-entrance-cta,
 .theme-entrance-cta,
-.reports-entrance-cta {
+.reports-entrance-cta,
+.ops-entrance-cta {
     margin-inline-start: auto;
     font-weight: 600;
     color: var(--color-primary);
@@ -1629,7 +1644,8 @@ html[dir='rtl'] .sa-impersonation-stop {
     margin-inline-start: 0.4rem;
 }
 
-.reports-entrance-kicker {
+.reports-entrance-kicker,
+.ops-entrance-kicker {
     display: block;
     font-size: 0.72rem;
     font-weight: 700;

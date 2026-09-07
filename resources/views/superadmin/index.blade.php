@@ -53,7 +53,7 @@
             <li class="is-done"><span class="sa-phase">SA3</span> {{ __('superadmin.roadmap_sa3_done') }}</li>
             <li class="is-done"><span class="sa-phase">SA4</span> {{ __('superadmin.roadmap_sa4_done') }}</li>
             <li class="is-done"><span class="sa-phase">SA5</span> {{ __('superadmin.roadmap_sa5_done') }}</li>
-            <li><span class="sa-phase">SA6</span> {{ __('superadmin.roadmap_sa6') }}</li>
+            <li class="is-done"><span class="sa-phase">SA6</span> {{ __('superadmin.roadmap_sa6_done') }}</li>
         </ul>
     </aside>
 </div>

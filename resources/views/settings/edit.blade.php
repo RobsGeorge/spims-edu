@@ -10,6 +10,7 @@
         @include('partials.config-entrance-banner', ['caption' => __('system_settings.entrance_from_settings')])
         @include('partials.theme-entrance-banner', ['caption' => __('theme_studio.entrance_from_settings')])
         @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_settings')])
+        @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_settings')])
         @include('partials.people-entrance-banner')
 
         <form method="POST" action="{{ route('settings.picture') }}" enctype="multipart/form-data" class="app-card p-4 mb-4">

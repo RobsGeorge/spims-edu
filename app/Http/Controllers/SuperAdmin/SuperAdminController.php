@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\User;
+use App\Services\SuperAdmin\OpsDeskService;
 use App\Support\AuditLogWriter;
 use App\Support\NavigationHub;
 use Illuminate\Http\RedirectResponse;
@@ -104,18 +105,11 @@ class SuperAdminController extends Controller
         ]);
     }
 
-    public function scheduledTasks(): View
+    public function scheduledTasks(OpsDeskService $ops): View
     {
-        $tasks = [
-            ['command' => 'assessments:auto-submit-expired', 'schedule' => __('superadmin.schedule_every_minute')],
-            ['command' => 'live:send-reminders', 'schedule' => __('superadmin.schedule_every_five')],
-            ['command' => 'communications:fire-reminders', 'schedule' => __('superadmin.schedule_every_minute')],
-            ['command' => 'finance:dunning-overdue-installments', 'schedule' => __('superadmin.schedule_daily')],
-            ['command' => 'spims:backup-database', 'schedule' => __('superadmin.schedule_daily_0230')],
-            ['command' => 'spims:prune-audit-logs', 'schedule' => __('superadmin.schedule_daily_0315')],
-        ];
-
-        return view('superadmin.scheduled-tasks', compact('tasks'));
+        return view('superadmin.scheduled-tasks', [
+            'tasks' => $ops->scheduledEvents(),
+        ]);
     }
 
     public function systemTests(): View

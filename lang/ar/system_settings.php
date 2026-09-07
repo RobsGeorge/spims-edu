@@ -35,7 +35,7 @@ return [
     'audit.retention_days' => 'احتفاظ التدقيق (أيام)',
     'audit.retention_days_help' => 'الصفوف العادية الأقدم تُحذف يوميًا. بادئات لوحة التحكم تبقى 3×. المستكشف لا يحذف من المتصفح.',
     'backup.retention_days' => 'احتفاظ النسخ (أيام)',
-    'backup.retention_days_help' => 'يتجاوز BACKUP_RETENTION_DAYS. مسار النسخ يبقى في .env.',
+    'backup.retention_days_help' => 'يتجاوز BACKUP_RETENTION_DAYS. «نسخ الآن» على مكتب تشغيل مشرف المنصة. المسار يبقى في .env.',
     'mail.from_name' => 'اسم مرسل البريد',
     'mail.from_name_help' => 'الاسم الظاهر. عنوان المرسل يبقى في .env ولا يُعرض هنا.',
     'locale_ar' => 'العربية',

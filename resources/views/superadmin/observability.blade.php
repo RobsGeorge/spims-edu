@@ -14,7 +14,11 @@
             'help' => __('superadmin.stat_audit_logs_help'),
             'url' => route('superadmin.audit.index'),
         ],
-        'failed_jobs' => ['label' => __('superadmin.stat_failed_jobs'), 'help' => __('superadmin.stat_failed_jobs_help')],
+        'failed_jobs' => [
+            'label' => __('superadmin.stat_failed_jobs'),
+            'help' => __('superadmin.stat_failed_jobs_help'),
+            'url' => route('superadmin.ops'),
+        ],
         'jobs' => ['label' => __('superadmin.stat_jobs'), 'help' => __('superadmin.stat_jobs_help')],
     ];
 @endphp
@@ -30,6 +34,7 @@
     @include('partials.config-entrance-banner')
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_observability')])
     @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_observability')])
+    @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_observability')])
 
     <div class="row g-3 mb-4">
         @foreach($stats as $key => $value)
@@ -66,7 +71,10 @@
         <dt class="col-sm-4">{{ __('superadmin.backup_path') }}</dt>
         <dd class="col-sm-8"><code>{{ $backupPath }}</code></dd>
         <dt class="col-sm-4">{{ __('superadmin.last_backup') }}</dt>
-        <dd class="col-sm-8">{{ $lastBackupAt ?? __('superadmin.last_backup_none') }}</dd>
+        <dd class="col-sm-8">
+            {{ $lastBackupAt ?? __('superadmin.last_backup_none') }}
+            <p class="form-text mb-0">{{ __('superadmin.observability_backup_help') }}</p>
+        </dd>
     </dl>
 
     <div class="mt-4">

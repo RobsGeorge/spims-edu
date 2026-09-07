@@ -48,6 +48,7 @@ return [
             'rbac.',
             'features.',
             'system_settings.',
+            'ops.',
         ],
     ],
 ];

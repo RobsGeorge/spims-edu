@@ -14,6 +14,10 @@
         <span class="text-muted-theme">{{ __('school_reports.reports.'.$report.'.title') }}</span>
     </nav>
 
+    @if($report === 'queue')
+        @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_reports')])
+    @endif
+
     <header class="mb-3">
         <h1 class="page-title mb-2">{{ __('school_reports.reports.'.$report.'.title') }}</h1>
         <p class="text-muted-theme mb-2">{{ __('school_reports.reports.'.$report.'.desc') }}</p>

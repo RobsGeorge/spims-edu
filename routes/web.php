@@ -77,6 +77,7 @@ use App\Http\Controllers\SuperAdmin\AuditExplorerController;
 use App\Http\Controllers\SuperAdmin\FeatureFlagController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
+use App\Http\Controllers\SuperAdmin\OpsDeskController;
 use App\Http\Controllers\SuperAdmin\SchoolReportController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\SystemSettingController;
@@ -391,6 +392,18 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('permission:audit.export')
             ->name('audit.export');
         Route::get('/audit/{auditLog}', [AuditExplorerController::class, 'show'])->name('audit.show');
+        Route::get('/ops', [OpsDeskController::class, 'index'])
+            ->middleware('permission:ops.failed_jobs')
+            ->name('ops');
+        Route::post('/ops/jobs/{uuid}/retry', [OpsDeskController::class, 'retry'])
+            ->middleware('permission:ops.failed_jobs')
+            ->name('ops.jobs.retry');
+        Route::post('/ops/jobs/{uuid}', [OpsDeskController::class, 'destroy'])
+            ->middleware('permission:ops.failed_jobs')
+            ->name('ops.jobs.delete');
+        Route::post('/ops/backup', [OpsDeskController::class, 'backup'])
+            ->middleware('permission:ops.backup')
+            ->name('ops.backup');
         Route::get('/observability', [SuperAdminController::class, 'observability'])->name('observability.index');
         Route::get('/scheduled-tasks', [SuperAdminController::class, 'scheduledTasks'])->name('scheduled-tasks.index');
         Route::get('/system-tests', [SuperAdminController::class, 'systemTests'])->name('system-tests.index');

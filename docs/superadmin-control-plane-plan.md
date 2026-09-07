@@ -1,6 +1,6 @@
 # Super Admin control-plane plan
 
-**Status:** SA0–SA5 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio, school reports hub). SA6 remains plan only.  
+**Status:** SA0–SA6 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio, school reports hub, ops desk).  
 **Audience:** implementers building Super Admin to the same depth as Learn / Teach.  
 **Traces to:** spec v0.2 Super Admin role (“everything; admin-role grants; cross-system audit”), `AuthorizeService` bypass, Roles Hub, unused `settings` table.
 
@@ -17,10 +17,11 @@ Super Admin today is a **thin ops hub**. Student Learn and instructor Teach are 
 | `/superadmin` | Tile grid. Most tiles open the same UIs `adm` / `aca` / `fin` already use. |
 | Roles Hub `/roles-hub` | The one real unique feature: rewrite every permission key for every non–Super Admin role. |
 | Audit | Explorer at `/superadmin/audit`: filters, before/after detail, CSV export, prune command. Schema already had `before`, `after`, `ip`, `user_agent`, `request_id`. |
-| Observability | Counts + queue name + last backup mtime. No actions. |
-| Security | Flush *other* sessions — only if `SESSION_DRIVER=database`. |
-| Scheduled tasks | Hard-coded list of 3 commands (matches `Kernel` on this branch). Later slices add more (e.g. `communications:fire-reminders`). |
+| Observability | Counts + queue name + last backup mtime. Failed-job retry and backup now live on `/superadmin/ops`. |
+| Security | Flush *other* sessions — only if `SESSION_DRIVER=database`. Driver limits documented. |
+| Scheduled tasks | Live Kernel schedule (not a hard-coded checklist). |
 | System tests | Prints `php artisan test --testsuite=…`. Does not run tests. |
+| Ops desk | `/superadmin/ops` — retry/delete failed jobs, kick `spims:backup-database`, live schedule, session-flush limits. |
 | Theme tile | Deep-link to `/admin/theme` (name, site name, 3 token colors × 2 modes, logo *URLs*). |
 | People tile | Deep-link to `/admin/users` (create, paginated list, suspend). No search, unsuspend, edit, role revoke, impersonate, or password reset. |
 
@@ -68,9 +69,10 @@ Restructure `NavigationHub::superadminSections()` from one flat “exclusive” 
 /superadmin/audit                   Audit explorer (SA2)
 /superadmin/audit/{log}             Detail: before/after JSON (SA2)
 /roles-hub                          Unchanged owner; polish in SA0
-/superadmin/security                Sessions + per-user revoke (SA1/SA6)
-/superadmin/observability           Counts + failed jobs + backup action (SA6)
-/superadmin/scheduled-tasks         Read schedule from Kernel (SA6)
+/superadmin/security                Sessions + driver-limit copy (SA1/SA6)
+/superadmin/observability           Counts; failed-jobs card links to ops (SA6)
+/superadmin/ops                     Failed jobs retry/delete, backup now, live schedule (SA6)
+/superadmin/scheduled-tasks         Live Kernel schedule (SA6)
 /superadmin/system-tests            Keep as runbook (no execute)
 /superadmin/feedback-reveals        Keep when that route exists (later branch)
 ```
@@ -270,10 +272,10 @@ UI gaps (SA2):
 
 | Surface | Gap | Phase |
 |---|---|---|
-| Sessions | File/cookie/redis drivers cannot flush; no per-user revoke | SA1 (per-user if DB), SA6 (document others) |
-| Failed jobs | Count only | SA6 retry / delete, audited |
-| Backups | mtime only | SA6 “run backup now” → `spims:backup-database`, audited |
-| Schedule | Hard-coded 3 rows; Kernel may have more | SA6 read `Illuminate\Console\Scheduling\Schedule` |
+| Sessions | File/cookie/redis drivers cannot flush; no per-user revoke | SA1 (per-user if DB), SA6 (document others) — **shipped** (limits copy on Security + Ops) |
+| Failed jobs | Count only | SA6 retry / delete, audited — **shipped** (`/superadmin/ops`) |
+| Backups | mtime only | SA6 “run backup now” → `spims:backup-database`, audited — **shipped** |
+| Schedule | Hard-coded 3 rows; Kernel may have more | SA6 read `Illuminate\Console\Scheduling\Schedule` — **shipped** |
 | Health | Public JSON `/health` | Keep public; Super Admin page embeds status |
 | System tests | Print commands | Keep; do not execute |
 | Feedback identity reveals | Exclusive on later branch | Keep; tile already Super Admin only |
@@ -357,13 +359,13 @@ Each phase is one PR-sized slice: tests first, `pint` on owned files, no `migrat
 
 **Goal:** Observability is actionable.
 
-- Failed jobs table + retry/delete.
-- Backup now (queue the command; do not block the request on `pg_dump` if it is slow — or sync with a timeout and flash).
-- Schedule read from Kernel (include `communications:fire-reminders` when present).
-- Document session flush limits when driver ≠ database.
-- Tests: retry increments attempt / deletes row; backup action writes audit; non-SA 403.
+- Failed jobs table + retry/delete. **Shipped** (`/superadmin/ops`). Payload never printed. Cap 50, newest first.
+- Backup now (queue the command when the queue driver is not `sync`; otherwise run in-request so PHPUnit / local sqlite can write a marker). **Shipped.**
+- Schedule read from Kernel (include `communications:fire-reminders` when present). **Shipped** on Ops desk and `/superadmin/scheduled-tasks`.
+- Document session flush limits when driver ≠ database. **Shipped** on Ops desk and Security tools.
+- Tests: retry increments attempt / deletes row; backup action writes audit; non-SA 403. **Shipped** in `OpsDeskTest`.
 
-**Done when:** Super Admin can clear a stuck job and kick a backup without SSH.
+**Done when:** Super Admin can clear a stuck job and kick a backup without SSH. **Shipped.**
 
 ---
 

@@ -355,6 +355,7 @@ class NavigationHub
                 'title' => __('superadmin.section_ops'),
                 'description' => __('superadmin.section_ops_desc'),
                 'links' => array_values(array_filter([
+                    self::superadminTile('superadmin.ops', 'superadmin.tile_ops', 'bi-hdd-network', 'superadmin.tile_ops_desc', 'superadmin.tile_ops_hint'),
                     self::superadminTile('superadmin.scheduled-tasks.index', 'superadmin.tile_scheduled', 'bi-clock-history', 'superadmin.tile_scheduled_desc', 'superadmin.tile_scheduled_hint'),
                     self::superadminTile('superadmin.system-tests.index', 'superadmin.tile_system_tests', 'bi-clipboard2-check', 'superadmin.tile_system_tests_desc', 'superadmin.tile_system_tests_hint'),
                     self::superadminTile('superadmin.feedback-reveals.index', 'superadmin.tile_reveals', 'bi-eye-slash', 'superadmin.tile_reveals_desc', 'superadmin.tile_reveals_hint'),

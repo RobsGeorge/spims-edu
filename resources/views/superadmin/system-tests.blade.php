@@ -10,7 +10,15 @@
         </a>
     </div>
     <h1 class="page-title">{{ __('superadmin.system_tests_title') }}</h1>
-    <p class="text-muted-theme mb-4">{{ __('superadmin.system_tests_desc') }}</p>
+    <p class="text-muted-theme mb-3">{{ __('superadmin.system_tests_desc') }}</p>
+    <aside class="sa-callout sa-callout-info mb-4" role="note">
+        <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+        <div>
+            <strong>{{ __('superadmin.system_tests_d8_title') }}</strong>
+            <p class="mb-0">{{ __('superadmin.system_tests_d8') }}</p>
+        </div>
+    </aside>
+    @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_tests')])
 
     <div class="row g-3">
         @foreach($suites as $suite)
@@ -19,6 +27,7 @@
                     <div class="card-body">
                         <h3 class="h6 page-title mb-2">{{ __('superadmin.suite') }}: {{ $suite }}</h3>
                         <code class="small">{{ __('superadmin.run_hint', ['suite' => $suite]) }}</code>
+                        <p class="form-text mb-0 mt-2">{{ __('superadmin.system_tests_copy_help') }}</p>
                     </div>
                 </div>
             </div>

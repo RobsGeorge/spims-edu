@@ -746,6 +746,7 @@ class SchoolReportService
                 ],
             ],
             'deep_links' => $this->links([
+                ['superadmin.ops', 'school_reports.link_ops'],
                 ['superadmin.observability.index', 'school_reports.link_observability'],
             ]),
             'notes' => [

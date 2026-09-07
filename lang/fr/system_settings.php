@@ -35,7 +35,7 @@ return [
     'audit.retention_days' => 'Rétention d’audit (jours)',
     'audit.retention_days_help' => 'Les lignes ordinaires plus vieilles sont purgées chaque jour. Les préfixes du plan de contrôle gardent un plancher 3×.',
     'backup.retention_days' => 'Rétention des sauvegardes (jours)',
-    'backup.retention_days_help' => 'Surcharge BACKUP_RETENTION_DAYS. Le chemin reste dans .env.',
+    'backup.retention_days_help' => 'Surcharge BACKUP_RETENTION_DAYS. « Sauvegarder maintenant » est le bureau ops Super Admin. Le chemin reste dans .env.',
     'mail.from_name' => 'Nom d’expéditeur mail',
     'mail.from_name_help' => 'Nom affiché. L’adresse reste dans .env et n’est pas montrée ici.',
     'locale_ar' => 'Arabe',

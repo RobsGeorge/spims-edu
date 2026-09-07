@@ -256,6 +256,12 @@
                                         </a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="{{ route('superadmin.ops') }}">
+                                            <i class="bi bi-hdd-network" aria-hidden="true"></i>
+                                            {{ __('ops.nav_ops') }}
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="{{ route('superadmin.audit.index') }}">
                                             <i class="bi bi-journal-text" aria-hidden="true"></i>
                                             {{ __('audit.nav_audit') }}

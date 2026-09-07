@@ -35,7 +35,7 @@ return [
     'audit.retention_days' => 'Audit retention (days)',
     'audit.retention_days_help' => 'Ordinary audit rows older than this are pruned daily. Control-plane prefixes (features., system_settings., impersonation, Roles Hub) keep a 3× floor. The explorer never deletes from the browser.',
     'backup.retention_days' => 'Backup retention (days)',
-    'backup.retention_days_help' => 'Overrides BACKUP_RETENTION_DAYS for the backup command. On-demand “backup now” is a later ops desk. The path itself stays in .env.',
+    'backup.retention_days_help' => 'Overrides BACKUP_RETENTION_DAYS for the backup command. On-demand “backup now” is the Super Admin ops desk. The path itself stays in .env.',
     'mail.from_name' => 'Mail from name',
     'mail.from_name_help' => 'Display name on outbound mail. The from address stays in .env and is never shown here.',
     'locale_ar' => 'Arabic',
