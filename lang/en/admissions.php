@@ -32,4 +32,10 @@ return [
     'current_document' => 'Current document',
     'upload_failed' => 'Document upload failed.',
     'no_applications' => 'You have not started any applications yet.',
+    'my_applications_subtitle' => 'Track your applications and their review status.',
+    'withdraw' => 'Withdraw application',
+    'withdraw_confirm_title' => 'Withdraw this application?',
+    'withdraw_confirm_body' => 'You can start a new application for this program afterwards.',
+    'withdrawn' => 'Application withdrawn.',
+    'not_withdrawable' => 'This application cannot be withdrawn.',
 ];
