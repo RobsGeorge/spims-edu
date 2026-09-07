@@ -4,6 +4,7 @@ namespace Tests\Feature\Demo;
 
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Support\DemoPersonas;
 use Database\Seeders\DemoDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -139,6 +140,22 @@ class DemoConsoleTest extends TestCase
         $this->post(route('demo.enter', 'superadmin'))->assertNotFound();
         $this->post(route('demo.enter', 'nobody'))->assertNotFound();
         $this->assertGuest();
+    }
+
+    #[Test]
+    public function a_full_persona_walk_is_not_throttled(): void
+    {
+        $this->seed();
+        config(['spims.seed_demo_data' => true]);
+        $this->seed(DemoDataSeeder::class);
+
+        foreach (DemoPersonas::all() as $persona) {
+            $this->from(route('demo.show'))
+                ->post(route('demo.enter', $persona['slug']))
+                ->assertRedirect();
+            $this->assertAuthenticated();
+            $this->post(route('auth.logout'));
+        }
     }
 
     #[Test]

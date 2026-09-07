@@ -54,7 +54,7 @@ PHPUnit already sets `DEMO_CONSOLE=false` and `SEED_DEMO_DATA=false`. Do not use
 
 1. Open `/demo` as a guest (or while logged in — Enter switches).
 2. Click **Enter as {First}** on the tile. Do **not** open `/login` and paste a password.
-3. Expect a 302 to the landing in §1.2, then a **200** (not Ignition / 500).
+3. Expect a 302 to the landing in §1.2, then a **200** (not Ignition / 500). A **429** on Enter is a product fail — the limiter is 60/min per IP so a full persona walk must succeed.
 4. Confirm the header user name matches the persona.
 5. Confirm the locale cookie matches the persona (`ar` / `en` / `fr`).
 
@@ -76,6 +76,8 @@ If the offering is missing, landings fall back to `/dashboard` or `/teach`. That
 | **BLOCKED** | Environment (DB, server, `DEMO_CONSOLE` off, missing seed) — not a product defect until reproduced on a seeded sqlite |
 
 A 500 on a listed route is always **FAIL** (or **BLOCKED** if the server is pointed at the wrong database — confirm `php artisan tinker --execute="echo config('database.default');"`).
+
+When asserting **403**, do **not** follow redirects. A guest 302 to `/login` (then 200) is not the same as an authenticated 200 on a staff URL.
 
 ### 0.6 Artifacts (each wave agent)
 
@@ -203,7 +205,7 @@ Resolve `{TH101}` from the first learn URL.
 |---|---|---|---|
 | S1 | | Landing after Enter | `/learn/{TH101}` 200. **TH101 — Introduction to Theology**. Week 1 items (Welcome / reading). Week 2 may be locked. |
 | S2 | | Dashboard `/dashboard` | **Hello, John**. Courses include TH101 + BI101. Wallet chips (EGP money). Announcement banner if present. |
-| S3 | | `/hubs/learning` | Tiles: catalog, grades, applications, enrollments, projects, live, live quiz, events, attendance, surveys, finance, transcript, settings, notifications, announcements. Each tile **200**. |
+| S3 | | `/hubs/learning` | Tiles: catalog, grades, applications, enrollments, **`/projects`** (not `/projects/mine`), live, live quiz, events, attendance, surveys, finance, transcript, settings, notifications, announcements. Each tile **200**. |
 | S4 | | `/courses/{TH101}` (player) | Same offering; items open. |
 | S5 | | Open a Week 1 TEXT item `/learn/{TH101}/items/{id}` | 200, body text, not 403. |
 | S6 | | `/announcements` | “Week 1 is open” (or seeded announcement). Show page 200. |
@@ -251,7 +253,7 @@ Enter as Mina. `{TH101}` from the teach landing.
 | T15 | | `/teach/{TH101}/live-quiz` | 200. Lobby / create chrome. Join code may show here — that is OK (not the account password). |
 | T16 | | `/teach/{TH101}/surveys` | 200. |
 | T17 | | Enter as **Yousef** (`ta1`) → `/teach` → open TH101 | 200. TA can see roster/attendance. Must **not** see grade-lock / offering-close if those are instructor-only (403 or hidden). |
-| T18 | | As Mina, open `/admin/programs` | **403** or hidden in nav (no Academic hub). |
+| T18 | | As Mina, open `/admin/programs` | **200** — `programs.view` is R for instructors. `/admin/users` and `/admin/finance` are **403**. Academic hub may be hidden; the URL is still readable. |
 | T19 | | 390×844 teach show | Tabs scroll; no overflow. |
 
 ---
@@ -268,7 +270,7 @@ Three personas. Can be three sub-agents if they avoid MUTATING.
 | C2 | Open DIP-THEO | Courses include TH101. |
 | C3 | `/admin/courses` | TH101, BI101, … 200. |
 | C4 | `/admin/offerings` | Fall **Open** vs Spring **Draft** visible. |
-| C5 | `/hubs/academic` | Every tile opens 200: programs, courses, offerings, templates, semesters, credentials, grading schemes, translations, attendance policy, communications, email templates, certificate templates, surveys. |
+| C5 | `/hubs/academic` | Every tile opens 200. Communications is **`/admin/communications`** (`admin.communications.report`), not `/admin/communications/report`. |
 | C6 | `/admin/users` | **403** or no Admin users tile (academic is not office admin). |
 
 ### 5.2 Admin (`adm`)
@@ -279,8 +281,8 @@ Three personas. Can be three sub-agents if they avoid MUTATING.
 | O2 | `/admin/users` | Demo users listed. 200. |
 | O3 | `/hubs/admin` | Tiles 200: users, enrollments, theme, application forms, applications, communications, events. |
 | O4 | `/admin/theme` | Theme editor 200. Do **not** save over production branding on a shared host. |
-| O5 | `/admin/programs` | **403** or hidden (not academic). |
-| O6 | `/admin/finance` | **403** or hidden. |
+| O5 | `/admin/programs` | **200** — office admin has `programs.view` R. `/admin/programs/create` is **403**. |
+| O6 | `/admin/finance` | **200** — office admin has `finance.invoices` R. |
 
 ### 5.3 Finance (`fin`)
 
@@ -324,10 +326,10 @@ Use `student1` unless noted.
 | X3 | Bottom nav at 390×844 | Home, Learning, Catalog (or Teach for ins1), Finance, More. Targets 200. |
 | X4 | Skip link | `#main-content` exists; skip link in DOM. |
 | X5 | `/catalog` while logged in as John | 200. Interest / enroll chrome does not 500. |
-| X6 | As John, `GET /teach` | 403 or empty/hidden — not Mina’s hub. |
-| X7 | As John, `GET /admin/users` | 403. |
-| X8 | As John, `GET /superadmin` | 403. |
-| X9 | As Mina, `GET /admin/finance` | 403. |
+| X6 | As John, `GET /teach` | **403** (do not follow the login redirect; guest 302→login is a different case). |
+| X7 | As John, `GET /admin/users` | **403**. |
+| X8 | As John, `GET /superadmin` | **403**. |
+| X9 | As Mina, `GET /admin/finance` | **403**. |
 | X10 | Guest `GET /dashboard` | Redirect to login. |
 | X11 | `/foundation/demo` as guest | 401/redirect — this is **not** the trial console. |
 
