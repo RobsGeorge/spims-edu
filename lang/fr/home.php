@@ -1,7 +1,23 @@
 <?php
 
 return [
+    'hero_chip' => 'Candidatures ouvertes',
+    'hero_display' => 'Approfondir les sciences coptes orthodoxes à l’âge moderne',
+    'nav_programs' => 'Programmes',
+    'nav_admissions' => 'Admissions',
+    'nav_academics' => 'Académie',
+    'nav_spiritual' => 'Vie spirituelle',
+    'stat_students' => 'Étudiants actifs',
+    'stat_courses' => 'Cours',
+    'stat_faculty' => 'Réseau enseignant',
+    'stat_faculty_value' => 'Mondial',
+    'featured_title' => 'Programmes mis en avant',
+    'featured_lead' => 'Explorez le tronc commun : langue, théologie et vie de l’Église.',
+    'featured_tile_badge' => 'À la une',
+    'featured_standalone_blurb' => 'Un cours indépendant à prévisualiser sans candidature à un programme complet.',
+    'featured_program_blurb' => 'Un cours de parcours — candidatez lorsque vous êtes prêt à étudier en séquence.',
     'how_title' => 'Comment ça se passe',
+    'how_lead' => 'Un chemin simple pour commencer vos études théologiques.',
     'how_1_title' => 'Créer un compte',
     'how_1_body' => 'Inscrivez-vous avec votre e-mail. Nous envoyons un court code — sans encombre.',
     'how_2_title' => 'Choisir un cours',
@@ -9,4 +25,7 @@ return [
     'how_3_title' => 'Apprendre avec soin',
     'how_3_body' => 'Étudiez à un rythme calme. Les diplômes suivent lorsque vous terminez le travail.',
     'catalog_teaser' => 'Voir le catalogue des cours',
+    'auth_brand_line' => 'Excellence académique',
+    'auth_brand_quote' => 'Entrez dans les salles feutrées du savoir.',
+    'footer_copy' => 'SPIMS — école copte orthodoxe en ligne.',
 ];

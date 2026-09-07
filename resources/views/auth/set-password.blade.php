@@ -3,8 +3,6 @@
 @section('title', __('ui.set_password'))
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
         <div class="card border-0 auth-card">
             <div class="card-body p-4 p-md-5">
                 <h1 class="h3 spims-title mb-2">{{ __('ui.set_password') }}</h1>
@@ -24,6 +22,4 @@
                 </form>
             </div>
         </div>
-    </div>
-</div>
 @endsection

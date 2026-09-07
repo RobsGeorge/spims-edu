@@ -24,4 +24,7 @@ return [
     'interest_filter' => 'Intérêt',
     'interest_all' => 'Tous les cours',
     'interest_flagged' => 'Mes signalements',
+    'featured_chip' => 'Programme mis en avant',
+    'browse_all' => 'Parcourir les cours',
+    'loading' => 'Chargement des cours',
 ];

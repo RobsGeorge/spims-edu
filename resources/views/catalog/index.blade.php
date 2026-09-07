@@ -11,6 +11,26 @@
 
     @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
+    @if(!empty($featured) && empty($showSkeletons))
+        @php
+            $featuredOffering = $offeringsByCourse->get($featured->id)?->first();
+        @endphp
+        <section class="catalog-featured" aria-labelledby="catalog-featured-title">
+            <div class="catalog-featured-copy">
+                <p class="catalog-featured-chip">{{ __('catalog.featured_chip') }}</p>
+                <h2 id="catalog-featured-title" class="catalog-featured-title">{{ $featured->title }}</h2>
+                <p class="text-muted-theme mb-3">{{ $featured->code }} · {{ __('catalog.credits', ['count' => $featured->credit_hours]) }}</p>
+                <div class="d-flex flex-wrap gap-2">
+                    @if($featuredOffering)
+                        <a class="btn btn-primary" href="{{ route('offerings.preview', $featuredOffering) }}">{{ __('catalog.preview') }}</a>
+                    @endif
+                    <a class="btn btn-outline-primary" href="#catalog-results">{{ __('catalog.browse_all') }}</a>
+                </div>
+            </div>
+            <div class="catalog-featured-media" aria-hidden="true"></div>
+        </section>
+    @endif
+
     <form method="GET" action="{{ route('catalog.index') }}" class="catalog-filters app-card p-3 mb-4" aria-controls="catalog-results">
         <div class="row g-2 align-items-end">
             <div class="col-md-4 col-lg-3">
@@ -55,7 +75,21 @@
         </div>
     </form>
 
-    <div id="catalog-results" class="catalog-results" aria-busy="false" aria-live="polite">
+    <div id="catalog-skeletons" class="catalog-skeletons mb-4" @if(empty($showSkeletons)) hidden @endif aria-hidden="{{ empty($showSkeletons) ? 'true' : 'false' }}" aria-label="{{ __('catalog.loading') }}">
+        @for($i = 0; $i < 6; $i++)
+            <div class="catalog-skeleton-card">
+                <div class="catalog-skeleton-media"></div>
+                <div class="catalog-skeleton-body">
+                    <div class="catalog-skeleton-line catalog-skeleton-line--title"></div>
+                    <div class="catalog-skeleton-line catalog-skeleton-line--meta"></div>
+                    <div class="catalog-skeleton-line catalog-skeleton-line--body"></div>
+                    <div class="catalog-skeleton-line catalog-skeleton-line--short"></div>
+                </div>
+            </div>
+        @endfor
+    </div>
+
+    <div id="catalog-results" class="catalog-results" aria-busy="{{ !empty($showSkeletons) ? 'true' : 'false' }}" aria-live="polite" @if(!empty($showSkeletons)) hidden @endif>
         @if($courses->isEmpty())
             <div class="spims-empty app-card p-5 text-center">
                 <h2 class="h5 spims-title">{{ __('catalog.empty') }}</h2>
@@ -63,7 +97,7 @@
             </div>
         @else
             <div class="row g-3">
-                @foreach($courses as $course)
+                @foreach($courses as $index => $course)
                     @php
                         $offering = $offeringsByCourse->get($course->id)?->first();
                         $form = $course->programCourses
@@ -73,6 +107,7 @@
                     @endphp
                     <div class="col-md-6 col-xl-4">
                         <article class="catalog-card app-card h-100 p-3 d-flex flex-column">
+                            <div class="catalog-card-media {{ $index % 2 === 1 ? 'catalog-card-media--alt' : '' }}" aria-hidden="true"></div>
                             <div class="d-flex flex-wrap gap-2 mb-2">
                                 @if($course->is_free)<span class="badge-brand">{{ __('catalog.free_badge') }}</span>@endif
                                 @if($course->is_standalone)<span class="badge-brand">{{ __('catalog.standalone_badge') }}</span>@endif
@@ -108,3 +143,21 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    var form = document.querySelector('.catalog-filters');
+    if (!form) return;
+    form.addEventListener('submit', function () {
+        var results = document.getElementById('catalog-results');
+        var skeletons = document.getElementById('catalog-skeletons');
+        if (!results || !skeletons) return;
+        results.hidden = true;
+        results.setAttribute('aria-busy', 'true');
+        skeletons.hidden = false;
+        skeletons.setAttribute('aria-hidden', 'false');
+    });
+})();
+</script>
+@endpush

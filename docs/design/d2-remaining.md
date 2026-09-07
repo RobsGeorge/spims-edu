@@ -40,8 +40,6 @@
 - FREE1 / PAID1 filters still pass
 - Guest home → catalog → offering preview
 
-## Intentionally not in this pass
+## Later closed (screenshot parity pass)
 
-- Visual parity screenshots vs the original design-reference pack
-- Client-side catalog loading skeletons (static `aria-busy` only)
-- Guest-nav catalog button (teaser in the landing band is the discoverability path)
+See `docs/design/d2-screenshot-parity.md` — marketing landing, split auth, catalog featured banner + real skeletons, contrast AA test, guest-nav catalog button.

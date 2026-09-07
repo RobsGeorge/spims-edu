@@ -24,4 +24,7 @@ return [
     'interest_filter' => 'الاهتمام',
     'interest_all' => 'كل المقررات',
     'interest_flagged' => 'إشاراتي',
+    'featured_chip' => 'برنامج مميز',
+    'browse_all' => 'تصفّح المقررات',
+    'loading' => 'جاري تحميل المقررات',
 ];

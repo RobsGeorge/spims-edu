@@ -75,9 +75,22 @@ class CatalogController extends Controller
             ->get()
             ->groupBy('course_id');
 
+        $hasActiveFilters = ($filters['q'] ?? '') !== ''
+            || $type !== 'all'
+            || $price !== 'all'
+            || $interest === 'flagged'
+            || $sort === 'interest';
+
+        $featured = null;
+        if (! $hasActiveFilters && $courses->isNotEmpty()) {
+            $featured = $courses->first();
+        }
+
         return view('catalog.index', [
             'courses' => $courses,
             'offeringsByCourse' => $offerings,
+            'featured' => $featured,
+            'showSkeletons' => $request->boolean('skeleton'),
             'filters' => [
                 'q' => $filters['q'] ?? '',
                 'type' => $type,

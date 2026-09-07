@@ -3,8 +3,6 @@
 @section('title', __('ui.verify_email'))
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
         <div class="card border-0 auth-card">
             <div class="card-body p-4 p-md-5">
                 <h1 class="h3 spims-title mb-2">{{ __('ui.verify_email') }}</h1>
@@ -16,13 +14,11 @@
                     @csrf
                     <div class="mb-3">
                         <label class="form-label" for="verify-code">{{ __('ui.otp_code') }}</label>
-                        <input id="verify-code" type="text" name="code" maxlength="6" class="form-control @error('code') is-invalid @enderror" required inputmode="numeric" autocomplete="one-time-code">
+                        <input id="verify-code" type="text" name="code" maxlength="6" class="form-control auth-otp-input @error('code') is-invalid @enderror" required inputmode="numeric" autocomplete="one-time-code">
                         @error('code')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <button type="submit" class="btn btn-primary w-100">{{ __('ui.verify') }}</button>
                 </form>
             </div>
         </div>
-    </div>
-</div>
 @endsection
