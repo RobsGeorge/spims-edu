@@ -107,6 +107,7 @@
                     @csrf
                     @method('PUT')
                     <div class="col-md-2">
+                        <label class="form-label small mb-1">{{ __('offerings.item_type') }}</label>
                         <select name="type" class="form-select form-select-sm" required>
                             @foreach($contentTypes as $type)
                                 <option value="{{ $type->value }}" @selected($item->type === $type)>{{ __('learning.item_'.strtolower($type->value)) }}</option>
@@ -114,19 +115,28 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <input name="title" class="form-control form-control-sm" value="{{ $item->title }}" required>
+                        <label class="form-label small mb-1">{{ __('academics.title') }}</label>
+                        <input name="title" class="form-control form-control-sm" value="{{ $item->title }}" placeholder="{{ __('academics.title') }}" required>
                     </div>
                     <div class="col-md-3">
-                        <input name="vimeo_id" class="form-control form-control-sm" value="{{ $item->vimeo_id }}" placeholder="{{ __('offerings.video_url_ph') }}">
+                        <label class="form-label small mb-1">{{ __('offerings.video_url') }}</label>
+                        <input name="video_url" class="form-control form-control-sm" placeholder="{{ __('offerings.video_url_ph') }}">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">{{ __('offerings.vimeo_id') }}</label>
+                        <input name="vimeo_id" class="form-control form-control-sm" value="{{ $item->vimeo_id }}" placeholder="{{ __('offerings.vimeo_id') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">{{ __('offerings.external_url') }}</label>
                         <input name="file_url" class="form-control form-control-sm" value="{{ $item->file_url }}" placeholder="{{ __('offerings.external_url_ph') }}">
                     </div>
                     <div class="col-md-4">
+                        <label class="form-label small mb-1">{{ __('offerings.upload_file') }}</label>
                         <input type="file" name="file" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,application/pdf,image/*">
                     </div>
                     <div class="col-md-6">
-                        <textarea name="body" class="form-control form-control-sm" rows="2">{{ $item->body }}</textarea>
+                        <label class="form-label small mb-1">{{ __('offerings.text_body') }}</label>
+                        <textarea name="body" class="form-control form-control-sm" rows="2" placeholder="{{ __('offerings.text_body') }}">{{ $item->body }}</textarea>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
                         <button class="btn btn-sm btn-outline-primary w-100">{{ __('ui.save_changes') }}</button>
