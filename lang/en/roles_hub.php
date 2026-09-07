@@ -50,6 +50,7 @@ return [
     'group_reports' => 'School reports',
     'group_ops' => 'Operations',
     'group_status' => 'Platform status',
+    'group_access' => 'Access map',
     'role_ADMINISTRATIVE_ADMIN' => 'Administrative admin',
     'role_ACADEMIC_ADMIN' => 'Academic admin',
     'role_FINANCIAL_ADMIN' => 'Financial admin',

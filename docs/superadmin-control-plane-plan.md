@@ -1,6 +1,6 @@
 # Super Admin control-plane plan
 
-**Status:** SA0–SA7 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio, school reports hub, ops desk, platform status).  
+**Status:** SA0–SA8 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio, school reports hub, ops desk, platform status, access map).  
 **Audience:** implementers building Super Admin to the same depth as Learn / Teach.  
 **Traces to:** spec v0.2 Super Admin role (“everything; admin-role grants; cross-system audit”), `AuthorizeService` bypass, Roles Hub, unused `settings` table.
 
@@ -15,7 +15,8 @@ Super Admin today is a **thin ops hub**. Student Learn and instructor Teach are 
 | Exclusive surface | What it actually does |
 |---|---|
 | `/superadmin` | Tile grid. Most tiles open the same UIs `adm` / `aca` / `fin` already use. |
-| Roles Hub `/roles-hub` | The one real unique feature: rewrite every permission key for every non–Super Admin role. |
+| Roles Hub `/roles-hub` | The editor: rewrite every permission key for every non–Super Admin role. |
+| Access map | `/superadmin/access` — review live grants, role census, exclusive-key leaks, learner extras, key lookup, audited CSV. Read-only. |
 | Audit | Explorer at `/superadmin/audit`: filters, before/after detail, CSV export, prune command. Schema already had `before`, `after`, `ip`, `user_agent`, `request_id`. |
 | Observability | Counts + queue name + last backup mtime. Failed-job retry and backup now live on `/superadmin/ops`. Health probes + integrations live on `/superadmin/status`. |
 | Security | Flush *other* sessions — only if `SESSION_DRIVER=database`. Driver limits documented. |
@@ -74,6 +75,8 @@ Restructure `NavigationHub::superadminSections()` from one flat “exclusive” 
 /superadmin/observability           Counts; failed-jobs card links to ops (SA6)
 /superadmin/ops                     Failed jobs retry/delete, backup now, live schedule (SA6)
 /superadmin/status                  Health probes, integrations configured/missing, runtime (SA7)
+/superadmin/access                  Access map: census, leaks, lookup, CSV (SA8)
+/superadmin/access/csv              Audited matrix CSV (SA8)
 /superadmin/scheduled-tasks         Live Kernel schedule (SA6)
 /superadmin/system-tests            Keep as runbook (no execute)
 /superadmin/feedback-reveals        Keep when that route exists (later branch)
@@ -103,6 +106,7 @@ Add keys with **empty role maps** (Super Admin bypass only), unless noted.
 | `ops.failed_jobs` | SA only | Retry / delete failed jobs |
 | `ops.backup` | SA only | Trigger on-demand dump |
 | `status.platform` | SA only | Read-only platform status desk |
+| `access.map` | SA only | Read-only access map + matrix CSV |
 
 Keep existing:
 
@@ -127,6 +131,7 @@ Controllers stay thin. New services:
 - `App\Services\SuperAdmin\SchoolReportService`
 - `App\Services\SuperAdmin\OpsDeskService`
 - `App\Services\SuperAdmin\PlatformStatusService`
+- `App\Services\SuperAdmin\AccessMapService`
 - `App\Services\Admin\UserAdminService` (extend — unsuspend, update, revoke role, reset password)
 
 `UserAdminService` already authorizes `users.manage` / `roles.assign`. Keep that. Impersonation is a separate service so ADM cannot reach it by sharing the user form.
@@ -388,6 +393,22 @@ Each phase is one PR-sized slice: tests first, `pint` on owned files, no `migrat
 
 **Done when:** Super Admin can see health + integration slots from the control plane. **Shipped.**
 
+### SA8 — Access map
+
+**Goal:** Super Admin can answer “who can do what — and did Roles Hub grant something dangerous?” without opening the checkbox wall.
+
+- Dedicated desk at `/superadmin/access` (`access.map`, empty map). **Shipped.**
+- Role census: people per static role, granted vs shipped default counts, added/removed keys, deep-links to Roles Hub and the People directory. **Shipped.**
+- Super Admin break-glass list (count + emails). The role still cannot be assigned from the UI. **Shipped.**
+- Exclusive-key leaks: empty-map keys (`features.manage`, `ops.failed_jobs`, …) held by an editable role. **Shipped.**
+- Learner extras: Student or TA holds a key not in their shipped defaults. **Shipped.**
+- Key lookup (`?q=`) shows current holders vs shipped defaults. Super Admin is never listed. **Shipped.**
+- Audited CSV (UTF-8 BOM) of role × granted key. **Shipped.**
+- Read-only — grants still change on Roles Hub. Does not write `.env` or assign Super Admin.
+- Tests: Super Admin sees census + exclusive keys; student grant of `finance.refunds` and `features.manage` surfaces as elevated + leak; CSV audited; student/ADM 403; dashboard/hub/Roles Hub entrances. **Shipped** in `AccessMapTest`.
+
+**Done when:** Super Admin can review the live matrix and catch a dangerous Roles Hub grant from the control plane. **Shipped.**
+
 ---
 
 ## 7. Data & migrations
@@ -431,6 +452,7 @@ New suite: `tests/Feature/SuperAdmin/`.
 | `SchoolReportTest` | SA5 | Census + finance integers |
 | `OpsDeskTest` | SA6 | Failed job retry audited |
 | `PlatformStatusTest` | SA7 | Health + integrations; secrets absent from HTML |
+| `AccessMapTest` | SA8 | Census + leak/elevated detection; CSV audited |
 
 Also extend `UserAdminTest`, `ThemeEditorTest`, `RolesHubTest`, `PortalHubsTest`.
 
@@ -464,7 +486,7 @@ If this plan lands on `feat/authz-scope-and-api-foundation` before other slices 
 
 ## 12. Explicitly out of scope
 
-Move or keep in `PARKING-LOT.md` — do not build in SA0–SA7:
+Move or keep in `PARKING-LOT.md` — do not build in SA0–SA8:
 
 - Run PHPUnit or `migrate` from the browser
 - Edit `.env` or rotate Super Admin password in the UI
@@ -487,6 +509,7 @@ SA0 safety + IA
               └── SA5 reports             (after SA2; reads audit + finance)
                     └── SA6 ops desk
                           └── SA7 platform status
+                                └── SA8 access map
 ```
 
 If only three phases ship: **SA0, SA1, SA2**. They turn Super Admin from a tile page into the role the spec describes (grants, people, cross-system audit). SA3 is the next highest leverage (features + config). Theme and reports are visibility; ops is convenience.

@@ -23,6 +23,7 @@
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_security')])
     @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_security')])
     @include('partials.status-entrance-banner', ['caption' => __('status.entrance_from_security')])
+    @include('partials.access-entrance-banner', ['caption' => __('access.entrance_from_security')])
 
     @if(session('status'))
         <div class="alert alert-success">{{ session('status') }}</div>

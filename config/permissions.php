@@ -530,4 +530,5 @@ return [
     'ops.failed_jobs' => [],
     'ops.backup' => [],
     'status.platform' => [],
+    'access.map' => [],
 ];

@@ -73,6 +73,7 @@ use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentCompletionController;
 use App\Http\Controllers\StudentPreviewController;
+use App\Http\Controllers\SuperAdmin\AccessMapController;
 use App\Http\Controllers\SuperAdmin\AuditExplorerController;
 use App\Http\Controllers\SuperAdmin\FeatureFlagController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
@@ -408,6 +409,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/status', [PlatformStatusController::class, 'index'])
             ->middleware('permission:status.platform')
             ->name('status');
+        Route::get('/access', [AccessMapController::class, 'index'])
+            ->middleware('permission:access.map')
+            ->name('access');
+        Route::get('/access/csv', [AccessMapController::class, 'csv'])
+            ->middleware('permission:access.map')
+            ->name('access.csv');
         Route::get('/observability', [SuperAdminController::class, 'observability'])->name('observability.index');
         Route::get('/scheduled-tasks', [SuperAdminController::class, 'scheduledTasks'])->name('scheduled-tasks.index');
         Route::get('/system-tests', [SuperAdminController::class, 'systemTests'])->name('system-tests.index');

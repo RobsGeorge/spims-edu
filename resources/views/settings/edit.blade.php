@@ -12,6 +12,7 @@
         @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_settings')])
         @include('partials.ops-entrance-banner', ['caption' => __('ops.entrance_from_settings')])
         @include('partials.status-entrance-banner', ['caption' => __('status.entrance_from_settings')])
+        @include('partials.access-entrance-banner', ['caption' => __('access.entrance_from_settings')])
         @include('partials.people-entrance-banner')
 
         <form method="POST" action="{{ route('settings.picture') }}" enctype="multipart/form-data" class="app-card p-4 mb-4">

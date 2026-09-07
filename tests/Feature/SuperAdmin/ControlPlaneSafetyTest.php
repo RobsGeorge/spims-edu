@@ -34,7 +34,8 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertDontSee(__('theme_studio.dashboard_tile'))
             ->assertDontSee(__('school_reports.dashboard_tile'))
             ->assertDontSee(__('ops.dashboard_tile'))
-            ->assertDontSee(__('status.dashboard_tile'));
+            ->assertDontSee(__('status.dashboard_tile'))
+            ->assertDontSee(__('access.dashboard_tile'));
     }
 
     #[Test]
@@ -109,6 +110,7 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee(__('superadmin.tile_reports'))
             ->assertSee(__('superadmin.tile_ops'))
             ->assertSee(__('superadmin.tile_status'))
+            ->assertSee(__('superadmin.tile_access'))
             ->assertSee(route('roles.hub'), false)
             ->assertSee(route('superadmin.features'), false)
             ->assertSee(route('superadmin.config'), false)
@@ -116,6 +118,7 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee(route('superadmin.reports'), false)
             ->assertSee(route('superadmin.ops'), false)
             ->assertSee(route('superadmin.status'), false)
+            ->assertSee(route('superadmin.access'), false)
             ->assertSee(__('superadmin.roadmap_title'));
 
         $this->actingAs($sa)->get(route('dashboard'))
@@ -138,7 +141,9 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee(__('ops.dashboard_tile'))
             ->assertSee(route('superadmin.ops'), false)
             ->assertSee(__('status.dashboard_tile'))
-            ->assertSee(route('superadmin.status'), false);
+            ->assertSee(route('superadmin.status'), false)
+            ->assertSee(__('access.dashboard_tile'))
+            ->assertSee(route('superadmin.access'), false);
 
         $this->actingAs($sa)->get(route('hubs.admin'))
             ->assertOk()
@@ -167,9 +172,11 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee(__('roles_hub.reset_role'))
             ->assertSee(__('roles_hub.group_features'))
             ->assertSee(__('roles_hub.group_status'))
+            ->assertSee(__('roles_hub.group_access'))
             ->assertSee('features.manage')
             ->assertSee('users.impersonate')
             ->assertSee('status.platform')
+            ->assertSee('access.map')
             ->assertDontSee(__('roles_hub.role_SUPER_ADMIN'));
 
         $rbac->updateRoleMatrix($sa, RoleType::Student, ['transcript.view']);
@@ -204,6 +211,7 @@ class ControlPlaneSafetyTest extends TestCase
         $this->assertTrue(\Illuminate\Support\Facades\Route::has('superadmin.reports'));
         $this->assertTrue(\Illuminate\Support\Facades\Route::has('superadmin.ops'));
         $this->assertTrue(\Illuminate\Support\Facades\Route::has('superadmin.status'));
+        $this->assertTrue(\Illuminate\Support\Facades\Route::has('superadmin.access'));
         $sections = NavigationHub::superadminSections();
         $urls = collect($sections)->pluck('links')->flatten(1)->pluck('url');
         $this->assertTrue($urls->contains(fn ($url) => str_contains((string) $url, '/superadmin/features')));
@@ -212,5 +220,6 @@ class ControlPlaneSafetyTest extends TestCase
         $this->assertTrue($urls->contains(fn ($url) => str_contains((string) $url, '/superadmin/reports')));
         $this->assertTrue($urls->contains(fn ($url) => str_contains((string) $url, '/superadmin/ops')));
         $this->assertTrue($urls->contains(fn ($url) => str_contains((string) $url, '/superadmin/status')));
+        $this->assertTrue($urls->contains(fn ($url) => str_contains((string) $url, '/superadmin/access')));
     }
 }

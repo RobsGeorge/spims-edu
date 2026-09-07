@@ -303,6 +303,7 @@ class NavigationHub
                 'title' => __('superadmin.section_access'),
                 'description' => __('superadmin.section_access_desc'),
                 'links' => array_values(array_filter([
+                    self::superadminTile('superadmin.access', 'superadmin.tile_access', 'bi-diagram-3', 'superadmin.tile_access_desc', 'superadmin.tile_access_hint'),
                     self::superadminTile('roles.hub', 'superadmin.tile_roles', 'bi-shield-check', 'superadmin.tile_roles_desc', 'superadmin.tile_roles_hint'),
                     self::superadminTile('superadmin.security', 'superadmin.tile_security', 'bi-shield-lock', 'superadmin.tile_security_desc', 'superadmin.tile_security_hint'),
                 ])),

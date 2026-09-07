@@ -32,9 +32,11 @@
         <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.reports') }}">{{ __('school_reports.nav_reports') }}</a>
         <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.ops') }}">{{ __('ops.nav_ops') }}</a>
         <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.status') }}">{{ __('status.nav_status') }}</a>
+        <a class="btn btn-outline-primary btn-sm" href="{{ route('superadmin.access') }}">{{ __('access.nav_access') }}</a>
         <a class="btn btn-outline-secondary btn-sm" href="{{ route('superadmin.audit.index', ['action' => 'features.']) }}">{{ __('features.open_audit') }}</a>
     </div>
     <p class="small text-muted-theme mb-4">{{ __('features.open_config_help') }}</p>
+    @include('partials.access-entrance-banner', ['caption' => __('access.entrance_from_features')])
 
     @foreach($groupOrder as $group)
         @if(!empty($groups[$group]))

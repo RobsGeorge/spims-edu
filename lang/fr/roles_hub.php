@@ -50,6 +50,7 @@ return [
     'group_reports' => 'Rapports école',
     'group_ops' => 'Exploitation',
     'group_status' => 'État de la plateforme',
+    'group_access' => 'Carte d’accès',
     'role_ADMINISTRATIVE_ADMIN' => 'Admin administratif',
     'role_ACADEMIC_ADMIN' => 'Admin académique',
     'role_FINANCIAL_ADMIN' => 'Admin financier',

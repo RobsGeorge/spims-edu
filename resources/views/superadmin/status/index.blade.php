@@ -184,8 +184,11 @@
         </div>
     </section>
 
+    @include('partials.access-entrance-banner', ['caption' => __('access.entrance_from_status')])
+
     <p class="small text-muted-theme mb-0">
-        <a href="{{ route('superadmin.observability.index') }}">{{ __('status.open_observability') }}</a>
+        <a href="{{ route('superadmin.access') }}">{{ __('access.nav_access') }}</a>
+        · <a href="{{ route('superadmin.observability.index') }}">{{ __('status.open_observability') }}</a>
         · <a href="{{ route('superadmin.ops') }}">{{ __('status.open_ops') }}</a>
         · <a href="{{ route('superadmin.config') }}">{{ __('status.open_config') }}</a>
         · <a href="{{ route('superadmin.audit.index') }}">{{ __('superadmin.tile_audit') }}</a>

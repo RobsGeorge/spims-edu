@@ -25,6 +25,7 @@
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_users')])
     @include('partials.features-entrance-banner')
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_directory')])
+    @include('partials.access-entrance-banner', ['caption' => __('access.entrance_from_people')])
 
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">

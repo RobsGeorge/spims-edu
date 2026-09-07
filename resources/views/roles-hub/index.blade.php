@@ -28,6 +28,7 @@
             <p class="mb-0">{{ __('roles_hub.safety_body') }}</p>
         </div>
     </div>
+    @include('partials.access-entrance-banner', ['caption' => __('access.entrance_from_roles')])
 
     @if(session('status'))
         <div class="alert alert-success">{{ session('status') }}</div>
@@ -54,7 +55,7 @@
                             /** @var RoleType $role */
                             $roleKey = $role->value;
                         @endphp
-                        <details class="roles-hub-panel mb-3" data-role-panel>
+                        <details class="roles-hub-panel mb-3" data-role-panel id="role-{{ $roleKey }}">
                             <summary class="roles-hub-summary">
                                 <span class="fw-semibold">{{ __('roles_hub.role_'.$roleKey) }}</span>
                                 <span class="text-muted-theme small ms-2"><code>{{ $roleKey }}</code></span>

@@ -50,6 +50,7 @@ return [
     'group_reports' => 'تقارير المدرسة',
     'group_ops' => 'التشغيل',
     'group_status' => 'حالة المنصة',
+    'group_access' => 'خريطة الوصول',
     'role_ADMINISTRATIVE_ADMIN' => 'مشرف إداري',
     'role_ACADEMIC_ADMIN' => 'مشرف أكاديمي',
     'role_FINANCIAL_ADMIN' => 'مشرف مالي',
