@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\Reports\AcademicStandingService;
 use App\Services\Reports\ReportService;
+use App\Support\AuthorizeService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -12,13 +15,17 @@ class ReportController extends Controller
 {
     public function __construct(
         private readonly ReportService $reports,
+        private readonly AcademicStandingService $standing,
+        private readonly AuthorizeService $authorize,
     ) {}
 
     public function index(Request $request): View
     {
         $this->reports->authorizeView($request->user());
 
-        return view('admin.reports.index');
+        return view('admin.reports.index', [
+            'canManageStanding' => $this->authorize->allows($request->user(), 'academic_standing.manage'),
+        ]);
     }
 
     public function headcount(Request $request): View
@@ -56,7 +63,41 @@ class ReportController extends Controller
 
     public function standing(Request $request): View
     {
-        return $this->show($request, 'standing');
+        $this->reports->authorizeReport($request->user(), 'standing');
+
+        return view('admin.reports.show', [
+            'report' => 'standing',
+            'title' => __('reports.standing_title'),
+            'subtitle' => __('reports.standing_desc'),
+            'headers' => $this->reports->headers('standing'),
+            'rows' => $this->reports->paginate('standing'),
+            'canManageStanding' => $this->authorize->allows($request->user(), 'academic_standing.manage'),
+        ]);
+    }
+
+    public function standingThresholds(Request $request): View
+    {
+        $this->authorize->authorize($request->user(), 'academic_standing.manage');
+
+        return view('admin.reports.standing-thresholds', [
+            'thresholds' => $this->standing->thresholds(),
+        ]);
+    }
+
+    public function updateStandingThresholds(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'good_min' => ['required', 'integer', 'min:0', 'max:400'],
+            'suspension_below' => ['required', 'integer', 'min:0', 'max:400', 'lt:good_min'],
+        ], [
+            'suspension_below.lt' => __('reports.thresholds_order_invalid'),
+        ]);
+
+        $this->standing->updateThresholds($request->user(), $data);
+
+        return redirect()
+            ->route('admin.reports.standing.thresholds')
+            ->with('status', __('reports.thresholds_saved'));
     }
 
     public function csv(Request $request, string $report): StreamedResponse

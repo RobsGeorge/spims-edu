@@ -5,6 +5,10 @@ namespace App\Services\Reports;
 use App\Enums\AcademicStanding;
 use App\Models\Setting;
 use App\Models\StudentProgram;
+use App\Models\User;
+use App\Support\AuditLogWriter;
+use App\Support\AuthorizeService;
+use Illuminate\Validation\ValidationException;
 
 class AcademicStandingService
 {
@@ -15,6 +19,15 @@ class AcademicStandingService
 
     /** Suspension below this GPA, stored as hundredths (100 = 1.00). */
     public const DEFAULT_SUSPENSION_BELOW = 100;
+
+    public const MIN_HUNDREDTHS = 0;
+
+    public const MAX_HUNDREDTHS = 400;
+
+    public function __construct(
+        private readonly AuthorizeService $authorize,
+        private readonly AuditLogWriter $audit,
+    ) {}
 
     /**
      * @return array{good_min: int, suspension_below: int}
@@ -27,6 +40,53 @@ class AcademicStandingService
             'good_min' => (int) ($value['good_min'] ?? self::DEFAULT_GOOD_MIN),
             'suspension_below' => (int) ($value['suspension_below'] ?? self::DEFAULT_SUSPENSION_BELOW),
         ];
+    }
+
+    /**
+     * @param  array{good_min: int|string, suspension_below: int|string}  $data
+     * @return array{good_min: int, suspension_below: int}
+     */
+    public function updateThresholds(User $actor, array $data): array
+    {
+        $this->authorize->authorize($actor, 'academic_standing.manage');
+
+        $goodMin = (int) $data['good_min'];
+        $suspensionBelow = (int) $data['suspension_below'];
+
+        if ($goodMin < self::MIN_HUNDREDTHS || $goodMin > self::MAX_HUNDREDTHS
+            || $suspensionBelow < self::MIN_HUNDREDTHS || $suspensionBelow > self::MAX_HUNDREDTHS) {
+            throw ValidationException::withMessages([
+                'good_min' => [__('reports.thresholds_range', [
+                    'min' => self::MIN_HUNDREDTHS,
+                    'max' => self::MAX_HUNDREDTHS,
+                ])],
+            ]);
+        }
+
+        if ($suspensionBelow >= $goodMin) {
+            throw ValidationException::withMessages([
+                'suspension_below' => [__('reports.thresholds_order_invalid')],
+            ]);
+        }
+
+        $this->audit->withAudit($actor, 'academic_standing.thresholds', function () use ($actor, $goodMin, $suspensionBelow) {
+            $setting = Setting::query()->updateOrCreate(
+                ['key' => self::SETTING_KEY],
+                [
+                    'value' => [
+                        'good_min' => $goodMin,
+                        'suspension_below' => $suspensionBelow,
+                    ],
+                    'updated_by_id' => $actor->id,
+                ]
+            );
+
+            $this->reapplyCached();
+
+            return $setting;
+        }, 'Setting');
+
+        return $this->thresholds();
     }
 
     public function apply(StudentProgram $sp): void
@@ -59,5 +119,13 @@ class AcademicStandingService
         }
 
         return AcademicStanding::Good;
+    }
+
+    private function reapplyCached(): void
+    {
+        StudentProgram::query()
+            ->whereNotNull('cached_gpa')
+            ->get()
+            ->each(fn (StudentProgram $sp) => $this->apply($sp));
     }
 }

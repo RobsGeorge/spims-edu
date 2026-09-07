@@ -270,4 +270,40 @@ class LiveCommsTest extends TestCase
         $this->assertSame(4, LiveSession::query()->where('offering_id', $offering->id)->count());
         $this->assertDatabaseHas('audit_logs', ['action' => 'live.recurrence']);
     }
+
+    #[Test]
+    public function join_url_uses_offering_staff_not_instructor_role(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $staffed = User::factory()->withRole(RoleType::Instructor)->create();
+        $outsider = User::factory()->withRole(RoleType::Instructor)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $offering = $this->offeringWithStudent($student);
+        $this->staffOffering($staffed, $offering);
+
+        $session = app(LiveSessionService::class)->schedule($adm, $offering, [
+            'title' => 'Host check',
+            'scheduled_start' => now()->addHour(),
+            'duration_minutes' => 60,
+        ]);
+        $session->update(['scheduled_start' => now()->subMinutes(5)]);
+
+        $staffedRedirect = $this->actingAs($staffed)->post(route('live.join', $session));
+        $staffedRedirect->assertRedirect();
+        $this->assertSame($session->zoom_start_url, $staffedRedirect->headers->get('Location'));
+
+        $deanRedirect = $this->actingAs($adm)->post(route('live.join', $session));
+        $deanRedirect->assertRedirect();
+        $this->assertSame($session->zoom_start_url, $deanRedirect->headers->get('Location'));
+
+        $studentRedirect = $this->actingAs($student)->post(route('live.join', $session));
+        $studentRedirect->assertRedirect();
+        $this->assertSame($session->zoom_join_url, $studentRedirect->headers->get('Location'));
+        $this->assertNotSame($session->zoom_start_url, $studentRedirect->headers->get('Location'));
+
+        $this->actingAs($outsider)
+            ->postJson(route('live.join', $session))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('session');
+    }
 }

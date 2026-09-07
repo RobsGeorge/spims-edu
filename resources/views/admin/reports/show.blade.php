@@ -5,6 +5,9 @@
     <x-page-header :title="$title" :subtitle="$subtitle">
         <x-slot:actions>
             <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-secondary">{{ __('reports.back_hub') }}</a>
+            @if(($report ?? '') === 'standing' && !empty($canManageStanding))
+                <a href="{{ route('admin.reports.standing.thresholds') }}" class="btn btn-outline-primary">{{ __('reports.edit_thresholds') }}</a>
+            @endif
             <a href="{{ route('admin.reports.csv', $report) }}" class="btn btn-primary">{{ __('reports.download_csv') }}</a>
         </x-slot:actions>
     </x-page-header>

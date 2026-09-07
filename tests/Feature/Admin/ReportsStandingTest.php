@@ -28,9 +28,11 @@ use App\Models\GradingScheme;
 use App\Models\Program;
 use App\Models\ProgramCourse;
 use App\Models\Semester;
+use App\Models\Setting;
 use App\Models\StudentProgram;
 use App\Models\User;
 use App\Services\Gradebook\GradebookService;
+use App\Services\Reports\AcademicStandingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -356,5 +358,77 @@ class ReportsStandingTest extends TestCase
             ->assertOk()
             ->assertSee(ApplicationStatus::Submitted->value)
             ->assertSee(ApplicationStatus::Accepted->value);
+    }
+
+    #[Test]
+    public function academic_admin_can_post_thresholds_and_reapply_standing(): void
+    {
+        $bundle = $this->lockedCohort();
+        $dean = $bundle['dean'];
+
+        $mid = StudentProgram::query()->create([
+            'student_id' => User::factory()->withRole(RoleType::Student)->create()->id,
+            'program_id' => $bundle['program']->id,
+            'status' => StudentProgramStatus::Active,
+            'enrolled_at' => now(),
+            'cached_gpa' => 1.50,
+        ]);
+        app(AcademicStandingService::class)->apply($mid);
+        $this->assertSame(AcademicStanding::Probation, $mid->fresh()->academic_standing);
+
+        $this->actingAs($dean)
+            ->get(route('admin.reports.index'))
+            ->assertOk()
+            ->assertSee(__('reports.thresholds_title'));
+
+        $this->actingAs($dean)
+            ->get(route('admin.reports.standing'))
+            ->assertOk()
+            ->assertSee(__('reports.edit_thresholds'));
+
+        $this->actingAs($dean)
+            ->get(route('admin.reports.standing.thresholds'))
+            ->assertOk()
+            ->assertSee(__('reports.good_min'))
+            ->assertSee(__('reports.suspension_below'))
+            ->assertSee(__('reports.thresholds_help'));
+
+        $this->actingAs($dean)
+            ->post(route('admin.reports.standing.thresholds.update'), [
+                'good_min' => 200,
+                'suspension_below' => 160,
+            ])
+            ->assertRedirect(route('admin.reports.standing.thresholds'));
+
+        $this->assertSame(AcademicStanding::Suspension, $mid->fresh()->academic_standing);
+        $this->assertSame(
+            ['good_min' => 200, 'suspension_below' => 160],
+            Setting::query()->find(AcademicStandingService::SETTING_KEY)?->value
+        );
+        $this->assertTrue(
+            AuditLog::query()->where('action', 'academic_standing.thresholds')->exists()
+        );
+    }
+
+    #[Test]
+    public function student_and_finance_admin_cannot_change_standing_thresholds(): void
+    {
+        $this->lockedCohort();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $bursar = User::factory()->withRole(RoleType::FinancialAdmin)->create();
+
+        $this->actingAs($student)->get(route('admin.reports.standing.thresholds'))->assertForbidden();
+        $this->actingAs($student)->post(route('admin.reports.standing.thresholds.update'), [
+            'good_min' => 200,
+            'suspension_below' => 160,
+        ])->assertForbidden();
+
+        $this->actingAs($bursar)->get(route('admin.reports.index'))->assertOk()->assertDontSee(__('reports.thresholds_title'));
+        $this->actingAs($bursar)->get(route('admin.reports.standing'))->assertOk()->assertDontSee(__('reports.edit_thresholds'));
+        $this->actingAs($bursar)->get(route('admin.reports.standing.thresholds'))->assertForbidden();
+        $this->actingAs($bursar)->post(route('admin.reports.standing.thresholds.update'), [
+            'good_min' => 200,
+            'suspension_below' => 160,
+        ])->assertForbidden();
     }
 }

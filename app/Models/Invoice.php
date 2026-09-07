@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Currency;
 use App\Enums\InvoiceStatus;
+use App\Enums\PaymentPlanStatus;
 use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -47,6 +48,20 @@ class Invoice extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function paymentPlans(): HasMany
+    {
+        return $this->hasMany(PaymentPlan::class);
+    }
+
+    public function openPaymentPlan(): ?PaymentPlan
+    {
+        $this->loadMissing('paymentPlans.installments');
+
+        return $this->paymentPlans->first(
+            fn (PaymentPlan $plan) => $plan->status === PaymentPlanStatus::Open
+        );
     }
 
     public function amountPaid(): int

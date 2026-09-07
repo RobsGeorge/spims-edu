@@ -27,6 +27,7 @@ use App\Models\ProgramRequirementFulfillment;
 use App\Models\StudentProgram;
 use App\Models\User;
 use App\Services\Assessment\AttemptService;
+use App\Services\Assessment\ResultsVisibilityService;
 use App\Services\Live\AttendanceService;
 use App\Services\Projects\ProjectGradingService;
 use App\Services\Reports\AcademicStandingService;
@@ -60,6 +61,7 @@ class GradebookService
         private readonly AttendanceService $attendance,
         private readonly ProjectGradingService $projects,
         private readonly AcademicStandingService $standing,
+        private readonly ResultsVisibilityService $visibility,
     ) {}
 
     public function seedFromTemplate(User $actor, CourseOffering $offering, ?AssessmentTemplate $template = null): void
@@ -250,9 +252,33 @@ class GradebookService
     }
 
     /**
+     * Staff / lock / submit rollup. Includes every scored component, even when
+     * linked exam results are not yet announced to the student.
+     *
      * @return array{percent: float, components: array<int, array{id: string, name: string, weight: float, score: float|null}>, letter?: string|null}
      */
     public function computeEnrollment(Enrollment $enrollment): array
+    {
+        return $this->computeEnrollmentPercent($enrollment, null);
+    }
+
+    /**
+     * Student-facing running percent. Drops components whose linked assessments
+     * are not scoresVisible (typically ON_RELEASE exams before announce) and
+     * renormalizes remaining visible weights. Null when nothing visible is scored
+     * so the grades Blade dash stays "—".
+     *
+     * @return array{percent: float|null, components: array<int, array{id: string, name: string, weight: float, score: float|null}>}
+     */
+    public function computeEnrollmentForStudent(Enrollment $enrollment, User $student): array
+    {
+        return $this->computeEnrollmentPercent($enrollment, $student);
+    }
+
+    /**
+     * @return array{percent: float|null, components: array<int, array{id: string, name: string, weight: float, score: float|null}>}
+     */
+    private function computeEnrollmentPercent(Enrollment $enrollment, ?User $studentViewer): array
     {
         $enrollment->loadMissing(['student', 'offering']);
         $components = $this->offeringCache !== null && $this->offeringCache['offering_id'] === $enrollment->offering_id
@@ -266,7 +292,9 @@ class GradebookService
         $weightSum = 0.0;
 
         foreach ($components as $component) {
-            $score = $this->componentPercent($component, $enrollment->student);
+            $hidden = $studentViewer !== null
+                && ! $this->componentScoresVisibleToStudent($component, $studentViewer);
+            $score = $hidden ? null : $this->componentPercent($component, $enrollment->student);
             $rows[] = [
                 'id' => $component->id,
                 'name' => $component->name,
@@ -279,11 +307,31 @@ class GradebookService
             }
         }
 
-        $percent = $weightSum > 0
-            ? round($weighted / ($weightSum / 100), 2)
-            : 0.0;
+        if ($weightSum > 0) {
+            $percent = round($weighted / ($weightSum / 100), 2);
+        } else {
+            $percent = $studentViewer !== null ? null : 0.0;
+        }
 
         return ['percent' => $percent, 'components' => $rows];
+    }
+
+    /**
+     * A component leaks into the student rollup if any linked assessment is
+     * still hidden. Assignment / attendance / discussion / project components
+     * with no Assessment rows stay visible.
+     */
+    private function componentScoresVisibleToStudent(GradebookComponent $component, User $student): bool
+    {
+        $assessments = $this->assessmentsFor($component);
+        foreach ($assessments as $assessment) {
+            $assessment->loadMissing(['offering', 'resultAnnouncement']);
+            if (! $this->visibility->scoresVisible($assessment, $student)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function submitGrades(User $actor, CourseOffering $offering): void

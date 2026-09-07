@@ -13,6 +13,7 @@ use App\Models\Refund;
 use App\Models\User;
 use App\Services\Finance\DonationService;
 use App\Services\Finance\InvoiceService;
+use App\Services\Finance\PaymentPlanService;
 use App\Services\Finance\PaymentService;
 use App\Services\Finance\WalletService;
 use App\Services\Reports\ReportService;
@@ -33,7 +34,7 @@ class FinanceAdminController extends Controller
 
         return view('admin.finance.index', [
             'students' => $students,
-            'invoices' => Invoice::query()->with('student')->latest()->limit(50)->get(),
+            'invoices' => Invoice::query()->with(['student', 'paymentPlans.installments'])->latest()->limit(50)->get(),
             'pendingManual' => Payment::query()
                 ->where('status', \App\Enums\PaymentStatus::PendingVerification)
                 ->with(['student', 'invoice'])
@@ -61,6 +62,32 @@ class FinanceAdminController extends Controller
         );
 
         return back()->with('status', __('finance.invoice_created'));
+    }
+
+    public function showInvoice(Invoice $invoice): View
+    {
+        $invoice->load(['student', 'lines', 'payments', 'paymentPlans.installments']);
+
+        return view('admin.finance.invoice', [
+            'invoice' => $invoice,
+        ]);
+    }
+
+    public function attachPaymentPlan(Request $request, Invoice $invoice, PaymentPlanService $plans): RedirectResponse
+    {
+        $data = $request->validate([
+            'installment_count' => 'required|integer|min:2|max:12',
+            'start_on' => 'nullable|date',
+        ]);
+
+        $plans->create(
+            $request->user(),
+            $invoice,
+            (int) $data['installment_count'],
+            isset($data['start_on']) ? \Illuminate\Support\Carbon::parse($data['start_on']) : null
+        );
+
+        return back()->with('status', __('finance.plan_created'));
     }
 
     public function recordManual(Request $request, Invoice $invoice, PaymentService $payments): RedirectResponse

@@ -31,7 +31,7 @@ class PaymentService
     ) {}
 
     /**
-     * @param  array{wallet_money?: int, wallet_points?: int, gateway?: string}  $split
+     * @param  array{wallet_money?: int, wallet_points?: int, gateway?: string, amount_minor?: int, installment_id?: string}  $split
      */
     public function checkout(User $student, Invoice $invoice, array $split = []): Payment
     {
@@ -50,22 +50,27 @@ class PaymentService
             throw ValidationException::withMessages(['invoice' => [__('finance.nothing_due')]]);
         }
 
+        $requested = array_key_exists('amount_minor', $split) ? (int) $split['amount_minor'] : $due;
+        if ($requested < 1 || $requested > $due) {
+            throw ValidationException::withMessages(['amount_minor' => [__('finance.invalid_split')]]);
+        }
+
         $walletMoney = (int) ($split['wallet_money'] ?? 0);
         $walletPoints = (int) ($split['wallet_points'] ?? 0);
-        $gatewayPortion = $due - $walletMoney - $walletPoints;
+        $gatewayPortion = $requested - $walletMoney - $walletPoints;
 
         if ($walletMoney < 0 || $walletPoints < 0 || $gatewayPortion < 0) {
             throw ValidationException::withMessages(['split' => [__('finance.invalid_split')]]);
         }
 
-        return DB::transaction(function () use ($student, $invoice, $due, $walletMoney, $walletPoints, $gatewayPortion, $split) {
+        return DB::transaction(function () use ($student, $invoice, $requested, $walletMoney, $walletPoints, $gatewayPortion, $split) {
             $method = $this->resolvePrimaryMethod($invoice->currency, $walletMoney, $walletPoints, $gatewayPortion, $split['gateway'] ?? null);
 
             $payment = Payment::query()->create([
                 'student_id' => $student->id,
                 'invoice_id' => $invoice->id,
                 'currency' => $invoice->currency,
-                'amount_minor' => $due,
+                'amount_minor' => $requested,
                 'method' => $method,
                 'status' => PaymentStatus::Pending,
             ]);
@@ -83,11 +88,11 @@ class PaymentService
 
                 if ($this->mockAutoCompleteEnabled()) {
                     $payment->update(['status' => PaymentStatus::Completed]);
-                    $this->finalizeCompletedPayment($payment->fresh());
+                    $this->finalizeCompletedPayment($payment->fresh(), $split['installment_id'] ?? null);
                 }
             } else {
                 $payment->update(['status' => PaymentStatus::Completed]);
-                $this->finalizeCompletedPayment($payment->fresh());
+                $this->finalizeCompletedPayment($payment->fresh(), $split['installment_id'] ?? null);
             }
 
             return $payment->fresh();
@@ -309,7 +314,26 @@ class PaymentService
         });
     }
 
-    private function finalizeCompletedPayment(Payment $payment): void
+    /**
+     * Complete a pending gateway payment when the testing/local mock flag is on.
+     */
+    public function completeIfMock(Payment $payment): Payment
+    {
+        if (! $this->mockAutoCompleteEnabled()) {
+            return $payment->fresh();
+        }
+
+        if ($payment->status === PaymentStatus::Completed) {
+            return $payment;
+        }
+
+        $payment->update(['status' => PaymentStatus::Completed]);
+        $this->finalizeCompletedPayment($payment->fresh());
+
+        return $payment->fresh();
+    }
+
+    private function finalizeCompletedPayment(Payment $payment, ?string $installmentId = null): void
     {
         if ($payment->receipt_serial === null) {
             $payment->update([
@@ -328,6 +352,7 @@ class PaymentService
             $invoice = Invoice::query()->find($payment->invoice_id);
             if ($invoice) {
                 $this->invoices->refreshStatus($invoice);
+                app(PaymentPlanService::class)->applyPayment($invoice->fresh(), $payment, $installmentId);
             }
         }
 

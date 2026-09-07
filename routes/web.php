@@ -51,6 +51,7 @@ use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\AdvisingController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\Events\StudentEventController;
 use App\Http\Controllers\ExamAttemptController;
@@ -432,12 +433,26 @@ Route::middleware(['auth'])->group(function () {
         ->name('enrollments.withdraw');
     Route::get('/degree-audit/{studentProgram}', [EnrollmentController::class, 'audit'])->name('enrollments.audit');
 
+    // #16 advising + what-if
+    Route::get('/advising', [AdvisingController::class, 'index'])->name('advising.index');
+    Route::post('/advising/assign', [AdvisingController::class, 'assign'])->name('advising.assign');
+    Route::get('/advising/students/{student}', [AdvisingController::class, 'show'])->name('advising.show');
+    Route::post('/advising/students/{student}/holds', [AdvisingController::class, 'placeHold'])->name('advising.holds.store');
+    Route::post('/advising/holds/{hold}/release', [AdvisingController::class, 'releaseHold'])->name('advising.holds.release');
+
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::get('/finance/invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');
     Route::get('/finance/receipts/{payment}', [FinanceController::class, 'showReceipt'])->name('finance.receipts.show');
     Route::post('/finance/invoices/{invoice}/checkout', [FinanceController::class, 'checkout'])
         ->middleware('permission:finance.pay')
         ->name('finance.checkout');
+    // #17 payment plans + gateways
+    Route::post('/finance/invoices/{invoice}/payment-plan', [FinanceController::class, 'storePaymentPlan'])
+        ->middleware('permission:finance.pay')
+        ->name('finance.payment-plan.store');
+    Route::post('/finance/invoices/{invoice}/installments/{installment}/pay', [FinanceController::class, 'payInstallment'])
+        ->middleware('permission:finance.pay')
+        ->name('finance.installments.pay');
     // #13 live recurrence + refund
     Route::post('/finance/payments/{payment}/refund-request', [FinanceController::class, 'requestRefund'])
         ->middleware('permission:finance.pay')
@@ -772,6 +787,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/finance/invoices', [FinanceAdminController::class, 'storeInvoice'])
             ->middleware('permission:finance.invoices')
             ->name('finance.invoices.store');
+        // #17 payment plans + gateways
+        Route::get('/finance/invoices/{invoice}', [FinanceAdminController::class, 'showInvoice'])
+            ->middleware('permission:finance.invoices')
+            ->name('finance.invoices.show');
+        Route::post('/finance/invoices/{invoice}/payment-plan', [FinanceAdminController::class, 'attachPaymentPlan'])
+            ->middleware('permission:finance.invoices')
+            ->name('finance.payment-plan.store');
         Route::post('/finance/invoices/{invoice}/manual', [FinanceAdminController::class, 'recordManual'])
             ->middleware('permission:finance.manual')
             ->name('finance.manual');
@@ -803,6 +825,11 @@ Route::middleware(['auth'])->group(function () {
             ->name('reports.finance');
         Route::get('/reports/standing', [ReportController::class, 'standing'])
             ->name('reports.standing');
+        // leftover polish
+        Route::get('/reports/standing/thresholds', [ReportController::class, 'standingThresholds'])
+            ->name('reports.standing.thresholds');
+        Route::post('/reports/standing/thresholds', [ReportController::class, 'updateStandingThresholds'])
+            ->name('reports.standing.thresholds.update');
         Route::get('/reports/{report}/csv', [ReportController::class, 'csv'])
             ->where('report', 'headcount|admissions|attendance|grades|finance|standing')
             ->name('reports.csv');

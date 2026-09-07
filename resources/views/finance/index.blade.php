@@ -76,6 +76,11 @@
             <td>{{ $invoice->amountDue() }}</td>
             <td>
                 <a href="{{ route('finance.invoices.show', $invoice) }}">{{ __('finance.pay') }}</a>
+                @if($invoice->openPaymentPlan())
+                    <span class="badge text-bg-secondary ms-1">{{ __('finance.plan_badge') }}</span>
+                @elseif($invoice->amountDue() > 0 && $invoice->amountPaid() === 0)
+                    <span class="small ms-1">{{ __('finance.pay_in_n', ['n' => 3]) }}</span>
+                @endif
                 @foreach($invoice->payments as $payment)
                     @if($payment->status === PaymentStatus::Completed || $payment->receipt_serial)
                         <a href="{{ route('finance.receipts.show', $payment) }}" class="ms-2">{{ __('finance.view_receipt') }}</a>

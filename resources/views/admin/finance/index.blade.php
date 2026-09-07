@@ -86,7 +86,7 @@
     <tbody>
     @foreach($invoices as $invoice)
         <tr>
-            <td>{{ $invoice->id }}</td>
+            <td><a href="{{ route('admin.finance.invoices.show', $invoice) }}">{{ $invoice->id }}</a></td>
             <td>{{ $invoice->student->email }}</td>
             <td>{{ $invoice->total_minor }} {{ $invoice->currency->value }}</td>
             <td>{{ $invoice->status->value }}</td>
@@ -101,6 +101,13 @@
                     <input type="number" name="amount_minor" class="form-control form-control-sm" value="{{ $invoice->amountDue() }}" min="1">
                     <button class="btn btn-sm btn-outline-primary">{{ __('finance.pay') }}</button>
                 </form>
+                @if($invoice->openPaymentPlan() === null && $invoice->amountDue() > 0 && $invoice->amountPaid() === 0)
+                <form method="POST" action="{{ route('admin.finance.payment-plan.store', $invoice) }}" class="d-flex gap-1 mt-1">
+                    @csrf
+                    <input type="number" name="installment_count" class="form-control form-control-sm" value="3" min="2" max="12" aria-label="{{ __('finance.installment_count') }}">
+                    <button class="btn btn-sm btn-outline-secondary">{{ __('finance.pay_in_n', ['n' => 3]) }}</button>
+                </form>
+                @endif
             </td>
         </tr>
     @endforeach

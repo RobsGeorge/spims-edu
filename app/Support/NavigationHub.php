@@ -102,7 +102,7 @@ class NavigationHub
                 'label' => __('hubs.nav_teach'),
                 'route' => 'teach.index',
                 'icon' => 'bi-easel2',
-                'active' => request()->routeIs('teach.*'),
+                'active' => request()->routeIs('teach.*') || request()->routeIs('advising.*'),
             ];
         }
 
@@ -111,7 +111,7 @@ class NavigationHub
                 'label' => __('hubs.nav_academic'),
                 'route' => 'hubs.academic',
                 'icon' => 'bi-mortarboard',
-                'active' => request()->routeIs('hubs.academic') || request()->routeIs('admin.programs.*') || request()->routeIs('admin.courses.*') || request()->routeIs('admin.offerings.*') || request()->routeIs('admin.reports.*'),
+                'active' => request()->routeIs('hubs.academic') || request()->routeIs('admin.programs.*') || request()->routeIs('admin.courses.*') || request()->routeIs('admin.offerings.*') || request()->routeIs('admin.reports.*') || request()->routeIs('advising.*'),
             ];
         }
 
@@ -204,6 +204,7 @@ class NavigationHub
         }
 
         return array_values(array_filter([
+            self::link('advising.index', 'hubs.advising', 'bi-person-lines-fill', 'hubs.advising_desc'),
             self::link('admin.programs.index', 'hubs.programs', 'bi-mortarboard', 'hubs.programs_desc'),
             self::link('admin.courses.index', 'hubs.courses', 'bi-book', 'hubs.courses_desc'),
             self::link('admin.offerings.index', 'hubs.offerings', 'bi-calendar3', 'hubs.offerings_desc'),
@@ -232,6 +233,7 @@ class NavigationHub
 
         return array_values(array_filter([
             self::link('admin.users.index', 'hubs.users', 'bi-people', 'hubs.users_desc'),
+            self::link('advising.index', 'hubs.advising', 'bi-person-lines-fill', 'hubs.advising_desc'),
             self::link('admin.enrollments.index', 'hubs.enrollment_admin', 'bi-person-plus', 'hubs.enrollment_admin_desc'),
             self::link('admin.theme.edit', 'hubs.theme', 'bi-palette', 'hubs.theme_desc'),
             self::link('admin.application-forms.index', 'hubs.app_forms', 'bi-ui-checks', 'hubs.app_forms_desc'),

@@ -20,6 +20,14 @@
                 'icon' => $link['icon'],
             ]])
         @endforeach
+        @if(!empty($canManageStanding))
+            @include('partials.hub-link-tile', ['link' => [
+                'route' => 'admin.reports.standing.thresholds',
+                'label' => __('reports.thresholds_title'),
+                'description' => __('reports.thresholds_desc'),
+                'icon' => 'bi-sliders',
+            ]])
+        @endif
     </div>
 </div>
 @endsection
