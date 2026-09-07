@@ -12,7 +12,7 @@
         <div class="min-w-0">
             <h1 class="spims-title mb-1">{{ $title }}</h1>
             @if($subtitle)
-                <p class="text-muted-theme mb-0">{{ $subtitle }}</p>
+                <p class="spims-text-dim mb-0">{{ $subtitle }}</p>
             @endif
         </div>
         @isset($actions)
