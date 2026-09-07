@@ -132,26 +132,31 @@ class SystemSettingService
      */
     private function validate(array $payload): array
     {
+        $nested = [];
         $rules = [];
 
-        foreach ($payload as $key => $unused) {
+        foreach ($payload as $key => $value) {
             $definition = $this->definitions()[$key];
+            data_set($nested, $key, $value);
             $rules[$key] = $this->rulesFor($definition);
         }
 
-        $validated = validator($payload, $rules)->validate();
+        $validatedNested = validator($nested, $rules)->validate();
 
-        foreach ($validated as $key => $value) {
+        $validated = [];
+        foreach ($payload as $key => $unused) {
+            $value = data_get($validatedNested, $key);
             $type = $this->definitions()[$key]['type'] ?? 'string';
             if ($type === 'int_list') {
-                $validated[$key] = $this->normalizeIntList($value);
+                $value = $this->normalizeIntList($value);
             }
             if ($type === 'int') {
-                $validated[$key] = (int) $value;
+                $value = (int) $value;
             }
             if ($type === 'string') {
-                $validated[$key] = trim((string) $value);
+                $value = trim((string) $value);
             }
+            $validated[$key] = $value;
         }
 
         return $validated;

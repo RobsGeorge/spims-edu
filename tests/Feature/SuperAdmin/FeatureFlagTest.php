@@ -78,6 +78,8 @@ class FeatureFlagTest extends TestCase
             ->put(route('superadmin.features.update', 'registration'), ['enabled' => '0'])
             ->assertRedirect();
 
+        $this->post(route('auth.logout'));
+
         $this->get(route('auth.register'))->assertNotFound();
         $this->get(route('home'))
             ->assertOk()

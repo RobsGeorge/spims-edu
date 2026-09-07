@@ -22,14 +22,15 @@ class SystemSettingTest extends TestCase
 
         $this->assertSame(60, app(AttendanceService::class)->defaultThresholdPercent());
 
-        $this->actingAs($sa)
+        $response = $this->actingAs($sa)
             ->from(route('superadmin.config'))
             ->put(route('superadmin.config.update'), [
                 'settings' => [
                     'attendance.default_threshold' => '90',
                 ],
-            ])
-            ->assertRedirect();
+            ]);
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
 
         $this->assertSame(90, app(SystemSettingService::class)->value('attendance.default_threshold'));
         $this->assertSame(90, app(AttendanceService::class)->defaultThresholdPercent());
