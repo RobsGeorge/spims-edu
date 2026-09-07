@@ -332,6 +332,47 @@ Centred empty-state placeholder with icon, title, and optional message/actions.
 <x-empty-state :title="__('ui.no_results')" icon="bi-inbox" />
 ```
 
+### confirm-dialog
+
+Bootstrap modal for destructive actions. Accepts optional `confirm` slot to override the default submit button.
+
+**Required props:** `id` (string), `title` (string), `message` (string)
+
+**Optional props:** `confirmLabel` (string), `cancelLabel` (string), `tone` (`danger`|`primary`, default: `danger`)
+
+**Optional slots:** `confirm` (override confirm button), default slot (extra body content)
+
+```blade
+<x-confirm-dialog
+    id="delete-user"
+    title="Delete user?"
+    message="This action cannot be undone."
+    tone="danger"
+>
+    <x-slot:confirm>
+        <form method="POST" action="...">
+            @csrf @method('DELETE')
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+    </x-slot:confirm>
+</x-confirm-dialog>
+```
+
+### status-badge
+
+String-keyed semantic status badge with automatic tone mapping.
+
+**Required props:** `status` (string)
+
+**Optional props:** `label` (string — display text override)
+
+**Tone mapping:** success → active/enrolled/released/paid/open/present; warning → pending/waitlist/draft/partial; danger → failed/rejected/suspended/locked/absent/dropped/withdrawn; info → processing/completed; neutral → everything else.
+
+```blade
+<x-status-badge status="active" />
+<x-status-badge status="suspended" label="Suspended" />
+```
+
 ---
 
 ## Icon Vocabulary

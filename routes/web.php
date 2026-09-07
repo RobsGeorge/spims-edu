@@ -1084,3 +1084,12 @@ Route::middleware(['auth'])->group(function () {
             ->name('events.check-in');
     });
 });
+
+// ## track:A2-a — layouts / partials / hubs / roles-hub
+// ## track:A2-b — auth / errors / catalog / announcements / notifications / settings
+// ## track:A2-c — learn / courses / assessments / assignments / completion / discussions / attendance / live
+// ## track:A2-d — teach / offerings
+// ## track:A2-e — finance / credentials / enrollments / grades / advising / applications
+// ## track:A2-f — admin offerings / gradebook / assessments / attendance / completion-criteria / offering-closing
+// ## track:A2-g — admin programs / courses / semesters / academic-years / grading-schemes / users / translations / theme
+// ## track:A2-h — admin applications / application-forms / enrollments / communications / credentials / certificate-templates / events / staff
