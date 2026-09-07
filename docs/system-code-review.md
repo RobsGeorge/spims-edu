@@ -1,6 +1,6 @@
 # SPIMS system code review
 
-> **2026-09-07 (`main` @ `acb20cb`):** S0–S8, S6 Wave E, and the S9 domain (events + live quiz on polling) are already on `main`. Prompts #10 (S5), #11 (S4), #14 (S6 A–D), #18 (S7), #19 (S8), and #20 (S9) in [agent-implementation-prompts.md](agent-implementation-prompts.md) are **cancelled — do not re-implement**. `gradebook.reopen` on the instructor API and applicant `WITHDRAWN` already landed (`e50faa8` and after). Leftover work: discussion attachments via `ObjectStorageService`, advisor what-if on the student API, program-level standing overrides, Paymob `integration_id` in `config/services.php`, `permissions:sync` for newer keys, optional Reverb, WhatsApp driver, and items in [PARKING-LOT.md](../PARKING-LOT.md). Sections below are a 2026-09-06 snapshot of `7cec603` unless this banner or §8 says otherwise.
+> **2026-09-07 (`main` after discussion-attachments merge):** S0–S8, S6 Wave E, and the S9 domain (events + live quiz on polling) are already on `main`. Prompts #10 (S5), #11 (S4), #14 (S6 A–D), #18 (S7), #19 (S8), and #20 (S9) in [agent-implementation-prompts.md](agent-implementation-prompts.md) are **cancelled — do not re-implement**. `gradebook.reopen`, applicant `WITHDRAWN`, and discussion attachments via `ObjectStorageService` already landed. Leftover work: advisor what-if on the student API, program-level standing overrides, Paymob `integration_id` in `config/services.php`, `permissions:sync` for newer keys, optional Reverb, WhatsApp driver, and items in [PARKING-LOT.md](../PARKING-LOT.md). Sections below are a 2026-09-06 snapshot of `7cec603` unless this banner or §8 says otherwise.
 
 **Date:** 2026-09-06 (snapshot)
 **Reviewed:** `main` @ `7cec603` (then: S0–S3 delivered). **Current `main` @ `acb20cb`:** S0–S8 + S6E + S9 domain shipped; S4–S9 are not greenfield.
@@ -165,14 +165,13 @@ These already have tables and services. They fail a client demo or a registrar�
 
 **Roadmap already on `main` (do not re-implement):** S4, S5, S6 A–E, S7, S8, and the S9 domain (events + live quiz on polling). Prompts #10, #11, #14, #18, #19, #20 are cancelled.
 
-**Leftover after `acb20cb` (not a new S-phase):**
+**Leftover after this merge (not a new S-phase):**
 
-1. Discussion attachments via `ObjectStorageService` (column exists; upload path unused).
-2. Advisor what-if on the student API (web what-if exists).
-3. Program-level academic-standing overrides (school-wide thresholds exist).
-4. Paymob `integration_id` in `config/services.php` / `.env.example`.
-5. `permissions:sync` for newer keys after deploy.
-6. Optional Reverb; WhatsApp driver; lockdown browser; native apps; other [PARKING-LOT.md](../PARKING-LOT.md) items.
+1. Advisor what-if on the student API (web what-if exists).
+2. Program-level academic-standing overrides (school-wide thresholds exist).
+3. Paymob `integration_id` in `config/services.php` / `.env.example`.
+4. `permissions:sync` for newer keys after deploy.
+5. Optional Reverb; WhatsApp driver; lockdown browser; native apps; other [PARKING-LOT.md](../PARKING-LOT.md) items.
 
 ### 3.3 Suitable to add to become Populi-like
 
@@ -348,15 +347,14 @@ Gaps in the *test* surface (not the product):
 
 ## 8. Recommended build order (after this review)
 
-**Do not start S4, S5, S6, S7, S8, or S9 as greenfield.** Those phases (plus S6 Wave E and the S9 domain on polling) are on `main` @ `acb20cb`. `gradebook.reopen` on the instructor API and applicant `WITHDRAWN` already landed (`e50faa8` and after).
+**Do not start S4, S5, S6, S7, S8, or S9 as greenfield.** Those phases (plus S6 Wave E and the S9 domain on polling) are on `main`. `gradebook.reopen`, applicant `WITHDRAWN`, and discussion attachments via `ObjectStorageService` already landed.
 
 Historical P0/P1 from the 2026-09-06 snapshot (teach 500, demo seeder, operator CRUD) may already be fixed — verify against current `main` before opening a prompt. Remaining work that is still open:
 
-1. **Discussion attachments** through `ObjectStorageService` (if still unused).
-2. **Advisor what-if** on the student `/api/v1` (web exists).
-3. **Program-level standing overrides** (school-wide hundredths exist).
-4. **Paymob `integration_id`** wiring in config / env.
-5. **`permissions:sync`** so newer keys land on deployed role rows.
-6. **Optional Reverb**, WhatsApp driver, and other parked items — only when named.
+1. **Advisor what-if** on the student `/api/v1` (web exists).
+2. **Program-level standing overrides** (school-wide hundredths exist).
+3. **Paymob `integration_id`** wiring in config / env.
+4. **`permissions:sync`** so newer keys land on deployed role rows.
+5. **Optional Reverb**, WhatsApp driver, and other parked items — only when named.
 
 Do not start library, bookstore, housing, Title IV, or SCORM. They are Populi features for a different school.
