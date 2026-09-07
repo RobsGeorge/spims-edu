@@ -4,11 +4,14 @@ namespace Tests\Feature\Api;
 
 use App\Enums\AssessmentMode;
 use App\Enums\ProgramType;
+use App\Enums\RequirementType;
 use App\Enums\StudentProgramStatus;
 use App\Models\AcademicRecord;
 use App\Models\Assessment;
+use App\Models\Course;
 use App\Models\GradingScheme;
 use App\Models\Program;
+use App\Models\ProgramCourse;
 use App\Models\StudentProgram;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -148,6 +151,105 @@ class StudentWaveBTest extends TestCase
 
         $this->withToken($this->apiToken($mine))
             ->getJson(route('api.v1.degree-audit.show', $sp))
+            ->assertNotFound()
+            ->assertJsonPath('code', 'NOT_FOUND');
+    }
+
+    #[Test]
+    public function owner_what_if_increases_electives_without_writing_records(): void
+    {
+        $this->seed(\Database\Seeders\GradingSchemeSeeder::class);
+        $student = $this->student();
+        $program = Program::query()->create([
+            'code' => 'DIPW',
+            'name' => 'Diploma What-If',
+            'type' => ProgramType::Diploma,
+            'max_credits_per_semester' => 15,
+            'max_courses_per_semester' => 5,
+            'max_semesters_to_graduate' => 8,
+            'elective_credits_required' => 3,
+            'grading_scheme_id' => GradingScheme::query()->first()->id,
+            'active' => true,
+        ]);
+        $required = Course::query()->create([
+            'code' => 'REQW',
+            'title' => 'Required',
+            'credit_hours' => 3,
+            'active' => true,
+        ]);
+        $elective = Course::query()->create([
+            'code' => 'ET101',
+            'title' => 'Elective topics',
+            'credit_hours' => 3,
+            'active' => true,
+        ]);
+        ProgramCourse::query()->create([
+            'program_id' => $program->id,
+            'course_id' => $required->id,
+            'requirement' => RequirementType::Required,
+        ]);
+        ProgramCourse::query()->create([
+            'program_id' => $program->id,
+            'course_id' => $elective->id,
+            'requirement' => RequirementType::Elective,
+        ]);
+        $sp = StudentProgram::query()->create([
+            'student_id' => $student->id,
+            'program_id' => $program->id,
+            'status' => StudentProgramStatus::Active,
+            'enrolled_at' => now(),
+        ]);
+
+        $records = AcademicRecord::query()->count();
+        $token = $this->apiToken($student);
+
+        $this->withToken($token)
+            ->postJson(route('api.v1.degree-audit.what-if', $sp), [
+                'hypothetical_course_ids' => [$elective->id],
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.what_if', true)
+            ->assertJsonPath('data.elective_credits_met', 3);
+
+        $this->assertSame($records, AcademicRecord::query()->count());
+
+        $this->withToken($token)
+            ->postJson(route('api.v1.degree-audit.what-if', $sp), [
+                'hypothetical_course_ids' => [],
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.what_if', true)
+            ->assertJsonPath('data.elective_credits_met', 0);
+    }
+
+    #[Test]
+    public function what_if_404s_for_another_students_program(): void
+    {
+        $this->seed(\Database\Seeders\GradingSchemeSeeder::class);
+        $mine = $this->student();
+        $theirs = $this->student();
+        $program = Program::query()->create([
+            'code' => 'DIPO',
+            'name' => 'Diploma Other',
+            'type' => ProgramType::Diploma,
+            'max_credits_per_semester' => 15,
+            'max_courses_per_semester' => 5,
+            'max_semesters_to_graduate' => 8,
+            'elective_credits_required' => 0,
+            'grading_scheme_id' => GradingScheme::query()->first()->id,
+            'active' => true,
+        ]);
+        $sp = StudentProgram::query()->create([
+            'student_id' => $theirs->id,
+            'program_id' => $program->id,
+            'status' => StudentProgramStatus::Active,
+            'enrolled_at' => now(),
+        ]);
+
+        $this->withToken($this->apiToken($mine))
+            ->postJson(route('api.v1.degree-audit.what-if', $sp), [
+                'hypothetical_course_ids' => [],
+            ])
             ->assertNotFound()
             ->assertJsonPath('code', 'NOT_FOUND');
     }

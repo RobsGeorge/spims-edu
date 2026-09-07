@@ -34,5 +34,6 @@ return [
     'run_what_if' => 'Run what-if',
     'reset_what_if' => 'Reset',
     'what_if_active' => 'What-if scenario',
+    'what_if_hint' => 'Includes a what-if planner. Nothing is saved.',
     'elective_remaining' => 'Remaining elective credits',
 ];

@@ -22,6 +22,7 @@
     @foreach($programs as $sp)
         <div class="py-2 border-bottom border-opacity-25">
             <a href="{{ route('enrollments.audit', $sp) }}">{{ __('enrollment.degree_audit') }} — {{ $sp->program->code }}</a>
+            <div class="small text-muted-theme">{{ __('advising.what_if_hint') }}</div>
         </div>
     @endforeach
 </section>
