@@ -643,6 +643,10 @@ class DemoDataSeeder extends Seeder
                 ->first();
 
             if ($existing !== null) {
+                if (! $existing->isPublished()) {
+                    $offerings->publishContentItem($actor, $existing);
+                    $existing = $existing->fresh();
+                }
                 $created[] = $existing;
 
                 continue;
@@ -653,6 +657,7 @@ class DemoDataSeeder extends Seeder
                 'title' => $title,
                 'body' => $body,
                 'order' => $i + 1,
+                'published' => true,
             ]);
         }
 

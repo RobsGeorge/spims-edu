@@ -81,6 +81,7 @@ class DemoDataSeederTest extends TestCase
             ->where('title', 'Welcome to Introduction to Theology')
             ->first();
         $this->assertNotNull($lesson);
+        $this->assertTrue($lesson->isPublished());
         $this->actingAs($student1)
             ->get(route('learn.item', [$th101, $lesson]))
             ->assertOk();

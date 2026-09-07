@@ -31,7 +31,8 @@ Superadmin env (defaults; no settings screen):
 Teach Content tab and admin offering show both include `offerings/partials/week-content-builder`.
 
 - Add / edit / delete / publish / unpublish on the same web routes (`offerings.content`, own offering).
-- New items created through the form or `OfferingService::addContentItem` start unpublished.
+- New items created through the form or `OfferingService::addContentItem` start unpublished unless the caller passes `published => true`.
+- `DemoDataSeeder` publishes Week 1 classroom items so the student walkthrough and catalog stay usable after `migrate:fresh --seed`.
 - Students, learn routes, student API item lists, and public Week 1 preview omit drafts.
 - Staff still see drafts in both editors.
 
