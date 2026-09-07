@@ -62,6 +62,6 @@ Teach and admin have **View as student**. It opens the real learn player with st
 
 `/offerings/{id}/preview` embeds published Week 1 video/PDF/image. Later weeks stay titles only. Stored files use `/offerings/{id}/preview/items/{item}/file` (Week 1 published only). Storage paths are not exposed in the public JSON.
 
-## Later slices
+## 8. Superadmin settings and CSP (shipped)
 
-8. CSP headers
+Env-only (`config/spims.php`): video providers, reading hosts, unknown-URL toggle, upload max/MIMEs, student download. `SecurityHeaders` sends `Content-Security-Policy: frame-src` for Vimeo, YouTube-nocookie, Drive, and Dropbox, and keeps `X-Frame-Options: SAMEORIGIN`.
