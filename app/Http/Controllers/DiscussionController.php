@@ -14,10 +14,9 @@ use App\Services\Teach\TeachAccessService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\HeaderUtils;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DiscussionController extends Controller
 {
@@ -133,7 +132,7 @@ class DiscussionController extends Controller
         int $index,
         DiscussionService $discussions,
         ObjectStorageService $storage,
-    ): StreamedResponse {
+    ): Response {
         try {
             $attachment = $discussions->attachmentForDownload($request->user(), $post, $index);
         } catch (AuthorizationException) {
@@ -148,9 +147,7 @@ class DiscussionController extends Controller
             $this->asciiDownloadName($attachment['name']),
         );
 
-        return response()->stream(function () use ($storage, $attachment) {
-            echo $storage->disk()->get($attachment['path']);
-        }, Response::HTTP_OK, [
+        return response($storage->disk()->get($attachment['path']), Response::HTTP_OK, [
             'Content-Type' => $this->mimeForPath($attachment['path'], $attachment['name']),
             'Content-Disposition' => $disposition,
             'X-Content-Type-Options' => 'nosniff',
