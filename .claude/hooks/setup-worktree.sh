@@ -16,12 +16,22 @@ cd "$wt"
 cp "$repo/.env" .env 2>/dev/null && echo "Copied .env" >&2 || echo "No .env to copy — continuing" >&2
 cp "$repo/.env.testing" .env.testing 2>/dev/null || true
 
-# Install dependencies
-echo "Running composer install..." >&2
-composer install --no-interaction --prefer-dist >&2
+# Reuse vendor/ from the main repo if present (avoids composer corrupting git remotes)
+if [[ -d "$repo/vendor" ]]; then
+  echo "Symlinking vendor/ from main repo..." >&2
+  ln -s "$repo/vendor" vendor
+else
+  echo "Running composer install..." >&2
+  # Run in a tmp dir so composer's own git context doesn't touch this worktree's .git
+  COMPOSER_HOME="$(mktemp -d)" composer install --no-interaction --prefer-dist --working-dir="$wt" >&2
+fi
 
-# Boot the app
-php artisan key:generate --force >&2
+# Boot the app only if .env was copied
+if [[ -f .env ]]; then
+  php artisan key:generate --force >&2
+else
+  echo "No .env — skipping key:generate (tests use .env.testing)" >&2
+fi
 
 # SQLite test DB
 touch database/database.sqlite
