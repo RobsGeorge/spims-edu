@@ -18,4 +18,10 @@ return [
     'no_offering' => 'Pas encore d’offre ouverte',
     'flag_interest' => 'Marquer mon intérêt',
     'programs' => 'Programmes',
+    'sort' => 'Tri',
+    'sort_code' => 'Code du cours',
+    'sort_interest' => 'Les plus signalés',
+    'interest_filter' => 'Intérêt',
+    'interest_all' => 'Tous les cours',
+    'interest_flagged' => 'Mes signalements',
 ];

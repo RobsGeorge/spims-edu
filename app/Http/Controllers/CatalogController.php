@@ -19,13 +19,14 @@ class CatalogController extends Controller
             'q' => 'nullable|string|max:100',
             'type' => 'nullable|in:all,standalone,program',
             'price' => 'nullable|in:all,free,paid',
+            'interest' => 'nullable|in:all,flagged',
+            'sort' => 'nullable|in:code,interest',
         ]);
 
         $query = Course::query()
             ->where('active', true)
             ->withCount('interestFlags')
-            ->with(['programCourses.program.applicationForms' => fn ($q) => $q->where('active', true)])
-            ->orderBy('code');
+            ->with(['programCourses.program.applicationForms' => fn ($q) => $q->where('active', true)]);
 
         if (! empty($filters['q'])) {
             $term = '%'.$filters['q'].'%';
@@ -48,6 +49,21 @@ class CatalogController extends Controller
             $query->where('is_free', false);
         }
 
+        $interest = $filters['interest'] ?? 'all';
+        if ($interest === 'flagged' && $request->user()) {
+            $query->whereHas(
+                'interestFlags',
+                fn ($q) => $q->where('student_id', $request->user()->id)
+            );
+        }
+
+        $sort = $filters['sort'] ?? 'code';
+        if ($sort === 'interest') {
+            $query->orderByDesc('interest_flags_count')->orderBy('code');
+        } else {
+            $query->orderBy('code');
+        }
+
         $courses = $query->paginate(12)->withQueryString();
 
         $courseIds = $courses->getCollection()->pluck('id')->all();
@@ -66,6 +82,8 @@ class CatalogController extends Controller
                 'q' => $filters['q'] ?? '',
                 'type' => $type,
                 'price' => $price,
+                'interest' => $interest,
+                'sort' => $sort,
             ],
             'programs' => Program::query()->where('active', true)->orderBy('code')->get(),
         ]);

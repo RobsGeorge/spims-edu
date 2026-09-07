@@ -18,4 +18,10 @@ return [
     'no_offering' => 'No open offering yet',
     'flag_interest' => 'Flag interest',
     'programs' => 'Programs',
+    'sort' => 'Sort',
+    'sort_code' => 'Course code',
+    'sort_interest' => 'Most flagged',
+    'interest_filter' => 'Interest',
+    'interest_all' => 'All courses',
+    'interest_flagged' => 'My flags',
 ];
