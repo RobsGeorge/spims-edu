@@ -97,7 +97,7 @@ From `docs/frontend-architecture.md` route map → Laravel reality:
 | Exam runner | Richest student UI, but not design-polished / mobile one-question default |
 | Admin CRUD (programs, courses, offerings, admissions, finance, users…) | ULID text inputs, dense forms, English hard-codes, poor discoverability |
 | Offering admin show | Content builder present but **no links** to banks, assessments, gradebook, live, discussions |
-| Superadmin observability / scheduled / system-tests | Static info pages, not live ops |
+| Superadmin observability / scheduled / system-tests | Static info pages, not live ops — remaining Super Admin work is planned in [superadmin-control-plane-plan.md](./superadmin-control-plane-plan.md) |
 | i18n | Catalog key parity mostly OK except `auth.php` ar/fr; many Blade strings still English |
 
 ### 3.3 Access / polish defects found in scan

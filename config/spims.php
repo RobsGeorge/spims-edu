@@ -38,4 +38,16 @@ return [
             FILTER_VALIDATE_BOOLEAN
         ),
     ],
+
+    'audit' => [
+        'retention_days' => 365,
+        'export_cap' => 10000,
+        'protected_prefixes' => [
+            'users.impersonate.',
+            'roles.hub.',
+            'rbac.',
+            'features.',
+            'system_settings.',
+        ],
+    ],
 ];

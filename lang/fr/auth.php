@@ -17,4 +17,5 @@ return [
     'user_updated' => 'Utilisateur mis à jour.',
     'role_assigned' => 'Rôle attribué.',
     'role_removed' => 'Rôle retiré.',
+    'user_unsuspended' => 'Utilisateur réactivé.',
 ];

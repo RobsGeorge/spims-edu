@@ -515,4 +515,18 @@ return [
     'projects.peer_eval' => [
         'STUDENT' => 'O',
     ],
+
+    /*
+     * Super Admin control-plane keys (SA0+). Empty role maps: Super Admin bypasses
+     * AuthorizeService. Roles Hub lists them so they stay visible and grantable later.
+     */
+    'features.manage' => [],
+    'system_settings.manage' => [],
+    'users.impersonate' => [],
+    'users.unsuspend' => [],
+    'users.reset_password' => [],
+    'audit.export' => [],
+    'reports.school' => [],
+    'ops.failed_jobs' => [],
+    'ops.backup' => [],
 ];

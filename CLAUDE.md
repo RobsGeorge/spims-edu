@@ -7,6 +7,7 @@ Separate from Ava Pakhomios / Khedma multi-tenant platform.
 Full spec: docs/spims-spec-summary.md (traces to spims-spec v0.2).
 Design gaps & next phases: docs/portal-design-gap-analysis.md.
 Academic roadmap (S0–S9, SIS gaps + mobile API): docs/academic-roadmap/.
+Super Admin remaining work: docs/superadmin-control-plane-plan.md.
 Out-of-phase ideas: PARKING-LOT.md.
 
 ## Hard rules

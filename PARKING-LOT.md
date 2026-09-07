@@ -25,6 +25,15 @@ Promote an item into an active phase only when the phase owner accepts it.
 - **Lockdown-browser-class exam enforcement** — remains out of scope. S5 shipped the proctor event
   log, warning escalation, and attempt termination.
 
+## Super Admin control plane — parked (do not build in SA0–SA6)
+
+Tracked in [docs/superadmin-control-plane-plan.md](docs/superadmin-control-plane-plan.md). These stay out of the Super Admin phases:
+
+- Run PHPUnit, `migrate`, or arbitrary Artisan from the browser
+- Edit `.env` or rotate `SUPERADMIN_PASSWORD` from the UI
+- Delete or rewrite `audit_logs` rows
+- Multi-tenant / multi-school Super Admin
+
 ## Promoted and delivered
 
 - **Hard exam proctoring (event log + termination)** — **S5**. `proctor_events` plus

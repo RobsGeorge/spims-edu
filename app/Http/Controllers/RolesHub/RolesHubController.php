@@ -5,18 +5,28 @@ namespace App\Http\Controllers\RolesHub;
 use App\Enums\RoleType;
 use App\Http\Controllers\Controller;
 use App\Services\Rbac\RolePermissionService;
+use App\Support\AuthorizeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class RolesHubController extends Controller
 {
-    public function index(Request $request, RolePermissionService $rbac): View
+    public function index(Request $request, RolePermissionService $rbac, AuthorizeService $authorize): View
     {
-        abort_unless($request->user()?->isSuperAdmin(), 403);
+        $authorize->authorize($request->user(), 'roles.manage_matrix');
+
+        $groups = [];
+        foreach ($rbac->groupedPermissionKeys() as $group => $keys) {
+            $groups[] = [
+                'id' => $group,
+                'label' => $rbac->groupLabel($group),
+                'keys' => $keys,
+            ];
+        }
 
         return view('roles-hub.index', [
-            'groups' => $rbac->groupedPermissionKeys(),
+            'groups' => $groups,
             'matrix' => $rbac->matrix(),
             'roles' => $rbac->editableRoles(),
             'section' => $request->query('section', 'templates'),
@@ -25,8 +35,6 @@ class RolesHubController extends Controller
 
     public function updateRole(Request $request, string $role, RolePermissionService $rbac): RedirectResponse
     {
-        abort_unless($request->user()?->isSuperAdmin(), 403);
-
         $roleType = RoleType::from($role);
         $data = $request->validate([
             'permissions' => 'array',
@@ -36,5 +44,16 @@ class RolesHubController extends Controller
         $rbac->updateRoleMatrix($request->user(), $roleType, $data['permissions'] ?? []);
 
         return back()->with('status', __('roles_hub.saved', ['role' => $roleType->value]));
+    }
+
+    public function resetRole(Request $request, string $role, RolePermissionService $rbac): RedirectResponse
+    {
+        $roleType = RoleType::from($role);
+        $written = $rbac->resetRoleFromConfig($request->user(), $roleType);
+
+        return back()->with('status', __('roles_hub.reset_saved', [
+            'role' => __('roles_hub.role_'.$roleType->value),
+            'count' => $written,
+        ]));
     }
 }

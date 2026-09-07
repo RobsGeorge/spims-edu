@@ -28,6 +28,7 @@
             <exclude>tests/Feature/Hardening</exclude>
             <exclude>tests/Feature/Portal</exclude>
             <exclude>tests/Feature/Rbac</exclude>
+            <exclude>tests/Feature/SuperAdmin</exclude>
             <exclude>tests/Feature/Integrations</exclude>
             <exclude>tests/Feature/Communications</exclude>
             <exclude>tests/Feature/Completion</exclude>
@@ -90,6 +91,9 @@
         </testsuite>
         <testsuite name="Rbac">
             <directory>tests/Feature/Rbac</directory>
+        </testsuite>
+        <testsuite name="SuperAdmin">
+            <directory>tests/Feature/SuperAdmin</directory>
         </testsuite>
         <testsuite name="Integrations">
             <directory>tests/Feature/Integrations</directory>

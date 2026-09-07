@@ -17,4 +17,5 @@ return [
     'user_updated' => 'تم تحديث المستخدم.',
     'role_assigned' => 'تم تعيين الدور.',
     'role_removed' => 'تم إزالة الدور.',
+    'user_unsuspended' => 'تم إلغاء إيقاف المستخدم.',
 ];

@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('communications:fire-reminders')->everyMinute();
         $schedule->command('finance:dunning-overdue-installments')->daily();
         $schedule->command('spims:backup-database')->dailyAt('02:30');
+        $schedule->command('spims:prune-audit-logs')->dailyAt('03:15');
     }
 
     /**

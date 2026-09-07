@@ -34,6 +34,7 @@ Push to `staging` → CI → staging deploy.
 - Spec summary: [docs/spims-spec-summary.md](docs/spims-spec-summary.md)
 - Design gap analysis & next phases: [docs/portal-design-gap-analysis.md](docs/portal-design-gap-analysis.md)
 - Academic roadmap (S0–S9: SIS gaps, mobile API): [docs/academic-roadmap/](docs/academic-roadmap/)
+- Super Admin control-plane plan: [docs/superadmin-control-plane-plan.md](docs/superadmin-control-plane-plan.md)
 - Parking lot (out-of-phase): [PARKING-LOT.md](PARKING-LOT.md)
 - VPS provisioning: [docs/vps-setup.md](docs/vps-setup.md)
 - Backups: [docs/backups-and-restore.md](docs/backups-and-restore.md)
@@ -43,6 +44,7 @@ Push to `staging` → CI → staging deploy.
 
 - Email: `robeir.george@outlook.com`
 - Password: set via `SUPERADMIN_PASSWORD` in `.env` (default `Spims@Dev2026!`)
+- Remaining control-plane work: [docs/superadmin-control-plane-plan.md](docs/superadmin-control-plane-plan.md)
 
 Sample curriculum (`DEMO-DIP` / `DEMO101`) is seeded when `SEED_SAMPLE_DATA=true` (default).
 Rich demo users/curriculum when `SEED_DEMO_DATA=true` — see [docs/demo-accounts.md](docs/demo-accounts.md).

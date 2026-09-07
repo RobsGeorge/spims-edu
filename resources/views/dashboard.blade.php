@@ -130,6 +130,15 @@
                 </a>
             </div>
         @endif
+        @if(!empty($canManagePeople))
+            <div class="col-md-6 col-lg-4">
+                <a href="{{ route('admin.users.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
+                    <h3><i class="bi bi-people" aria-hidden="true"></i> {{ __('people.dashboard_tile') }}</h3>
+                    <p class="text-muted-theme mb-0">{{ __('people.dashboard_tile_desc') }}</p>
+                    <p class="sa-tile-hint small mb-0 mt-2">{{ __('people.dashboard_tile_hint') }}</p>
+                </a>
+            </div>
+        @endif
         <div class="col-md-6 col-lg-4">
             <a href="{{ route('grades.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                 <h3><i class="bi bi-clipboard-data" aria-hidden="true"></i> {{ __('learning.grades') }}</h3>
@@ -156,6 +165,13 @@
         </div>
         @if($hasSuperadmin)
             <div class="col-md-6 col-lg-4">
+                <a href="{{ route('superadmin.audit.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
+                    <h3><i class="bi bi-journal-text" aria-hidden="true"></i> {{ __('audit.dashboard_tile') }}</h3>
+                    <p class="text-muted-theme mb-0">{{ __('audit.dashboard_tile_desc') }}</p>
+                    <p class="sa-tile-hint small mb-0 mt-2">{{ __('audit.dashboard_tile_hint') }}</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-4">
                 <a href="{{ route('superadmin.index') }}"
                    class="app-tile hub-tile hub-tile-superadmin d-flex flex-column h-100 text-decoration-none border border-danger border-opacity-25">
                     <h3>
@@ -163,6 +179,7 @@
                         {{ __('dashboard.superadmin_hub') }}
                     </h3>
                     <p class="text-muted-theme mb-0">{{ __('dashboard.superadmin_hub_desc') }}</p>
+                    <p class="sa-tile-hint small mb-0 mt-2">{{ __('superadmin.dashboard_hint') }}</p>
                 </a>
             </div>
         @endif

@@ -104,11 +104,17 @@ class AuthorizeService
 
     public function canAssignRole(User $actor, RoleType $roleToAssign): bool
     {
+        // Super Admin is break-glass only (seeder / SUPERADMIN_EMAIL). Nobody, including
+        // Super Admin, may grant that role from the UI.
+        if ($roleToAssign === RoleType::SuperAdmin) {
+            return false;
+        }
+
         if ($actor->isSuperAdmin()) {
             return true;
         }
 
-        if (in_array($roleToAssign, [RoleType::SuperAdmin, RoleType::AdministrativeAdmin], true)) {
+        if ($roleToAssign === RoleType::AdministrativeAdmin) {
             return false;
         }
 
@@ -119,6 +125,17 @@ class AuthorizeService
         } catch (AuthorizationException) {
             return false;
         }
+    }
+
+    /**
+     * @return list<RoleType>
+     */
+    public function assignableRoles(User $actor): array
+    {
+        return array_values(array_filter(
+            RoleType::cases(),
+            fn (RoleType $role): bool => $this->canAssignRole($actor, $role)
+        ));
     }
 
     public function forgetMatrixCache(): void

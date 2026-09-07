@@ -37,4 +37,14 @@ class AuditLog extends Model
     {
         return $this->belongsTo(User::class, 'actor_id');
     }
+
+    /**
+     * First segment plus the trailing dot, e.g. users.impersonate.start → users.
+     */
+    public function actionPrefix(): string
+    {
+        $dot = strpos((string) $this->action, '.');
+
+        return $dot === false ? (string) $this->action : substr((string) $this->action, 0, $dot + 1);
+    }
 }

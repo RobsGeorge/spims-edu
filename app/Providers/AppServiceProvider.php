@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Models\Theme;
+use App\Models\User;
 use App\Services\Ai\AiClient;
 use App\Services\Ai\GeminiAiClient;
 use App\Services\Communications\AnnouncementService;
+use App\Services\SuperAdmin\ImpersonationService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use App\Support\ThemeTokens;
@@ -44,6 +46,11 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
 
+            $impersonatorId = session(ImpersonationService::SESSION_KEY);
+            $impersonator = is_string($impersonatorId) && $impersonatorId !== ''
+                ? User::query()->find($impersonatorId)
+                : null;
+
             $view->with([
                 'activeTheme' => $activeTheme,
                 'cookieTheme' => $cookieTheme,
@@ -51,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
                 'isRtl' => $isRtl,
                 'localeDir' => $isRtl ? 'rtl' : 'ltr',
                 'activeBanner' => $activeBanner,
+                'impersonator' => $impersonator,
             ]);
         });
     }

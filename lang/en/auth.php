@@ -17,4 +17,5 @@ return [
     'user_updated' => 'User updated.',
     'role_assigned' => 'Role assigned.',
     'role_removed' => 'Role removed.',
+    'user_unsuspended' => 'User unsuspended.',
 ];

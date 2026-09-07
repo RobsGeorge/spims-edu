@@ -81,6 +81,18 @@ class AuthService
         return $user;
     }
 
+    /**
+     * Trusted session switch for Super Admin impersonation. Does not accept a
+     * password and does not reuse public demo-console enter.
+     */
+    public function loginAs(User $user): User
+    {
+        Auth::login($user, false);
+        $this->audit->write($user, 'auth.loginAs', 'User', $user->id);
+
+        return $user;
+    }
+
     public function logout(): void
     {
         $user = Auth::user();

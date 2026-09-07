@@ -74,7 +74,9 @@ use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentCompletionController;
 use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\SuperAdmin\AuditExplorerController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
+use App\Http\Controllers\SuperAdmin\ImpersonationController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\Teach\AssessmentController as TeachAssessmentController;
 use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController;
@@ -320,17 +322,27 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [SuperAdminController::class, 'index'])->name('index');
         Route::get('/security', [SuperAdminController::class, 'security'])->name('security');
         Route::post('/sessions/flush', [SuperAdminController::class, 'flushSessions'])->name('sessions.flush');
-        Route::get('/audit', [SuperAdminController::class, 'audit'])->name('audit.index');
+        Route::get('/audit', [AuditExplorerController::class, 'index'])->name('audit.index');
+        Route::get('/audit/export', [AuditExplorerController::class, 'export'])
+            ->middleware('permission:audit.export')
+            ->name('audit.export');
+        Route::get('/audit/{auditLog}', [AuditExplorerController::class, 'show'])->name('audit.show');
         Route::get('/observability', [SuperAdminController::class, 'observability'])->name('observability.index');
         Route::get('/scheduled-tasks', [SuperAdminController::class, 'scheduledTasks'])->name('scheduled-tasks.index');
         Route::get('/system-tests', [SuperAdminController::class, 'systemTests'])->name('system-tests.index');
         Route::get('/feedback-reveals', [FeedbackRevealController::class, 'index'])->name('feedback-reveals.index');
         Route::post('/feedback-reveals/{reveal}/decide', [FeedbackRevealController::class, 'decide'])->name('feedback-reveals.decide');
+        Route::post('/people/{user}/impersonate', [ImpersonationController::class, 'start'])
+            ->middleware('permission:users.impersonate')
+            ->name('people.impersonate');
     });
+
+    Route::post('/impersonation/stop', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
 
     Route::middleware('superadmin')->prefix('roles-hub')->group(function () {
         Route::get('/', [RolesHubController::class, 'index'])->name('roles.hub');
         Route::put('/roles/{role}', [RolesHubController::class, 'updateRole'])->name('roles.hub.role.update');
+        Route::post('/roles/{role}/reset', [RolesHubController::class, 'resetRole'])->name('roles.hub.role.reset');
     });
 
     Route::get('/api/me', [MeController::class, 'show'])->name('api.me');
@@ -559,25 +571,36 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/users', [UserController::class, 'index'])
             ->middleware('permission:users.manage')
             ->name('users.index');
-        Route::get('/users/{user}', [UserController::class, 'show'])
-            ->middleware('permission:users.manage')
-            ->name('users.show');
         Route::post('/users', [UserController::class, 'store'])
             ->middleware('permission:users.manage')
             ->name('users.store');
-        Route::post('/users/{user}/suspend', [UserController::class, 'suspend'])
+        Route::get('/users/{user}', [UserController::class, 'show'])
             ->middleware('permission:users.manage')
-            ->name('users.suspend');
-        // #12 admissions/users/discussions
+            ->name('users.show');
         Route::match(['put', 'patch'], '/users/{user}', [UserController::class, 'update'])
             ->middleware('permission:users.manage')
             ->name('users.update');
+        Route::post('/users/{user}/suspend', [UserController::class, 'suspend'])
+            ->middleware('permission:users.manage')
+            ->name('users.suspend');
+        Route::post('/users/{user}/unsuspend', [UserController::class, 'unsuspend'])
+            ->middleware('permission:users.unsuspend')
+            ->name('users.unsuspend');
+        Route::post('/users/{user}/activate', [UserController::class, 'activate'])
+            ->middleware('permission:users.manage')
+            ->name('users.activate');
         Route::post('/users/{user}/roles', [UserController::class, 'assignRole'])
             ->middleware('permission:roles.assign')
             ->name('users.roles.assign');
-        Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole'])
+        Route::delete('/users/{user}/roles/{role}', [UserController::class, 'revokeRole'])
             ->middleware('permission:roles.assign')
-            ->name('users.roles.remove');
+            ->name('users.roles.destroy');
+        Route::post('/users/{user}/password-reset', [UserController::class, 'passwordReset'])
+            ->middleware('permission:users.reset_password')
+            ->name('users.password-reset');
+        Route::post('/users/{user}/sessions/revoke', [UserController::class, 'revokeSessions'])
+            ->middleware('permission:users.manage')
+            ->name('users.sessions.revoke');
 
         Route::get('/theme', [ThemeEditorController::class, 'edit'])
             ->middleware('permission:theme.manage')

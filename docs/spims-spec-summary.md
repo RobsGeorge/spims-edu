@@ -79,4 +79,6 @@ Multi-role users: effective permissions = union.
 
 Laravel `spims-edu` completed domain Phases 0–9 plus portal hubs / roles hub. Remaining work is
 primarily **design-system fidelity**, **missing product surfaces** (especially Course Player and
-Teach hub), and **real integrations**. See [portal-design-gap-analysis.md](./portal-design-gap-analysis.md).
+Teach hub), **real integrations**, and the Super Admin control plane (features, themes, users,
+config, reporting, audit). See [portal-design-gap-analysis.md](./portal-design-gap-analysis.md)
+and [superadmin-control-plane-plan.md](./superadmin-control-plane-plan.md).

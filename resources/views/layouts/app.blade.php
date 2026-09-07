@@ -133,7 +133,8 @@
                     <ul class="list-unstyled mb-0">
                         @foreach($primaryNav as $item)
                             <li>
-                                <a href="{{ route($item['route']) }}" class="app-side-link {{ $item['active'] ? 'active' : '' }}">
+                                <a href="{{ route($item['route']) }}"
+                                   class="app-side-link {{ $item['active'] ? 'active' : '' }} {{ ($item['tone'] ?? '') === 'superadmin' ? 'app-side-link-superadmin' : '' }}">
                                     <i class="bi {{ $item['icon'] }}" aria-hidden="true"></i>
                                     <span>{{ $item['label'] }}</span>
                                 </a>
@@ -152,7 +153,9 @@
                     <ul class="list-unstyled mb-0">
                         @foreach($primaryNav as $item)
                             <li>
-                                <a href="{{ route($item['route']) }}" class="app-side-link {{ $item['active'] ? 'active' : '' }}" data-bs-dismiss="offcanvas">
+                                <a href="{{ route($item['route']) }}"
+                                   class="app-side-link {{ $item['active'] ? 'active' : '' }} {{ ($item['tone'] ?? '') === 'superadmin' ? 'app-side-link-superadmin' : '' }}"
+                                   data-bs-dismiss="offcanvas">
                                     <i class="bi {{ $item['icon'] }}" aria-hidden="true"></i>
                                     <span>{{ $item['label'] }}</span>
                                 </a>
@@ -163,6 +166,7 @@
             </div>
 
             <div class="app-main-column">
+                @include('partials.impersonation-banner')
                 <header class="app-topbar sticky-top" aria-label="{{ __('ui.nav_dashboard') }}">
                     <button class="btn btn-outline-secondary app-menu-btn d-lg-none" type="button"
                             data-bs-toggle="offcanvas" data-bs-target="#appDrawer" aria-controls="appDrawer"
@@ -178,6 +182,14 @@
                     </form>
                     <div class="app-topbar-spacer"></div>
                     <div class="d-flex flex-wrap align-items-center gap-2">
+                        @if($hasSuperadminNav)
+                            <a href="{{ route('superadmin.index') }}"
+                               class="btn btn-sm btn-outline-danger app-icon-btn sa-topbar-entry {{ request()->routeIs('superadmin.*') || request()->routeIs('roles.hub') ? 'active' : '' }}"
+                               title="{{ __('superadmin.entrance_title') }}">
+                                <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+                                <span class="d-none d-md-inline">{{ __('hubs.nav_superadmin') }}</span>
+                            </a>
+                        @endif
                         <a href="{{ route('notifications.index') }}" class="btn btn-sm btn-outline-secondary position-relative app-icon-btn" title="{{ __('ui.nav_notifications') }}" aria-label="{{ __('ui.nav_notifications') }}">
                             <i class="bi bi-bell" aria-hidden="true"></i>
                             @if($unreadCount > 0)
@@ -197,6 +209,29 @@
                                 <li><a class="dropdown-item" href="{{ route('grades.index') }}">{{ __('ui.nav_grades') }}</a></li>
                                 <li><a class="dropdown-item" href="{{ route('settings.edit') }}">{{ __('ui.nav_settings') }}</a></li>
                                 <li><a class="dropdown-item" href="{{ route('transcript.show') }}">{{ __('ui.nav_transcript') }}</a></li>
+                                @if(app(\App\Support\AuthorizeService::class)->allows(auth()->user(), 'users.manage'))
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.users.index') }}">
+                                            <i class="bi bi-people" aria-hidden="true"></i>
+                                            {{ __('people.nav_people') }}
+                                        </a>
+                                    </li>
+                                @endif
+                                @if($hasSuperadminNav)
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('superadmin.audit.index') }}">
+                                            <i class="bi bi-journal-text" aria-hidden="true"></i>
+                                            {{ __('audit.nav_audit') }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{{ route('superadmin.index') }}">
+                                            <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+                                            {{ __('superadmin.entrance_title') }}
+                                        </a>
+                                    </li>
+                                @endif
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('auth.logout') }}">
@@ -236,7 +271,7 @@
 
             <nav class="app-bottom-nav d-lg-none" aria-label="{{ __('hubs.nav_primary') }}">
                 @foreach($bottomNav as $item)
-                    <a href="{{ route($item['route']) }}" class="app-bottom-link {{ $item['active'] ? 'active' : '' }}">
+                    <a href="{{ route($item['route']) }}" class="app-bottom-link {{ $item['active'] ? 'active' : '' }} {{ ($item['tone'] ?? '') === 'superadmin' ? 'app-bottom-link-superadmin' : '' }}">
                         <i class="bi {{ $item['icon'] }}" aria-hidden="true"></i>
                         <span>{{ $item['label'] }}</span>
                     </a>

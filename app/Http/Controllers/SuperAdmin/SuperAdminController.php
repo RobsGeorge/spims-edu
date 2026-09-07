@@ -56,16 +56,6 @@ class SuperAdminController extends Controller
         return back()->with('status', __('superadmin.sessions_flush_unsupported', ['driver' => $driver]));
     }
 
-    public function audit(Request $request): View
-    {
-        $logs = AuditLog::query()
-            ->with('actor')
-            ->latest('created_at')
-            ->paginate(40);
-
-        return view('superadmin.audit', compact('logs'));
-    }
-
     public function observability(): View
     {
         $stats = [
@@ -122,6 +112,7 @@ class SuperAdminController extends Controller
             ['command' => 'communications:fire-reminders', 'schedule' => __('superadmin.schedule_every_minute')],
             ['command' => 'finance:dunning-overdue-installments', 'schedule' => __('superadmin.schedule_daily')],
             ['command' => 'spims:backup-database', 'schedule' => __('superadmin.schedule_daily_0230')],
+            ['command' => 'spims:prune-audit-logs', 'schedule' => __('superadmin.schedule_daily_0315')],
         ];
 
         return view('superadmin.scheduled-tasks', compact('tasks'));
@@ -132,7 +123,7 @@ class SuperAdminController extends Controller
         $suites = [
             'Unit', 'Database', 'Auth', 'Audit', 'Smoke', 'Admin', 'Api',
             'Academics', 'Offerings', 'Admissions', 'Enrollment', 'Finance',
-            'Assessment', 'Live', 'Credentials', 'Hardening', 'Portal', 'Rbac',
+            'Assessment', 'Live', 'Credentials', 'Hardening',             'Portal', 'Rbac', 'SuperAdmin',
         ];
 
         return view('superadmin.system-tests', compact('suites'));

@@ -14,6 +14,7 @@ class SettingsSeeder extends Seeder
             'late_penalty.escalating' => ['value' => [0, 10, 20, 30]],
             'zoom.concurrent_hosts' => ['value' => 1],
             'academic_standing.thresholds' => ['good_min' => 200, 'suspension_below' => 100],
+            'audit.retention_days' => ['value' => 365],
         ];
 
         foreach ($defaults as $key => $value) {
