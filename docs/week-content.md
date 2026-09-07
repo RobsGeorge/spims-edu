@@ -26,9 +26,17 @@ Superadmin env (defaults; no settings screen):
 - `SPIMS_UPLOAD_MIMES=pdf,jpg,jpeg,png,webp,gif`
 - `SPIMS_STUDENT_FILE_DOWNLOAD=true`
 
+## 2. Dual content builder + draft/publish (shipped)
+
+Teach Content tab and admin offering show both include `offerings/partials/week-content-builder`.
+
+- Add / edit / delete / publish / unpublish on the same web routes (`offerings.content`, own offering).
+- New items created through the form or `OfferingService::addContentItem` start unpublished.
+- Students, learn routes, student API item lists, and public Week 1 preview omit drafts.
+- Staff still see drafts in both editors.
+
 ## Later slices
 
-2. Dual content builder + draft/publish
 3. YouTube / Vimeo URL embeds in the player
 4. Readings, uploads, gated file viewer
 5. Reorder + move to another week

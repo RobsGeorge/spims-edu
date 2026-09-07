@@ -151,15 +151,14 @@
         </div>
     @else
         <x-page-header :title="__('teach.tab_content')" :subtitle="__('teach.tab_content_help')" />
-        <a class="btn btn-primary mb-3" href="{{ route('admin.offerings.show', $offering) }}">{{ __('teach.edit_content') }}</a>
-        @forelse($offering->weeks as $week)
-            <div class="border rounded-3 p-3 mb-2">
-                <h3 class="h6 mb-1">{{ __('teach.week_n', ['n' => $week->number]) }} — {{ $week->title }}</h3>
-                <p class="small text-muted-theme mb-0">{{ $week->items->count() }} {{ __('teach.items') }}</p>
-            </div>
-        @empty
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <a class="btn btn-outline-primary btn-sm" href="{{ route('admin.offerings.show', $offering) }}">{{ __('teach.edit_content') }}</a>
+        </div>
+        @if($offering->weeks->isEmpty())
             <x-empty-state :title="__('teach.no_weeks')" :message="__('teach.no_weeks_help')" icon="bi-calendar-week" />
-        @endforelse
+        @else
+            @include('offerings.partials.week-content-builder', ['offering' => $offering, 'contentTypes' => \App\Enums\ContentItemType::cases()])
+        @endif
     @endif
 </div>
 @endsection

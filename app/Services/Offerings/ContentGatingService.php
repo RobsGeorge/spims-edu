@@ -26,7 +26,9 @@ class ContentGatingService
                 'number' => $w->number,
                 'title' => $w->title,
             ])->all(),
-            'week_one' => $weeks->firstWhere('number', 1)?->items->map(fn ($item) => [
+            'week_one' => $weeks->firstWhere('number', 1)?->items
+                ->filter(fn ($item) => $item->isPublished())
+                ->map(fn ($item) => [
                 'type' => $item->type->value,
                 'title' => $item->title,
                 'vimeo_id' => $item->vimeo_id,

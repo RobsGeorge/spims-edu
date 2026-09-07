@@ -37,6 +37,7 @@ return [
     'item_assignment' => 'Assignment',
     'item_quiz' => 'Quiz',
     'item_exam' => 'Exam',
+    'item_file' => 'File',
     'item_discussion' => 'Discussion',
     'discussions' => 'Discussions',
     'live_quiz' => 'Live quiz',

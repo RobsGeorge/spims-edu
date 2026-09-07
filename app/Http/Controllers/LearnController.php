@@ -25,6 +25,7 @@ class LearnController extends Controller
     {
         $enrollment = $this->access->requireEnrollment($request->user(), $offering);
         $offering->load(['course', 'weeks.items.assignment', 'weeks.items.assessment']);
+        $this->hideDraftItems($offering);
 
         $weeks = $offering->weeks->sortBy('number')->values();
         $completedWeeks = $this->progress->completedWeekNumbers($enrollment);
@@ -51,6 +52,8 @@ class LearnController extends Controller
         $this->access->assertWeekBelongsToOffering($week, $offering);
         $offering->load(['course', 'weeks.items.assignment', 'weeks.items.assessment']);
         $week->load(['items.assignment', 'items.assessment']);
+        $this->hideDraftItems($offering);
+        $week->setRelation('items', $week->items->filter(fn ($item) => $item->isPublished())->values());
 
         $unlocked = $this->progress->isWeekUnlocked($enrollment, $offering, $week);
 
@@ -72,6 +75,10 @@ class LearnController extends Controller
         $week = $this->access->assertItemBelongsToOffering($item, $offering);
         $offering->load(['course', 'weeks.items.assignment', 'weeks.items.assessment']);
         $item->load(['assignment', 'assessment']);
+
+        if (! $item->isPublished()) {
+            abort(404);
+        }
 
         if (! $this->progress->isWeekUnlocked($enrollment, $offering, $week)) {
             return redirect()
@@ -141,5 +148,15 @@ class LearnController extends Controller
         }
 
         return redirect()->route('learn.offering', $offering);
+    }
+
+    private function hideDraftItems(CourseOffering $offering): void
+    {
+        foreach ($offering->weeks as $week) {
+            $week->setRelation(
+                'items',
+                $week->items->filter(fn (ContentItem $item) => $item->isPublished())->values()
+            );
+        }
     }
 }

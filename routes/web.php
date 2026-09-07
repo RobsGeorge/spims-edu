@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\GradebookController;
 use App\Http\Controllers\Admin\GradingSchemeController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
 use App\Http\Controllers\Admin\OfferingClosingController;
+use App\Http\Controllers\Admin\ContentItemController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\SemesterController;
@@ -667,9 +668,21 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/offerings/{offering}/weeks', [OfferingController::class, 'addWeek'])
             ->middleware('permission:offerings.content')
             ->name('offerings.weeks');
-        Route::post('/weeks/{week}/items', [OfferingController::class, 'addContent'])
+        Route::post('/weeks/{week}/items', [ContentItemController::class, 'store'])
             ->middleware('permission:offerings.content')
             ->name('weeks.items');
+        Route::match(['put', 'patch'], '/content-items/{item}', [ContentItemController::class, 'update'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.update');
+        Route::delete('/content-items/{item}', [ContentItemController::class, 'destroy'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.destroy');
+        Route::post('/content-items/{item}/publish', [ContentItemController::class, 'publish'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.publish');
+        Route::post('/content-items/{item}/unpublish', [ContentItemController::class, 'unpublish'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.unpublish');
 
         Route::get('/application-forms', [ApplicationFormController::class, 'index'])
             ->middleware('permission:admissions.forms')
