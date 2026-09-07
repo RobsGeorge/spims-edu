@@ -8,15 +8,14 @@ cd "$cwd" || exit 0
 
 step_file=".claude/current-step"
 if [[ ! -f "$step_file" ]]; then
-  echo "No .claude/current-step file found." >&2
-  echo "Write your step ID (e.g. 'A1.1') to .claude/current-step before finishing." >&2
-  exit 2
+  # No step declared — interactive or non-wave session; pass through.
+  exit 0
 fi
 
 step=$(cat "$step_file" | tr -d '[:space:]')
 if [[ -z "$step" ]]; then
-  echo ".claude/current-step is empty — set it to your step ID." >&2
-  exit 2
+  # Empty file — treat same as absent; pass through.
+  exit 0
 fi
 
 validate_script="./scripts/validate-step.sh"
