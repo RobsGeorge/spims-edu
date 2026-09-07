@@ -330,7 +330,7 @@ class PaymentPlanTest extends TestCase
             ->post(route('finance.payment-plan.store', $invoice), [
                 'installment_count' => 3,
             ])
-            ->assertStatus(422);
+            ->assertSessionHasErrors('invoice');
 
         $this->assertSame(0, PaymentPlan::query()->count());
     }
