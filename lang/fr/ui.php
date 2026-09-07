@@ -106,4 +106,9 @@ return [
     'country_code' => 'Code pays',
     'assign_role' => 'Attribuer un rôle',
     'remove_role' => 'Retirer le rôle',
+    'no_results' => 'Aucun résultat trouvé',
+    'file_drop_hint' => 'Glissez-déposez un fichier ici, ou cliquez pour parcourir',
+    'file_drop_size_error' => 'Le fichier dépasse la taille maximale de :max',
+    'file_drop_type_error' => 'Type de fichier non accepté. Autorisé : :accept',
+    'file_drop_browse' => 'Parcourir les fichiers',
 ];
