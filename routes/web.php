@@ -44,6 +44,7 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CommunicationOpenController;
 use App\Http\Controllers\ContentItemFileController;
 use App\Http\Controllers\CoursePlayerController;
+use App\Http\Controllers\StudentPreviewController;
 use App\Http\Controllers\CredentialDownloadController;
 use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\DashboardController;
@@ -333,6 +334,12 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:courses.flag_interest')
         ->name('catalog.interest');
 
+    Route::post('/offerings/{offering}/view-as-student', [StudentPreviewController::class, 'start'])
+        ->middleware('permission:offerings.view')
+        ->name('offerings.preview.student');
+    Route::post('/offerings/{offering}/view-as-student/stop', [StudentPreviewController::class, 'stop'])
+        ->middleware('permission:offerings.view')
+        ->name('offerings.preview.stop');
     Route::get('/courses/{offering}', [CoursePlayerController::class, 'show'])
         ->middleware('permission:offerings.view')
         ->name('courses.player');

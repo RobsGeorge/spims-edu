@@ -6,6 +6,7 @@ use App\Models\CourseOffering;
 use App\Models\Week;
 use App\Services\Learning\CoursePlayerService;
 use App\Services\Learning\OfferingAccessService;
+use App\Services\Learning\StudentPreviewService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -16,6 +17,7 @@ class CoursePlayerController extends Controller
         private readonly LearnController $learn,
         private readonly OfferingAccessService $access,
         private readonly CoursePlayerService $player,
+        private readonly StudentPreviewService $preview,
     ) {}
 
     public function show(Request $request, CourseOffering $offering): View
@@ -30,6 +32,7 @@ class CoursePlayerController extends Controller
         CourseOffering $offering,
         Week $week,
     ): RedirectResponse {
+        $this->preview->assertNotPreview($request, $offering);
         $this->player->completeWeek($request->user(), $offering, $week);
 
         return back()->with('status', __('learning.week_completed'));

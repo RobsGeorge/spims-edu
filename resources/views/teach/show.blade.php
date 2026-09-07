@@ -153,6 +153,10 @@
         <x-page-header :title="__('teach.tab_content')" :subtitle="__('teach.tab_content_help')" />
         <div class="d-flex flex-wrap gap-2 mb-3">
             <a class="btn btn-outline-primary btn-sm" href="{{ route('admin.offerings.show', $offering) }}">{{ __('teach.edit_content') }}</a>
+            <form method="POST" action="{{ route('offerings.preview.student', $offering) }}">
+                @csrf
+                <button class="btn btn-outline-secondary btn-sm">{{ __('offerings.view_as_student') }}</button>
+            </form>
         </div>
         @if($offering->weeks->isEmpty())
             <x-empty-state :title="__('teach.no_weeks')" :message="__('teach.no_weeks_help')" icon="bi-calendar-week" />

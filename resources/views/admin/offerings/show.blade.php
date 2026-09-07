@@ -11,6 +11,10 @@
             <a href="{{ route('admin.enrollments.waitlist', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('enrollment.waitlist') }}</a>
         @endif
         <a href="{{ route('offerings.preview', $offering) }}" class="btn btn-outline-secondary btn-sm">{{ __('offerings.public_preview') }}</a>
+        <form method="POST" action="{{ route('offerings.preview.student', $offering) }}" class="d-inline">
+            @csrf
+            <button class="btn btn-outline-secondary btn-sm">{{ __('offerings.view_as_student') }}</button>
+        </form>
         <a href="{{ route('teach.show', $offering) }}" class="btn btn-outline-primary btn-sm">{{ __('teach.workspace') }}</a>
     </x-slot:actions>
 </x-page-header>
