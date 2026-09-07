@@ -125,6 +125,8 @@ class CoursePlayerService
             'type' => $item->type->value,
             'title' => $item->title,
             'vimeo_id' => $item->vimeo_id,
+            'video_provider' => $item->video_provider?->value,
+            'iframe_url' => $item->videoIframeUrl(),
             'file_url' => $item->file_url,
             'body' => $item->body,
             'url' => null,

@@ -4,6 +4,7 @@ namespace App\Services\Offerings;
 
 use App\Enums\ContentItemType;
 use App\Enums\OfferingMode;
+use App\Support\Content\VideoUrlParser;
 use App\Enums\OfferingStaffRole;
 use App\Enums\OfferingStatus;
 use App\Models\ContentItem;
@@ -224,6 +225,8 @@ class OfferingService
             $data['file_url'] = $this->storeItemFile($week, $file);
         }
 
+        $data = $this->applyVideoInput($data);
+
         $published = array_key_exists('published', $data) ? (bool) $data['published'] : false;
 
         return $this->audit->withAudit($actor, 'offerings.add_content', fn () => ContentItem::query()->create([
@@ -252,6 +255,8 @@ class OfferingService
             if ($file !== null && $item->week !== null) {
                 $data['file_url'] = $this->storeItemFile($item->week, $file);
             }
+
+            $data = $this->applyVideoInput($data, $item);
 
             if (isset($data['type'])) {
                 $data['type'] = $data['type'] instanceof ContentItemType
@@ -302,6 +307,24 @@ class OfferingService
 
             return $item;
         }, 'ContentItem');
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function applyVideoInput(array $data, ?ContentItem $existing = null): array
+    {
+        $raw = $data['video_url'] ?? $data['vimeo_id'] ?? null;
+        if ($raw === null || $raw === '') {
+            return $data;
+        }
+
+        $ref = VideoUrlParser::parse((string) $raw);
+        $data['vimeo_id'] = $ref->id;
+        $data['video_provider'] = $ref->provider;
+
+        return $data;
     }
 
     private function storeItemFile(Week $week, UploadedFile $file): string

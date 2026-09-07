@@ -113,6 +113,11 @@
                         <button class="btn btn-sm btn-outline-primary w-100">{{ __('ui.save_changes') }}</button>
                     </div>
                 </form>
+                @if($item->type->value === 'VIDEO' && $item->videoIframeUrl())
+                    <div class="ratio ratio-16x9 mt-2">
+                        <iframe src="{{ $item->videoIframeUrl() }}" allowfullscreen allow="autoplay; fullscreen; picture-in-picture" title="{{ $item->title }}"></iframe>
+                    </div>
+                @endif
             </article>
         @empty
             <p class="small text-muted-theme mb-0">{{ __('offerings.no_items_in_week') }}</p>
