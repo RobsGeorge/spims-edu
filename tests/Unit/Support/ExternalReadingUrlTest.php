@@ -25,6 +25,8 @@ class ExternalReadingUrlTest extends TestCase
     #[Test]
     public function it_marks_unknown_https_as_link_only(): void
     {
+        config(['spims.content.allow_unknown_reading_urls' => true]);
+
         $ref = ExternalReadingUrl::parse('https://example.com/notes.pdf');
         $this->assertSame('https://example.com/notes.pdf', $ref->canonicalUrl);
         $this->assertFalse($ref->embeddable);
@@ -47,8 +49,6 @@ class ExternalReadingUrlTest extends TestCase
     #[Test]
     public function it_rejects_unknown_hosts_when_allowlist_is_closed(): void
     {
-        config(['spims.content.allow_unknown_reading_urls' => false]);
-
         $this->expectException(ValidationException::class);
         ExternalReadingUrl::parse('https://example.com/notes.pdf');
     }

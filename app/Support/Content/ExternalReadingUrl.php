@@ -83,7 +83,7 @@ final class ExternalReadingUrl
 
     public static function allowsUnknownHosts(): bool
     {
-        $value = config('spims.content.allow_unknown_reading_urls', true);
+        $value = config('spims.content.allow_unknown_reading_urls', false);
 
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }

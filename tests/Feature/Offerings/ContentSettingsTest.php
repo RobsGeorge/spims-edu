@@ -50,21 +50,30 @@ class ContentSettingsTest extends TestCase
     }
 
     #[Test]
-    public function unknown_reading_hosts_can_be_closed(): void
+    public function unknown_reading_hosts_are_rejected_by_default_while_drive_urls_work(): void
     {
         $this->seed(ThemeSeeder::class);
-        config(['spims.content.allow_unknown_reading_urls' => false]);
         [, $week, $instructor] = $this->staffed();
 
         $this->actingAs($instructor)
-            ->from(route('teach.show', $week->offering))
-            ->post(route('admin.weeks.items', $week), [
-                'type' => ContentItemType::Reading->value,
-                'title' => 'Random',
-                'file_url' => 'https://example.com/a.pdf',
+            ->postJson(route('admin.weeks.items', $week), [
+                'type' => ContentItemType::File->value,
+                'title' => 'W3 PDF',
+                'file_url' => 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
             ])
-            ->assertRedirect()
-            ->assertSessionHasErrors('file_url');
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('file_url')
+            ->assertJsonPath('errors.file_url.0', __('offerings.reading_url_host_blocked'));
+
+        $this->actingAs($instructor)->post(route('admin.weeks.items', $week), [
+            'type' => ContentItemType::File->value,
+            'title' => 'Drive PDF',
+            'file_url' => 'https://drive.google.com/file/d/x/view',
+        ])->assertRedirect();
+
+        $drive = ContentItem::query()->where('title', 'Drive PDF')->firstOrFail();
+        $this->assertSame('https://drive.google.com/file/d/x/preview', $drive->file_url);
+        $this->assertNull(ContentItem::query()->where('title', 'W3 PDF')->first());
     }
 
     #[Test]

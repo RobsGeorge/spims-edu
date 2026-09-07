@@ -66,6 +66,7 @@ class ContentFileViewerTest extends TestCase
     public function drive_urls_embed_and_unknown_https_is_link_only(): void
     {
         $this->seed(ThemeSeeder::class);
+        config(['spims.content.allow_unknown_reading_urls' => true]);
         [$offering, $week, $instructor] = $this->staffedOffering();
         $student = $this->enrollStudent($offering);
 
