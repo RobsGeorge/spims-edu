@@ -4,6 +4,8 @@ namespace App\Services\Offerings;
 
 use App\Enums\ContentItemType;
 use App\Enums\OfferingMode;
+use App\Support\Content\ExternalReadingUrl;
+use App\Support\Content\VideoUrlParser;
 use App\Enums\OfferingStaffRole;
 use App\Enums\OfferingStatus;
 use App\Models\ContentItem;
@@ -224,14 +226,22 @@ class OfferingService
             $data['file_url'] = $this->storeItemFile($week, $file);
         }
 
+        $data = $this->applyVideoInput($data);
+        $data = $this->applyReadingUrl($data);
+
+        $published = array_key_exists('published', $data) ? (bool) $data['published'] : false;
+
         return $this->audit->withAudit($actor, 'offerings.add_content', fn () => ContentItem::query()->create([
             'week_id' => $week->id,
             'type' => ContentItemType::from($data['type']),
             'title' => $data['title'],
             'order' => $data['order'] ?? (($week->items()->max('order') ?? 0) + 1),
             'vimeo_id' => $data['vimeo_id'] ?? null,
+            'video_provider' => $data['video_provider'] ?? null,
             'file_url' => $data['file_url'] ?? null,
             'body' => $data['body'] ?? null,
+            'published' => $published,
+            'published_at' => $published ? now() : null,
         ]), 'ContentItem');
     }
 
@@ -248,6 +258,9 @@ class OfferingService
                 $data['file_url'] = $this->storeItemFile($item->week, $file);
             }
 
+            $data = $this->applyVideoInput($data, $item);
+            $data = $this->applyReadingUrl($data);
+
             if (isset($data['type'])) {
                 $data['type'] = $data['type'] instanceof ContentItemType
                     ? $data['type']
@@ -255,8 +268,33 @@ class OfferingService
             }
 
             $item->fill(array_intersect_key($data, array_flip([
-                'type', 'title', 'order', 'vimeo_id', 'file_url', 'body',
+                'type', 'title', 'order', 'vimeo_id', 'video_provider', 'file_url', 'body',
             ])));
+            $item->save();
+
+            return $item->fresh();
+        }, 'ContentItem');
+    }
+
+    public function publishContentItem(User $actor, ContentItem $item): ContentItem
+    {
+        $this->authorize->authorize($actor, 'offerings.content', $item);
+
+        return $this->audit->withAudit($actor, 'offerings.publish_content', function () use ($item) {
+            $item->published = true;
+            $item->published_at = $item->published_at ?? now();
+            $item->save();
+
+            return $item->fresh();
+        }, 'ContentItem');
+    }
+
+    public function unpublishContentItem(User $actor, ContentItem $item): ContentItem
+    {
+        $this->authorize->authorize($actor, 'offerings.content', $item);
+
+        return $this->audit->withAudit($actor, 'offerings.unpublish_content', function () use ($item) {
+            $item->published = false;
             $item->save();
 
             return $item->fresh();
@@ -274,14 +312,150 @@ class OfferingService
         }, 'ContentItem');
     }
 
+    /**
+     * @param  list<string>  $orderedIds
+     */
+    public function reorderContentItems(User $actor, Week $week, array $orderedIds): void
+    {
+        $this->authorize->authorize($actor, 'offerings.content', $week);
+
+        $ids = array_values(array_filter($orderedIds, fn ($id) => is_string($id) && $id !== ''));
+        $existing = $week->items()->orderBy('order')->pluck('id')->all();
+        sort($ids);
+        $expected = $existing;
+        sort($expected);
+        if ($ids !== $expected) {
+            throw ValidationException::withMessages([
+                'items' => [__('offerings.reorder_invalid')],
+            ]);
+        }
+
+        $this->audit->withAudit($actor, 'offerings.reorder_content', function () use ($week, $orderedIds) {
+            foreach (array_values($orderedIds) as $index => $id) {
+                ContentItem::query()->whereKey($id)->where('week_id', $week->id)->update(['order' => $index + 1]);
+            }
+
+            return $week->fresh();
+        }, 'Week');
+    }
+
+    public function moveContentItem(User $actor, ContentItem $item, Week $target): ContentItem
+    {
+        $item->loadMissing('week.offering');
+        $target->loadMissing('offering');
+        $this->authorize->authorize($actor, 'offerings.content', $item);
+
+        if ($item->week?->offering_id !== $target->offering_id) {
+            throw ValidationException::withMessages([
+                'week_id' => [__('offerings.move_week_invalid')],
+            ]);
+        }
+
+        if ($item->week_id === $target->id) {
+            return $item;
+        }
+
+        $fromWeekId = $item->week_id;
+
+        return $this->audit->withAudit($actor, 'offerings.move_content', function () use ($item, $target, $fromWeekId) {
+            $item->week_id = $target->id;
+            $item->order = ((int) $target->items()->max('order')) + 1;
+            $item->save();
+            $this->compactWeekOrder($target->id);
+            $this->compactWeekOrder($fromWeekId);
+
+            return $item->fresh();
+        }, 'ContentItem');
+    }
+
+    public function moveContentItemByDelta(User $actor, ContentItem $item, int $delta): void
+    {
+        $item->loadMissing('week');
+        $week = $item->week;
+        abort_unless($week !== null, 404);
+
+        $ids = $week->items()->orderBy('order')->pluck('id')->values()->all();
+        $index = array_search($item->id, $ids, true);
+        if ($index === false) {
+            return;
+        }
+        $swap = $index + $delta;
+        if ($swap < 0 || $swap >= count($ids)) {
+            return;
+        }
+        $tmp = $ids[$index];
+        $ids[$index] = $ids[$swap];
+        $ids[$swap] = $tmp;
+        $this->reorderContentItems($actor, $week, $ids);
+    }
+
+    private function compactWeekOrder(?string $weekId): void
+    {
+        if ($weekId === null || $weekId === '') {
+            return;
+        }
+
+        $ids = ContentItem::query()->where('week_id', $weekId)->orderBy('order')->pluck('id')->all();
+        foreach ($ids as $index => $id) {
+            ContentItem::query()->whereKey($id)->update(['order' => $index + 1]);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function applyVideoInput(array $data, ?ContentItem $existing = null): array
+    {
+        $raw = $data['video_url'] ?? $data['vimeo_id'] ?? null;
+        if ($raw === null || $raw === '') {
+            return $data;
+        }
+
+        $ref = VideoUrlParser::parse((string) $raw);
+        $data['vimeo_id'] = $ref->id;
+        $data['video_provider'] = $ref->provider;
+
+        return $data;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function applyReadingUrl(array $data): array
+    {
+        $raw = $data['file_url'] ?? null;
+        if (! is_string($raw) || $raw === '' || ! str_starts_with(strtolower($raw), 'http')) {
+            return $data;
+        }
+
+        $ref = ExternalReadingUrl::parse($raw);
+        $data['file_url'] = $ref->canonicalUrl;
+
+        return $data;
+    }
+
     private function storeItemFile(Week $week, UploadedFile $file): string
     {
-        $path = $this->storage->signedUploadPath(
-            'uploads',
-            $week->id,
-            $file->getClientOriginalExtension() ?: $file->extension()
-        );
-        $contents = $file->get() ?: '';
+        $ext = strtolower($file->getClientOriginalExtension() ?: (string) $file->extension());
+        $allowed = config('spims.content.upload_mimes', ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'gif']);
+        if (! in_array($ext, $allowed, true) || in_array($ext, ['html', 'htm', 'svg', 'js'], true)) {
+            throw ValidationException::withMessages([
+                'file' => [__('offerings.upload_type_blocked')],
+            ]);
+        }
+
+        $maxMb = max(1, (int) config('spims.content.upload_max_mb', 20));
+        if ($file->getSize() > $maxMb * 1024 * 1024) {
+            throw ValidationException::withMessages([
+                'file' => [__('offerings.upload_too_large', ['mb' => $maxMb])],
+            ]);
+        }
+
+        $path = $this->storage->signedUploadPath('uploads', $week->id, $ext);
+        $real = $file->getRealPath();
+        $contents = ($real && is_readable($real)) ? (string) file_get_contents($real) : (string) $file->get();
         $this->storage->store($path, $contents);
 
         return $path;

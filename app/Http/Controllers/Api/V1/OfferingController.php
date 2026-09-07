@@ -134,7 +134,7 @@ class OfferingController extends Controller
         $completedIds = $this->progress->completedItemIds($enrollment);
 
         $week->load('items');
-        $items = $week->items->sortBy('order')->values()->map(
+        $items = $week->items->filter(fn (ContentItem $item) => $item->isPublished())->sortBy('order')->values()->map(
             fn (ContentItem $item) => StudentPayload::itemMeta(
                 $item,
                 $unlocked,

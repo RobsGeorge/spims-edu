@@ -18,12 +18,18 @@
 <div class="card border-0 shadow-sm">
     <div class="card-body">
         <h2 class="h6">{{ __('offerings.week_one_content') }}</h2>
-        @forelse($preview['week_one'] as $item)
-            <div class="mb-2">
-                <strong>{{ $item['type'] }}:</strong> {{ $item['title'] }}
-                @if($item['vimeo_id'])<div class="small">Vimeo: {{ $item['vimeo_id'] }}</div>@endif
-                @if($item['body'])<div class="small">{{ $item['body'] }}</div>@endif
-            </div>
+        @forelse($weekOneItems as $item)
+            <article class="mb-4">
+                <h3 class="h6 mb-2">
+                    <span class="badge text-bg-light">{{ __('learning.item_'.strtolower($item->type->value)) }}</span>
+                    {{ $item->title }}
+                </h3>
+                @include('learn.partials.item-media', [
+                    'item' => $item,
+                    'storedFileUrl' => $item->isStoredFile() ? route('offerings.preview.item.file', [$offering, $item]) : null,
+                    'hideDownload' => true,
+                ])
+            </article>
         @empty
             <p class="text-muted-theme mb-0">{{ __('offerings.no_week_one') }}</p>
         @endforelse

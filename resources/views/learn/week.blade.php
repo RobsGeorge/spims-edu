@@ -6,6 +6,7 @@
     <h1 class="spims-title mb-1">{{ __('learn.week', ['number' => $activeWeek->number]) }}: {{ $activeWeek->title }}</h1>
     <p class="text-muted-theme mb-0">{{ $offering->course->code }}</p>
 </div>
+@include('offerings.partials.student-preview-banner')
 @error('learn')<div class="alert alert-danger">{{ $message }}</div>@enderror
 
 <div class="row">

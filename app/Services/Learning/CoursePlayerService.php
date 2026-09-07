@@ -57,7 +57,12 @@ class CoursePlayerService
                 'unlocked' => $unlocked,
                 'completed' => in_array($week->number, $completed, true),
                 'items' => $unlocked
-                    ? $week->items->sortBy('order')->values()->map(fn ($item) => $this->mapItem($item, $offering, $offeringAssessments))->all()
+                    ? $week->items
+                        ->when(! $isStaff, fn ($items) => $items->filter(fn ($item) => $item->isPublished()))
+                        ->sortBy('order')
+                        ->values()
+                        ->map(fn ($item) => $this->mapItem($item, $offering, $offeringAssessments))
+                        ->all()
                     : [],
             ];
         })->all();
@@ -120,6 +125,8 @@ class CoursePlayerService
             'type' => $item->type->value,
             'title' => $item->title,
             'vimeo_id' => $item->vimeo_id,
+            'video_provider' => $item->video_provider?->value,
+            'iframe_url' => $item->videoIframeUrl(),
             'file_url' => $item->file_url,
             'body' => $item->body,
             'url' => null,

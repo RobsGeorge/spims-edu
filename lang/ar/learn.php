@@ -28,6 +28,8 @@ return [
     'no_weeks' => 'لا توجد أسابيع منشورة بعد.',
     'no_items' => 'لا توجد عناصر في هذا الأسبوع بعد.',
     'reading_open' => 'فتح القراءة',
+    'file_download' => 'تنزيل',
+    'reading_link_only' => 'يفتح هذا الملف خارج سبيمز.',
     'back_to_course' => 'العودة إلى المقرر',
     'completion' => 'الإكمال',
 ];

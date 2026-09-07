@@ -23,6 +23,7 @@ class ContentItemController extends Controller
     public function show(Request $request, ContentItem $item): JsonResponse
     {
         $offering = $this->offeringFor($item);
+        abort_unless($item->isPublished(), 404);
         $enrollment = $this->guard->enrollmentForRead($request->user(), $offering);
         $week = $item->week;
         $unlocked = $this->progress->isWeekUnlocked($enrollment, $offering, $week);

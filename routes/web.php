@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\GradebookController;
 use App\Http\Controllers\Admin\GradingSchemeController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
 use App\Http\Controllers\Admin\OfferingClosingController;
+use App\Http\Controllers\Admin\ContentItemController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\SemesterController;
@@ -41,7 +42,9 @@ use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CommunicationOpenController;
+use App\Http\Controllers\ContentItemFileController;
 use App\Http\Controllers\CoursePlayerController;
+use App\Http\Controllers\StudentPreviewController;
 use App\Http\Controllers\CredentialDownloadController;
 use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\DashboardController;
@@ -99,6 +102,8 @@ Route::post('/api/webhooks/zoom', ZoomWebhookController::class)
 Route::get('/verify/{token}', CredentialVerifyController::class)->name('credentials.verify');
 Route::get('/communications/open/{log}', CommunicationOpenController::class)->name('communications.open');
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
+Route::get('/offerings/{offering}/preview/items/{item}/file', [ContentItemFileController::class, 'publicPreview'])
+    ->name('offerings.preview.item.file');
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
@@ -331,6 +336,12 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:courses.flag_interest')
         ->name('catalog.interest');
 
+    Route::post('/offerings/{offering}/view-as-student', [StudentPreviewController::class, 'start'])
+        ->middleware('permission:offerings.view')
+        ->name('offerings.preview.student');
+    Route::post('/offerings/{offering}/view-as-student/stop', [StudentPreviewController::class, 'stop'])
+        ->middleware('permission:offerings.view')
+        ->name('offerings.preview.stop');
     Route::get('/courses/{offering}', [CoursePlayerController::class, 'show'])
         ->middleware('permission:offerings.view')
         ->name('courses.player');
@@ -400,6 +411,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/learn/{offering}/items/{item}', [LearnController::class, 'item'])
         ->middleware('permission:offerings.view')
         ->name('learn.item');
+    Route::get('/learn/items/{item}/file', [ContentItemFileController::class, 'show'])
+        ->middleware('permission:offerings.view')
+        ->name('learn.item.file');
     Route::post('/learn/{offering}/items/{item}/complete', [LearnController::class, 'complete'])
         ->middleware('permission:offerings.view')
         ->name('learn.item.complete');
@@ -667,9 +681,30 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/offerings/{offering}/weeks', [OfferingController::class, 'addWeek'])
             ->middleware('permission:offerings.content')
             ->name('offerings.weeks');
-        Route::post('/weeks/{week}/items', [OfferingController::class, 'addContent'])
+        Route::post('/weeks/{week}/items', [ContentItemController::class, 'store'])
             ->middleware('permission:offerings.content')
             ->name('weeks.items');
+        Route::match(['put', 'patch'], '/content-items/{item}', [ContentItemController::class, 'update'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.update');
+        Route::delete('/content-items/{item}', [ContentItemController::class, 'destroy'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.destroy');
+        Route::post('/content-items/{item}/publish', [ContentItemController::class, 'publish'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.publish');
+        Route::post('/content-items/{item}/unpublish', [ContentItemController::class, 'unpublish'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.unpublish');
+        Route::post('/content-items/{item}/move-up', [ContentItemController::class, 'moveUp'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.move-up');
+        Route::post('/content-items/{item}/move-down', [ContentItemController::class, 'moveDown'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.move-down');
+        Route::post('/content-items/{item}/move', [ContentItemController::class, 'move'])
+            ->middleware('permission:offerings.content')
+            ->name('content-items.move');
 
         Route::get('/application-forms', [ApplicationFormController::class, 'index'])
             ->middleware('permission:admissions.forms')

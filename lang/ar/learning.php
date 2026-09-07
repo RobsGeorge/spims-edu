@@ -37,6 +37,7 @@ return [
     'item_assignment' => 'واجب',
     'item_quiz' => 'اختبار قصير',
     'item_exam' => 'امتحان',
+    'item_file' => 'ملف',
     'item_discussion' => 'نقاش',
     'discussions' => 'النقاشات',
     'live_quiz' => 'اختبار مباشر',

@@ -28,6 +28,8 @@ return [
     'no_weeks' => 'Aucune semaine publiée pour le moment.',
     'no_items' => 'Aucun élément dans cette semaine.',
     'reading_open' => 'Ouvrir la lecture',
+    'file_download' => 'Télécharger',
+    'reading_link_only' => 'Ce fichier s’ouvre en dehors de SPIMS.',
     'back_to_course' => 'Retour au cours',
     'completion' => 'Achèvement',
 ];
