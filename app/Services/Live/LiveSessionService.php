@@ -39,6 +39,7 @@ class LiveSessionService
         $this->assertNoOverlap($start, $end);
 
         return DB::transaction(function () use ($actor, $offering, $data, $start, $duration) {
+            // Production Zoom needs API keys; tests keep the mock when credentials are absent.
             $meeting = $this->zoom->createMeeting($data['title'], $start, $duration);
 
             $session = LiveSession::query()->create([
@@ -65,35 +66,40 @@ class LiveSessionService
     {
         $this->authorize->authorize($actor, 'live.schedule', $offering);
 
-        $recurrence = SessionRecurrence::query()->create([
-            'offering_id' => $offering->id,
-            'days_of_week' => $data['days_of_week'],
-            'start_time' => $data['start_time'],
-            'duration_minutes' => $data['duration_minutes'],
-            'start_date' => Carbon::parse($data['start_date'])->startOfDay(),
-            'end_date' => Carbon::parse($data['end_date'])->endOfDay(),
-        ]);
+        $days = array_values(array_unique(array_map('intval', $data['days_of_week'])));
+        $days = array_values(array_filter($days, fn (int $day) => $day >= 0 && $day <= 6));
 
-        $sessions = [];
-        $cursor = $recurrence->start_date->copy();
-        $prefix = $data['title_prefix'] ?? 'Live session';
+        return DB::transaction(function () use ($actor, $offering, $data, $days) {
+            $recurrence = SessionRecurrence::query()->create([
+                'offering_id' => $offering->id,
+                'days_of_week' => $days,
+                'start_time' => $data['start_time'],
+                'duration_minutes' => $data['duration_minutes'],
+                'start_date' => Carbon::parse($data['start_date'])->startOfDay(),
+                'end_date' => Carbon::parse($data['end_date'])->endOfDay(),
+            ]);
 
-        while ($cursor->lte($recurrence->end_date)) {
-            if (in_array((int) $cursor->dayOfWeek, $recurrence->days_of_week, true)) {
-                [$h, $m] = array_map('intval', explode(':', $recurrence->start_time));
-                $start = $cursor->copy()->setTime($h, $m);
-                $sessions[] = $this->schedule($actor, $offering, [
-                    'title' => $prefix.' '.$start->toDateString(),
-                    'scheduled_start' => $start,
-                    'duration_minutes' => $recurrence->duration_minutes,
-                ]);
+            $sessions = [];
+            $cursor = $recurrence->start_date->copy();
+            $prefix = $data['title_prefix'] ?? 'Live session';
+
+            while ($cursor->lte($recurrence->end_date)) {
+                if (in_array((int) $cursor->dayOfWeek, $recurrence->days_of_week, true)) {
+                    [$h, $m] = array_map('intval', explode(':', $recurrence->start_time));
+                    $start = $cursor->copy()->setTime($h, $m);
+                    $sessions[] = $this->schedule($actor, $offering, [
+                        'title' => $prefix.' '.$start->toDateString(),
+                        'scheduled_start' => $start,
+                        'duration_minutes' => $recurrence->duration_minutes,
+                    ]);
+                }
+                $cursor->addDay();
             }
-            $cursor->addDay();
-        }
 
-        $this->audit->write($actor, 'live.recurrence', 'SessionRecurrence', $recurrence->id);
+            $this->audit->write($actor, 'live.recurrence', 'SessionRecurrence', $recurrence->id);
 
-        return $sessions;
+            return $sessions;
+        });
     }
 
     public function joinUrl(User $user, LiveSession $session): string
@@ -173,12 +179,17 @@ class LiveSessionService
             $hosts = 1;
         }
 
-        $overlapping = LiveSession::query()->get()->filter(function (LiveSession $existing) use ($start, $end) {
-            $eStart = $existing->scheduled_start;
-            $eEnd = $existing->endsAt();
+        $maxDuration = (int) (LiveSession::query()->max('duration_minutes') ?? 0);
+        $lookbackMinutes = max($maxDuration, $start->diffInMinutes($end), 1);
 
-            return $start->lt($eEnd) && $end->gt($eStart);
-        })->count();
+        $overlapping = LiveSession::query()
+            ->where('scheduled_start', '<', $end)
+            ->where('scheduled_start', '>=', $start->copy()->subMinutes($lookbackMinutes))
+            ->get()
+            ->filter(function (LiveSession $existing) use ($start, $end) {
+                return $start->lt($existing->endsAt()) && $end->gt($existing->scheduled_start);
+            })
+            ->count();
 
         if ($overlapping >= $hosts) {
             throw ValidationException::withMessages(['session' => [__('live.overlap_blocked')]]);

@@ -40,6 +40,27 @@ class LiveSessionAdminController extends Controller
         return back()->with('status', __('live.scheduled'));
     }
 
+    public function storeRecurrence(Request $request, CourseOffering $offering, LiveSessionService $live): RedirectResponse
+    {
+        $data = $request->validate([
+            'days_of_week' => 'required|array|min:1',
+            'days_of_week.*' => 'integer|min:0|max:6',
+            'start_time' => ['required', 'string', 'regex:/^\d{1,2}:\d{2}(:\d{2})?$/'],
+            'duration_minutes' => 'required|integer|min:15|max:480',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'title_prefix' => 'nullable|string|max:200',
+        ]);
+
+        $data['days_of_week'] = array_values(array_unique(array_map('intval', $data['days_of_week'])));
+        $parts = explode(':', $data['start_time']);
+        $data['start_time'] = sprintf('%02d:%02d', (int) $parts[0], (int) $parts[1]);
+
+        $live->scheduleRecurrence($request->user(), $offering, $data);
+
+        return back()->with('status', __('live.recurrence_scheduled'));
+    }
+
     public function importAttendance(Request $request, LiveSession $session, AttendanceService $attendance): RedirectResponse
     {
         $data = $request->validate([

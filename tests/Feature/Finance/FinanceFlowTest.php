@@ -13,8 +13,10 @@ use App\Enums\WalletKind;
 use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
+use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\Refund;
 use App\Models\User;
 use App\Models\WalletAccount;
 use App\Services\Finance\InvoiceService;
@@ -259,5 +261,55 @@ class FinanceFlowTest extends TestCase
 
         $this->assertSame(PaymentStatus::Completed, $payment->fresh()->status);
         $this->assertSame(InvoiceStatus::Paid, $invoice->fresh()->status);
+    }
+
+    #[Test]
+    public function student_can_request_refund_via_http_and_admin_approves(): void
+    {
+        $fin = User::factory()->withRole(RoleType::FinancialAdmin)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create(['country_code' => 'US']);
+        $other = User::factory()->withRole(RoleType::Student)->create(['country_code' => 'US']);
+        $offering = $this->pricedOffering(4000);
+
+        $this->actingAs($student)->post(route('enrollments.store'), ['offering_id' => $offering->id]);
+        $invoice = Invoice::query()->first();
+        $this->actingAs($student)->post(route('finance.checkout', $invoice))->assertRedirect();
+
+        $payment = Payment::query()->first();
+        $this->assertSame(PaymentStatus::Completed, $payment->status);
+
+        $this->actingAs($student)
+            ->get(route('finance.invoices.show', $invoice))
+            ->assertOk()
+            ->assertSee(__('finance.request_refund'), false)
+            ->assertSee(__('finance.view_receipt'), false);
+
+        $this->actingAs($other)->post(route('finance.refund-request', $payment), [
+            'amount_minor' => 1500,
+            'reason' => 'not mine',
+        ])->assertForbidden();
+
+        $this->actingAs($student)->post(route('finance.refund-request', $payment), [
+            'amount_minor' => 1500,
+            'reason' => 'partial',
+            'as_points' => '1',
+        ])->assertRedirect();
+
+        $refund = Refund::query()->first();
+        $this->assertNotNull($refund);
+        $this->assertSame(RefundStatus::Requested, $refund->status);
+        $this->assertTrue($refund->as_points);
+        $this->assertSame(1500, $refund->amount_minor);
+        $this->assertTrue(
+            AuditLog::query()
+                ->where('action', 'finance.refund_request')
+                ->where('entity_id', $refund->id)
+                ->exists()
+        );
+
+        $this->actingAs($fin)->post(route('admin.finance.refunds.approve', $refund))->assertRedirect();
+        $wallet = WalletAccount::query()->where('user_id', $student->id)->first();
+        $this->assertSame(1500, $wallet->usd_points_minor);
+        $this->assertSame(PaymentStatus::Refunded, $payment->fresh()->status);
     }
 }

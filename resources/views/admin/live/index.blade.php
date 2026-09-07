@@ -11,6 +11,17 @@
 @if(session('status'))
     <div class="alert alert-success">{{ session('status') }}</div>
 @endif
+@if($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+<p class="small text-muted-theme mb-3">{{ __('live.zoom_production_keys') }}</p>
 
 <form method="POST" action="{{ route('admin.live.store', $offering) }}" class="row g-2 mb-4">
     @csrf
@@ -18,6 +29,50 @@
     <div class="col-md-4"><input type="datetime-local" name="scheduled_start" class="form-control" required></div>
     <div class="col-md-2"><input type="number" name="duration_minutes" class="form-control" value="60" required aria-label="{{ __('live.duration_minutes') }}"></div>
     <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('live.schedule') }}</button></div>
+</form>
+
+<form method="POST" action="{{ route('admin.live.recurrence', $offering) }}" class="card border-0 shadow-sm mb-4">
+    @csrf
+    <div class="card-body">
+        <h2 class="h6 mb-3">{{ __('live.schedule_recurrence') }}</h2>
+        <div class="mb-3">
+            <span class="form-label d-block">{{ __('live.days_of_week') }}</span>
+            <div class="d-flex flex-wrap gap-3">
+                @foreach(range(0, 6) as $day)
+                    <label class="form-check">
+                        <input type="checkbox" class="form-check-input" name="days_of_week[]" value="{{ $day }}" @checked(in_array((string) $day, old('days_of_week', []), true))>
+                        <span class="form-check-label">{{ __('live.day_'.$day) }}</span>
+                    </label>
+                @endforeach
+            </div>
+            @error('days_of_week')<div class="text-danger small">{{ $message }}</div>@enderror
+        </div>
+        <div class="row g-2">
+            <div class="col-md-3">
+                <label class="form-label" for="recurrence-start-time">{{ __('live.start_time') }}</label>
+                <input id="recurrence-start-time" type="time" name="start_time" class="form-control" value="{{ old('start_time', '10:00') }}" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="recurrence-duration">{{ __('live.duration_minutes') }}</label>
+                <input id="recurrence-duration" type="number" name="duration_minutes" class="form-control" value="{{ old('duration_minutes', 60) }}" min="15" max="480" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="recurrence-start-date">{{ __('live.start_date') }}</label>
+                <input id="recurrence-start-date" type="date" name="start_date" class="form-control" value="{{ old('start_date') }}" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="recurrence-end-date">{{ __('live.end_date') }}</label>
+                <input id="recurrence-end-date" type="date" name="end_date" class="form-control" value="{{ old('end_date') }}" required>
+            </div>
+            <div class="col-md-8">
+                <label class="form-label" for="recurrence-title-prefix">{{ __('live.title_prefix') }}</label>
+                <input id="recurrence-title-prefix" name="title_prefix" class="form-control" value="{{ old('title_prefix') }}" maxlength="200">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button class="btn btn-outline-primary w-100">{{ __('live.schedule_recurrence') }}</button>
+            </div>
+        </div>
+    </div>
 </form>
 
 @php

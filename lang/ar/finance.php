@@ -58,4 +58,12 @@ return [
     'outstanding_by_currency' => 'فواتير مستحقة',
     'paid_revenue_by_currency' => 'إيرادات مدفوعة',
     'reports_empty' => 'لا مبالغ في هذه الفئة.',
+    'request_refund' => 'طلب استرداد',
+    'refund_requested' => 'تم إرسال طلب الاسترداد.',
+    'refund_amount' => 'مبلغ الاسترداد (وحدات صغرى)',
+    'refund_reason' => 'السبب (اختياري)',
+    'refund_as_points' => 'أضف كنقاط',
+    'refund_amount_invalid' => 'يجب أن يكون مبلغ الاسترداد عدداً صحيحاً موجباً ضمن الدفع.',
+    'refund_not_completed' => 'يمكن استرداد المدفوعات المكتملة فقط.',
+    'refund_already_requested' => 'يوجد طلب استرداد قائم أو مكتمل لهذا الدفع.',
 ];
