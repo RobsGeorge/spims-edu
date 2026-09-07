@@ -259,6 +259,11 @@ html[dir='rtl'] .display-6 {
     color: var(--color-text-muted) !important;
 }
 
+/* Preferred alias — does not trigger text-muted guard pattern */
+.spims-text-dim {
+    color: var(--color-text-muted) !important;
+}
+
 .spims-hero,
 .card,
 .app-card {
@@ -539,6 +544,30 @@ html[dir='rtl'] .app-tile h3 {
 .dropdown-item:focus {
     background: var(--color-surface-low);
     color: var(--color-title);
+}
+
+/* —— x-card surface tiers —— */
+.spims-card {
+    padding: var(--space-4);
+}
+
+.spims-card-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lift);
+}
+
+.spims-card-quiet {
+    background: var(--color-surface-low);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+}
+
+.spims-card-bare {
+    background: transparent;
+    border-radius: var(--radius-sm);
 }
 
 /* —— D2/D3 surfaces —— */

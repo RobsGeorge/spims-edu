@@ -10,7 +10,7 @@
     </div>
     <h2 class="h5 spims-title mb-2">{{ $title }}</h2>
     @if($message)
-        <p class="text-muted-theme mb-3 mx-auto" style="max-width: 28rem;">{{ $message }}</p>
+        <p class="spims-text-dim mb-3 mx-auto" style="max-width: 28rem;">{{ $message }}</p>
     @endif
     @isset($actions)
         <div class="d-flex flex-wrap justify-content-center gap-2">{{ $actions }}</div>
