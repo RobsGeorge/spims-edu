@@ -14,7 +14,7 @@
             {{ $link['label'] }}
         </h3>
         @if(!empty($link['description']))
-            <p class="text-muted-theme small mb-0">{{ $link['description'] }}</p>
+            <p class="spims-text-dim small mb-0">{{ $link['description'] }}</p>
         @endif
         @if(!empty($link['hint']))
             <p class="sa-tile-hint small mb-0 mt-2">{{ $link['hint'] }}</p>

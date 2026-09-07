@@ -4,8 +4,7 @@
 
 @section('content')
 <div class="hub-page animate-in" style="max-width:920px;margin:0 auto;">
-    <h1 class="page-title">{{ __('hubs.finance_title') }}</h1>
-    <p class="text-muted-theme mb-4">{{ __('hubs.finance_desc') }}</p>
+    <x-page-header :title="__('hubs.finance_title')" :subtitle="__('hubs.finance_desc')" />
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_finance')])
     @include('partials.people-entrance-banner')
     @include('partials.people-entrance-banner')

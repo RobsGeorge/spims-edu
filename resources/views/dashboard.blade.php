@@ -12,7 +12,7 @@
         <h1 class="display-6 page-title mb-1">
             {{ __('dashboard.hello', ['name' => $user->first_name ?: __('dashboard.user_fallback')]) }}
         </h1>
-        <p class="text-muted-theme mb-0">{{ __('ui.dashboard_subheading') }}</p>
+        <p class="spims-text-dim mb-0">{{ __('ui.dashboard_subheading') }}</p>
     </div>
 
     <div class="bento-grid mb-4">
@@ -23,7 +23,7 @@
             </div>
             @if($enrollments->isEmpty())
                 <div class="spims-empty py-4 text-center">
-                    <p class="text-muted-theme mb-3">{{ __('learning.my_courses_empty') }}</p>
+                    <p class="spims-text-dim mb-3">{{ __('learning.my_courses_empty') }}</p>
                     <a href="{{ route('catalog.index') }}" class="btn btn-primary">{{ __('learning.browse_catalog') }}</a>
                 </div>
             @else
@@ -33,7 +33,7 @@
                             <div class="d-flex justify-content-between gap-2 align-items-start">
                                 <div>
                                     <div class="fw-semibold">{{ $enrollment->offering->course->code }} · {{ $enrollment->offering->course->title }}</div>
-                                    <div class="small text-muted-theme">{{ __('learning.progress', ['percent' => (int) $enrollment->progress_percent]) }}</div>
+                                    <div class="small spims-text-dim">{{ __('learning.progress', ['percent' => (int) $enrollment->progress_percent]) }}</div>
                                 </div>
                                 <a class="btn btn-sm btn-outline-primary" href="{{ route('learn.offering', $enrollment->offering) }}">{{ __('learning.open_player') }}</a>
                             </div>
@@ -60,7 +60,7 @@
                 <div class="d-flex justify-content-between gap-2 py-2 border-bottom border-opacity-25">
                     <div>
                         <div class="fw-semibold">{{ $assessment->title }}</div>
-                        <div class="small text-muted-theme">
+                        <div class="small spims-text-dim">
                             {{ $assessment->offering->course->code }}
                             ·
                             @if($assessment->closes_at)
@@ -73,7 +73,7 @@
                     <a class="btn btn-sm btn-outline-primary" href="{{ route('assessments.show', $assessment) }}">{{ __('learning.continue_learning') }}</a>
                 </div>
             @empty
-                <p class="text-muted-theme mb-0">{{ __('learning.due_empty') }}</p>
+                <p class="spims-text-dim mb-0">{{ __('learning.due_empty') }}</p>
             @endforelse
         </section>
 
@@ -98,87 +98,87 @@
             @forelse($notifications as $note)
                 <div class="py-2 border-bottom border-opacity-25">
                     <div class="fw-semibold">{{ $note->title }}</div>
-                    <div class="small text-muted-theme">{{ $note->body }}</div>
+                    <div class="small spims-text-dim">{{ $note->body }}</div>
                 </div>
             @empty
-                <p class="text-muted-theme mb-0">{{ __('learning.notifications_empty') }}</p>
+                <p class="spims-text-dim mb-0">{{ __('learning.notifications_empty') }}</p>
             @endforelse
             <a href="{{ route('notifications.index') }}" class="btn btn-sm btn-outline-secondary mt-3">{{ __('dashboard.notifications') }}</a>
         </section>
     </div>
 
     <div class="row g-3">
-        <div class="col-md-6 col-lg-4">
+        <div class="col-12 col-md-6 col-lg-4">
             <a href="{{ route('hubs.learning') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                 <h3><i class="bi bi-book-half" aria-hidden="true"></i> {{ __('dashboard.learning_hub') }}</h3>
-                <p class="text-muted-theme mb-0">{{ __('dashboard.learning_hub_desc') }}</p>
+                <p class="spims-text-dim mb-0">{{ __('dashboard.learning_hub_desc') }}</p>
             </a>
         </div>
         @if($hasAcademic)
-            <div class="col-md-6 col-lg-4">
+            <div class="col-12 col-md-6 col-lg-4">
                 <a href="{{ route('hubs.academic') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                     <h3><i class="bi bi-mortarboard" aria-hidden="true"></i> {{ __('dashboard.academic_hub') }}</h3>
-                    <p class="text-muted-theme mb-0">{{ __('dashboard.academic_hub_desc') }}</p>
+                    <p class="spims-text-dim mb-0">{{ __('dashboard.academic_hub_desc') }}</p>
                 </a>
             </div>
         @endif
         @if($hasAdmin)
-            <div class="col-md-6 col-lg-4">
+            <div class="col-12 col-md-6 col-lg-4">
                 <a href="{{ route('hubs.admin') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                     <h3><i class="bi bi-gear" aria-hidden="true"></i> {{ __('dashboard.admin_hub') }}</h3>
-                    <p class="text-muted-theme mb-0">{{ __('dashboard.admin_hub_desc') }}</p>
+                    <p class="spims-text-dim mb-0">{{ __('dashboard.admin_hub_desc') }}</p>
                 </a>
             </div>
         @endif
         @if(!empty($canManagePeople))
-            <div class="col-md-6 col-lg-4">
+            <div class="col-12 col-md-6 col-lg-4">
                 <a href="{{ route('admin.users.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                     <h3><i class="bi bi-people" aria-hidden="true"></i> {{ __('people.dashboard_tile') }}</h3>
-                    <p class="text-muted-theme mb-0">{{ __('people.dashboard_tile_desc') }}</p>
+                    <p class="spims-text-dim mb-0">{{ __('people.dashboard_tile_desc') }}</p>
                     <p class="sa-tile-hint small mb-0 mt-2">{{ __('people.dashboard_tile_hint') }}</p>
                 </a>
             </div>
         @endif
-        <div class="col-md-6 col-lg-4">
+        <div class="col-12 col-md-6 col-lg-4">
             <a href="{{ route('grades.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                 <h3><i class="bi bi-clipboard-data" aria-hidden="true"></i> {{ __('learning.grades') }}</h3>
-                <p class="text-muted-theme mb-0">{{ __('hubs.grades_desc') }}</p>
+                <p class="spims-text-dim mb-0">{{ __('hubs.grades_desc') }}</p>
             </a>
         </div>
-        <div class="col-md-6 col-lg-4">
+        <div class="col-12 col-md-6 col-lg-4">
             <a href="{{ route('events.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                 <h3><i class="bi bi-calendar-event" aria-hidden="true"></i> {{ __('events.hub') }}</h3>
-                <p class="text-muted-theme mb-0">{{ __('events.hub_desc') }}</p>
+                <p class="spims-text-dim mb-0">{{ __('events.hub_desc') }}</p>
             </a>
         </div>
-        <div class="col-md-6 col-lg-4">
+        <div class="col-12 col-md-6 col-lg-4">
             <a href="{{ route('student.surveys.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                 <h3><i class="bi bi-clipboard-check" aria-hidden="true"></i> {{ __('dashboard.surveys') }}</h3>
-                <p class="text-muted-theme mb-0">{{ __('dashboard.surveys_desc') }}</p>
+                <p class="spims-text-dim mb-0">{{ __('dashboard.surveys_desc') }}</p>
             </a>
         </div>
-        <div class="col-md-6 col-lg-4">
+        <div class="col-12 col-md-6 col-lg-4">
             <a href="{{ route('settings.edit') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                 <h3><i class="bi bi-person-gear" aria-hidden="true"></i> {{ __('learning.settings') }}</h3>
-                <p class="text-muted-theme mb-0">{{ __('hubs.settings_desc') }}</p>
+                <p class="spims-text-dim mb-0">{{ __('hubs.settings_desc') }}</p>
             </a>
         </div>
         @if($hasSuperadmin)
-            <div class="col-md-6 col-lg-4">
+            <div class="col-12 col-md-6 col-lg-4">
                 <a href="{{ route('superadmin.audit.index') }}" class="app-tile hub-tile d-flex flex-column h-100 text-decoration-none">
                     <h3><i class="bi bi-journal-text" aria-hidden="true"></i> {{ __('audit.dashboard_tile') }}</h3>
-                    <p class="text-muted-theme mb-0">{{ __('audit.dashboard_tile_desc') }}</p>
+                    <p class="spims-text-dim mb-0">{{ __('audit.dashboard_tile_desc') }}</p>
                     <p class="sa-tile-hint small mb-0 mt-2">{{ __('audit.dashboard_tile_hint') }}</p>
                 </a>
             </div>
-            <div class="col-md-6 col-lg-4">
+            <div class="col-12 col-md-6 col-lg-4">
                 <a href="{{ route('superadmin.index') }}"
                    class="app-tile hub-tile hub-tile-superadmin d-flex flex-column h-100 text-decoration-none border border-danger border-opacity-25">
                     <h3>
                         @include('partials.superadmin-entry-tag', ['class' => 'me-1'])
                         {{ __('dashboard.superadmin_hub') }}
                     </h3>
-                    <p class="text-muted-theme mb-0">{{ __('dashboard.superadmin_hub_desc') }}</p>
+                    <p class="spims-text-dim mb-0">{{ __('dashboard.superadmin_hub_desc') }}</p>
                     <p class="sa-tile-hint small mb-0 mt-2">{{ __('superadmin.dashboard_hint') }}</p>
                 </a>
             </div>

@@ -4,8 +4,7 @@
 
 @section('content')
 <div class="hub-page animate-in" style="max-width:920px;margin:0 auto;">
-    <h1 class="page-title">{{ __('hubs.admin_title') }}</h1>
-    <p class="text-muted-theme mb-4">{{ __('hubs.admin_desc') }}</p>
+    <x-page-header :title="__('hubs.admin_title')" :subtitle="__('hubs.admin_desc')" />
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_admin')])
     @include('partials.people-entrance-banner')
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_admin')])
@@ -13,7 +12,7 @@
         @forelse($links as $link)
             @include('partials.hub-link-tile', ['link' => $link])
         @empty
-            <p class="text-muted-theme">—</p>
+            <p class="spims-text-dim">—</p>
         @endforelse
     </div>
 </div>

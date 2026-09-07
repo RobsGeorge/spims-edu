@@ -43,7 +43,7 @@
         <section id="programs" class="spims-landing-featured" aria-labelledby="landing-featured-title">
             <div class="spims-landing-featured-intro">
                 <h2 id="landing-featured-title" class="spims-landing-featured-title">{{ __('home.featured_title') }}</h2>
-                <p class="text-muted-theme mb-0">{{ __('home.featured_lead') }}</p>
+                <p class="spims-text-dim mb-0">{{ __('home.featured_lead') }}</p>
             </div>
             <div class="spims-landing-featured-grid">
                 @foreach($featured as $index => $course)
@@ -80,7 +80,7 @@
 
     <div id="admissions" class="spims-landing-band" aria-labelledby="landing-how-title">
         <h2 id="landing-how-title" class="spims-landing-band-title">{{ __('home.how_title') }}</h2>
-        <p class="text-muted-theme mb-0">{{ __('home.how_lead') }}</p>
+        <p class="spims-text-dim mb-0">{{ __('home.how_lead') }}</p>
         <ol class="spims-landing-beats">
             <li>
                 <span class="spims-landing-beat-num" aria-hidden="true">1</span>
