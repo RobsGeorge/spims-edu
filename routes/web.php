@@ -825,6 +825,11 @@ Route::middleware(['auth'])->group(function () {
             ->name('reports.finance');
         Route::get('/reports/standing', [ReportController::class, 'standing'])
             ->name('reports.standing');
+        // leftover polish
+        Route::get('/reports/standing/thresholds', [ReportController::class, 'standingThresholds'])
+            ->name('reports.standing.thresholds');
+        Route::post('/reports/standing/thresholds', [ReportController::class, 'updateStandingThresholds'])
+            ->name('reports.standing.thresholds.update');
         Route::get('/reports/{report}/csv', [ReportController::class, 'csv'])
             ->where('report', 'headcount|admissions|attendance|grades|finance|standing')
             ->name('reports.csv');
