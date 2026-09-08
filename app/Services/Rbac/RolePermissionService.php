@@ -8,9 +8,17 @@ use App\Models\User;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class RolePermissionService
 {
+    /**
+     * Grant tokens Super Admin may store. Empty/off is deny (no row), never a default F.
+     *
+     * @var list<string>
+     */
+    public const GRANT_LEVELS = ['R', 'O', 'F', 'lock', 'reopen', 'issue'];
+
     public function __construct(
         private readonly AuthorizeService $authorize,
         private readonly AuditLogWriter $audit,
@@ -132,12 +140,13 @@ class RolePermissionService
     }
 
     /**
-     * Replace grants for one role from checkbox list of permission keys.
-     * Levels default to F when newly granted; keep existing level if already present in config defaults.
+     * Replace grants for one role from an explicit permission_key => level map.
+     * Empty/off omits the row (deny). Unknown keys and unknown levels are rejected.
+     * A new grant is never defaulted to F.
      *
-     * @param  list<string>  $permissionKeys
+     * @param  array<string, string|null>  $permissionLevels
      */
-    public function updateRoleMatrix(User $actor, RoleType $role, array $permissionKeys): void
+    public function updateRoleMatrix(User $actor, RoleType $role, array $permissionLevels): void
     {
         $this->authorize->authorize($actor, 'roles.manage_matrix');
 
@@ -145,29 +154,34 @@ class RolePermissionService
             abort(403);
         }
 
-        $permissionKeys = array_values(array_unique(array_filter($permissionKeys)));
-        $defaults = config('permissions', []);
+        $grants = $this->validatedGrants($permissionLevels);
 
-        $this->audit->write($actor, 'rbac.role_matrix.update', 'RoleType', $role->value, null, [
-            'permissions' => $permissionKeys,
-        ]);
+        DB::transaction(function () use ($actor, $role, $grants): void {
+            $before = RolePermission::query()
+                ->where('role', $role->value)
+                ->pluck('level', 'permission_key')
+                ->all();
 
-        DB::transaction(function () use ($role, $permissionKeys, $defaults): void {
             RolePermission::query()->where('role', $role->value)->delete();
 
-            foreach ($permissionKeys as $key) {
-                if (! array_key_exists($key, $defaults)) {
-                    continue;
-                }
-
-                $level = $defaults[$key][$role->value] ?? 'F';
-
+            foreach ($grants as $key => $level) {
                 RolePermission::query()->create([
                     'role' => $role->value,
                     'permission_key' => $key,
-                    'level' => (string) $level,
+                    'level' => $level,
                 ]);
             }
+
+            $after = RolePermission::query()
+                ->where('role', $role->value)
+                ->pluck('level', 'permission_key')
+                ->all();
+
+            $this->audit->write($actor, 'rbac.role_matrix.update', 'RoleType', $role->value, [
+                'levels' => $before,
+            ], [
+                'levels' => $after,
+            ]);
         });
 
         $this->authorize->forgetMatrixCache();
@@ -188,7 +202,7 @@ class RolePermissionService
         $written = 0;
         $before = RolePermission::query()
             ->where('role', $role->value)
-            ->pluck('permission_key')
+            ->pluck('level', 'permission_key')
             ->all();
 
         DB::transaction(function () use ($actor, $role, $defaults, $before, &$written): void {
@@ -207,13 +221,17 @@ class RolePermissionService
                 $written++;
             }
 
+            $after = RolePermission::query()
+                ->where('role', $role->value)
+                ->pluck('level', 'permission_key')
+                ->all();
+
             $this->audit->write($actor, 'rbac.role_matrix.reset', 'RoleType', $role->value, [
-                'permissions' => $before,
+                'permissions' => array_keys($before),
+                'levels' => $before,
             ], [
-                'permissions' => RolePermission::query()
-                    ->where('role', $role->value)
-                    ->pluck('permission_key')
-                    ->all(),
+                'permissions' => array_keys($after),
+                'levels' => $after,
                 'written' => $written,
             ]);
         });
@@ -221,5 +239,61 @@ class RolePermissionService
         $this->authorize->forgetMatrixCache();
 
         return $written;
+    }
+
+    /**
+     * @param  array<int|string, mixed>  $permissionLevels
+     * @return array<string, string>
+     */
+    private function validatedGrants(array $permissionLevels): array
+    {
+        if ($permissionLevels !== [] && array_is_list($permissionLevels)) {
+            throw ValidationException::withMessages([
+                'permissions' => [__('roles_hub.level_required')],
+            ]);
+        }
+
+        $knownKeys = array_fill_keys(array_keys(config('permissions', [])), true);
+        $allowedLevels = array_fill_keys(self::GRANT_LEVELS, true);
+        $grants = [];
+
+        foreach ($permissionLevels as $key => $level) {
+            if (! is_string($key) || $key === '') {
+                throw ValidationException::withMessages([
+                    'permissions' => [__('roles_hub.unknown_key', ['key' => (string) $key])],
+                ]);
+            }
+
+            if (! isset($knownKeys[$key])) {
+                throw ValidationException::withMessages([
+                    "permissions.$key" => [__('roles_hub.unknown_key', ['key' => $key])],
+                ]);
+            }
+
+            if ($level === null) {
+                continue;
+            }
+
+            if (! is_string($level) && ! is_int($level)) {
+                throw ValidationException::withMessages([
+                    "permissions.$key" => [__('roles_hub.unknown_level', ['level' => get_debug_type($level)])],
+                ]);
+            }
+
+            $level = trim((string) $level);
+            if ($level === '') {
+                continue;
+            }
+
+            if (! isset($allowedLevels[$level])) {
+                throw ValidationException::withMessages([
+                    "permissions.$key" => [__('roles_hub.unknown_level', ['level' => $level])],
+                ]);
+            }
+
+            $grants[$key] = $level;
+        }
+
+        return $grants;
     }
 }

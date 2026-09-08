@@ -8,6 +8,7 @@ use App\Services\Rbac\RolePermissionService;
 use App\Support\AuthorizeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class RolesHubController extends Controller
@@ -29,6 +30,7 @@ class RolesHubController extends Controller
             'groups' => $groups,
             'matrix' => $rbac->matrix(),
             'roles' => $rbac->editableRoles(),
+            'grantLevels' => RolePermissionService::GRANT_LEVELS,
             'section' => $request->query('section', 'templates'),
         ]);
     }
@@ -37,13 +39,15 @@ class RolesHubController extends Controller
     {
         $roleType = RoleType::from($role);
         $data = $request->validate([
-            'permissions' => 'array',
-            'permissions.*' => 'string',
+            'permissions' => ['sometimes', 'array'],
+            'permissions.*' => ['nullable', 'string', Rule::in(array_merge([''], RolePermissionService::GRANT_LEVELS))],
         ]);
 
         $rbac->updateRoleMatrix($request->user(), $roleType, $data['permissions'] ?? []);
 
-        return back()->with('status', __('roles_hub.saved', ['role' => $roleType->value]));
+        return back()->with('status', __('roles_hub.saved', [
+            'role' => __('roles_hub.role_'.$roleType->value),
+        ]));
     }
 
     public function resetRole(Request $request, string $role, RolePermissionService $rbac): RedirectResponse
