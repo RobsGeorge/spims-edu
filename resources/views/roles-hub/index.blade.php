@@ -21,6 +21,18 @@
     </div>
     <p class="spims-text-dim mb-3">{{ __('roles_hub.desc') }}</p>
 
+    @php
+        $section = $section ?? 'templates';
+        $helpOpen = $section === 'help';
+        $assignmentsOpen = $section === 'assignments';
+        $templatesOpen = ! $helpOpen && ! $assignmentsOpen;
+    @endphp
+
+    <a href="{{ route('roles.hub', ['section' => 'help']) }}" class="btn btn-outline-primary roles-hub-help-jump mb-4">
+        <x-icon name="course" size="sm" />
+        {{ __('roles_hub.help_jump') }}
+    </a>
+
     <div class="sa-callout sa-callout-danger mb-4" role="note">
         <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
         <div>
@@ -33,21 +45,33 @@
         <div class="alert alert-success">{{ session('status') }}</div>
     @endif
 
-    <label class="form-label" for="roles-hub-search">{{ __('roles_hub.search_label') }}</label>
-    <input type="search" id="roles-hub-search" class="form-control mb-2" autocomplete="off"
-           placeholder="{{ __('roles_hub.search_placeholder') }}">
-    <p class="small spims-text-dim mb-4">{{ __('roles_hub.search_help') }}</p>
-
     <div class="accordion roles-hub-accordion" id="rolesHubAccordion">
         <div class="accordion-item app-card mb-3 border-0">
             <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#templatesSection" aria-expanded="true">
+                <button class="accordion-button{{ $helpOpen ? '' : ' collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#helpSection" aria-expanded="{{ $helpOpen ? 'true' : 'false' }}" aria-controls="helpSection">
+                    <x-icon name="course" size="sm" class="me-2" /> {{ __('roles_hub.section_help') }}
+                </button>
+            </h2>
+            <div id="helpSection" class="accordion-collapse collapse{{ $helpOpen ? ' show' : '' }}" data-bs-parent="#rolesHubAccordion">
+                <div class="accordion-body">
+                    @include('roles-hub.help')
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item app-card mb-3 border-0">
+            <h2 class="accordion-header">
+                <button class="accordion-button{{ $templatesOpen ? '' : ' collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#templatesSection" aria-expanded="{{ $templatesOpen ? 'true' : 'false' }}" aria-controls="templatesSection">
                     <i class="bi bi-shield-check me-2"></i> {{ __('roles_hub.section_templates') }}
                 </button>
             </h2>
-            <div id="templatesSection" class="accordion-collapse collapse show" data-bs-parent="#rolesHubAccordion">
+            <div id="templatesSection" class="accordion-collapse collapse{{ $templatesOpen ? ' show' : '' }}" data-bs-parent="#rolesHubAccordion">
                 <div class="accordion-body">
                     <p class="spims-text-dim small mb-3">{{ __('roles_hub.templates_hint') }}</p>
+                    <label class="form-label" for="roles-hub-search">{{ __('roles_hub.search_label') }}</label>
+                    <input type="search" id="roles-hub-search" class="form-control mb-2" autocomplete="off"
+                           placeholder="{{ __('roles_hub.search_placeholder') }}">
+                    <p class="small spims-text-dim mb-4">{{ __('roles_hub.search_help') }}</p>
 
                     @foreach($roles as $role)
                         @php
@@ -103,11 +127,11 @@
 
         <div class="accordion-item app-card mb-3 border-0">
             <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#assignmentsSection">
+                <button class="accordion-button{{ $assignmentsOpen ? '' : ' collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#assignmentsSection" aria-expanded="{{ $assignmentsOpen ? 'true' : 'false' }}" aria-controls="assignmentsSection">
                     <i class="bi bi-people me-2"></i> {{ __('roles_hub.section_assignments') }}
                 </button>
             </h2>
-            <div id="assignmentsSection" class="accordion-collapse collapse" data-bs-parent="#rolesHubAccordion">
+            <div id="assignmentsSection" class="accordion-collapse collapse{{ $assignmentsOpen ? ' show' : '' }}" data-bs-parent="#rolesHubAccordion">
                 <div class="accordion-body">
                     <p class="spims-text-dim mb-3">{{ __('roles_hub.assignments_hint') }}</p>
                     @include('partials.people-entrance-banner')
