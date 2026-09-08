@@ -23,7 +23,15 @@ class RolesHubTest extends TestCase
         $this->actingAs($sa)->get(route('roles.hub'))
             ->assertOk()
             ->assertSee(__('roles_hub.title'))
-            ->assertSee('programs.manage');
+            ->assertSee('programs.manage')
+            ->assertSee(__('roles_hub.section_help'))
+            ->assertSee(__('roles_hub.help_jump'));
+
+        $this->actingAs($sa)->get(route('roles.hub', ['section' => 'help']))
+            ->assertOk()
+            ->assertSee(__('roles_hub.help_intro_title'))
+            ->assertSee(__('roles_hub.help_vs_title'))
+            ->assertSee(__('roles_hub.help_gap_levels'));
 
         $this->actingAs($sa)->put(route('roles.hub.role.update', RoleType::Student->value), [
             'permissions' => ['programs.view', 'transcript.view'],

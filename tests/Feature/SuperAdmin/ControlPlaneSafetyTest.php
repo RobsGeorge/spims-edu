@@ -135,7 +135,9 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee(__('roles_hub.group_features'))
             ->assertSee('features.manage')
             ->assertSee('users.impersonate')
-            ->assertDontSee(__('roles_hub.role_SUPER_ADMIN'));
+            ->assertDontSee('<code>SUPER_ADMIN</code>', false)
+            ->assertSee(__('roles_hub.section_help'))
+            ->assertSee(__('roles_hub.role_SUPER_ADMIN'));
 
         $rbac->updateRoleMatrix($sa, RoleType::Student, ['transcript.view']);
         $this->assertFalse(
