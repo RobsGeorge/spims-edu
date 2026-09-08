@@ -56,7 +56,7 @@
     <div class="d-flex justify-content-between align-items-center border rounded-3 p-2 mb-2">
         <div>
             <div>{{ $reminder->subject_type }} · {{ $reminder->subject_id }}</div>
-            <div class="small text-muted-theme">{{ $reminder->remind_at }}</div>
+            <div class="small spims-text-dim">{{ $reminder->remind_at }}</div>
         </div>
         <form method="POST" action="{{ route('settings.reminders.cancel', $reminder) }}">
             @csrf
@@ -65,6 +65,6 @@
         </form>
     </div>
 @empty
-    <p class="text-muted-theme">{{ __('communications.no_reminders') }}</p>
+    <p class="spims-text-dim">{{ __('communications.no_reminders') }}</p>
 @endforelse
 @endsection

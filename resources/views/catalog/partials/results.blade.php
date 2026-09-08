@@ -1,7 +1,7 @@
 @if($courses->isEmpty())
     <div class="spims-empty app-card p-5 text-center">
         <h2 class="h5 spims-title">{{ __('catalog.empty') }}</h2>
-        <p class="text-muted-theme mb-0">{{ __('catalog.empty_hint') }}</p>
+        <p class="spims-text-dim mb-0">{{ __('catalog.empty_hint') }}</p>
     </div>
 @else
     <div class="row g-3">
@@ -22,7 +22,7 @@
                     </div>
                     <h2 class="h5 spims-title mb-1">{{ $course->code }}</h2>
                     <p class="mb-2">{{ $course->title }}</p>
-                    <p class="text-muted-theme small mb-3">
+                    <p class="spims-text-dim small mb-3">
                         {{ __('catalog.credits', ['count' => $course->credit_hours]) }}
                         · {{ __('catalog.interest_count', ['count' => $course->interest_flags_count]) }}
                     </p>
@@ -30,7 +30,7 @@
                         @if($offering)
                             <a class="btn btn-sm btn-outline-primary" href="{{ route('offerings.preview', $offering) }}">{{ __('catalog.preview') }}</a>
                         @else
-                            <span class="text-muted-theme small align-self-center">{{ __('catalog.no_offering') }}</span>
+                            <span class="spims-text-dim small align-self-center">{{ __('catalog.no_offering') }}</span>
                         @endif
                         @auth
                             @if($form)

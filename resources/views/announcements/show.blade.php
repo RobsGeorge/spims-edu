@@ -6,7 +6,7 @@
 <article class="app-card p-4">
     <p class="mb-0">{{ $announcement->localizedBody() }}</p>
     @if($announcement->offering?->course)
-        <p class="small text-muted-theme mt-3 mb-0">{{ $announcement->offering->course->code }} — {{ $announcement->offering->course->title }}</p>
+        <p class="small spims-text-dim mt-3 mb-0">{{ $announcement->offering->course->code }} — {{ $announcement->offering->course->title }}</p>
     @endif
 </article>
 @endsection
