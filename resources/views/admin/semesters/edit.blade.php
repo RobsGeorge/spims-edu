@@ -2,11 +2,11 @@
 @section('title', __('offerings.edit_semester'))
 @section('content')
 <h1 class="spims-title mb-3">{{ __('offerings.edit_semester') }}</h1>
-<p class="text-muted-theme">{{ $semester->academicYear?->name }}</p>
-<form method="POST" action="{{ route('admin.semesters.update', $semester) }}" class="card border-0 shadow-sm">
+<p class="spims-text-dim">{{ $semester->academicYear?->name }}</p>
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.semesters.update', $semester) }}">
     @csrf
     @method('PUT')
-    <div class="card-body row g-3">
+    <div class="row g-3">
         <div class="col-md-4">
             <label class="form-label">{{ __('academics.name') }}</label>
             <input name="name" class="form-control" value="{{ old('name', $semester->name) }}" required>
@@ -31,7 +31,8 @@
             <label class="form-label">{{ __('offerings.status') }}</label>
             <select name="status" class="form-select" required>
                 @foreach($statuses as $status)
-                    <option value="{{ $status->value }}" @selected(old('status', $semester->status->value) === $status->value)>{{ $status->value }}</option>
+                    @php $semStatusVal = $status->value; @endphp
+                    <option value="{{ $semStatusVal }}" @selected(old('status', $semester->status->value) === $semStatusVal)>{{ $semStatusVal }}</option>
                 @endforeach
             </select>
         </div>
@@ -52,5 +53,5 @@
             <a href="{{ route('admin.semesters.index') }}" class="btn btn-outline-secondary">{{ __('ui.cancel') }}</a>
         </div>
     </div>
-</form>
+</x-card>
 @endsection

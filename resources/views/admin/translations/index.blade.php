@@ -12,7 +12,7 @@
 @if($pending->isEmpty())
     <x-empty-state :title="__('academics.translations_inbox_empty')" />
 @else
-    <div class="card border-0 shadow-sm mb-4">
+    <x-card variant="panel" class="mb-4">
         <div class="table-responsive">
             <table class="table mb-0 align-middle">
                 <thead>
@@ -27,10 +27,11 @@
                 </thead>
                 <tbody>
                 @foreach($pending as $translation)
+                    @php $tVal = $translation->value; @endphp
                     <tr>
                         <td>
                             <span class="small">{{ $translation->entity_type }}</span>
-                            <div class="text-muted-theme small">{{ $translation->entity_id }}</div>
+                            <div class="spims-text-dim small">{{ $translation->entity_id }}</div>
                         </td>
                         <td>{{ $translation->field }}</td>
                         <td>{{ strtoupper($translation->locale) }}</td>
@@ -41,7 +42,7 @@
                                 <input type="hidden" name="entity_id" value="{{ $translation->entity_id }}">
                                 <input type="hidden" name="field" value="{{ $translation->field }}">
                                 <input type="hidden" name="locale" value="{{ $translation->locale }}">
-                                <textarea name="value" class="form-control form-control-sm" rows="2" required>{{ $translation->value }}</textarea>
+                                <textarea name="value" class="form-control form-control-sm" rows="2" required>{{ $tVal }}</textarea>
                                 <button class="btn btn-sm btn-outline-primary align-self-start">{{ __('ui.save') }}</button>
                             </form>
                         </td>
@@ -62,7 +63,7 @@
                                 <input type="hidden" name="entity_id" value="{{ $translation->entity_id }}">
                                 <input type="hidden" name="field" value="{{ $translation->field }}">
                                 <input type="hidden" name="source_locale" value="{{ $translation->locale }}">
-                                <input type="hidden" name="source_text" value="{{ $translation->value }}">
+                                <input type="hidden" name="source_text" value="{{ $tVal }}">
                                 <select name="target_locale" class="form-select form-select-sm" style="width:auto">
                                     @foreach(['ar','en','fr'] as $loc)
                                         @if($loc !== $translation->locale)
@@ -78,28 +79,26 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </x-card>
     {{ $pending->links() }}
 @endif
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
-        <h2 class="h6">{{ __('academics.add_translation') }}</h2>
-        <form method="POST" action="{{ route('admin.translations.store') }}" class="row g-2">
-            @csrf
-            <div class="col-md-3"><input name="entity_type" class="form-control" placeholder="{{ __('academics.entity') }}" required></div>
-            <div class="col-md-3"><input name="entity_id" class="form-control" placeholder="{{ __('academics.entity_id') }}" required></div>
-            <div class="col-md-2"><input name="field" class="form-control" placeholder="{{ __('academics.field') }}" required></div>
-            <div class="col-md-2">
-                <select name="locale" class="form-select" required>
-                    <option value="ar">AR</option>
-                    <option value="en">EN</option>
-                    <option value="fr">FR</option>
-                </select>
-            </div>
-            <div class="col-12"><textarea name="value" class="form-control" rows="2" required></textarea></div>
-            <div class="col-12"><button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button></div>
-        </form>
-    </div>
-</div>
+<x-card variant="panel">
+    <h2 class="h6">{{ __('academics.add_translation') }}</h2>
+    <form method="POST" action="{{ route('admin.translations.store') }}" class="row g-2">
+        @csrf
+        <div class="col-md-3"><input name="entity_type" class="form-control" placeholder="{{ __('academics.entity') }}" required></div>
+        <div class="col-md-3"><input name="entity_id" class="form-control" placeholder="{{ __('academics.entity_id') }}" required></div>
+        <div class="col-md-2"><input name="field" class="form-control" placeholder="{{ __('academics.field') }}" required></div>
+        <div class="col-md-2">
+            <select name="locale" class="form-select" required>
+                <option value="ar">AR</option>
+                <option value="en">EN</option>
+                <option value="fr">FR</option>
+            </select>
+        </div>
+        <div class="col-12"><textarea name="value" class="form-control" rows="2" required></textarea></div>
+        <div class="col-12"><button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button></div>
+    </form>
+</x-card>
 @endsection

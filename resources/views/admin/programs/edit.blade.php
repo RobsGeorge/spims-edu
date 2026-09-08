@@ -11,10 +11,10 @@
     <div class="alert alert-success">{{ session('status') }}</div>
 @endif
 
-<form method="POST" action="{{ route('admin.programs.update', $program) }}" class="card border-0 shadow-sm app-card mb-4">
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.programs.update', $program) }}" class="mb-4">
     @csrf
     @method('PUT')
-    <div class="card-body row g-3">
+    <div class="row g-3">
         <div class="col-md-4">
             <label class="form-label">{{ __('academics.code') }}</label>
             <input class="form-control" value="{{ $program->code }}" disabled>
@@ -28,7 +28,8 @@
             <label class="form-label">{{ __('academics.type') }}</label>
             <select name="type" class="form-select" required>
                 @foreach($types as $type)
-                    <option value="{{ $type->value }}" @selected(old('type', $program->type->value) === $type->value)>{{ $type->value }}</option>
+                    @php $typeVal = $type->value; @endphp
+                    <option value="{{ $typeVal }}" @selected(old('type', $program->type->value) === $typeVal)>{{ $typeVal }}</option>
                 @endforeach
             </select>
         </div>
@@ -58,7 +59,7 @@
             <a href="{{ route('admin.programs.show', $program) }}" class="btn btn-outline-secondary">{{ __('ui.cancel') }}</a>
         </div>
     </div>
-</form>
+</x-card>
 
 @include('admin.programs._standing')
 @endsection

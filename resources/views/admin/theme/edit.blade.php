@@ -20,9 +20,8 @@
     $darkAccent = old('tokens.dark.accent', $tokens['dark']['accent'] ?? '#e9c16d');
 @endphp
 
-<div class="spims-theme-preview card border-0 shadow-sm mb-4">
-    <div class="card-body">
-        <p class="small text-muted-theme mb-2">{{ __('ui.theme_preview') }}</p>
+<x-card variant="panel" class="spims-theme-preview mb-4">
+    <p class="small spims-text-dim mb-2">{{ __('ui.theme_preview') }}</p>
         <div class="d-flex flex-wrap gap-3 align-items-stretch">
             <div class="flex-grow-1 rounded-3 p-3" style="background: {{ $lightBg }}; min-width: 12rem;">
                 <div class="small mb-2" style="color: {{ $lightPrimary }};">{{ __('ui.theme_light') }}</div>
@@ -41,14 +40,13 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
+</x-card>
 
 <form method="POST" action="{{ route('admin.theme.update', $theme) }}" id="theme-editor-form">
     @csrf
     @method('PUT')
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body row g-3">
+    <x-card variant="panel" class="mb-4">
+        <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label">{{ __('ui.theme_name') }}</label>
                 <input name="name" class="form-control" value="{{ old('name', $theme->name) }}" required>
@@ -76,14 +74,13 @@
                 </label>
             </div>
         </div>
-    </div>
+    </x-card>
 
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <h2 class="h6 mb-3">{{ __('ui.theme_tokens') }}</h2>
+    <x-card variant="panel" class="mb-4">
+        <h2 class="h6 mb-3">{{ __('ui.theme_tokens') }}</h2>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <h3 class="h6 text-muted-theme">{{ __('ui.theme_light') }}</h3>
+                    <h3 class="h6 spims-text-dim">{{ __('ui.theme_light') }}</h3>
                     <div class="row g-2">
                         <div class="col-4">
                             <label class="form-label">{{ __('ui.token_primary') }}</label>
@@ -100,7 +97,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h3 class="h6 text-muted-theme">{{ __('ui.theme_dark') }}</h3>
+                    <h3 class="h6 spims-text-dim">{{ __('ui.theme_dark') }}</h3>
                     <div class="row g-2">
                         <div class="col-4">
                             <label class="form-label">{{ __('ui.token_primary') }}</label>
@@ -117,8 +114,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+    </x-card>
 
     <button class="btn btn-primary">{{ __('ui.save') }}</button>
 </form>
