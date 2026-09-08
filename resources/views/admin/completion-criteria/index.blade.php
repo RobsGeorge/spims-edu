@@ -4,13 +4,14 @@
 <h1 class="spims-title mb-3">{{ __('completion.criteria_title') }} — {{ $course->code }}</h1>
 @if(session('status'))<div class="alert alert-success" role="status">{{ session('status') }}</div>@endif
 
-<form method="POST" action="{{ route('admin.completion-criteria.store', $course) }}" class="card border-0 shadow-sm mb-4">
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.completion-criteria.store', $course) }}" class="mb-4">
     @csrf
-    <div class="card-body row g-2">
+    <div class="row g-2">
         <div class="col-md-3">
             <select name="kind" class="form-select" required aria-label="{{ __('completion.kind') }}">
                 @foreach($kinds as $kind)
-                    <option value="{{ $kind->value }}">{{ $kind->value }}</option>
+                    @php $kindVal = $kind->value; @endphp
+                    <option value="{{ $kindVal }}">{{ $kindVal }}</option>
                 @endforeach
             </select>
         </div>
@@ -33,7 +34,7 @@
         </div>
         <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('completion.add_criterion') }}</button></div>
     </div>
-</form>
+</x-card>
 
 <div class="table-responsive spims-table-wrap">
 <table class="table table-sm">
@@ -41,7 +42,7 @@
     <tbody>
     @forelse($criteria as $criterion)
         <tr>
-            <td>{{ $criterion->kind->value }}</td>
+            <td><x-badge :value="$criterion->kind" /></td>
             <td>{{ $criterion->threshold }}</td>
             <td>{{ $criterion->offering_id ? __('completion.scope_offering') : __('completion.scope_course') }}</td>
             <td>{{ $criterion->is_required ? __('completion.required_yes') : __('completion.required_no') }}</td>
@@ -53,7 +54,7 @@
             </td>
         </tr>
     @empty
-        <tr><td colspan="5" class="text-muted-theme">{{ __('completion.no_criteria') }}</td></tr>
+        <tr><td colspan="5" class="spims-text-dim">{{ __('completion.no_criteria') }}</td></tr>
     @endforelse
     </tbody>
 </table>

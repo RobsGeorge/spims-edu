@@ -35,7 +35,7 @@
     <div class="spims-staff-row border rounded-3 p-3 mb-2">
         <div>
             <strong>{{ $survey->title }}</strong>
-            <div class="small text-muted-theme">
+            <div class="small spims-text-dim">
                 <x-status-badge :status="$survey->status->value" :label="$survey->statusLabel()" />
                 {{ $survey->questions_count }} {{ __('staff.surveys.questions') }}
             </div>

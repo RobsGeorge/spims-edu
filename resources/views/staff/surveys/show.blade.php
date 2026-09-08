@@ -38,7 +38,8 @@
         <div class="col-md-2">
             <select name="kind" class="form-select" aria-label="{{ __('staff.surveys.kind') }}">
                 @foreach($kinds as $kind)
-                    <option value="{{ $kind->value }}">{{ __('staff.surveys.kind_'.$kind->value) }}</option>
+                    @php $kindVal = $kind->value; @endphp
+                    <option value="{{ $kindVal }}">{{ __('staff.surveys.kind_'.$kindVal) }}</option>
                 @endforeach
             </select>
         </div>
@@ -56,7 +57,7 @@
 @forelse($survey->questions as $question)
     <div class="border rounded-3 p-3 mb-2">
         <strong>{{ $question->position }}. {{ $question->prompt }}</strong>
-        <div class="small text-muted-theme">
+        <div class="small spims-text-dim">
             {{ __('staff.surveys.kind_'.$question->kind->value) }}
             @if($question->required)
                 · {{ __('staff.surveys.required') }}

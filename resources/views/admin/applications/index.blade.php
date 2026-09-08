@@ -10,7 +10,8 @@
             <select name="status" id="status_filter" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
                 <option value="">{{ __('admissions.filter_all_queue') }}</option>
                 @foreach($statusOptions as $status)
-                    <option value="{{ $status->value }}" @selected(($currentStatus ?? '') === $status->value)>{{ $status->value }}</option>
+                    @php $statusVal = $status->value; @endphp
+                    <option value="{{ $statusVal }}" @selected(($currentStatus ?? '') === $statusVal)>{{ $statusVal }}</option>
                 @endforeach
             </select>
         </form>
@@ -24,7 +25,7 @@
 @if($applications->isEmpty())
     <x-empty-state :title="__('admissions.queue_empty')" />
 @else
-    <div class="card border-0 shadow-sm">
+    <x-card variant="panel">
         <div class="table-responsive">
             <table class="table mb-0 align-middle">
                 <thead>
@@ -51,7 +52,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+</x-card>
     {{ $applications->withQueryString()->links() }}
 @endif
 @endsection

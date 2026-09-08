@@ -6,7 +6,7 @@
     <a href="{{ route('admin.courses.create') }}" class="btn btn-primary">{{ __('academics.create_course') }}</a>
 </div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
-<div class="card border-0 shadow-sm">
+<x-card variant="panel">
     <div class="table-responsive">
         <table class="table mb-0">
             <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('academics.title') }}</th><th>{{ __('academics.credits') }}</th><th>{{ __('academics.interest') }}</th></tr></thead>
@@ -25,6 +25,6 @@
             </tbody>
         </table>
     </div>
-</div>
+</x-card>
 {{ $courses->links() }}
 @endsection

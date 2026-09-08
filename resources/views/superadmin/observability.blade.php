@@ -20,12 +20,12 @@
 @endphp
 <div class="hub-page animate-in" style="max-width:920px;margin:0 auto;">
     <div class="mb-3">
-        <a href="{{ route('superadmin.index') }}" class="text-decoration-none text-muted-theme">
+        <a href="{{ route('superadmin.index') }}" class="text-decoration-none spims-text-dim">
             @include('partials.superadmin-entry-tag', ['class' => 'me-1']) {{ __('superadmin.title') }}
         </a>
     </div>
     <h1 class="page-title">{{ __('superadmin.observability_title') }}</h1>
-    <p class="text-muted-theme mb-4">{{ __('superadmin.observability_desc') }}</p>
+    <p class="spims-text-dim mb-4">{{ __('superadmin.observability_desc') }}</p>
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_observability')])
 
     <div class="row g-3 mb-4">
@@ -36,7 +36,7 @@
                     <a href="{{ $meta['url'] }}" class="app-card card shadow-sm h-100 text-decoration-none" data-stat="{{ $key }}">
                         <div class="card-body text-center">
                             <div class="display-6 fw-bold page-title">{{ number_format($value) }}</div>
-                            <div class="text-muted-theme text-uppercase small">{{ $meta['label'] }}</div>
+                            <div class="spims-text-dim text-uppercase small">{{ $meta['label'] }}</div>
                             @if(!empty($meta['help']))
                                 <p class="form-text mb-0 mt-2">{{ $meta['help'] }}</p>
                             @endif
@@ -46,7 +46,7 @@
                     <div class="app-card card shadow-sm h-100" data-stat="{{ $key }}">
                         <div class="card-body text-center">
                             <div class="display-6 fw-bold page-title">{{ number_format($value) }}</div>
-                            <div class="text-muted-theme text-uppercase small">{{ $meta['label'] }}</div>
+                            <div class="spims-text-dim text-uppercase small">{{ $meta['label'] }}</div>
                             @if(!empty($meta['help']))
                                 <p class="form-text mb-0 mt-2">{{ $meta['help'] }}</p>
                             @endif

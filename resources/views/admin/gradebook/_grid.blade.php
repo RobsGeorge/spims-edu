@@ -11,7 +11,7 @@
                         @else
                             {{ $component->name }}
                         @endif
-                        <div class="small text-muted-theme">{{ $component->weight_percent }}% · {{ __('assessment.kind_'.$component->kind->value) }}</div>
+                        <div class="small spims-text-dim">{{ $component->weight_percent }}% · {{ __('assessment.kind_'.$component->kind->value) }}</div>
                     </th>
                 @endforeach
                 <th scope="col">{{ __('assessment.final_percent') }}</th>
@@ -29,7 +29,7 @@
             <tr>
                 <td>
                     <strong>{{ $enrollment->student->first_name }} {{ $enrollment->student->last_name }}</strong>
-                    <div class="small text-muted-theme">{{ $enrollment->student->email }}</div>
+                    <div class="small spims-text-dim">{{ $enrollment->student->email }}</div>
                 </td>
                 @foreach($components as $component)
                     @php $score = $scores->get($component->id)['score'] ?? null; @endphp

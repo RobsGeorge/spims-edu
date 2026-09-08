@@ -44,12 +44,13 @@
                         <td>
                             <input type="hidden" name="marks[{{ $i }}][student_id]" value="{{ $enrollment->student_id }}">
                             <strong>{{ $enrollment->student->first_name }} {{ $enrollment->student->last_name }}</strong>
-                            <div class="small text-muted-theme">{{ $enrollment->student->email }}</div>
+                            <div class="small spims-text-dim">{{ $enrollment->student->email }}</div>
                         </td>
                         <td>
                             <select name="marks[{{ $i }}][status]" class="form-select form-select-sm">
                                 @foreach($statuses as $status)
-                                    <option value="{{ $status->value }}" @selected(($mark?->status->value ?? 'ABSENT') === $status->value)>{{ __('attendance.status_'.$status->value) }}</option>
+                                    @php $statusVal = $status->value; @endphp
+                                    <option value="{{ $statusVal }}" @selected(($mark?->status->value ?? 'ABSENT') === $statusVal)>{{ __('attendance.status_'.$statusVal) }}</option>
                                 @endforeach
                             </select>
                         </td>

@@ -16,7 +16,7 @@
                     <img src="{{ $avatarUrl }}" alt="{{ __('learning.profile_picture_current') }}" width="96" height="96" class="rounded-circle" style="object-fit: cover;">
                 </div>
             @else
-                <p class="text-muted mb-3">{{ __('learning.profile_picture_empty') }}</p>
+                <p class="spims-text-dim mb-3">{{ __('learning.profile_picture_empty') }}</p>
             @endif
             <div class="mb-3">
                 <label class="form-label" for="set-picture">{{ __('learning.profile_picture_choose') }}</label>

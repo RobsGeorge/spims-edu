@@ -12,8 +12,7 @@
 
 <div class="row g-3">
     <div class="col-lg-6">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
+        <x-card variant="panel" class="h-100">
                 <h2 class="h6">{{ __('enrollment.override_register') }}</h2>
                 <form method="POST" action="{{ route('admin.enrollments.override') }}" class="row g-2">
                     @csrf
@@ -52,18 +51,16 @@
                         <button class="btn btn-primary">{{ __('enrollment.override_register') }}</button>
                     </div>
                 </form>
-            </div>
-        </div>
+        </x-card>
     </div>
     <div class="col-lg-6">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
+        <x-card variant="panel" class="h-100">
                 <h2 class="h6">{{ __('enrollment.financial_hold_label') }}</h2>
                 @forelse($students as $student)
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-bottom py-2">
                         <div>
                             <a href="{{ route('admin.users.show', $student) }}">{{ $student->first_name }} {{ $student->last_name }}</a>
-                            <div class="small text-muted-theme">{{ $student->email }}</div>
+                            <div class="small spims-text-dim">{{ $student->email }}</div>
                             <div class="small">{{ in_array($student->id, $holds, true) ? __('enrollment.hold_on') : __('enrollment.hold_off') }}</div>
                         </div>
                         <form method="POST" action="{{ route('admin.enrollments.financial-hold', $student) }}">
@@ -80,8 +77,7 @@
                 @empty
                     <x-empty-state :title="__('enrollment.no_students')" icon="bi-people" />
                 @endforelse
-            </div>
-        </div>
+        </x-card>
     </div>
 </div>
 @endsection

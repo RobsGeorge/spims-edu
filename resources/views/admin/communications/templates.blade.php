@@ -69,7 +69,7 @@
 @foreach($templates as $template)
     <article class="border rounded-3 p-3 mb-2">
         <div class="fw-semibold">{{ $template->key }} · {{ $template->locale }}</div>
-        <div class="small text-muted-theme">{{ $template->isGlobal() ? __('communications.template_global') : $template->scope_type }}</div>
+        <div class="small spims-text-dim">{{ $template->isGlobal() ? __('communications.template_global') : $template->scope_type }}</div>
         <div>{{ $template->subject }}</div>
     </article>
 @endforeach

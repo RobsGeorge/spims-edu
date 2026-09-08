@@ -31,7 +31,7 @@
                     <h2 class="h6 mb-1">
                         <a href="{{ route('discussions.thread', $thread) }}">{{ $thread->title }}</a>
                     </h2>
-                    <div class="small text-muted-theme">{{ $thread->author?->email }}</div>
+                    <div class="small spims-text-dim">{{ $thread->author?->email }}</div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     @if($thread->is_graded)

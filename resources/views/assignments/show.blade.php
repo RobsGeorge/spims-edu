@@ -13,7 +13,7 @@
     · {{ __('assessment.max_points_label') }}: {{ $assignment->max_points }}
 </p>
 @if($assignment->allowed_file_types)
-    <p class="text-muted-theme">{{ __('assessment.allowed_types', ['types' => implode(', ', $assignment->allowed_file_types)]) }}</p>
+    <p class="spims-text-dim">{{ __('assessment.allowed_types', ['types' => implode(', ', $assignment->allowed_file_types)]) }}</p>
 @endif
 
 @if($submission)
@@ -31,7 +31,7 @@
 @endif
 
 @if($assignment->delivery_mode->value === 'OFFLINE')
-    <p class="text-muted-theme">{{ __('assessment.offline_use_mark_received') }}</p>
+    <p class="spims-text-dim">{{ __('assessment.offline_use_mark_received') }}</p>
 @else
     <form method="POST" action="{{ route('assignments.submit', $assignment) }}" enctype="multipart/form-data">
         @csrf
@@ -42,7 +42,7 @@
         @if($assignment->submission_type->value !== 'TEXT')
             <label class="form-label" for="assignment-file">{{ __('assessment.file_label') }}</label>
             <input id="assignment-file" type="file" name="file" class="form-control mb-2">
-            <p class="small text-muted-theme">{{ __('assessment.file_help') }}</p>
+            <p class="small spims-text-dim">{{ __('assessment.file_help') }}</p>
         @endif
         <button class="btn btn-primary" type="submit">{{ __('assessment.submit_work') }}</button>
     </form>

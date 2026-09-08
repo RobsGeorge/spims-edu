@@ -22,8 +22,8 @@
     </div>
 @endif
 
-<p class="mt-3 mb-2 small text-muted-theme">
-    {{ $assessment->mode->value }}
+<p class="mt-3 mb-2 small spims-text-dim">
+    <x-badge :value="$assessment->mode" />
     @if($assessment->time_limit_minutes)
         · {{ $assessment->time_limit_minutes }} {{ __('assessment.minutes') }}
     @endif
@@ -60,7 +60,7 @@
         <div class="spims-staff-row">
             <div>
                 <strong>{{ $attempt->student?->first_name }} {{ $attempt->student?->last_name }}</strong>
-                <div class="small text-muted-theme">{{ $attempt->student?->email }} · {{ __('assessment.attempt_n', ['n' => $attempt->attempt_no]) }}</div>
+                <div class="small spims-text-dim">{{ $attempt->student?->email }} · {{ __('assessment.attempt_n', ['n' => $attempt->attempt_no]) }}</div>
             </div>
             <div class="d-flex flex-wrap align-items-center gap-2">
                 <x-status-badge :status="$attempt->status->value" :label="$attempt->status->value" />
@@ -74,7 +74,7 @@
         </div>
 
         @if($attempt->proctor_warnings || $attempt->proctorEvents->isNotEmpty())
-            <p class="small text-muted-theme mt-2 mb-1">
+            <p class="small spims-text-dim mt-2 mb-1">
                 {{ __('assessment.proctor_warnings') }}: {{ $attempt->proctor_warnings }}
             </p>
             @if($attempt->proctorEvents->isNotEmpty())
@@ -100,7 +100,7 @@
                             <span class="badge bg-warning text-dark">{{ __('assessment.needs_override') }}</span>
                         @endif
                     </div>
-                    <div class="small text-muted-theme">
+                    <div class="small spims-text-dim">
                         @if($answer->auto_score !== null)
                             {{ __('assessment.auto_score') }}: {{ $answer->auto_score }}
                         @endif
@@ -130,7 +130,7 @@
                 @endif
             </div>
         @empty
-            <p class="small text-muted-theme mb-0 mt-2">{{ __('assessment.no_answers') }}</p>
+            <p class="small spims-text-dim mb-0 mt-2">{{ __('assessment.no_answers') }}</p>
         @endforelse
     </article>
 @empty

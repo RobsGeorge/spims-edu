@@ -12,7 +12,7 @@
         <div class="d-flex justify-content-between gap-2">
             <div>
                 <strong>{{ $reveal->submission?->survey?->title }}</strong>
-                <div class="small text-muted-theme">
+                <div class="small spims-text-dim">
                     {{ __('staff.surveys.requested_by') }}: {{ $reveal->requester?->email }}
                     · {{ $reveal->reason }}
                 </div>

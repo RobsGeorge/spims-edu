@@ -15,7 +15,7 @@
 
     <form method="POST" action="{{ route('admin.reports.standing.thresholds.update') }}" class="app-card p-4">
         @csrf
-        <p class="text-muted-theme mb-4">{{ __('reports.thresholds_help') }}</p>
+        <p class="spims-text-dim mb-4">{{ __('reports.thresholds_help') }}</p>
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label" for="good_min">{{ __('reports.good_min') }}</label>
@@ -59,7 +59,7 @@
 
     <div class="app-card p-4 mt-4">
         <h2 class="h5 spims-title mb-2">{{ __('reports.program_overrides_title') }}</h2>
-        <p class="text-muted-theme mb-3">{{ __('reports.program_overrides_desc') }}</p>
+        <p class="spims-text-dim mb-3">{{ __('reports.program_overrides_desc') }}</p>
         <div class="table-responsive">
             <table class="table mb-0 align-middle">
                 <thead>
@@ -92,7 +92,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-muted-theme">{{ __('reports.program_overrides_empty') }}</td>
+                        <td colspan="6" class="spims-text-dim">{{ __('reports.program_overrides_empty') }}</td>
                     </tr>
                 @endforelse
                 </tbody>

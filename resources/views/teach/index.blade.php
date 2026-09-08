@@ -24,8 +24,8 @@
                             <x-status-badge :status="$offering->status->value" :label="$offering->status->value" />
                         </div>
                         <h2 class="h6 spims-title mb-1">{{ $offering->course->title }}</h2>
-                        <p class="small text-muted-theme mb-0">
-                            {{ $offering->mode->value }}
+                        <p class="small spims-text-dim mb-0">
+                            <x-badge :value="$offering->mode" />
                             @if($offering->semester)
                                 · {{ $offering->semester->name }}
                             @endif

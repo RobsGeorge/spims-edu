@@ -14,7 +14,7 @@
 @endif
 
 <p><a href="{{ route('admin.finance.index') }}">{{ __('finance.admin_title') }}</a></p>
-<p>{{ $invoice->student->email }} — {{ $invoice->status->value }} — {{ $invoice->total_minor }} {{ $invoice->currency->value }}</p>
+<p>{{ $invoice->student->email }} — <x-badge :value="$invoice->status" /> — <x-money :minor="(int) $invoice->total_minor" :currency="$invoice->currency" /></p>
 <p>{{ __('finance.paid') }}: {{ $invoice->amountPaid() }} · {{ __('finance.due') }}: {{ $invoice->amountDue() }}</p>
 
 @include('finance._payment-plan', [
@@ -24,9 +24,9 @@
 ])
 
 @if($invoice->amountDue() > 0)
-<form method="POST" action="{{ route('admin.finance.manual', $invoice) }}" class="card border-0 shadow-sm">
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.finance.manual', $invoice) }}">
     @csrf
-    <div class="card-body row g-2">
+    <div class="row g-2">
         <div class="col-md-4">
             <select name="method" class="form-select">
                 <option value="MANUAL_CASH">CASH</option>
@@ -41,6 +41,6 @@
             <button class="btn btn-outline-primary">{{ __('finance.pay') }}</button>
         </div>
     </div>
-</form>
+</x-card>
 @endif
 @endsection

@@ -4,9 +4,9 @@
 <h1 class="spims-title mb-3">{{ __('credentials.admin_title') }}</h1>
 @if(session('status'))<div class="alert alert-success" role="status">{{ session('status') }}</div>@endif
 
-<form method="POST" action="{{ route('admin.credentials.store') }}" class="card border-0 shadow-sm mb-4">
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.credentials.store') }}" class="mb-4">
     @csrf
-    <div class="card-body row g-2">
+    <div class="row g-2">
         <div class="col-md-3"><input name="student_id" class="form-control" placeholder="student ULID" required aria-label="{{ __('credentials.student') }}"></div>
         <div class="col-md-2">
             <select name="type" class="form-select" required aria-label="{{ __('credentials.type') }}">
@@ -23,7 +23,7 @@
         </div>
         <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('credentials.issue') }}</button></div>
     </div>
-</form>
+</x-card>
 
 <div class="table-responsive spims-table-wrap">
 <table class="table table-sm">
@@ -33,7 +33,8 @@
         <tr class="@if($c->revoked_at) table-secondary @endif">
             <td>{{ $c->serial }}</td>
             <td>{{ $c->student->email }}</td>
-            <td>{{ $c->type->value }}</td>
+            @php $credType = $c->type->value; @endphp
+            <td>{{ $credType }}</td>
             <td class="d-flex gap-1">
                 <a class="btn btn-sm btn-outline-secondary" href="{{ $c->verifyUrl() }}">QR</a>
                 <a class="btn btn-sm btn-outline-secondary" href="{{ route('credentials.download', $c) }}">{{ __('credentials.download') }}</a>

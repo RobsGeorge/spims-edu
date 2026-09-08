@@ -21,7 +21,7 @@
     @foreach($aggregates as $row)
         <div class="border rounded-3 p-3 mb-2">
             <strong>{{ $row['prompt'] }}</strong>
-            <div class="small text-muted-theme mb-2">{{ __('staff.surveys.kind_'.$row['kind']) }} · {{ __('staff.surveys.response_count', ['count' => $row['response_count']]) }}</div>
+            <div class="small spims-text-dim mb-2">{{ __('staff.surveys.kind_'.$row['kind']) }} · {{ __('staff.surveys.response_count', ['count' => $row['response_count']]) }}</div>
             @if(isset($row['aggregates']['counts']))
                 <ul class="mb-0">
                     @foreach((array) $row['aggregates']['counts'] as $label => $count)
@@ -42,7 +42,7 @@
 <h2 class="h6 mt-4">{{ __('staff.surveys.submissions') }}</h2>
 @forelse($submissions as $row)
     <div class="border rounded-3 p-3 mb-2">
-        <div class="small text-muted-theme">{{ $row['submitted_at'] }} · {{ $row['is_anonymous'] ? __('staff.surveys.anonymous') : __('staff.surveys.identified') }}</div>
+        <div class="small spims-text-dim">{{ $row['submitted_at'] }} · {{ $row['is_anonymous'] ? __('staff.surveys.anonymous') : __('staff.surveys.identified') }}</div>
         <form method="POST" action="{{ $revealRoute($row['id']) }}" class="row g-2 mt-2">
             @csrf
             <div class="col-md-8"><input name="reason" class="form-control form-control-sm" placeholder="{{ __('staff.surveys.reveal_reason') }}"></div>

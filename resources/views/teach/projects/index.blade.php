@@ -21,7 +21,8 @@
     <div class="col-md-2">
         <select name="grading_mode" class="form-select" aria-label="{{ __('staff.projects.grading_mode') }}">
             @foreach($gradingModes as $mode)
-                <option value="{{ $mode->value }}">{{ __('staff.projects.mode_'.$mode->value) }}</option>
+                @php $modeVal = $mode->value; @endphp
+                <option value="{{ $modeVal }}">{{ __('staff.projects.mode_'.$modeVal) }}</option>
             @endforeach
         </select>
     </div>
@@ -32,7 +33,7 @@
     <div class="spims-staff-row border rounded-3 p-3 mb-2">
         <div>
             <strong>{{ $assessment->title }}</strong>
-            <div class="small text-muted-theme">
+            <div class="small spims-text-dim">
                 <x-status-badge :status="$assessment->status->value" :label="__('staff.projects.status_'.$assessment->status->value)" />
             </div>
         </div>

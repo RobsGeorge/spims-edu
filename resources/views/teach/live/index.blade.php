@@ -28,7 +28,7 @@
     @else
         @foreach($agenda as $date => $daySessions)
             <div class="mb-3">
-                <h3 class="h6 text-muted-theme mb-2">
+                <h3 class="h6 spims-text-dim mb-2">
                     {{ $date === 'unscheduled' ? __('live.unscheduled') : \Illuminate\Support\Carbon::parse($date)->toFormattedDateString() }}
                 </h3>
                 <ul class="list-unstyled spims-live-agenda mb-0">
@@ -36,7 +36,7 @@
                         <li class="d-flex flex-wrap gap-2 align-items-baseline py-2 border-bottom border-opacity-25">
                             <span class="fw-semibold">{{ optional($session->scheduled_start)->format('H:i') }}</span>
                             <span>{{ $session->title }}</span>
-                            <span class="text-muted-theme small">({{ $session->duration_minutes }}{{ __('live.minutes_abbr') }})</span>
+                            <span class="spims-text-dim small">({{ $session->duration_minutes }}{{ __('live.minutes_abbr') }})</span>
                         </li>
                     @endforeach
                 </ul>
@@ -46,24 +46,24 @@
 </section>
 
 @forelse($sessions as $session)
-<div class="card border-0 shadow-sm mb-3">
-    <div class="card-body">
-        <h2 class="h6">{{ $session->title }} — {{ $session->scheduled_start }} ({{ $session->duration_minutes }}{{ __('live.minutes_abbr') }})</h2>
-        <p class="small mb-2">{{ __('live.zoom_meeting') }}: {{ $session->zoom_meeting_id }}
-            @if($session->recording_url)
-                · {{ __('live.recording') }}: {{ $session->recording_url }}
-            @endif
-        </p>
-        <ul class="small">
-            @forelse($session->attendance as $row)
-                <li>{{ $row->student->email }} — {{ $row->status->value }} ({{ $row->minutes_attended }}{{ __('live.minutes_abbr') }})</li>
-            @empty
-                <li class="text-muted-theme">{{ __('live.no_attendance_yet') }}</li>
-            @endforelse
-        </ul>
+<x-card variant="panel" class="mb-3">
+    <h2 class="h6">{{ $session->title }} — {{ $session->scheduled_start }} ({{ $session->duration_minutes }}{{ __('live.minutes_abbr') }})</h2>
+    <p class="small mb-2">{{ __('live.zoom_meeting') }}: {{ $session->zoom_meeting_id }}
+        @if($session->recording_url)
+            · {{ __('live.recording') }}: {{ $session->recording_url }}
+        @endif
+    </p>
+    <ul class="small">
+        @forelse($session->attendance as $row)
+            @php $rowStatusVal = $row->status->value; @endphp
+            <li>{{ $row->student->email }} — {{ $rowStatusVal }} ({{ $row->minutes_attended }}{{ __('live.minutes_abbr') }})</li>
+        @empty
+            <li class="spims-text-dim">{{ __('live.no_attendance_yet') }}</li>
+        @endforelse
+    </ul>
 
-        <h3 class="h6 mt-3">{{ __('live.import_attendance') }}</h3>
-        <p class="small text-muted-theme">{{ __('live.import_help') }}</p>
+    <h3 class="h6 mt-3">{{ __('live.import_attendance') }}</h3>
+    <p class="small spims-text-dim">{{ __('live.import_help') }}</p>
         <form method="POST" action="{{ route('teach.live.attendance.import', [$offering, $session]) }}" class="row g-2">
             @csrf
             <div class="col-12">
@@ -104,8 +104,8 @@
                 <button class="btn btn-primary">{{ __('live.import') }}</button>
             </div>
         </form>
-    </div>
-</div>
+
+</x-card>
 @empty
     <x-empty-state :title="__('live.agenda_empty')" icon="bi-camera-video" />
 @endforelse
