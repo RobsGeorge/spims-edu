@@ -129,10 +129,13 @@ class PeopleDirectoryTest extends TestCase
     }
 
     #[Test]
-    public function administrative_admin_can_open_directory_but_cannot_unsuspend(): void
+    public function administrative_admin_can_unsuspend_and_a_student_cannot(): void
     {
         $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
         $student = User::factory()->withRole(RoleType::Student)->create([
+            'status' => UserStatus::Suspended,
+        ]);
+        $other = User::factory()->withRole(RoleType::Student)->create([
             'status' => UserStatus::Suspended,
         ]);
 
@@ -144,11 +147,21 @@ class PeopleDirectoryTest extends TestCase
         $this->actingAs($adm)->get(route('admin.users.show', $student))
             ->assertOk()
             ->assertSee($student->email)
+            ->assertSee(__('people.unsuspend'))
             ->assertDontSee(__('people.impersonate_start'));
 
         $this->actingAs($adm)->post(route('admin.users.unsuspend', $student))
+            ->assertRedirect();
+        $this->assertSame(UserStatus::Active, $student->fresh()->status);
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'users.unsuspend',
+            'actor_id' => $adm->id,
+            'entity_id' => $student->id,
+        ]);
+
+        $this->actingAs($other)->post(route('admin.users.unsuspend', $other))
             ->assertForbidden();
-        $this->assertSame(UserStatus::Suspended, $student->fresh()->status);
+        $this->assertSame(UserStatus::Suspended, $other->fresh()->status);
     }
 
     #[Test]

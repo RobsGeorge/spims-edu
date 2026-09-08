@@ -187,6 +187,21 @@ class ResourceScopeTest extends TestCase
     }
 
     #[Test]
+    public function instructor_enrollment_waitlist_without_a_resource_fails_closed(): void
+    {
+        $instructor = User::factory()->withRole(RoleType::Instructor)->create();
+        $offering = $this->offering('WAIT');
+        $this->staffOffering($instructor, $offering);
+
+        $this->assertTrue(
+            app(AuthorizeService::class)->allows($instructor, 'enrollment.waitlist', $offering)
+        );
+
+        $this->expectException(AuthorizationException::class);
+        app(AuthorizeService::class)->authorize($instructor, 'enrollment.waitlist');
+    }
+
+    #[Test]
     public function self_scoped_own_permissions_still_work_without_a_resource(): void
     {
         $student = User::factory()->withRole(RoleType::Student)->create();
@@ -270,6 +285,10 @@ class ResourceScopeTest extends TestCase
 
         $this->actingAs($instructor)
             ->get(route('admin.gradebook.csv', $theirs))
+            ->assertForbidden();
+
+        $this->actingAs($instructor)
+            ->get(route('admin.enrollments.waitlist', $theirs))
             ->assertForbidden();
     }
 }
