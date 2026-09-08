@@ -1,13 +1,16 @@
 @extends('layouts.app')
 @section('title', __('ui.nav_courses'))
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="spims-title mb-0">{{ __('ui.nav_courses') }}</h1>
-    <a href="{{ route('admin.courses.create') }}" class="btn btn-primary">{{ __('academics.create_course') }}</a>
-</div>
+<x-page-header :title="__('ui.nav_courses')">
+    <x-slot:actions>
+        <a href="{{ route('admin.courses.create') }}" class="btn btn-primary">
+            <x-icon name="add" /> {{ __('academics.create_course') }}
+        </a>
+    </x-slot:actions>
+</x-page-header>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
-<div class="card border-0 shadow-sm">
-    <div class="table-responsive">
+<x-card variant="panel">
+    <div class="table-responsive spims-table-wrap">
         <table class="table mb-0">
             <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('academics.title') }}</th><th>{{ __('academics.credits') }}</th><th>{{ __('academics.interest') }}</th></tr></thead>
             <tbody>
@@ -17,7 +20,12 @@
                         <a href="{{ route('admin.courses.show', $course) }}">{{ $course->code }}</a>
                         <a href="{{ route('admin.courses.edit', $course) }}" class="btn btn-sm btn-link">{{ __('ui.edit') }}</a>
                     </td>
-                    <td>{{ $course->title }}</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <x-course-cover :course="$course" class="bento-course-thumb" />
+                            <span>{{ $course->title }}</span>
+                        </div>
+                    </td>
                     <td>{{ $course->credit_hours }}</td>
                     <td>{{ $course->interest_flags_count }}</td>
                 </tr>
@@ -25,6 +33,6 @@
             </tbody>
         </table>
     </div>
-</div>
+</x-card>
 {{ $courses->links() }}
 @endsection

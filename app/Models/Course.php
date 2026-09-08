@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasUlids;
+use App\Support\Ui\CourseCoverLibrary;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,6 +18,7 @@ class Course extends Model
     protected $fillable = [
         'code',
         'title',
+        'cover_image_url',
         'credit_hours',
         'default_price_usd',
         'default_price_egp',
@@ -36,6 +38,11 @@ class Course extends Model
         'passing_threshold' => 'float',
         'active' => 'boolean',
     ];
+
+    public function coverUrl(): string
+    {
+        return CourseCoverLibrary::urlForCourse($this);
+    }
 
     public function assessmentTemplate(): BelongsTo
     {

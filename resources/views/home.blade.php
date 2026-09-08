@@ -42,7 +42,10 @@
     @if($featured->isNotEmpty())
         <section id="programs" class="spims-landing-featured" aria-labelledby="landing-featured-title">
             <div class="spims-landing-featured-intro">
-                <h2 id="landing-featured-title" class="spims-landing-featured-title">{{ __('home.featured_title') }}</h2>
+                <h2 id="landing-featured-title" class="spims-landing-featured-title spims-section-heading">
+                    <span class="spims-heading-icon-wrap" aria-hidden="true"><x-icon name="catalog" class="spims-heading-icon" /></span>
+                    <span>{{ __('home.featured_title') }}</span>
+                </h2>
                 <p class="spims-text-dim mb-0">{{ __('home.featured_lead') }}</p>
             </div>
             <div class="spims-landing-featured-grid">
@@ -63,7 +66,7 @@
                         </a>
                     @else
                         <a class="spims-landing-program" href="{{ $href }}">
-                            <div class="spims-landing-program-media {{ $index === 1 ? 'spims-landing-program-media--2' : '' }}" aria-hidden="true"></div>
+                            <x-course-cover :course="$course" class="spims-landing-program-media {{ $index === 1 ? 'spims-landing-program-media--2' : '' }}" />
                             <div class="spims-landing-program-body">
                                 <h3 class="spims-landing-program-title">{{ $course->title }}</h3>
                                 <p class="spims-landing-program-blurb">

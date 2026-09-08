@@ -35,6 +35,7 @@ use App\Models\Assessment;
 use App\Models\ClassSession;
 use App\Models\ContentItem;
 use App\Models\Course;
+use App\Support\Ui\CourseCoverLibrary;
 use App\Models\CourseOffering;
 use App\Models\DiscussionPost;
 use App\Models\Enrollment;
@@ -218,18 +219,23 @@ class DemoDataSeeder extends Seeder
 
         $courses = [];
         foreach ($defs as [$code, $title, $credits, $usd, $egp, $free]) {
+            $attrs = [
+                'title' => $title,
+                'credit_hours' => $credits,
+                'default_price_usd' => $usd,
+                'default_price_egp' => $egp,
+                'is_free' => $free || $usd === 0,
+                'is_standalone' => in_array($code, ['ET101', 'FREE1'], true),
+                'passing_threshold' => 60,
+                'active' => true,
+            ];
+            $existing = Course::query()->where('code', $code)->first();
+            if ($existing === null || blank($existing->cover_image_url)) {
+                $attrs['cover_image_url'] = CourseCoverLibrary::urlForSeed($code);
+            }
             $courses[$code] = Course::query()->updateOrCreate(
                 ['code' => $code],
-                [
-                    'title' => $title,
-                    'credit_hours' => $credits,
-                    'default_price_usd' => $usd,
-                    'default_price_egp' => $egp,
-                    'is_free' => $free || $usd === 0,
-                    'is_standalone' => in_array($code, ['ET101', 'FREE1'], true),
-                    'passing_threshold' => 60,
-                    'active' => true,
-                ]
+                $attrs
             );
         }
 

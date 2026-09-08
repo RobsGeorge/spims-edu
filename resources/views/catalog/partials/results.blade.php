@@ -15,7 +15,7 @@
             @endphp
             <div class="col-md-6 col-xl-4">
                 <article class="catalog-card app-card h-100 p-3 d-flex flex-column">
-                    <div class="catalog-card-media {{ $index % 2 === 1 ? 'catalog-card-media--alt' : '' }}" aria-hidden="true"></div>
+                    <x-course-cover :course="$course" class="catalog-card-media {{ $index % 2 === 1 ? 'catalog-card-media--alt' : '' }}" />
                     <div class="d-flex flex-wrap gap-2 mb-2">
                         @if($course->is_free)<span class="badge-brand">{{ __('catalog.free_badge') }}</span>@endif
                         @if($course->is_standalone)<span class="badge-brand">{{ __('catalog.standalone_badge') }}</span>@endif
