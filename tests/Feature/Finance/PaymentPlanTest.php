@@ -83,7 +83,7 @@ class PaymentPlanTest extends TestCase
             ->assertOk()
             ->assertSee(__('finance.installment_schedule'), false)
             ->assertSee(__('finance.pay_installment'), false)
-            ->assertSee('3335', false);
+            ->assertSee('33.35', false);
     }
 
     #[Test]

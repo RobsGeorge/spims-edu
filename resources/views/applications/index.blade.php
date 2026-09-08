@@ -10,24 +10,22 @@
     <div class="alert alert-danger">{{ $errors->first() }}</div>
 @endif
 
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-        <h2 class="h6">{{ __('admissions.start_application') }}</h2>
-        <ul class="mb-0">
-        @foreach($programs as $program)
-            @foreach($program->applicationForms as $form)
-                <li><a href="{{ route('applications.create', $form) }}">{{ $program->code }} — {{ $form->name }}</a></li>
-            @endforeach
+<x-card variant="panel" class="mb-4">
+    <h2 class="h6">{{ __('admissions.start_application') }}</h2>
+    <ul class="mb-0">
+    @foreach($programs as $program)
+        @foreach($program->applicationForms as $form)
+            <li><a href="{{ route('applications.create', $form) }}">{{ $program->code }} — {{ $form->name }}</a></li>
         @endforeach
-        </ul>
-    </div>
-</div>
+    @endforeach
+    </ul>
+</x-card>
 
 @if($applications->isEmpty())
     <x-empty-state :title="__('admissions.no_applications')" />
 @else
-    <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
+    <x-card variant="panel">
+        <div class="table-responsive spims-table-wrap">
             <table class="table mb-0 align-middle">
                 <thead>
                     <tr>
@@ -68,7 +66,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </x-card>
     {{ $applications->links() }}
 @endif
 @endsection

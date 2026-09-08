@@ -13,7 +13,7 @@
 <div class="row g-3">
     @if($canAssign)
     <div class="col-lg-5">
-        <div class="app-card p-3 h-100">
+        <x-card variant="panel" class="h-100">
             <h2 class="h6 spims-title">{{ __('advising.assign_title') }}</h2>
             <form method="POST" action="{{ route('advising.assign') }}" class="row g-2">
                 @csrf
@@ -46,19 +46,19 @@
                     <button class="btn btn-primary">{{ __('advising.assign') }}</button>
                 </div>
             </form>
-        </div>
+        </x-card>
     </div>
     @endif
 
     <div class="{{ $canAssign ? 'col-lg-7' : 'col-12' }}">
-        <div class="app-card p-3">
+        <x-card variant="panel">
             <h2 class="h6 spims-title">{{ __('advising.roster') }}</h2>
             @forelse($assignments as $assignment)
                 <div class="py-2 border-bottom border-opacity-25 d-flex flex-wrap justify-content-between gap-2">
                     <div>
                         <a href="{{ route('advising.show', $assignment->student) }}">{{ $assignment->student->first_name }} {{ $assignment->student->last_name }}</a>
-                        <div class="small text-muted-theme">{{ $assignment->student->email }}</div>
-                        <div class="small text-muted-theme">
+                        <div class="small spims-text-dim">{{ $assignment->student->email }}</div>
+                        <div class="small spims-text-dim">
                             {{ __('advising.advisor') }}: {{ $assignment->advisor->first_name }} {{ $assignment->advisor->last_name }}
                             @if($assignment->program)
                                 · {{ $assignment->program->code }}
@@ -70,7 +70,7 @@
             @empty
                 <x-empty-state :title="__('advising.roster_empty')" icon="bi-people" />
             @endforelse
-        </div>
+        </x-card>
     </div>
 </div>
 @endsection

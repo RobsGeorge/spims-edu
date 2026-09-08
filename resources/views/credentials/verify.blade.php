@@ -12,7 +12,8 @@
         <div class="alert alert-success" role="alert">{{ __('credentials.valid') }}</div>
         <dl class="row mb-0">
             <dt class="col-sm-3">{{ __('credentials.serial') }}</dt><dd class="col-sm-9">{{ $credential->serial }}</dd>
-            <dt class="col-sm-3">{{ __('credentials.type') }}</dt><dd class="col-sm-9">{{ $credential->type->value }}</dd>
+            <dt class="col-sm-3">{{ __('credentials.type') }}</dt>
+            <dd class="col-sm-9"><x-badge :value="$credential->type" /></dd>
             <dt class="col-sm-3">{{ __('credentials.student') }}</dt>
             <dd class="col-sm-9">{{ $credential->student->first_name }} {{ $credential->student->last_name }}</dd>
             <dt class="col-sm-3">{{ __('credentials.issued_at') }}</dt><dd class="col-sm-9">{{ $credential->issued_at }}</dd>

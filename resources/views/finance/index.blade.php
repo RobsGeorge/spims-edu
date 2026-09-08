@@ -45,21 +45,23 @@
 
 <div class="row g-3 mb-4">
     <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <h2 class="h6">{{ __('finance.transactions') }}</h2>
-                <ul class="small mb-0">
-                    @forelse($transactions as $tx)
-                        <li>{{ $tx->direction->value }} {{ $tx->amount_minor }} {{ $tx->currency->value }} ({{ $tx->kind->value }} / {{ $tx->reason->value }})</li>
-                    @empty
-                        <li>{{ __('ui.empty') }}</li>
-                    @endforelse
-                </ul>
-                @if($transactions->hasPages())
-                    <div class="mt-3">{{ $transactions->links() }}</div>
-                @endif
-            </div>
-        </div>
+        <x-card variant="panel">
+            <h2 class="h6">{{ __('finance.transactions') }}</h2>
+            <ul class="small mb-0">
+                @forelse($transactions as $tx)
+                    <li class="d-flex flex-wrap align-items-center gap-1 py-1">
+                        <x-badge :value="$tx->direction" />
+                        <x-money :minor="(int) $tx->amount_minor" :currency="$tx->currency" />
+                        <span class="spims-text-dim">(</span><x-badge :value="$tx->kind" /><span class="spims-text-dim"> / </span><x-badge :value="$tx->reason" /><span class="spims-text-dim">)</span>
+                    </li>
+                @empty
+                    <li>{{ __('ui.empty') }}</li>
+                @endforelse
+            </ul>
+            @if($transactions->hasPages())
+                <div class="mt-3">{{ $transactions->links() }}</div>
+            @endif
+        </x-card>
     </div>
 </div>
 
@@ -71,13 +73,13 @@
     @foreach($invoices as $invoice)
         <tr>
             <td>{{ \Illuminate\Support\Str::limit($invoice->id, 8, '') }}</td>
-            <td>{{ $invoice->total_minor }} {{ $invoice->currency->value }}</td>
-            <td>{{ $invoice->status->value }}</td>
+            <td><x-money :minor="(int) $invoice->total_minor" :currency="$invoice->currency" /></td>
+            <td><x-badge :value="$invoice->status" /></td>
             <td>{{ $invoice->amountDue() }}</td>
             <td>
                 <a href="{{ route('finance.invoices.show', $invoice) }}">{{ __('finance.pay') }}</a>
                 @if($invoice->openPaymentPlan())
-                    <span class="badge text-bg-secondary ms-1">{{ __('finance.plan_badge') }}</span>
+                    <span class="badge spims-badge spims-badge--info ms-1">{{ __('finance.plan_badge') }}</span>
                 @elseif($invoice->amountDue() > 0 && $invoice->amountPaid() === 0)
                     <span class="small ms-1">{{ __('finance.pay_in_n', ['n' => 3]) }}</span>
                 @endif
