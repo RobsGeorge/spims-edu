@@ -10,12 +10,12 @@
     </x-slot:actions>
 </x-page-header>
 
-<p class="text-muted-theme">{{ __('enrollment.waitlist_promote_note') }}</p>
+<p class="spims-text-dim">{{ __('enrollment.waitlist_promote_note') }}</p>
 
 @if($waitlisted->isEmpty())
     <x-empty-state :title="__('enrollment.waitlist_empty')" icon="bi-hourglass" />
 @else
-    <div class="card border-0 shadow-sm">
+    <x-card variant="panel">
         <div class="table-responsive">
             <table class="table mb-0">
                 <thead>
@@ -38,6 +38,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </x-card>
 @endif
 @endsection

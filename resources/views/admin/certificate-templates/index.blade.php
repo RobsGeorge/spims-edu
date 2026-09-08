@@ -4,9 +4,9 @@
 <h1 class="spims-title mb-3">{{ __('completion.templates_title') }}</h1>
 @if(session('status'))<div class="alert alert-success" role="status">{{ session('status') }}</div>@endif
 
-<form method="POST" action="{{ route('admin.certificate-templates.store') }}" class="card border-0 shadow-sm mb-4">
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.certificate-templates.store') }}" class="mb-4">
     @csrf
-    <div class="card-body row g-2">
+    <div class="row g-2">
         <div class="col-md-3">
             <select name="course_id" class="form-select" aria-label="{{ __('completion.scope') }}">
                 <option value="">{{ __('completion.scope_global') }}</option>
@@ -26,7 +26,7 @@
         <div class="col-12"><textarea name="body" class="form-control" rows="4" required placeholder="{{ __('completion.template_body') }}"></textarea></div>
         <div class="col-md-3"><button class="btn btn-primary">{{ __('completion.save_template') }}</button></div>
     </div>
-</form>
+</x-card>
 
 <form method="GET" action="{{ route('admin.certificate-templates.preview') }}" class="mb-4">
     <div class="row g-2">
@@ -60,7 +60,7 @@
             <td>{{ $template->title }}</td>
         </tr>
     @empty
-        <tr><td colspan="3" class="text-muted-theme">{{ __('completion.no_templates') }}</td></tr>
+        <tr><td colspan="3" class="spims-text-dim">{{ __('completion.no_templates') }}</td></tr>
     @endforelse
     </tbody>
 </table>

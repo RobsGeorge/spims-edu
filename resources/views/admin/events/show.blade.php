@@ -58,7 +58,7 @@
     <div class="spims-staff-row border rounded-3 p-2 mb-2">
         <div>
             <strong>{{ $reservation->student?->first_name }} {{ $reservation->student?->last_name }}</strong>
-            <div class="small text-muted-theme">{{ $reservation->student?->email }}</div>
+            <div class="small spims-text-dim">{{ $reservation->student?->email }}</div>
         </div>
         <div>
             <x-status-badge status="success" :label="__('staff.events.status_RESERVED')" />
@@ -88,7 +88,8 @@
     <div class="col-md-3">
         <select name="kind" class="form-select" aria-label="{{ __('staff.events.exception_kind') }}">
             @foreach($exceptionKinds as $kind)
-                <option value="{{ $kind->value }}">{{ __('staff.events.exception_'.$kind->value) }}</option>
+                @php $kindVal = $kind->value; @endphp
+                <option value="{{ $kindVal }}">{{ __('staff.events.exception_'.$kindVal) }}</option>
             @endforeach
         </select>
     </div>

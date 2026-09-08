@@ -34,10 +34,11 @@
             @foreach($logs as $log)
                 <tr>
                     <td>{{ $log->type }}</td>
-                    <td>{{ $log->channel->value }}</td>
+                    @php $logChannel = $log->channel->value; $logStatus = $log->status->value; @endphp
+                    <td>{{ $logChannel }}</td>
                     <td>{{ $log->recipient?->email }}</td>
                     <td>{{ $log->subject }}</td>
-                    <td>{{ $log->status->value }}</td>
+                    <td>{{ $logStatus }}</td>
                     <td>{{ $log->opened_at?->toDateTimeString() }}</td>
                     <td>{{ $log->created_at?->toDateTimeString() }}</td>
                 </tr>

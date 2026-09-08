@@ -28,7 +28,7 @@
     <div class="spims-staff-row border rounded-3 p-3 mb-2">
         <div>
             <strong>{{ $event->title }}</strong>
-            <div class="small text-muted-theme">
+            <div class="small spims-text-dim">
                 <x-status-badge :status="$event->status->value" :label="__('staff.events.status_'.$event->status->value)" />
                 {{ $event->starts_at }} · {{ $event->venue }}
             </div>
