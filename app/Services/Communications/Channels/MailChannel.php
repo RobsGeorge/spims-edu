@@ -6,6 +6,7 @@ use App\Enums\NotificationChannel;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\Mail\TransactionalMailer;
+use App\Services\SuperAdmin\IntegrationConfigService;
 
 class MailChannel implements OutboundChannel
 {
@@ -29,7 +30,12 @@ class MailChannel implements OutboundChannel
             'metadata' => $metadata,
         ]);
 
-        $sent = $this->mailer->send((string) $recipient->email, $subject, $body);
+        $sent = $this->mailer->send(
+            (string) $recipient->email,
+            $subject,
+            $body,
+            IntegrationConfigService::IDENTITY_NOTIFICATIONS
+        );
 
         return [
             'ok' => $sent,

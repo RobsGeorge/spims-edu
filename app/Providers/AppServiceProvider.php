@@ -9,6 +9,8 @@ use App\Services\Ai\GeminiAiClient;
 use App\Services\Communications\AnnouncementService;
 use App\Services\SuperAdmin\FeatureFlagService;
 use App\Services\SuperAdmin\ImpersonationService;
+use App\Services\SuperAdmin\IntegrationConfigService;
+use App\Services\SuperAdmin\SystemSettingService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use App\Support\ThemeTokens;
@@ -25,10 +27,19 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(AiClient::class, GeminiAiClient::class);
         $this->app->singleton(FeatureFlagService::class);
         $this->app->singleton(SystemSettingService::class);
+        $this->app->singleton(IntegrationConfigService::class);
     }
 
     public function boot(): void
     {
+        try {
+            if (Schema::hasTable('settings')) {
+                $this->app->make(IntegrationConfigService::class)->applyRuntime();
+            }
+        } catch (\Throwable) {
+            // Migrate / package discover before settings exists.
+        }
+
         View::composer('layouts.app', function ($view): void {
             $cookieTheme = request()->cookie('theme', 'system');
             if (! in_array($cookieTheme, ['light', 'dark', 'system'], true)) {

@@ -51,6 +51,7 @@ return [
     'group_ops' => 'Operations',
     'group_status' => 'Platform status',
     'group_access' => 'Access map',
+    'group_integrations' => 'Integrations',
     'role_ADMINISTRATIVE_ADMIN' => 'Administrative admin',
     'role_ACADEMIC_ADMIN' => 'Academic admin',
     'role_FINANCIAL_ADMIN' => 'Financial admin',

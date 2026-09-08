@@ -59,6 +59,7 @@ return [
         'mail_username' => ['env' => 'MAIL_USERNAME'],
         'paypal' => ['env' => 'PAYPAL_SECRET'],
         'paymob' => ['env' => 'PAYMOB_API_KEY'],
+        'cashier' => ['env' => 'CASHIER_SECRET'],
         'zoom' => ['env' => 'ZOOM_CLIENT_SECRET'],
         'vimeo' => ['env' => 'VIMEO_TOKEN'],
         'gemini' => ['env' => 'GOOGLE_API_KEY'],

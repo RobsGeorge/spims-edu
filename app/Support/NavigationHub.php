@@ -324,6 +324,7 @@ class NavigationHub
                 'links' => array_values(array_filter([
                     self::superadminTile('superadmin.features', 'superadmin.tile_features', 'bi-toggles', 'superadmin.tile_features_desc', 'superadmin.tile_features_hint'),
                     self::superadminTile('superadmin.config', 'superadmin.tile_config', 'bi-sliders2', 'superadmin.tile_config_desc', 'superadmin.tile_config_hint'),
+                    self::superadminTile('superadmin.integrations', 'superadmin.tile_integrations', 'bi-plug', 'superadmin.tile_integrations_desc', 'superadmin.tile_integrations_hint'),
                 ])),
             ],
             [

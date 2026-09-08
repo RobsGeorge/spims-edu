@@ -30,7 +30,7 @@ Promote an item into an active phase only when the phase owner accepts it.
 Tracked in [docs/superadmin-control-plane-plan.md](docs/superadmin-control-plane-plan.md). These stay out of the Super Admin phases:
 
 - Run PHPUnit, `migrate`, or arbitrary Artisan from the browser
-- Edit `.env` or rotate `SUPERADMIN_PASSWORD` from the UI
+- Edit `.env` or rotate `SUPERADMIN_PASSWORD` from the UI. (SA9 stores encrypted overlays in `settings` instead.)
 - Delete or rewrite `audit_logs` rows
 - Multi-tenant / multi-school Super Admin
 

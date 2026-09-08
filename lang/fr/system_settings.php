@@ -45,6 +45,7 @@ return [
     'integration_mail_username' => 'Identifiant mail',
     'integration_paypal' => 'PayPal',
     'integration_paymob' => 'Paymob',
+    'integration_cashier' => 'Cashier',
     'integration_zoom' => 'Zoom',
     'integration_vimeo' => 'Vimeo',
     'integration_gemini' => 'Gemini (GOOGLE_API_KEY)',

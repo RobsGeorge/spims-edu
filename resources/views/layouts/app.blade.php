@@ -244,6 +244,12 @@
                                         </a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" href="{{ route('superadmin.integrations') }}">
+                                            <i class="bi bi-plug" aria-hidden="true"></i>
+                                            {{ __('integrations.nav_integrations') }}
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="{{ route('superadmin.theme.index') }}">
                                             <i class="bi bi-palette" aria-hidden="true"></i>
                                             {{ __('theme_studio.nav_studio') }}

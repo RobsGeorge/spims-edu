@@ -1,6 +1,6 @@
 # Super Admin control-plane plan
 
-**Status:** SA0–SA8 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio, school reports hub, ops desk, platform status, access map).  
+**Status:** SA0–SA9 implemented (control-plane hub, People directory + dossier + impersonation, audit explorer, feature flags + school config, theme studio, school reports hub, ops desk, platform status, access map, integrations).  
 **Audience:** implementers building Super Admin to the same depth as Learn / Teach.  
 **Traces to:** spec v0.2 Super Admin role (“everything; admin-role grants; cross-system audit”), `AuthorizeService` bypass, Roles Hub, unused `settings` table.
 
@@ -43,13 +43,13 @@ These are the defaults so implementation can start without another design pass. 
 | D2 | Keep `EnsureSuperAdmin` + Super Admin **matrix bypass**. New exclusive actions get permission keys with **empty role maps** (same pattern as `roles.manage_matrix`, `feedback.identity.reveal` on later branches). No `if ($user->isSuperAdmin())` in new controllers. | Hard rule. Controllers authorize a key; middleware guards the console door. |
 | D3 | Every mutation goes through a service + `AuditLogWriter::withAudit()`. | Hard rule. Especially impersonation, feature toggles, settings, theme activate, session flush, failed-job retry. |
 | D4 | Feature kill-switches and school knobs live in `settings`. Registry in `config/features.php` + `config/system_settings.php` (allowlists). | Table already exists. Env remains source of secrets. |
-| D5 | **Secrets never appear in the UI** — not even masked. Show “configured / missing” for PayPal, Paymob, Zoom, Vimeo, Gemini, mail password, `SUPERADMIN_*`. | A compromised Super Admin session must not dump `.env`. |
+| D5 | **Secrets never appear in the UI** — not even masked. Super Admin may **set** a new secret write-once on Integrations (encrypted in `settings`, never echoed). Show “configured / missing” elsewhere. | A compromised Super Admin session must not dump `.env` or stored secrets. |
 | D6 | Super Admin may impersonate any **non–Super Admin** user. Confirm-gated, time-boxed, audited, sticky “stop impersonating” banner. Distinct from the public `/demo` persona enter (later branch). | Needed for support. Impersonating Super Admin is a privilege-escalation loop. |
 | D7 | The Super Admin **role cannot be granted or created via the UI**, including by Super Admin. Break-glass: artisan / seeder / `SUPERADMIN_EMAIL`. `canAssignRole()` today returns `true` for Super Admin → Super Admin; that is a defect to close in SA1. | Spec: one break-glass operator. Roles Hub must not list `SUPER_ADMIN` as an editable role (already true). User create form must not offer the checkbox. |
 | D8 | System-tests page stays **documentation**. Do not run PHPUnit, `migrate:fresh`, or arbitrary Artisan from the web. Allowlisted ops only: retry/delete a failed job, trigger `spims:backup-database`, flush sessions. | Running the suite or migrations on production is destructive. |
 | D9 | Administrative Admin keeps day-to-day **people** (`users.manage`) and **theme** (`theme.manage`). Super Admin exclusive: feature flags, school-config dangerous knobs, impersonation, audit export, Roles Hub, failed-job actions, backup trigger. | School staff should not need Super Admin to create an instructor or change a logo. |
 | D10 | Money stays integer minor units. All Super Admin strings in `lang/{ar,en,fr}/superadmin.php` (+ feature/settings keys). Additive migrations only. No npm. | Hard rules. |
-| D11 | Out of phase (stay in `PARKING-LOT.md`): Reverb, WhatsApp driver, lockdown browser, native apps, multi-tenant, writing `.env` from the UI, rotating `SUPERADMIN_PASSWORD` from the UI, parent/guardian roles. | Do not dilute this plan. |
+| D11 | Out of phase (stay in `PARKING-LOT.md`): Reverb, WhatsApp driver, lockdown browser, native apps, multi-tenant, **writing `.env` from the UI**, rotating `SUPERADMIN_PASSWORD` from the UI, parent/guardian roles. Portal overlays live in `settings` (allowlisted, encrypted secrets), not the env file. | Do not dilute this plan. |
 
 ---
 
@@ -76,6 +76,7 @@ Restructure `NavigationHub::superadminSections()` from one flat “exclusive” 
 /superadmin/ops                     Failed jobs retry/delete, backup now, live schedule (SA6)
 /superadmin/status                  Health probes, integrations configured/missing, runtime (SA7)
 /superadmin/access                  Access map: census, leaks, lookup, CSV (SA8)
+/superadmin/integrations            Mail identities + PayPal/Paymob/Cashier (SA9)
 /superadmin/access/csv              Audited matrix CSV (SA8)
 /superadmin/scheduled-tasks         Live Kernel schedule (SA6)
 /superadmin/system-tests            Keep as runbook (no execute)
@@ -107,6 +108,7 @@ Add keys with **empty role maps** (Super Admin bypass only), unless noted.
 | `ops.backup` | SA only | Trigger on-demand dump |
 | `status.platform` | SA only | Read-only platform status desk |
 | `access.map` | SA only | Read-only access map + matrix CSV |
+| `integrations.manage` | SA only | Edit allowlisted mail/payment integrations; write-once secrets; test mail/payment |
 
 Keep existing:
 
@@ -409,6 +411,20 @@ Each phase is one PR-sized slice: tests first, `pint` on owned files, no `migrat
 
 **Done when:** Super Admin can review the live matrix and catch a dangerous Roles Hub grant from the control plane. **Shipped.**
 
+### SA9 — Integrations (mail + payments)
+
+**Goal:** Super Admin can set two student mail From identities and PayPal / Paymob / Cashier from the portal without writing `.env` or dumping secrets.
+
+- Dedicated desk at `/superadmin/integrations` (`integrations.manage`, empty map).
+- Registry in `config/integrations.php`. Values in `settings`. Host env is fallback. The env file is never written.
+- Mail: one SMTP transport; two identities (`transactional` for OTP/receipts, `notifications` for student mail). `TransactionalMailer` sets From per identity.
+- Payments: enable/disable PayPal, Paymob, and Cashier; PayPal sandbox/live + public client id; Paymob integration id. Currency routing stays EGP → Paymob else PayPal.
+- Secrets (SMTP password, PayPal secret/webhook id, Paymob API key/HMAC, Cashier secret) are write-once, encrypted with `APP_KEY`, never returned to views or audit payloads (audit records `changed` / `cleared` / `stored`).
+- Test message to the signed-in Super Admin (no OTP digits). Test payment: 1 minor unit, confirm-gated, no invoice row; simulated in `testing` / mock mode.
+- Tests: Super Admin can save from-addresses and a secret that never reappears in HTML or audit JSON; test mail and test payment are audited; student/ADM 403; unknown keys 422. **Shipped** in `IntegrationSettingsTest`.
+
+**Done when:** Super Admin can point OTP and student notifications at two From addresses and turn PayPal/Paymob/Cashier on with write-once secrets, without opening `.env`.
+
 ---
 
 ## 7. Data & migrations
@@ -453,6 +469,7 @@ New suite: `tests/Feature/SuperAdmin/`.
 | `OpsDeskTest` | SA6 | Failed job retry audited |
 | `PlatformStatusTest` | SA7 | Health + integrations; secrets absent from HTML |
 | `AccessMapTest` | SA8 | Census + leak/elevated detection; CSV audited |
+| `IntegrationSettingsTest` | SA9 | Allowlist write; secrets absent from HTML/audit; test mail/payment audited |
 
 Also extend `UserAdminTest`, `ThemeEditorTest`, `RolesHubTest`, `PortalHubsTest`.
 

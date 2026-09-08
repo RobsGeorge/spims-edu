@@ -37,6 +37,7 @@ class AccessMapTest extends TestCase
             ->assertSee('features.manage', false)
             ->assertSee('status.platform', false)
             ->assertSee('access.map', false)
+            ->assertSee('integrations.manage', false)
             ->assertSee('data-exclusive-key="features.manage"', false)
             ->assertSee('data-role="STUDENT"', false)
             ->assertSee('data-role="SUPER_ADMIN"', false)

@@ -1361,7 +1361,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 .reports-entrance-banner,
 .ops-entrance-banner,
 .status-entrance-banner,
-.access-entrance-banner {
+.access-entrance-banner,
+.integrations-entrance-banner {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1403,13 +1404,19 @@ html[dir='rtl'] .sa-impersonation-stop {
     background: color-mix(in srgb, var(--color-danger) 5%, color-mix(in srgb, var(--color-title) 6%, var(--color-surface)));
 }
 
+.integrations-entrance-banner {
+    border-color: color-mix(in srgb, var(--color-accent) 22%, color-mix(in srgb, var(--color-primary) 18%, var(--color-surface-border)));
+    background: color-mix(in srgb, var(--color-accent) 6%, color-mix(in srgb, var(--color-primary) 5%, var(--color-surface)));
+}
+
 .features-entrance-icon,
 .config-entrance-icon,
 .theme-entrance-icon,
 .reports-entrance-icon,
 .ops-entrance-icon,
 .status-entrance-icon,
-.access-entrance-icon {
+.access-entrance-icon,
+.integrations-entrance-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1450,13 +1457,19 @@ html[dir='rtl'] .sa-impersonation-stop {
     color: var(--color-title);
 }
 
+.integrations-entrance-icon {
+    background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
+    color: var(--color-title);
+}
+
 .features-entrance-title,
 .config-entrance-title,
 .theme-entrance-title,
 .reports-entrance-title,
 .ops-entrance-title,
 .status-entrance-title,
-.access-entrance-title {
+.access-entrance-title,
+.integrations-entrance-title {
     display: block;
     font-weight: 700;
     color: var(--color-title);
@@ -1468,7 +1481,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 .reports-entrance-body,
 .ops-entrance-body,
 .status-entrance-body,
-.access-entrance-body {
+.access-entrance-body,
+.integrations-entrance-body {
     display: block;
     font-size: 0.85rem;
     color: var(--color-text-muted);
@@ -1480,7 +1494,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 .reports-entrance-cta,
 .ops-entrance-cta,
 .status-entrance-cta,
-.access-entrance-cta {
+.access-entrance-cta,
+.integrations-entrance-cta {
     margin-inline-start: auto;
     font-weight: 600;
     color: var(--color-primary);
@@ -1677,7 +1692,8 @@ html[dir='rtl'] .sa-impersonation-stop {
 .reports-entrance-kicker,
 .ops-entrance-kicker,
 .status-entrance-kicker,
-.access-entrance-kicker {
+.access-entrance-kicker,
+.integrations-entrance-kicker {
     display: block;
     font-size: 0.72rem;
     font-weight: 700;

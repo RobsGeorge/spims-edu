@@ -9,6 +9,7 @@
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_finance')])
     @include('partials.people-entrance-banner')
     @include('partials.reports-entrance-banner', ['caption' => __('school_reports.entrance_from_finance')])
+    @include('partials.integrations-entrance-banner', ['caption' => __('integrations.entrance_from_finance')])
     <div class="row g-3">
         @foreach($links as $link)
             @include('partials.hub-link-tile', ['link' => $link])

@@ -6,6 +6,7 @@ use App\Enums\OtpPurpose;
 use App\Models\OtpToken;
 use App\Models\User;
 use App\Services\Mail\TransactionalMailer;
+use App\Services\SuperAdmin\IntegrationConfigService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
@@ -44,7 +45,8 @@ class OtpService
         $this->mailer->send(
             (string) $user->email,
             'SPIMS OTP',
-            'Your verification code is: '.$plain
+            'Your verification code is: '.$plain,
+            IntegrationConfigService::IDENTITY_TRANSACTIONAL
         );
 
         return $plain;

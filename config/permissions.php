@@ -531,4 +531,5 @@ return [
     'ops.backup' => [],
     'status.platform' => [],
     'access.map' => [],
+    'integrations.manage' => [],
 ];

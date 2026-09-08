@@ -46,15 +46,20 @@ return [
         'client_id' => env('PAYPAL_CLIENT_ID'),
         'secret' => env('PAYPAL_SECRET'),
         'webhook_id' => env('PAYPAL_WEBHOOK_ID', 'paypal-test'),
+        'mode' => env('PAYPAL_MODE', 'sandbox'),
+        'enabled' => true,
     ],
 
     'paymob' => [
         'api_key' => env('PAYMOB_API_KEY'),
         'hmac' => env('PAYMOB_HMAC', 'paymob-test'),
+        'integration_id' => env('PAYMOB_INTEGRATION_ID'),
+        'enabled' => true,
     ],
 
     'cashier' => [
         'secret' => env('CASHIER_SECRET', 'cashier-test'),
+        'enabled' => true,
     ],
 
     'payments' => [

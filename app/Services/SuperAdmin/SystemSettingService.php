@@ -16,6 +16,7 @@ class SystemSettingService
     public function __construct(
         private readonly AuthorizeService $authorize,
         private readonly AuditLogWriter $audit,
+        private readonly IntegrationConfigService $integrations,
     ) {}
 
     /**
@@ -116,10 +117,9 @@ class SystemSettingService
 
         foreach ($map as $id => $row) {
             $envKey = (string) ($row['env'] ?? '');
-            $raw = $envKey !== '' ? env($envKey) : null;
             $items[] = [
                 'id' => (string) $id,
-                'configured' => is_string($raw) ? trim($raw) !== '' : $raw !== null && $raw !== false,
+                'configured' => $this->integrations->slotConfigured((string) $id, $envKey),
             ];
         }
 

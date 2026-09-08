@@ -78,6 +78,7 @@ use App\Http\Controllers\SuperAdmin\AuditExplorerController;
 use App\Http\Controllers\SuperAdmin\FeatureFlagController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
+use App\Http\Controllers\SuperAdmin\IntegrationSettingsController;
 use App\Http\Controllers\SuperAdmin\OpsDeskController;
 use App\Http\Controllers\SuperAdmin\PlatformStatusController;
 use App\Http\Controllers\SuperAdmin\SchoolReportController;
@@ -354,6 +355,18 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/config', [SystemSettingController::class, 'update'])
             ->middleware('permission:system_settings.manage')
             ->name('config.update');
+        Route::get('/integrations', [IntegrationSettingsController::class, 'index'])
+            ->middleware('permission:integrations.manage')
+            ->name('integrations');
+        Route::put('/integrations', [IntegrationSettingsController::class, 'update'])
+            ->middleware('permission:integrations.manage')
+            ->name('integrations.update');
+        Route::post('/integrations/test-mail', [IntegrationSettingsController::class, 'testMail'])
+            ->middleware('permission:integrations.manage')
+            ->name('integrations.test-mail');
+        Route::post('/integrations/test-payment', [IntegrationSettingsController::class, 'testPayment'])
+            ->middleware('permission:integrations.manage')
+            ->name('integrations.test-payment');
         Route::get('/theme', [ThemeStudioController::class, 'index'])
             ->middleware('permission:theme.manage')
             ->name('theme.index');

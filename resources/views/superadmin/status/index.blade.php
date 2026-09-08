@@ -98,6 +98,7 @@
                 @endforeach
             </ul>
             <a href="{{ route('superadmin.config') }}">{{ __('status.open_config') }}</a>
+            · <a href="{{ route('superadmin.integrations') }}">{{ __('integrations.entrance_cta') }}</a>
         </div>
     </section>
 
@@ -185,6 +186,7 @@
     </section>
 
     @include('partials.access-entrance-banner', ['caption' => __('access.entrance_from_status')])
+    @include('partials.integrations-entrance-banner', ['caption' => __('integrations.entrance_from_status')])
 
     <p class="small text-muted-theme mb-0">
         <a href="{{ route('superadmin.access') }}">{{ __('access.nav_access') }}</a>

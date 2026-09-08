@@ -4,6 +4,7 @@ namespace App\Services\Finance;
 
 use App\Enums\Currency;
 use App\Enums\PaymentMethod;
+use App\Services\SuperAdmin\IntegrationConfigService;
 use App\Support\WebhookSecretGuard;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -23,22 +24,35 @@ use Illuminate\Validation\ValidationException;
  */
 class GatewayRouter
 {
+    public function __construct(
+        private readonly IntegrationConfigService $integrations,
+    ) {}
+
     public function methodFor(Currency $currency, ?string $preferred = null): PaymentMethod
     {
+        $this->integrations->applyRuntime();
+
         if ($preferred !== null) {
             $method = PaymentMethod::tryFrom(strtoupper($preferred));
             if ($method === null) {
                 throw ValidationException::withMessages(['gateway' => [__('finance.unknown_gateway')]]);
             }
+            $this->assertGatewayEnabled($method);
 
             return $method;
         }
 
-        return $currency === Currency::Egp ? PaymentMethod::Paymob : PaymentMethod::Paypal;
+        $method = $currency === Currency::Egp ? PaymentMethod::Paymob : PaymentMethod::Paypal;
+        $this->assertGatewayEnabled($method);
+
+        return $method;
     }
 
     public function charge(PaymentMethod $method, int $amountMinor, Currency $currency, string $paymentId): string
     {
+        $this->integrations->applyRuntime();
+        $this->assertGatewayEnabled($method);
+
         $mock = (bool) config('services.payments.mock_auto_complete');
 
         // Tests (and explicit mock mode) never call a live HTTP SDK.
@@ -62,6 +76,8 @@ class GatewayRouter
 
     public function verifySignature(PaymentMethod $method, string $signature, array $payload): bool
     {
+        $this->integrations->applyRuntime();
+
         $secret = match ($method) {
             PaymentMethod::Paypal => config('services.paypal.webhook_id', 'paypal-test'),
             PaymentMethod::Paymob => config('services.paymob.hmac', 'paymob-test'),
@@ -87,6 +103,46 @@ class GatewayRouter
         $expected = hash_hmac('sha256', json_encode($payload), $secret);
 
         return hash_equals($expected, $signature);
+    }
+
+    /**
+     * One-minor-unit probe used by Super Admin. Never creates an invoice row.
+     * Testing and mock mode never open a live HTTP socket.
+     *
+     * @return array{gateway: string, reference: string, simulated: bool, amount_minor: int, currency: string}
+     */
+    public function testCharge(PaymentMethod $method): array
+    {
+        $this->integrations->applyRuntime();
+        $this->assertGatewayEnabled($method);
+
+        $currency = $method === PaymentMethod::Paymob ? Currency::Egp : Currency::Usd;
+        $simulated = (bool) config('services.payments.mock_auto_complete')
+            || app()->environment('testing')
+            || ! $this->hasLiveChargeKeys($method);
+
+        $reference = $this->charge($method, 1, $currency, 'TEST-'.Str::ulid());
+
+        return [
+            'gateway' => $method->value,
+            'reference' => $reference,
+            'simulated' => $simulated,
+            'amount_minor' => 1,
+            'currency' => $currency->value,
+        ];
+    }
+
+    private function assertGatewayEnabled(PaymentMethod $method): void
+    {
+        if (! in_array($method, [PaymentMethod::Paypal, PaymentMethod::Paymob, PaymentMethod::Cashier], true)) {
+            return;
+        }
+
+        if (! $this->integrations->gatewayEnabled($method)) {
+            throw ValidationException::withMessages([
+                'gateway' => [__('integrations.gateway_disabled')],
+            ]);
+        }
     }
 
     /**
@@ -170,9 +226,7 @@ class GatewayRouter
 
     private function chargePaypal(int $amountMinor, Currency $currency, string $paymentId): ?string
     {
-        $base = app()->isProduction()
-            ? 'https://api-m.paypal.com'
-            : 'https://api-m.sandbox.paypal.com';
+        $base = $this->integrations->paypalApiBase();
 
         $token = Http::timeout(15)
             ->asForm()
@@ -293,9 +347,7 @@ class GatewayRouter
             return false;
         }
 
-        $base = app()->isProduction()
-            ? 'https://api-m.paypal.com'
-            : 'https://api-m.sandbox.paypal.com';
+        $base = $this->integrations->paypalApiBase();
 
         $token = Http::timeout(15)
             ->asForm()
