@@ -106,4 +106,31 @@ class AnnouncementLifecycleTest extends TestCase
         );
         $this->assertSame(1, Announcement::query()->count());
     }
+
+    #[Test]
+    public function administrative_admin_can_publish_an_announcement_and_a_student_cannot(): void
+    {
+        $aca = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $offering = $this->offeringWithStudent($aca, $student);
+        $service = app(AnnouncementService::class);
+
+        $draft = $service->draft($aca, $offering, [
+            'title' => 'School notice',
+            'body' => 'Published by registrar',
+        ]);
+
+        $this->actingAs($student)
+            ->post(route('teach.announcements.publish', $draft))
+            ->assertForbidden();
+        $this->assertFalse($draft->fresh()->isPublished());
+
+        $this->actingAs($adm)
+            ->post(route('teach.announcements.publish', $draft))
+            ->assertRedirect();
+
+        $this->assertTrue($draft->fresh()->isPublished());
+        $this->assertSame($adm->id, $draft->fresh()->published_by_id);
+    }
 }

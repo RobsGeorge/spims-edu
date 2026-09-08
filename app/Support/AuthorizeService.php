@@ -110,16 +110,15 @@ class AuthorizeService
             return false;
         }
 
-        if ($actor->isSuperAdmin()) {
-            return true;
-        }
-
-        if ($roleToAssign === RoleType::AdministrativeAdmin) {
-            return false;
-        }
+        // ADMINISTRATIVE_ADMIN is gated by roles.assign_admin (empty map → SA bypass
+        // only). Other roles, including Academic Admin and Financial Admin, use
+        // roles.assign. Super Admin still succeeds via authorize()'s bypass.
+        $action = $roleToAssign === RoleType::AdministrativeAdmin
+            ? 'roles.assign_admin'
+            : 'roles.assign';
 
         try {
-            $this->authorize($actor, 'roles.assign');
+            $this->authorize($actor, $action);
 
             return true;
         } catch (AuthorizationException) {

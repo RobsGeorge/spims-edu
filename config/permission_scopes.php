@@ -24,6 +24,7 @@ return [
     'offering_scoped' => [
         'offerings.view',
         'offerings.content',
+        'enrollment.waitlist',
         'questions.manage',
         'assessments.manage',
         'assessments.grade',

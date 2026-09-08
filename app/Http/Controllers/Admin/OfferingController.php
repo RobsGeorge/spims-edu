@@ -70,7 +70,7 @@ class OfferingController extends Controller
             'contentTypes' => ContentItemType::cases(),
             'statuses' => $this->editableStatuses(),
             'semesters' => Semester::query()->orderByDesc('start_date')->get(),
-            'canViewWaitlist' => $authorize->allows($request->user(), 'enrollment.waitlist'),
+            'canViewWaitlist' => $authorize->allows($request->user(), 'enrollment.waitlist', $offering),
         ]);
     }
 

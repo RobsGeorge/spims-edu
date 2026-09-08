@@ -225,6 +225,27 @@ class LiveCommsTest extends TestCase
     }
 
     #[Test]
+    public function academic_admin_can_schedule_a_live_session(): void
+    {
+        $aca = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $offering = $this->offeringWithStudent($student);
+        $start = now()->addDays(2)->seconds(0);
+
+        $this->actingAs($aca)->post(route('admin.live.store', $offering), [
+            'title' => 'Dean lecture',
+            'scheduled_start' => $start->toDateTimeString(),
+            'duration_minutes' => 60,
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('live_sessions', [
+            'offering_id' => $offering->id,
+            'title' => 'Dean lecture',
+        ]);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'live.schedule', 'actor_id' => $aca->id]);
+    }
+
+    #[Test]
     public function recurrence_creates_weekly_sessions_and_overlap_returns_422(): void
     {
         $adm = User::factory()->withRole(RoleType::AcademicAdmin)->create();

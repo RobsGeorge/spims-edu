@@ -51,9 +51,15 @@ class ControlPlaneSafetyTest extends TestCase
         $authz = app(AuthorizeService::class);
 
         $this->assertFalse($authz->canAssignRole($sa, RoleType::SuperAdmin));
-        $this->assertFalse($authz->canAssignRole($adm, RoleType::SuperAdmin));
+        $this->assertTrue($authz->canAssignRole($sa, RoleType::AdministrativeAdmin));
         $this->assertTrue($authz->canAssignRole($sa, RoleType::Instructor));
+
+        $this->assertFalse($authz->canAssignRole($adm, RoleType::SuperAdmin));
         $this->assertFalse($authz->canAssignRole($adm, RoleType::AdministrativeAdmin));
+        $this->assertTrue($authz->canAssignRole($adm, RoleType::Student));
+        $this->assertTrue($authz->canAssignRole($adm, RoleType::Instructor));
+        $this->assertTrue($authz->canAssignRole($adm, RoleType::AcademicAdmin));
+        $this->assertTrue($authz->canAssignRole($adm, RoleType::FinancialAdmin));
 
         foreach ([$sa, $adm] as $actor) {
             $this->actingAs($actor)->post(route('admin.users.store'), [
@@ -77,7 +83,15 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee(__('superadmin.users_roles_help'))
             ->assertSee(__('people.directory_title'))
             ->assertSee(__('people.search_label'))
-            ->assertDontSee('name="roles[]" value="'.RoleType::SuperAdmin->value.'"', false);
+            ->assertDontSee('name="roles[]" value="'.RoleType::SuperAdmin->value.'"', false)
+            ->assertSee('name="roles[]" value="'.RoleType::AdministrativeAdmin->value.'"', false);
+
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+        $this->actingAs($adm)->get(route('admin.users.index'))
+            ->assertOk()
+            ->assertDontSee('name="roles[]" value="'.RoleType::SuperAdmin->value.'"', false)
+            ->assertDontSee('name="roles[]" value="'.RoleType::AdministrativeAdmin->value.'"', false)
+            ->assertSee('name="roles[]" value="'.RoleType::Student->value.'"', false);
     }
 
     #[Test]
@@ -137,7 +151,7 @@ class ControlPlaneSafetyTest extends TestCase
             ->assertSee('users.impersonate')
             ->assertDontSee(__('roles_hub.role_SUPER_ADMIN'));
 
-        $rbac->updateRoleMatrix($sa, RoleType::Student, ['transcript.view']);
+        $rbac->updateRoleMatrix($sa, RoleType::Student, ['transcript.view' => 'O']);
         $this->assertFalse(
             RolePermission::query()
                 ->where('role', RoleType::Student->value)

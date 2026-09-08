@@ -64,7 +64,7 @@
                                 <form method="POST" action="{{ route('roles.hub.role.reset', $roleKey) }}" class="mb-3"
                                       onsubmit="return confirm(@json(__('roles_hub.reset_confirm', ['role' => __('roles_hub.role_'.$roleKey)])));">
                                     @csrf
-                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                    <button type="submit" class="btn btn-outline-secondary">
                                         <i class="bi bi-arrow-counterclockwise"></i> {{ __('roles_hub.reset_role') }}
                                     </button>
                                     <span class="small spims-text-dim ms-2">{{ __('roles_hub.reset_help') }}</span>
@@ -80,29 +80,17 @@
                                             </summary>
                                             <div class="row g-2 mt-2">
                                                 @foreach($group['keys'] as $permKey)
-                                                    @php
-                                                        $checked = isset($matrix[$permKey][$roleKey]);
-                                                    @endphp
-                                                    <div class="col-12 col-md-6 col-lg-4" data-perm-row data-perm-key="{{ $permKey }}">
-                                                        <div class="form-check form-check-sm">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                   name="permissions[]"
-                                                                   id="perm-{{ $roleKey }}-{{ md5($permKey) }}"
-                                                                   value="{{ $permKey }}"
-                                                                   @checked($checked)>
-                                                            <label class="form-check-label" for="perm-{{ $roleKey }}-{{ md5($permKey) }}">
-                                                                {{ $permKey }}
-                                                                @if($checked)
-                                                                    <span class="spims-badge spims-badge--secondary">{{ $matrix[$permKey][$roleKey] }}</span>
-                                                                @endif
-                                                            </label>
-                                                        </div>
-                                                    </div>
+                                                    @include('roles-hub.partials.permission-level-row', [
+                                                        'permKey' => $permKey,
+                                                        'roleKey' => $roleKey,
+                                                        'matrix' => $matrix,
+                                                        'grantLevels' => $grantLevels,
+                                                    ])
                                                 @endforeach
                                             </div>
                                         </details>
                                     @endforeach
-                                    <button type="submit" class="btn btn-primary btn-sm mt-2">
+                                    <button type="submit" class="btn btn-primary mt-2">
                                         <i class="bi bi-save"></i> {{ __('roles_hub.save_role') }}
                                     </button>
                                 </form>

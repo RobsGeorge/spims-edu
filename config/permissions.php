@@ -89,6 +89,8 @@ return [
     'offerings.view' => [
         'ACADEMIC_ADMIN' => 'F',
         'ADMINISTRATIVE_ADMIN' => 'R',
+        // Pricing lives on offering show/index. Financial Admin is R here; never offerings.manage.
+        'FINANCIAL_ADMIN' => 'R',
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
         'STUDENT' => 'R',
@@ -119,9 +121,15 @@ return [
     'enrollment.override' => [
         'ADMINISTRATIVE_ADMIN' => 'F',
     ],
+    /*
+     * Instructor O is VIEW ONLY on staffed offerings. Promote/override stay
+     * Administrative Admin F (`enrollment.override`). Academic Admin stays R.
+     * TA is not granted. Offering-scoped — authorize with the offering.
+     */
     'enrollment.waitlist' => [
         'ACADEMIC_ADMIN' => 'R',
         'ADMINISTRATIVE_ADMIN' => 'F',
+        'INSTRUCTOR' => 'O',
     ],
     /*
      * Advising-lite. These keys are NOT offering-scoped — do not add them to
@@ -138,6 +146,7 @@ return [
     ],
     'advising.view' => [
         'ACADEMIC_ADMIN' => 'F',
+        'ADMINISTRATIVE_ADMIN' => 'F',
         'INSTRUCTOR' => 'O',
         'STUDENT' => 'O',
     ],
@@ -244,7 +253,7 @@ return [
     ],
     'live.schedule' => [
         'ADMINISTRATIVE_ADMIN' => 'F',
-        'ACADEMIC_ADMIN' => 'R',
+        'ACADEMIC_ADMIN' => 'F',
         'INSTRUCTOR' => 'O',
         'TA' => 'O',
     ],
@@ -356,6 +365,7 @@ return [
     ],
     'announcements.publish' => [
         'ACADEMIC_ADMIN' => 'F',
+        'ADMINISTRATIVE_ADMIN' => 'F',
         'INSTRUCTOR' => 'O',
     ],
     'communications.report' => [
@@ -523,7 +533,9 @@ return [
     'features.manage' => [],
     'system_settings.manage' => [],
     'users.impersonate' => [],
-    'users.unsuspend' => [],
+    'users.unsuspend' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
     'users.reset_password' => [],
     'audit.export' => [],
     'reports.school' => [],
