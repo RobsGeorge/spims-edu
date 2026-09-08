@@ -27,11 +27,17 @@ class RolesHubTest extends TestCase
             ->assertSee(__('roles_hub.section_help'))
             ->assertSee(__('roles_hub.help_jump'));
 
-        $this->actingAs($sa)->get(route('roles.hub', ['section' => 'help']))
+        $help = $this->actingAs($sa)->get(route('roles.hub', ['section' => 'help']))
             ->assertOk()
-            ->assertSee(__('roles_hub.help_intro_title'))
-            ->assertSee(__('roles_hub.help_vs_title'))
-            ->assertSee(__('roles_hub.help_gap_levels'));
+            ->getContent();
+
+        foreach ([
+            __('roles_hub.help_intro_title'),
+            __('roles_hub.help_vs_title'),
+            __('roles_hub.help_gap_levels'),
+        ] as $needle) {
+            $this->assertTrue(str_contains($help, $needle), 'Missing from role guide: '.$needle);
+        }
 
         $this->actingAs($sa)->put(route('roles.hub.role.update', RoleType::Student->value), [
             'permissions' => ['programs.view', 'transcript.view'],
