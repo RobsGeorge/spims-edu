@@ -15,6 +15,7 @@
 <body>
 @php
     use App\Support\Money;
+    $statusLabel = __('payment_status.'.$payment->status->value);
 @endphp
     <h1>{{ __('finance.receipt_title') }}</h1>
     <dl>
@@ -24,11 +25,8 @@
         <dt>{{ __('finance.amount') }}</dt>
         <dd>{{ Money::fromMinor((int) $payment->amount_minor, $payment->currency)->format() }}</dd>
 
-        <dt>{{ __('finance.currency') }}</dt>
-        <dd>{{ $payment->currency->value }}</dd>
-
         <dt>{{ __('ui.status') }}</dt>
-        <dd>{{ $payment->status->value }}</dd>
+        <dd>{{ $statusLabel }}</dd>
 
         @if($payment->invoice_id)
             <dt>{{ __('finance.invoices') }}</dt>
