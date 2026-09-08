@@ -6,7 +6,7 @@
     <a href="{{ route('admin.offerings.create') }}" class="btn btn-primary">{{ __('offerings.create_offering') }}</a>
 </div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
-<div class="card border-0 shadow-sm">
+<x-card variant="panel">
     <div class="table-responsive">
         <table class="table mb-0">
             <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('offerings.mode') }}</th><th>{{ __('offerings.semester') }}</th><th>{{ __('ui.status') }}</th></tr></thead>
@@ -17,14 +17,14 @@
                         <a href="{{ route('admin.offerings.show', $offering) }}">{{ $offering->course->code }}</a>
                         <a href="{{ route('admin.offerings.edit', $offering) }}" class="btn btn-sm btn-link">{{ __('ui.edit') }}</a>
                     </td>
-                    <td>{{ $offering->mode->value }}</td>
+                    <td><x-badge :value="$offering->mode" /></td>
                     <td>{{ $offering->semester?->name ?? '—' }}</td>
-                    <td>{{ $offering->status->value }}</td>
+                    <td><x-badge :value="$offering->status" /></td>
                 </tr>
             @endforeach
             </tbody>
         </table>
     </div>
-</div>
+</x-card>
 {{ $offerings->links() }}
 @endsection

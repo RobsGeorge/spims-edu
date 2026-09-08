@@ -2,11 +2,11 @@
 @section('title', __('offerings.edit_offering'))
 @section('content')
 <h1 class="spims-title mb-3">{{ __('offerings.edit_offering') }}</h1>
-<p class="text-muted-theme">{{ $offering->course->code }} — {{ $offering->course->title }}</p>
-<form method="POST" action="{{ route('admin.offerings.update', $offering) }}" class="card border-0 shadow-sm">
+<p class="spims-text-dim">{{ $offering->course->code }} — {{ $offering->course->title }}</p>
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.offerings.update', $offering) }}">
     @csrf
     @method('PUT')
-    <div class="card-body row g-3">
+    <div class="row g-3">
         @if($offering->mode->value === 'COHORT')
         <div class="col-md-4">
             <label class="form-label">{{ __('offerings.semester') }}</label>
@@ -38,7 +38,8 @@
             <label class="form-label">{{ __('offerings.status') }}</label>
             <select name="status" class="form-select" required>
                 @foreach($statuses as $status)
-                    <option value="{{ $status->value }}" @selected(old('status', $offering->status->value) === $status->value)>{{ $status->value }}</option>
+                    @php $statusVal = $status->value; @endphp
+                    <option value="{{ $statusVal }}" @selected(old('status', $offering->status->value) === $statusVal)>{{ $statusVal }}</option>
                 @endforeach
             </select>
         </div>
@@ -47,5 +48,5 @@
             <a href="{{ route('admin.offerings.show', $offering) }}" class="btn btn-outline-secondary">{{ __('ui.cancel') }}</a>
         </div>
     </div>
-</form>
+</x-card>
 @endsection

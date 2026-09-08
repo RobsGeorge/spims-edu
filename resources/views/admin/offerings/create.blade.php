@@ -2,9 +2,9 @@
 @section('title', __('offerings.create_offering'))
 @section('content')
 <h1 class="spims-title mb-3">{{ __('offerings.create_offering') }}</h1>
-<form method="POST" action="{{ route('admin.offerings.store') }}" class="card border-0 shadow-sm">
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.offerings.store') }}">
     @csrf
-    <div class="card-body row g-3">
+    <div class="row g-3">
         <div class="col-md-6"><label class="form-label">{{ __('ui.nav_courses') }}</label>
             <select name="course_id" class="form-select" required>
                 @foreach($courses as $course)<option value="{{ $course->id }}">{{ $course->code }} — {{ $course->title }}</option>@endforeach
@@ -12,7 +12,7 @@
         </div>
         <div class="col-md-3"><label class="form-label">{{ __('offerings.mode') }}</label>
             <select name="mode" class="form-select" required>
-                @foreach($modes as $mode)<option value="{{ $mode->value }}">{{ $mode->value }}</option>@endforeach
+                @foreach($modes as $mode)@php $modeVal = $mode->value; @endphp<option value="{{ $modeVal }}">{{ $modeVal }}</option>@endforeach
             </select>
         </div>
         <div class="col-md-3"><label class="form-label">{{ __('offerings.semester') }}</label>
@@ -26,5 +26,5 @@
         <div class="col-md-3 form-check mt-4"><input type="checkbox" name="clone" value="1" class="form-check-input" id="clone" checked><label for="clone" class="form-check-label">{{ __('offerings.clone_week1') }}</label></div>
         <div class="col-12"><button class="btn btn-primary">{{ __('ui.save') }}</button></div>
     </div>
-</form>
+</x-card>
 @endsection
