@@ -338,6 +338,47 @@ class AdvisingWhatIfTest extends TestCase
     }
 
     #[Test]
+    public function administrative_admin_can_open_advising_view_but_cannot_place_or_release_a_hold(): void
+    {
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+        $aca = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+
+        $this->actingAs($adm)
+            ->get(route('advising.index'))
+            ->assertOk();
+
+        $this->actingAs($adm)
+            ->get(route('advising.show', $student))
+            ->assertOk()
+            ->assertDontSee(__('advising.place_hold'), false);
+
+        $this->actingAs($adm)
+            ->post(route('advising.holds.store', $student), [
+                'kind' => AdvisingHoldKind::Advising->value,
+                'reason' => 'Registrar should not hold',
+            ])
+            ->assertForbidden();
+
+        $this->assertSame(0, AdvisingHold::query()->count());
+
+        $this->actingAs($aca)
+            ->post(route('advising.holds.store', $student), [
+                'kind' => AdvisingHoldKind::Advising->value,
+                'reason' => 'Meet your advisor first',
+            ])
+            ->assertRedirect();
+
+        $hold = AdvisingHold::query()->where('student_id', $student->id)->firstOrFail();
+
+        $this->actingAs($adm)
+            ->post(route('advising.holds.release', $hold))
+            ->assertForbidden();
+
+        $this->assertNull($hold->fresh()->released_at);
+    }
+
+    #[Test]
     public function student_cannot_open_advising_show_for_notes(): void
     {
         $student = User::factory()->withRole(RoleType::Student)->create();

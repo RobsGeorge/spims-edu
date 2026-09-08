@@ -12,6 +12,7 @@ use App\Models\Setting;
 use App\Models\StudentProgram;
 use App\Models\User;
 use App\Services\Enrollment\EnrollmentService;
+use App\Support\AuthorizeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -70,8 +71,10 @@ class EnrollmentAdminController extends Controller
         return back()->with('status', __('enrollment.hold_updated'));
     }
 
-    public function waitlist(CourseOffering $offering): View
+    public function waitlist(Request $request, CourseOffering $offering, AuthorizeService $authorize): View
     {
+        $authorize->authorize($request->user(), 'enrollment.waitlist', $offering);
+
         return view('admin.enrollments.waitlist', [
             'offering' => $offering->load('course'),
             'waitlisted' => Enrollment::query()

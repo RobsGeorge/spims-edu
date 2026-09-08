@@ -129,6 +129,34 @@ class ContentGatingAndPricingTest extends TestCase
     }
 
     #[Test]
+    public function financial_admin_can_open_offering_show_but_cannot_manage(): void
+    {
+        $fin = User::factory()->withRole(RoleType::FinancialAdmin)->create();
+        $offering = $this->makeSelfPacedOffering();
+        $authorize = app(\App\Support\AuthorizeService::class);
+
+        $this->actingAs($fin)
+            ->get(route('admin.offerings.index'))
+            ->assertOk();
+
+        $this->actingAs($fin)
+            ->get(route('admin.offerings.show', $offering))
+            ->assertOk()
+            ->assertSee(__('offerings.pricing'));
+
+        $this->actingAs($fin)
+            ->get(route('admin.offerings.edit', $offering))
+            ->assertForbidden();
+
+        $this->actingAs($fin)
+            ->get(route('admin.offerings.create'))
+            ->assertForbidden();
+
+        $this->assertTrue($authorize->allows($fin, 'offerings.view', $offering));
+        $this->assertFalse($authorize->allows($fin, 'offerings.manage', $offering));
+    }
+
+    #[Test]
     public function aca_cannot_set_pricing(): void
     {
         $aca = User::factory()->withRole(RoleType::AcademicAdmin)->create();
