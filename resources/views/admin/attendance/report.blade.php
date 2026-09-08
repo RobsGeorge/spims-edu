@@ -6,7 +6,7 @@
 @forelse($rows as $row)
     <div class="app-card p-3 mb-3">
         <h2 class="h6">{{ $row['offering']->course->code }} — {{ $row['offering']->course->title }}</h2>
-        <p class="small text-muted-theme mb-2">
+        <p class="small spims-text-dim mb-2">
             {{ __('attendance.session_count') }}: {{ $row['report']['aggregate']['session_count'] }}
             · {{ __('attendance.present') }}: {{ $row['report']['aggregate']['present'] }}
             · {{ __('attendance.absent') }}: {{ $row['report']['aggregate']['absent'] }}

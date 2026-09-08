@@ -25,7 +25,8 @@
     <div class="col-md-3">
         <select name="kind" class="form-select" aria-label="{{ __('assessment.component') }}">
             @foreach($componentKinds as $kind)
-                <option value="{{ $kind->value }}">{{ __('assessment.kind_'.$kind->value) }}</option>
+                @php $kindVal = $kind->value; @endphp
+                <option value="{{ $kindVal }}">{{ __('assessment.kind_'.$kindVal) }}</option>
             @endforeach
         </select>
     </div>
