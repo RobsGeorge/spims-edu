@@ -59,8 +59,40 @@ class AuthorizeServiceTest extends TestCase
         $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
         $sa = User::factory()->withRole(RoleType::SuperAdmin)->create();
 
-        $this->assertFalse($service->canAssignRole($adm, RoleType::SuperAdmin));
         $this->assertTrue($service->canAssignRole($sa, RoleType::AdministrativeAdmin));
+        $this->assertFalse($service->canAssignRole($sa, RoleType::SuperAdmin));
+
         $this->assertTrue($service->canAssignRole($adm, RoleType::Student));
+        $this->assertTrue($service->canAssignRole($adm, RoleType::Instructor));
+        $this->assertTrue($service->canAssignRole($adm, RoleType::Ta));
+        $this->assertTrue($service->canAssignRole($adm, RoleType::AcademicAdmin));
+        $this->assertTrue($service->canAssignRole($adm, RoleType::FinancialAdmin));
+        $this->assertFalse($service->canAssignRole($adm, RoleType::AdministrativeAdmin));
+        $this->assertFalse($service->canAssignRole($adm, RoleType::SuperAdmin));
+    }
+
+    #[Test]
+    public function assignable_roles_match_can_assign_role(): void
+    {
+        $service = app(AuthorizeService::class);
+        $adm = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+        $sa = User::factory()->withRole(RoleType::SuperAdmin)->create();
+
+        foreach ([$sa, $adm] as $actor) {
+            $assignable = $service->assignableRoles($actor);
+
+            $this->assertNotContains(RoleType::SuperAdmin, $assignable);
+
+            foreach (RoleType::cases() as $role) {
+                $this->assertSame(
+                    $service->canAssignRole($actor, $role),
+                    in_array($role, $assignable, true),
+                    $role->value.' must match canAssignRole() for '.$actor->email
+                );
+            }
+        }
+
+        $this->assertContains(RoleType::AdministrativeAdmin, $service->assignableRoles($sa));
+        $this->assertNotContains(RoleType::AdministrativeAdmin, $service->assignableRoles($adm));
     }
 }
