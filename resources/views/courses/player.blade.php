@@ -7,7 +7,7 @@
 <div class="course-player animate-in">
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
-            <p class="text-muted-theme mb-1">{{ __('learning.player_title') }}</p>
+            <p class="spims-text-dim mb-1">{{ __('learning.player_title') }}</p>
             <h1 class="spims-title mb-1">{{ $course->code }} · {{ $course->title }}</h1>
             <p class="mb-0">{{ __('learning.progress', ['percent' => (int) $progress]) }}</p>
         </div>
@@ -49,7 +49,7 @@
                         <div id="week-{{ $week['id'] }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : '' }}" data-bs-parent="#playerWeeks">
                             <div class="accordion-body">
                                 @if(! $week['unlocked'])
-                                    <p class="text-muted-theme mb-0">{{ __('learning.week_locked') }}</p>
+                                    <p class="spims-text-dim mb-0">{{ __('learning.week_locked') }}</p>
                                 @else
                                     <ul class="list-unstyled mb-3">
                                         @foreach($week['items'] as $item)
@@ -67,7 +67,7 @@
                                             <li class="player-item p-3 mb-2 rounded-3">
                                                 <div class="d-flex justify-content-between gap-2 align-items-start">
                                                     <div>
-                                                        <div class="small text-muted-theme text-uppercase">{{ __('learning.'.$typeKey) }}</div>
+                                                        <div class="small spims-text-dim text-uppercase">{{ __('learning.'.$typeKey) }}</div>
                                                         <div class="fw-semibold">{{ $item['title'] }}</div>
                                                     </div>
                                                     @if($item['url'])
@@ -82,7 +82,7 @@
                                                 @elseif($item['type'] === 'READING' && $item['file_url'])
                                                     <p class="mt-3 mb-0"><a href="{{ $item['file_url'] }}" target="_blank" rel="noopener">{{ $item['file_url'] }}</a></p>
                                                 @elseif($item['body'])
-                                                    <div class="mt-3 text-muted-theme">{!! nl2br(e($item['body'])) !!}</div>
+                                                    <div class="mt-3 spims-text-dim">{!! nl2br(e($item['body'])) !!}</div>
                                                 @endif
                                             </li>
                                         @endforeach
@@ -107,10 +107,10 @@
                 @forelse($announcements as $announcement)
                     <div class="py-2 border-bottom border-opacity-25">
                         <div class="fw-semibold">{{ $announcement->title }}</div>
-                        <div class="small text-muted-theme">{{ \Illuminate\Support\Str::limit($announcement->body, 120) }}</div>
+                        <div class="small spims-text-dim">{{ \Illuminate\Support\Str::limit($announcement->body, 120) }}</div>
                     </div>
                 @empty
-                    <p class="text-muted-theme mb-0">{{ __('learning.no_announcements') }}</p>
+                    <p class="spims-text-dim mb-0">{{ __('learning.no_announcements') }}</p>
                 @endforelse
             </aside>
         </div>

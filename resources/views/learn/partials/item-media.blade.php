@@ -31,7 +31,7 @@
             </div>
             <a class="btn btn-outline-primary" href="{{ $remote->canonicalUrl }}" target="_blank" rel="noopener">{{ __('learn.reading_open') }}</a>
         @else
-            <p class="text-muted-theme">{{ __('learn.reading_link_only') }}</p>
+            <p class="spims-text-dim">{{ __('learn.reading_link_only') }}</p>
             <a class="btn btn-outline-primary" href="{{ $remote->canonicalUrl }}" target="_blank" rel="noopener">{{ __('learn.reading_open') }}</a>
         @endif
     @endif

@@ -22,13 +22,12 @@
         </div>
     </div>
 
-    <p class="small text-muted" x-show="savedAt">{{ __('assessment.autosaved') }} <span x-text="savedAt"></span></p>
-    <p class="small text-muted" x-show="enforceFullScreen">{{ __('assessment.fullscreen_hint') }}</p>
+    <p class="small spims-text-dim" x-show="savedAt">{{ __('assessment.autosaved') }} <span x-text="savedAt"></span></p>
+    <p class="small spims-text-dim" x-show="enforceFullScreen">{{ __('assessment.fullscreen_hint') }}</p>
     <p class="small text-danger" x-show="uploadError" x-text="uploadError"></p>
 
     <template x-for="(q, idx) in questions" :key="q.id">
-        <div class="card border-0 shadow-sm mb-3" x-show="!oneAtATime || idx === current">
-            <div class="card-body">
+        <x-card variant="panel" class="mb-3" x-show="!oneAtATime || idx === current">
                 <p class="fw-semibold" x-text="(idx+1)+'. '+q.prompt"></p>
 
                 <template x-if="q.type === 'MCQ_SINGLE' || q.type === 'TRUE_FALSE'">
@@ -117,13 +116,12 @@
                                :id="'file_'+q.id"
                                :name="'file_'+q.id"
                                @change="uploadFile(q, $event)">
-                        <p class="small text-muted mb-0 mt-1" x-show="answers[q.id] && answers[q.id].filename">
+                        <p class="small spims-text-dim mb-0 mt-1" x-show="answers[q.id] && answers[q.id].filename">
                             {{ __('assessment.file_uploaded') }}: <span x-text="answers[q.id] && answers[q.id].filename"></span>
                         </p>
                     </div>
                 </template>
-            </div>
-        </div>
+        </x-card>
     </template>
 
     <div class="d-flex gap-2 mb-3" x-show="oneAtATime">

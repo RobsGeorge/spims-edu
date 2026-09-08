@@ -1,15 +1,14 @@
 @if($canGrade)
-    <section class="card border-0 shadow-sm mt-4" aria-labelledby="discussion-grade-heading">
-        <div class="card-body">
+    <x-card variant="panel" tag="section" class="mt-4" aria-labelledby="discussion-grade-heading">
             <h2 id="discussion-grade-heading" class="h6 mb-3">{{ __('discussions.grade_heading') }}</h2>
-            <p class="small text-muted-theme mb-3">{{ __('discussions.grade_help') }}</p>
+            <p class="small spims-text-dim mb-3">{{ __('discussions.grade_help') }}</p>
 
             @if($thread->relationLoaded('grades') && $thread->grades->isNotEmpty())
                 <ul class="list-unstyled mb-3">
                     @foreach($thread->grades as $grade)
                         <li class="border rounded-3 p-2 mb-2">
                             <strong>{{ $grade->student?->first_name }} {{ $grade->student?->last_name }}</strong>
-                            <span class="small text-muted-theme">{{ $grade->student?->email }}</span>
+                            <span class="small spims-text-dim">{{ $grade->student?->email }}</span>
                             <div class="small">
                                 {{ __('discussions.score') }}: {{ $grade->final_score }}
                                 @if($grade->overridden)
@@ -17,7 +16,7 @@
                                 @endif
                             </div>
                             @if($grade->feedback)
-                                <div class="small text-muted-theme">{{ $grade->feedback }}</div>
+                                <div class="small spims-text-dim">{{ $grade->feedback }}</div>
                             @endif
                         </li>
                     @endforeach
@@ -47,6 +46,5 @@
                     <button class="btn btn-primary w-100">{{ __('discussions.submit_grade') }}</button>
                 </div>
             </form>
-        </div>
-    </section>
+    </x-card>
 @endif
