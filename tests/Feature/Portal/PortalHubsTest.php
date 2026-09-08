@@ -16,6 +16,12 @@ class PortalHubsTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        app(AuthorizeService::class)->forgetMatrixCache();
+    }
+
     #[Test]
     public function superadmin_sees_dashboard_tiles_and_console(): void
     {
