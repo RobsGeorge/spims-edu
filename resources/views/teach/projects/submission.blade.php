@@ -25,7 +25,7 @@
         <p class="mt-3 mb-0"><a href="{{ $submission->link }}">{{ $submission->link }}</a></p>
     @endif
     @foreach($submission->files as $file)
-        <div class="small text-muted-theme">{{ $file->original_name }} ({{ $file->size_bytes }})</div>
+        <div class="small spims-text-dim">{{ $file->original_name }} ({{ $file->size_bytes }})</div>
     @endforeach
 </div>
 
@@ -34,7 +34,8 @@
     <div class="col-md-6">
         <select name="review_status" class="form-select" required>
             @foreach($reviewStatuses as $status)
-                <option value="{{ $status->value }}" @selected($submission->review_status === $status)>{{ __('staff.projects.review_'.$status->value) }}</option>
+                @php $statusVal = $status->value; @endphp
+                <option value="{{ $statusVal }}" @selected($submission->review_status === $status)>{{ __('staff.projects.review_'.$statusVal) }}</option>
             @endforeach
         </select>
     </div>

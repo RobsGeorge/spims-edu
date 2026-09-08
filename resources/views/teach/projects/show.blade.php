@@ -25,12 +25,12 @@
     <div class="border rounded-3 p-3 mb-2">
         <div class="spims-staff-row">
             <strong>{{ $project->name }}</strong>
-            <span class="small text-muted-theme">{{ $row['seats'] }}/{{ $row['capacity'] }}</span>
+            <span class="small spims-text-dim">{{ $row['seats'] }}/{{ $row['capacity'] }}</span>
         </div>
         <ul class="mb-0 mt-2">
             @foreach($project->activeMemberships as $membership)
                 <li>{{ $membership->student?->first_name }} {{ $membership->student?->last_name }}
-                    <span class="small text-muted-theme">{{ $membership->student_id }}</span>
+                    <span class="small spims-text-dim">{{ $membership->student_id }}</span>
                 </li>
             @endforeach
         </ul>
@@ -98,7 +98,7 @@
     <div class="spims-staff-row border rounded-3 p-2 mb-2">
         <div>
             <strong>{{ $submission->deliverable?->title }}</strong>
-            <div class="small text-muted-theme">{{ $submission->project?->name }} · {{ $submission->review_status->value }}</div>
+            <div class="small spims-text-dim">{{ $submission->project?->name }} · <x-badge :value="$submission->review_status" /></div>
         </div>
         <a class="btn btn-sm btn-outline-primary" href="{{ route('teach.projects.submissions.show', [$offering, $assessment, $submission]) }}">{{ __('staff.projects.review') }}</a>
     </div>
@@ -110,7 +110,7 @@
 @forelse($peerAggregates as $agg)
     <div class="border rounded-3 p-3 mb-2">
         <div>{{ __('staff.projects.peer_count', ['count' => $agg['count']]) }} · {{ __('staff.projects.peer_avg', ['avg' => $agg['average_score']]) }}</div>
-        <div class="small text-muted-theme">{{ implode(', ', $agg['scores']) }}</div>
+        <div class="small spims-text-dim">{{ implode(', ', $agg['scores']) }}</div>
     </div>
 @empty
     <x-empty-state :title="__('staff.projects.no_peer')" icon="bi-chat-square-text" />

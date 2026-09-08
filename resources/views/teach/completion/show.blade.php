@@ -17,7 +17,7 @@
     @forelse($results as $result)
         <tr>
             <td>{{ $result->student?->email }}</td>
-            <td>{{ $result->outcome->value }}</td>
+            <td><x-badge :value="$result->outcome" /></td>
             <td class="small">
                 @foreach($result->met_criteria ?? [] as $row)
                     {{ $row['kind'] }}: {{ $row['passed'] ? __('completion.passed') : __('completion.failed') }}@if(! $loop->last), @endif
@@ -25,12 +25,12 @@
             </td>
             <td class="text-nowrap">
                 <a href="{{ route('teach.students.show', [$offering, $result->student_id]) }}">{{ __('teach.view_dossier') }}</a>
-                <span class="text-muted-theme">·</span>
+                <span class="spims-text-dim">·</span>
                 <a href="{{ route('teach.completion.show', ['offering' => $offering, 'student_id' => $result->student_id]) }}">{{ __('completion.notes') }}</a>
             </td>
         </tr>
     @empty
-        <tr><td colspan="4" class="text-muted-theme">{{ __('completion.no_results') }}</td></tr>
+        <tr><td colspan="4" class="spims-text-dim">{{ __('completion.no_results') }}</td></tr>
     @endforelse
     </tbody>
 </table>
@@ -40,13 +40,11 @@
 <h2 class="h5">{{ __('completion.notes') }} — {{ $selectedStudent->email }}
     <a class="fs-6 fw-normal" href="{{ route('teach.students.show', [$offering, $selectedStudent]) }}">{{ __('teach.view_dossier') }}</a>
 </h2>
-<form method="POST" action="{{ route('teach.completion.notes.store', [$offering, $selectedStudent]) }}" class="card border-0 shadow-sm mb-4">
+<x-card variant="panel" tag="form" method="POST" action="{{ route('teach.completion.notes.store', [$offering, $selectedStudent]) }}" class="mb-4">
     @csrf
-    <div class="card-body">
-        <textarea name="body" class="form-control mb-2" required></textarea>
-        <button class="btn btn-primary">{{ __('completion.add_note') }}</button>
-    </div>
-</form>
+    <textarea name="body" class="form-control mb-2" required></textarea>
+    <button class="btn btn-primary">{{ __('completion.add_note') }}</button>
+</x-card>
 <ul>
     @foreach($notes as $note)
         <li>{{ $note->body }} — {{ $note->author?->email }}</li>
