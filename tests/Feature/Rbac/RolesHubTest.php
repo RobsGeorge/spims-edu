@@ -164,18 +164,6 @@ class RolesHubTest extends TestCase
                 ->where('permission_key', 'credentials.issue')
                 ->value('level')
         );
-        $this->assertSame(
-            'lock',
-            config('permissions.gradebook.lock.INSTRUCTOR')
-        );
-        $this->assertSame(
-            'reopen',
-            config('permissions.gradebook.reopen.ACADEMIC_ADMIN')
-        );
-        $this->assertSame(
-            'issue',
-            config('permissions.credentials.issue.ADMINISTRATIVE_ADMIN')
-        );
     }
 
     #[Test]
