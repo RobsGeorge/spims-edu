@@ -119,4 +119,13 @@ class CorrectnessPrimitiveTest extends TestCase
         $this->assertStringContainsString('spims-icon-sm', $sm);
         $this->assertStringContainsString('spims-icon-lg', $lg);
     }
+
+    #[Test]
+    public function icon_renders_expanded_vocabulary_keys(): void
+    {
+        $html = view('components.icon', ['name' => 'home'])->render();
+        $this->assertStringContainsString('bi-house', $html);
+        $html = view('components.icon', ['name' => 'catalog'])->render();
+        $this->assertStringContainsString('bi-grid', $html);
+    }
 }
