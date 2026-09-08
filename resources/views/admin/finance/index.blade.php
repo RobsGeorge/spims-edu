@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('finance.admin_title'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('finance.admin_title') }}</h1>
+<x-page-header :title="__('finance.admin_title')" />
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
 @php
@@ -9,7 +9,7 @@
 @endphp
 
 <div class="row g-3 mb-4">
-    <div class="col-lg-4">
+    <div class="col-12 col-lg-4">
         <form method="POST" action="{{ route('admin.finance.invoices.store') }}" class="card border-0 shadow-sm">
             @csrf
             <div class="card-body">
@@ -27,7 +27,7 @@
             </div>
         </form>
     </div>
-    <div class="col-lg-4">
+    <div class="col-12 col-lg-4">
         <form method="POST" action="{{ route('admin.finance.points') }}" class="card border-0 shadow-sm">
             @csrf
             <div class="card-body">
@@ -44,7 +44,7 @@
             </div>
         </form>
     </div>
-    <div class="col-lg-4">
+    <div class="col-12 col-lg-4">
         <form method="POST" action="{{ route('admin.finance.top-up') }}" class="card border-0 shadow-sm">
             @csrf
             <div class="card-body">
@@ -64,6 +64,7 @@
 </div>
 
 <h2 class="h5">{{ __('finance.pending_manual') }}</h2>
+<div class="spims-table-wrap">
 <table class="table table-sm">
     <thead><tr><th>Payment</th><th>{{ __('finance.student') }}</th><th>{{ __('finance.total') }}</th><th></th></tr></thead>
     <tbody>
@@ -79,8 +80,10 @@
     @endforeach
     </tbody>
 </table>
+</div>
 
 <h2 class="h5">{{ __('finance.invoices') }}</h2>
+<div class="spims-table-wrap">
 <table class="table table-sm">
     <thead><tr><th>ID</th><th>{{ __('finance.student') }}</th><th>{{ __('finance.total') }}</th><th>{{ __('ui.status') }}</th><th></th></tr></thead>
     <tbody>
@@ -113,8 +116,10 @@
     @endforeach
     </tbody>
 </table>
+</div>
 
 <h2 class="h5">{{ __('finance.refunds') }}</h2>
+<div class="spims-table-wrap">
 <table class="table table-sm">
     <thead><tr><th>ID</th><th>{{ __('finance.student') }}</th><th>{{ __('finance.total') }}</th><th>{{ __('ui.status') }}</th><th></th></tr></thead>
     <tbody>
@@ -133,4 +138,5 @@
     @endforeach
     </tbody>
 </table>
+</div>
 @endsection

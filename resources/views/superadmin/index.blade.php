@@ -11,7 +11,7 @@
                 {{ __('superadmin.role') }}
             </span>
             <div class="min-w-0 flex-grow-1">
-                <h1 class="page-title mb-2">{{ __('superadmin.title') }}</h1>
+                <x-page-header :title="__('superadmin.title')" />
                 <p class="text-muted-theme mb-0">{{ __('superadmin.hub_desc') }}</p>
             </div>
         </div>

@@ -1,22 +1,22 @@
 @extends('layouts.app')
 @section('title', __('completion.criteria_title'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('completion.criteria_title') }} — {{ $course->code }}</h1>
+<x-page-header :title="__('completion.criteria_title').' — '.$course->code" />
 @if(session('status'))<div class="alert alert-success" role="status">{{ session('status') }}</div>@endif
 
 <form method="POST" action="{{ route('admin.completion-criteria.store', $course) }}" class="card border-0 shadow-sm mb-4">
     @csrf
     <div class="card-body row g-2">
-        <div class="col-md-3">
+        <div class="col-12 col-md-3">
             <select name="kind" class="form-select" required aria-label="{{ __('completion.kind') }}">
                 @foreach($kinds as $kind)
                     <option value="{{ $kind->value }}">{{ $kind->value }}</option>
                 @endforeach
             </select>
         </div>
-        <div class="col-md-2"><input name="threshold" type="number" step="0.01" min="0" max="100" class="form-control" placeholder="{{ __('completion.threshold') }}"></div>
-        <div class="col-md-2"><input name="content_item_id" class="form-control" placeholder="{{ __('completion.content_item') }}"></div>
-        <div class="col-md-3">
+        <div class="col-12 col-md-2"><input name="threshold" type="number" step="0.01" min="0" max="100" class="form-control" placeholder="{{ __('completion.threshold') }}"></div>
+        <div class="col-12 col-md-2"><input name="content_item_id" class="form-control" placeholder="{{ __('completion.content_item') }}"></div>
+        <div class="col-12 col-md-3">
             <select name="offering_id" class="form-select" aria-label="{{ __('completion.scope') }}">
                 <option value="">{{ __('completion.scope_course') }}</option>
                 @foreach($offerings as $offering)
@@ -24,14 +24,14 @@
                 @endforeach
             </select>
         </div>
-        <div class="col-md-2">
+        <div class="col-12 col-md-2">
             <label class="form-check mt-2">
                 <input type="hidden" name="is_required" value="0">
                 <input class="form-check-input" type="checkbox" name="is_required" value="1" checked>
                 {{ __('completion.is_required') }}
             </label>
         </div>
-        <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('completion.add_criterion') }}</button></div>
+        <div class="col-12 col-md-2"><button class="btn btn-primary w-100">{{ __('completion.add_criterion') }}</button></div>
     </div>
 </form>
 

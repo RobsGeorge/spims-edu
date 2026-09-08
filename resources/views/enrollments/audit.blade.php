@@ -20,7 +20,7 @@
 </div>
 
 <div class="row g-3 mb-4">
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted-theme small">{{ __('enrollment.required_progress') }}</div>
@@ -28,7 +28,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
                 <div class="text-muted-theme small">{{ __('enrollment.elective_progress') }}</div>

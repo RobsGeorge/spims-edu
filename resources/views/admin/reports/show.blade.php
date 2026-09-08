@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', $title)
 @section('content')
-<div class="hub-page animate-in" style="max-width:1100px;margin:0 auto;">
+<div class="hub-page hub-page-wide animate-in">
     <x-page-header :title="$title" :subtitle="$subtitle">
         <x-slot:actions>
             <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-secondary">{{ __('reports.back_hub') }}</a>
@@ -15,7 +15,7 @@
     @if($rows->isEmpty())
         <x-empty-state :title="__('reports.empty')" icon="bi-table" />
     @else
-        <div class="table-responsive">
+        <div class="table-responsive spims-table-wrap">
             <table class="table align-middle">
                 <thead>
                     <tr>

@@ -43,7 +43,7 @@
 
         @if($row['delivery_mode'] === 'OFFLINE')
             <div class="row g-2 mt-2">
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <form method="POST" action="{{ route('teach.assignments.mark-received', ['offering' => $offering, 'assignment' => $row['assignment_id']]) }}" class="row g-2">
                         @csrf
                         <label class="form-text">{{ __('teach.assignments_mark_received_label') }}</label>
@@ -51,7 +51,7 @@
                         <div class="col-4"><button class="btn btn-sm btn-outline-secondary w-100">{{ __('teach.assignments_mark_received') }}</button></div>
                     </form>
                 </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <form method="POST" action="{{ route('teach.assignments.bulk-grade', ['offering' => $offering, 'assignment' => $row['assignment_id']]) }}">
                         @csrf
                         <label class="form-text">{{ __('teach.assignments_bulk_grade_label') }}</label>

@@ -25,10 +25,10 @@
 
 <form method="POST" action="{{ route('admin.live.store', $offering) }}" class="row g-2 mb-4">
     @csrf
-    <div class="col-md-4"><input name="title" class="form-control" required placeholder="{{ __('live.session_title') }}"></div>
-    <div class="col-md-4"><input type="datetime-local" name="scheduled_start" class="form-control" required></div>
-    <div class="col-md-2"><input type="number" name="duration_minutes" class="form-control" value="60" required aria-label="{{ __('live.duration_minutes') }}"></div>
-    <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('live.schedule') }}</button></div>
+    <div class="col-12 col-md-4"><input name="title" class="form-control" required placeholder="{{ __('live.session_title') }}"></div>
+    <div class="col-12 col-md-4"><input type="datetime-local" name="scheduled_start" class="form-control" required></div>
+    <div class="col-12 col-md-2"><input type="number" name="duration_minutes" class="form-control" value="60" required aria-label="{{ __('live.duration_minutes') }}"></div>
+    <div class="col-12 col-md-2"><button class="btn btn-primary w-100">{{ __('live.schedule') }}</button></div>
 </form>
 
 <form method="POST" action="{{ route('admin.live.recurrence', $offering) }}" class="card border-0 shadow-sm mb-4">
@@ -48,27 +48,27 @@
             @error('days_of_week')<div class="text-danger small">{{ $message }}</div>@enderror
         </div>
         <div class="row g-2">
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label" for="recurrence-start-time">{{ __('live.start_time') }}</label>
                 <input id="recurrence-start-time" type="time" name="start_time" class="form-control" value="{{ old('start_time', '10:00') }}" required>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label" for="recurrence-duration">{{ __('live.duration_minutes') }}</label>
                 <input id="recurrence-duration" type="number" name="duration_minutes" class="form-control" value="{{ old('duration_minutes', 60) }}" min="15" max="480" required>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label" for="recurrence-start-date">{{ __('live.start_date') }}</label>
                 <input id="recurrence-start-date" type="date" name="start_date" class="form-control" value="{{ old('start_date') }}" required>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label" for="recurrence-end-date">{{ __('live.end_date') }}</label>
                 <input id="recurrence-end-date" type="date" name="end_date" class="form-control" value="{{ old('end_date') }}" required>
             </div>
-            <div class="col-md-8">
+            <div class="col-12 col-md-8">
                 <label class="form-label" for="recurrence-title-prefix">{{ __('live.title_prefix') }}</label>
                 <input id="recurrence-title-prefix" name="title_prefix" class="form-control" value="{{ old('title_prefix') }}" maxlength="200">
             </div>
-            <div class="col-md-4 d-flex align-items-end">
+            <div class="col-12 col-md-4 d-flex align-items-end">
                 <button class="btn btn-outline-primary w-100">{{ __('live.schedule_recurrence') }}</button>
             </div>
         </div>
@@ -115,9 +115,9 @@
         </ul>
         <form method="POST" action="{{ route('admin.live.attendance.override', $session) }}" class="row g-1">
             @csrf
-            <div class="col-md-4"><input name="student_id" class="form-control form-control-sm" placeholder="student ULID" required></div>
-            <div class="col-md-2"><select name="status" class="form-select form-select-sm"><option>PRESENT</option><option>ABSENT</option></select></div>
-            <div class="col-md-2"><button class="btn btn-sm btn-outline-primary">{{ __('live.override') }}</button></div>
+            <div class="col-12 col-md-4"><input name="student_id" class="form-control form-control-sm" placeholder="student ULID" required></div>
+            <div class="col-12 col-md-2"><select name="status" class="form-select form-select-sm"><option>PRESENT</option><option>ABSENT</option></select></div>
+            <div class="col-12 col-md-2"><button class="btn btn-sm btn-outline-primary">{{ __('live.override') }}</button></div>
         </form>
     </div>
 </div>

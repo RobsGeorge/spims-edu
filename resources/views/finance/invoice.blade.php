@@ -13,7 +13,7 @@
         </ul>
     </div>
 @endif
-<h1 class="spims-title mb-3">{{ __('finance.checkout') }}</h1>
+<x-page-header :title="__('finance.checkout')" />
 <p>{{ $invoice->status->value }} — {{ $invoice->total_minor }} {{ $invoice->currency->value }}</p>
 <p>{{ __('finance.paid') }}: {{ $invoice->amountPaid() }} · {{ __('finance.due') }}: {{ $invoice->amountDue() }}</p>
 
@@ -23,15 +23,15 @@
 <form method="POST" action="{{ route('finance.checkout', $invoice) }}" class="card border-0 shadow-sm">
     @csrf
     <div class="card-body row g-2">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('finance.wallet_money') }}</label>
             <input type="number" name="wallet_money" class="form-control" value="0" min="0">
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('finance.wallet_points') }}</label>
             <input type="number" name="wallet_points" class="form-control" value="0" min="0">
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('finance.gateway') }}</label>
             <select name="gateway" class="form-select">
                 <option value="">auto</option>

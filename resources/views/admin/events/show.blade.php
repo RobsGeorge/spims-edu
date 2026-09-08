@@ -30,27 +30,27 @@
 @if($event->status->value === 'DRAFT')
     <form method="POST" action="{{ route('admin.events.update', $event) }}" class="row g-2 mb-4">
         @csrf
-        <div class="col-md-4"><input name="title" class="form-control" required value="{{ $event->title }}"></div>
-        <div class="col-md-3"><input type="datetime-local" name="starts_at" class="form-control" required value="{{ optional($event->starts_at)->format('Y-m-d\TH:i') }}"></div>
-        <div class="col-md-3"><input type="datetime-local" name="ends_at" class="form-control" required value="{{ optional($event->ends_at)->format('Y-m-d\TH:i') }}"></div>
-        <div class="col-md-2"><input name="venue" class="form-control" value="{{ $event->venue }}" placeholder="{{ __('staff.events.venue') }}"></div>
-        <div class="col-md-2"><input type="number" name="capacity" class="form-control" min="1" value="{{ $event->capacity }}" placeholder="{{ __('staff.events.capacity') }}"></div>
-        <div class="col-md-8"><input name="description" class="form-control" value="{{ $event->description }}" placeholder="{{ __('staff.events.description') }}"></div>
-        <div class="col-md-2">
+        <div class="col-12 col-md-4"><input name="title" class="form-control" required value="{{ $event->title }}"></div>
+        <div class="col-12 col-md-3"><input type="datetime-local" name="starts_at" class="form-control" required value="{{ optional($event->starts_at)->format('Y-m-d\TH:i') }}"></div>
+        <div class="col-12 col-md-3"><input type="datetime-local" name="ends_at" class="form-control" required value="{{ optional($event->ends_at)->format('Y-m-d\TH:i') }}"></div>
+        <div class="col-12 col-md-2"><input name="venue" class="form-control" value="{{ $event->venue }}" placeholder="{{ __('staff.events.venue') }}"></div>
+        <div class="col-12 col-md-2"><input type="number" name="capacity" class="form-control" min="1" value="{{ $event->capacity }}" placeholder="{{ __('staff.events.capacity') }}"></div>
+        <div class="col-12 col-md-8"><input name="description" class="form-control" value="{{ $event->description }}" placeholder="{{ __('staff.events.description') }}"></div>
+        <div class="col-12 col-md-2">
             <label class="form-check mt-2">
                 <input type="checkbox" name="waitlist_enabled" value="1" class="form-check-input" @checked($event->waitlist_enabled)>
                 <span class="form-check-label">{{ __('staff.events.waitlist') }}</span>
             </label>
         </div>
-        <div class="col-md-2"><button class="btn btn-outline-primary w-100">{{ __('ui.save') }}</button></div>
+        <div class="col-12 col-md-2"><button class="btn btn-outline-primary w-100">{{ __('ui.save') }}</button></div>
     </form>
 @endif
 
 <h2 class="h6">{{ __('staff.events.check_in') }}</h2>
 <form method="POST" action="{{ route('admin.events.check-in', $event) }}" class="row g-2 mb-4">
     @csrf
-    <div class="col-md-8"><input name="payload" class="form-control" required placeholder="{{ __('staff.events.token_placeholder') }}" autocomplete="off"></div>
-    <div class="col-md-4"><button class="btn btn-primary w-100">{{ __('staff.events.verify') }}</button></div>
+    <div class="col-12 col-md-8"><input name="payload" class="form-control" required placeholder="{{ __('staff.events.token_placeholder') }}" autocomplete="off"></div>
+    <div class="col-12 col-md-4"><button class="btn btn-primary w-100">{{ __('staff.events.verify') }}</button></div>
 </form>
 
 <h2 class="h6">{{ __('staff.events.reservations') }}</h2>
@@ -84,15 +84,15 @@
 <h2 class="h6 mt-4">{{ __('staff.events.exceptions') }}</h2>
 <form method="POST" action="{{ route('admin.events.exceptions.store', $event) }}" class="row g-2 mb-3">
     @csrf
-    <div class="col-md-5"><input name="student_id" class="form-control" required placeholder="{{ __('staff.events.student_id') }}"></div>
-    <div class="col-md-3">
+    <div class="col-12 col-md-5"><input name="student_id" class="form-control" required placeholder="{{ __('staff.events.student_id') }}"></div>
+    <div class="col-12 col-md-3">
         <select name="kind" class="form-select" aria-label="{{ __('staff.events.exception_kind') }}">
             @foreach($exceptionKinds as $kind)
                 <option value="{{ $kind->value }}">{{ __('staff.events.exception_'.$kind->value) }}</option>
             @endforeach
         </select>
     </div>
-    <div class="col-md-4"><button class="btn btn-outline-primary w-100">{{ __('staff.events.save_exception') }}</button></div>
+    <div class="col-12 col-md-4"><button class="btn btn-outline-primary w-100">{{ __('staff.events.save_exception') }}</button></div>
 </form>
 @foreach($event->exceptions as $exception)
     <div class="border rounded-3 p-2 mb-2">

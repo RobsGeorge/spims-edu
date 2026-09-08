@@ -3,7 +3,7 @@
 @section('content')
 <div class="mb-3">
     <a href="{{ route('learn.offering', $offering) }}" class="btn btn-link px-0">{{ __('learn.back_to_course') }}</a>
-    <h1 class="spims-title mb-1">{{ __('learn.week', ['number' => $activeWeek->number]) }}: {{ $activeWeek->title }}</h1>
+    <x-page-header :title="__('learn.week', ['number' => $activeWeek->number]).': '.$activeWeek->title" />
     <p class="text-muted-theme mb-0">{{ $offering->course->code }}</p>
 </div>
 @include('offerings.partials.student-preview-banner')
@@ -11,7 +11,7 @@
 
 <div class="row">
     @include('learn.partials.week-nav')
-    <div class="col-lg-9">
+    <div class="col-12 col-lg-9">
         <div class="card border-0 shadow-sm">
             <div class="card-body">
                 @if(! $unlocked)

@@ -40,22 +40,22 @@
 @endforelse
 
 <div class="row g-3 mt-1">
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
         <h2 class="h6">{{ __('staff.projects.move') }}</h2>
         <form method="POST" action="{{ route('teach.projects.move', [$offering, $assessment]) }}" class="row g-2">
             @csrf
             <div class="col-12"><input name="student_id" class="form-control form-control-sm" required placeholder="{{ __('staff.projects.student_id') }}"></div>
-            <div class="col-6"><input name="from_project_id" class="form-control form-control-sm" required placeholder="{{ __('staff.projects.from_team') }}"></div>
-            <div class="col-6"><input name="to_project_id" class="form-control form-control-sm" required placeholder="{{ __('staff.projects.to_team') }}"></div>
+            <div class="col-12 col-sm-6"><input name="from_project_id" class="form-control form-control-sm" required placeholder="{{ __('staff.projects.from_team') }}"></div>
+            <div class="col-12 col-sm-6"><input name="to_project_id" class="form-control form-control-sm" required placeholder="{{ __('staff.projects.to_team') }}"></div>
             <div class="col-12"><button class="btn btn-sm btn-outline-primary">{{ __('staff.projects.move') }}</button></div>
         </form>
     </div>
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
         <h2 class="h6">{{ __('staff.projects.merge') }}</h2>
         <form method="POST" action="{{ route('teach.projects.merge', [$offering, $assessment]) }}" class="row g-2">
             @csrf
-            <div class="col-6"><input name="source_project_id" class="form-control form-control-sm" required placeholder="{{ __('staff.projects.source_team') }}"></div>
-            <div class="col-6"><input name="target_project_id" class="form-control form-control-sm" required placeholder="{{ __('staff.projects.target_team') }}"></div>
+            <div class="col-12 col-sm-6"><input name="source_project_id" class="form-control form-control-sm" required placeholder="{{ __('staff.projects.source_team') }}"></div>
+            <div class="col-12 col-sm-6"><input name="target_project_id" class="form-control form-control-sm" required placeholder="{{ __('staff.projects.target_team') }}"></div>
             <div class="col-12"><button class="btn btn-sm btn-outline-primary">{{ __('staff.projects.merge') }}</button></div>
         </form>
     </div>
@@ -64,15 +64,15 @@
 <h2 class="h6 mt-4">{{ __('staff.projects.grades') }}</h2>
 <form method="POST" action="{{ route('teach.projects.team-score', [$offering, $assessment]) }}" class="row g-2 mb-2">
     @csrf
-    <div class="col-md-6"><input name="project_id" class="form-control" required placeholder="{{ __('staff.projects.team_id') }}"></div>
-    <div class="col-md-4"><input type="number" step="0.01" name="score" class="form-control" required placeholder="{{ __('staff.projects.score') }}"></div>
-    <div class="col-md-2"><button class="btn btn-outline-primary w-100">{{ __('staff.projects.save_team') }}</button></div>
+    <div class="col-12 col-md-6"><input name="project_id" class="form-control" required placeholder="{{ __('staff.projects.team_id') }}"></div>
+    <div class="col-12 col-md-4"><input type="number" step="0.01" name="score" class="form-control" required placeholder="{{ __('staff.projects.score') }}"></div>
+    <div class="col-12 col-md-2"><button class="btn btn-outline-primary w-100">{{ __('staff.projects.save_team') }}</button></div>
 </form>
 <form method="POST" action="{{ route('teach.projects.student-score', [$offering, $assessment]) }}" class="row g-2 mb-3">
     @csrf
-    <div class="col-md-6"><input name="student_id" class="form-control" required placeholder="{{ __('staff.projects.student_id') }}"></div>
-    <div class="col-md-4"><input type="number" step="0.01" name="score" class="form-control" required placeholder="{{ __('staff.projects.score') }}"></div>
-    <div class="col-md-2"><button class="btn btn-outline-primary w-100">{{ __('staff.projects.save_student') }}</button></div>
+    <div class="col-12 col-md-6"><input name="student_id" class="form-control" required placeholder="{{ __('staff.projects.student_id') }}"></div>
+    <div class="col-12 col-md-4"><input type="number" step="0.01" name="score" class="form-control" required placeholder="{{ __('staff.projects.score') }}"></div>
+    <div class="col-12 col-md-2"><button class="btn btn-outline-primary w-100">{{ __('staff.projects.save_student') }}</button></div>
 </form>
 
 @if($confirmToken)

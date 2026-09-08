@@ -21,14 +21,14 @@
         <h2 class="h6 spims-title">{{ __('enrollment.register') }}</h2>
         <form method="POST" action="{{ route('enrollments.store') }}" class="row g-2">
             @csrf
-            <div class="col-md-5">
+            <div class="col-12 col-md-5">
                 <select name="offering_id" class="form-select" required>
                     @foreach($offerings as $offering)
                         <option value="{{ $offering->id }}">{{ $offering->course->code }} ({{ $offering->mode->value }})</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <select name="student_program_id" class="form-select">
                     <option value="">{{ __('enrollment.standalone_or_none') }}</option>
                     @foreach($programs as $sp)
@@ -36,7 +36,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-3"><button class="btn btn-primary w-100">{{ __('enrollment.register') }}</button></div>
+            <div class="col-12 col-md-3"><button class="btn btn-primary w-100">{{ __('enrollment.register') }}</button></div>
         </form>
         @error('enrollment')<div class="text-danger mt-2">{{ $message }}</div>@enderror
     </div>
@@ -63,7 +63,7 @@
     <x-empty-state :title="__('enrollment.no_enrollments')" icon="bi-journal-bookmark" />
 @else
     <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
+        <div class="table-responsive spims-table-wrap">
             <table class="table mb-0 align-middle">
                 <thead>
                     <tr>

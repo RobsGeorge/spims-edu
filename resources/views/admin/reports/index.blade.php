@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('reports.hub_title'))
 @section('content')
-<div class="hub-page animate-in" style="max-width:920px;margin:0 auto;">
+<div class="hub-page animate-in">
     <x-page-header :title="__('reports.hub_title')" :subtitle="__('reports.hub_desc')" />
 
     <div class="row g-3">

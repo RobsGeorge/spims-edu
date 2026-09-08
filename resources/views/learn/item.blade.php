@@ -3,7 +3,7 @@
 @section('content')
 <div class="mb-3">
     <a href="{{ route('learn.week', [$offering, $activeWeek]) }}" class="btn btn-link px-0">{{ __('learn.week', ['number' => $activeWeek->number]) }}</a>
-    <h1 class="spims-title mb-1">{{ $item->title }}</h1>
+    <x-page-header :title="$item->title" />
     <p class="text-muted-theme mb-0"><span class="badge text-bg-light">{{ $item->type->value }}</span></p>
 </div>
 @include('offerings.partials.student-preview-banner')
@@ -12,7 +12,7 @@
 
 <div class="row">
     @include('learn.partials.week-nav')
-    <div class="col-lg-9">
+    <div class="col-12 col-lg-9">
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body">
                 @include('learn.partials.item-media', ['item' => $item])

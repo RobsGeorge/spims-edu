@@ -2,12 +2,12 @@
 @section('title', __('ui.nav_offerings'))
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="spims-title mb-0">{{ __('ui.nav_offerings') }}</h1>
+    <x-page-header :title="__('ui.nav_offerings')" />
     <a href="{{ route('admin.offerings.create') }}" class="btn btn-primary">{{ __('offerings.create_offering') }}</a>
 </div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 <div class="card border-0 shadow-sm">
-    <div class="table-responsive">
+    <div class="table-responsive spims-table-wrap">
         <table class="table mb-0">
             <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('offerings.mode') }}</th><th>{{ __('offerings.semester') }}</th><th>{{ __('ui.status') }}</th></tr></thead>
             <tbody>

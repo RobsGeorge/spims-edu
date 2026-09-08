@@ -45,8 +45,8 @@
         <div class="small text-muted-theme">{{ $row['submitted_at'] }} · {{ $row['is_anonymous'] ? __('staff.surveys.anonymous') : __('staff.surveys.identified') }}</div>
         <form method="POST" action="{{ $revealRoute($row['id']) }}" class="row g-2 mt-2">
             @csrf
-            <div class="col-md-8"><input name="reason" class="form-control form-control-sm" placeholder="{{ __('staff.surveys.reveal_reason') }}"></div>
-            <div class="col-md-4"><button class="btn btn-sm btn-outline-secondary w-100">{{ __('staff.surveys.request_reveal') }}</button></div>
+            <div class="col-12 col-md-8"><input name="reason" class="form-control form-control-sm" placeholder="{{ __('staff.surveys.reveal_reason') }}"></div>
+            <div class="col-12 col-md-4"><button class="btn btn-sm btn-outline-secondary w-100">{{ __('staff.surveys.request_reveal') }}</button></div>
         </form>
     </div>
 @empty

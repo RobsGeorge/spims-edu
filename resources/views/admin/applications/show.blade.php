@@ -31,15 +31,15 @@
 <form method="POST" action="{{ route('admin.applications.decide', $application) }}" class="card border-0 shadow-sm mt-3">
     @csrf
     <div class="card-body row g-2">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <select name="decision" class="form-select" required>
                 <option value="ACCEPTED">ACCEPTED</option>
                 <option value="REJECTED">REJECTED</option>
                 <option value="WAITLISTED">WAITLISTED</option>
             </select>
         </div>
-        <div class="col-md-6"><input name="decision_note" class="form-control" placeholder="{{ __('admissions.decision_note') }}"></div>
-        <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('ui.save') }}</button></div>
+        <div class="col-12 col-md-6"><input name="decision_note" class="form-control" placeholder="{{ __('admissions.decision_note') }}"></div>
+        <div class="col-12 col-md-2"><button class="btn btn-primary w-100">{{ __('ui.save') }}</button></div>
     </div>
 </form>
 @endsection

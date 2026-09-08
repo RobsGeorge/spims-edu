@@ -81,9 +81,9 @@
         <x-page-header :title="__('teach.tab_announcements')" :subtitle="__('teach.tab_announcements_help')" />
         <form method="POST" action="{{ route('teach.announcements.store', $offering) }}" class="row g-2 mb-4">
             @csrf
-            <div class="col-md-4"><input name="title" class="form-control" placeholder="{{ __('teach.announcement_title') }}" required></div>
-            <div class="col-md-6"><input name="body" class="form-control" placeholder="{{ __('teach.announcement_body') }}" required></div>
-            <div class="col-md-2 d-flex flex-column gap-1">
+            <div class="col-12 col-md-4"><input name="title" class="form-control" placeholder="{{ __('teach.announcement_title') }}" required></div>
+            <div class="col-12 col-md-6"><input name="body" class="form-control" placeholder="{{ __('teach.announcement_body') }}" required></div>
+            <div class="col-12 col-md-2 d-flex flex-column gap-1">
                 <button class="btn btn-outline-primary w-100" name="publish" value="0">{{ __('communications.save_draft') }}</button>
                 <button class="btn btn-primary w-100" name="publish" value="1">{{ __('communications.publish') }}</button>
             </div>
@@ -104,9 +104,9 @@
                 <form method="POST" action="{{ route('teach.announcements.update', $announcement) }}" class="row g-2 mb-2">
                     @csrf
                     @method('PUT')
-                    <div class="col-md-4"><input name="title" class="form-control form-control-sm" value="{{ $announcement->title }}" required></div>
-                    <div class="col-md-6"><input name="body" class="form-control form-control-sm" value="{{ $announcement->body }}" required></div>
-                    <div class="col-md-2"><button class="btn btn-sm btn-outline-secondary w-100">{{ __('communications.edit') }}</button></div>
+                    <div class="col-12 col-md-4"><input name="title" class="form-control form-control-sm" value="{{ $announcement->title }}" required></div>
+                    <div class="col-12 col-md-6"><input name="body" class="form-control form-control-sm" value="{{ $announcement->body }}" required></div>
+                    <div class="col-12 col-md-2"><button class="btn btn-sm btn-outline-secondary w-100">{{ __('communications.edit') }}</button></div>
                 </form>
                 <div class="d-flex gap-2">
                     @if($announcement->status->value === 'DRAFT')

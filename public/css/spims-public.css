@@ -297,6 +297,10 @@ html[dir='rtl'] .spims-landing-featured-title {
         url('../img/landing-featured-1.jpg') center / cover;
 }
 
+.spims-landing-program-media .spims-cover-photo {
+    height: 10rem;
+}
+
 .spims-landing-program-media--2 {
     background:
         linear-gradient(200deg, rgba(56, 0, 20, 0.28), rgba(239, 244, 255, 0.35)),
@@ -678,6 +682,11 @@ html[dir='rtl'] .catalog-featured-title {
     background:
         linear-gradient(160deg, rgba(93, 3, 38, 0.28), rgba(248, 249, 255, 0.28)),
         url('../img/landing-featured-1.jpg') center / cover;
+    overflow: hidden;
+}
+
+.catalog-featured-media .spims-cover-photo {
+    min-height: 10rem;
 }
 
 @media (min-width: 768px) {
@@ -697,6 +706,19 @@ html[dir='rtl'] .catalog-featured-title {
     background:
         linear-gradient(165deg, rgba(93, 3, 38, 0.22), rgba(230, 238, 255, 0.45)),
         url('../img/landing-featured-1.jpg') center / cover;
+}
+
+.catalog-card-media .spims-cover-photo {
+    height: 8.5rem;
+}
+
+.catalog-card-media::after,
+.catalog-featured-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, color-mix(in srgb, var(--color-primary) 28%, transparent));
+    pointer-events: none;
 }
 
 .catalog-card-media--alt {
@@ -784,5 +806,41 @@ html[dir='rtl'] .catalog-featured-title {
     .catalog-skeleton-media,
     .catalog-skeleton-line {
         animation: none;
+    }
+}
+
+/* SPIMS mobile viewport contract — public surfaces */
+@media (max-width: 767.98px) {
+    .catalog-featured {
+        padding: var(--space-4);
+    }
+
+    .spims-public-nav .btn-sm {
+        min-height: 44px;
+    }
+
+    .spims-public-nav .form-select {
+        min-height: 44px;
+        max-width: 6.5rem;
+    }
+
+    .spims-landing {
+        padding-inline: var(--space-4);
+    }
+
+    .spims-landing-hero {
+        min-height: 16rem;
+        padding-block: var(--space-8);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .spims-auth-split {
+        width: calc(100% - 1rem);
+        margin-block: var(--space-4) var(--space-8);
+    }
+
+    .spims-public-nav .container-xl {
+        padding-inline: var(--space-3);
     }
 }

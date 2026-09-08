@@ -18,7 +18,7 @@
         <span class="text-muted-theme">{{ __('people.directory_title') }}</span>
     </nav>
 
-    <h1 class="page-title mb-2">{{ __('people.directory_title') }}</h1>
+    <x-page-header :title="__('people.directory_title')" />
     <p class="text-muted-theme mb-2">{{ __('people.directory_lead') }}</p>
     <p class="small text-muted-theme mb-3">{{ __('people.directory_help') }}</p>
 
@@ -31,29 +31,29 @@
             <p class="small text-muted-theme">{{ __('people.create_help') }}</p>
             <form method="POST" action="{{ route('admin.users.store') }}" class="row g-3">
                 @csrf
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="form-label" for="create-first">{{ __('ui.first_name') }}</label>
                     <input id="create-first" name="first_name" class="form-control" required>
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="form-label" for="create-last">{{ __('ui.last_name') }}</label>
                     <input id="create-last" name="last_name" class="form-control" required>
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="form-label" for="create-email">{{ __('ui.email') }}</label>
                     <input id="create-email" name="email" type="email" class="form-control" required>
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="form-label" for="create-phone">{{ __('ui.phone') }}</label>
                     <input id="create-phone" name="phone" class="form-control">
                     <p class="form-text mb-0">{{ __('people.phone_help') }}</p>
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="form-label" for="create-password">{{ __('ui.password') }}</label>
                     <input id="create-password" name="password" type="password" class="form-control" required minlength="8">
                     <p class="form-text mb-0">{{ __('people.password_help') }}</p>
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="form-label" for="create-locale">{{ __('people.locale') }}</label>
                     <select id="create-locale" name="preferred_locale" class="form-select">
                         @foreach(['ar' => 'العربية', 'en' => 'English', 'fr' => 'Français'] as $code => $label)
@@ -89,13 +89,13 @@
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.users.index') }}" class="row g-3 align-items-end">
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label" for="people-q">{{ __('people.search_label') }}</label>
                     <input id="people-q" name="q" type="search" class="form-control" value="{{ $filters['q'] ?? '' }}"
                            placeholder="{{ __('people.search_placeholder') }}" autocomplete="off">
                     <p class="form-text mb-0">{{ __('people.search_help') }}</p>
                 </div>
-                <div class="col-md-2">
+                <div class="col-12 col-md-2">
                     <label class="form-label" for="people-role">{{ __('people.filter_role') }}</label>
                     <select id="people-role" name="role" class="form-select">
                         <option value="">{{ __('people.filter_all') }}</option>
@@ -107,7 +107,7 @@
                     </select>
                     <p class="form-text mb-0">{{ __('people.filter_role_help') }}</p>
                 </div>
-                <div class="col-md-2">
+                <div class="col-12 col-md-2">
                     <label class="form-label" for="people-status">{{ __('people.filter_status') }}</label>
                     <select id="people-status" name="status" class="form-select">
                         <option value="">{{ __('people.filter_all') }}</option>
@@ -119,7 +119,7 @@
                     </select>
                     <p class="form-text mb-0">{{ __('people.filter_status_help') }}</p>
                 </div>
-                <div class="col-md-2">
+                <div class="col-12 col-md-2">
                     <label class="form-label" for="people-locale">{{ __('people.filter_locale') }}</label>
                     <select id="people-locale" name="locale" class="form-select">
                         <option value="">{{ __('people.filter_all') }}</option>
@@ -129,7 +129,7 @@
                     </select>
                     <p class="form-text mb-0">{{ __('people.filter_locale_help') }}</p>
                 </div>
-                <div class="col-md-2 d-flex gap-2">
+                <div class="col-12 col-md-2 d-flex gap-2">
                     <button class="btn btn-primary">{{ __('people.apply_filters') }}</button>
                     <a class="btn btn-outline-secondary" href="{{ route('admin.users.index') }}">{{ __('people.clear_filters') }}</a>
                 </div>
@@ -139,7 +139,7 @@
 
     <p class="small text-muted-theme mb-2">{{ __('people.results_help') }}</p>
     <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
+        <div class="table-responsive spims-table-wrap">
             <table class="table mb-0 align-middle">
                 <thead>
                     <tr>

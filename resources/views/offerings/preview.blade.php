@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('offerings.public_preview'))
 @section('content')
-<h1 class="spims-title">{{ $preview['course']['code'] }} — {{ $preview['course']['title'] }}</h1>
+<x-page-header :title="$preview['course']['code'].' — '.$preview['course']['title']" />
 <p class="text-muted-theme">{{ __('offerings.mode') }}: {{ $preview['mode'] }}</p>
 
 <div class="card border-0 shadow-sm mb-3">

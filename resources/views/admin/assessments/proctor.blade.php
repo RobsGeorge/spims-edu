@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('assessment.assessments'))
 @section('content')
-<h1 class="spims-title mb-3">{{ $attempt->student->email }} — #{{ $attempt->attempt_no }}</h1>
+<x-page-header :title="$attempt->student->email.' — #'.$attempt->attempt_no" />
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 <p>{{ $attempt->assessment->title }} · {{ $attempt->status->value }}
     @if($attempt->terminated_for_cheating)<span class="badge bg-danger">terminated for cheating</span>@endif
@@ -16,6 +16,7 @@
 @endif
 
 <h2 class="h6">Proctor events</h2>
+<div class="spims-table-wrap">
 <table class="table table-sm">
     <thead><tr><th>#</th><th>type</th><th>at</th></tr></thead>
     <tbody>
@@ -28,4 +29,5 @@
     @endforeach
     </tbody>
 </table>
+</div>
 @endsection

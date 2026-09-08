@@ -10,7 +10,7 @@
 @if(session('status'))
     <div class="alert alert-success">{{ session('status') }}</div>
 @endif
-<h1 class="spims-title mb-3">{{ __('finance.my_finance') }}</h1>
+<x-page-header :title="__('finance.my_finance')" />
 
 <div class="row g-3 mb-4 wallet-balance-cards">
     <div class="col-6 col-md-3">

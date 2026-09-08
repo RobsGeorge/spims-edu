@@ -11,7 +11,7 @@
 @endif
 
 <div class="row g-3">
-    <div class="col-lg-6">
+    <div class="col-12 col-lg-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
                 <h2 class="h6">{{ __('enrollment.override_register') }}</h2>
@@ -55,7 +55,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-6">
+    <div class="col-12 col-lg-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
                 <h2 class="h6">{{ __('enrollment.financial_hold_label') }}</h2>

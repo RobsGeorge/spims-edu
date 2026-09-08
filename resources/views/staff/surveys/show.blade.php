@@ -34,16 +34,16 @@
 @if($survey->isDraft())
     <form method="POST" action="{{ $questionRoute }}" class="row g-2 mb-4">
         @csrf
-        <div class="col-md-5"><input name="prompt" class="form-control" required placeholder="{{ __('staff.surveys.prompt') }}"></div>
-        <div class="col-md-2">
+        <div class="col-12 col-md-5"><input name="prompt" class="form-control" required placeholder="{{ __('staff.surveys.prompt') }}"></div>
+        <div class="col-12 col-md-2">
             <select name="kind" class="form-select" aria-label="{{ __('staff.surveys.kind') }}">
                 @foreach($kinds as $kind)
                     <option value="{{ $kind->value }}">{{ __('staff.surveys.kind_'.$kind->value) }}</option>
                 @endforeach
             </select>
         </div>
-        <div class="col-md-3"><input name="options_text" class="form-control" placeholder="{{ __('staff.surveys.options_hint') }}"></div>
-        <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('staff.surveys.add_question') }}</button></div>
+        <div class="col-12 col-md-3"><input name="options_text" class="form-control" placeholder="{{ __('staff.surveys.options_hint') }}"></div>
+        <div class="col-12 col-md-2"><button class="btn btn-primary w-100">{{ __('staff.surveys.add_question') }}</button></div>
         <div class="col-12">
             <label class="form-check">
                 <input type="checkbox" name="required" value="1" class="form-check-input" checked>

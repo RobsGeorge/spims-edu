@@ -32,6 +32,18 @@
         <style id="spims-theme-tokens">{!! $themeCssBlock !!}</style>
     @endif
     @stack('styles')
+    <script>
+        (function () {
+            try {
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    return;
+                }
+                if (!sessionStorage.getItem('spims.session.entered')) {
+                    document.documentElement.classList.add('spims-loader-pending', 'spims-session-enter');
+                }
+            } catch (e) {}
+        })();
+    </script>
 </head>
 @php
     use App\Support\NavigationHub;
@@ -64,6 +76,7 @@
     }
 @endphp
 <body class="theme-{{ $themeClass }} {{ $shellLess ? 'shell-guest' : 'shell-app' }}{{ $isPublicHome ? ' spims-public-home' : '' }}{{ $isPublicAuth ? ' spims-public-auth' : '' }}{{ $isPublicCatalog ? ' spims-public-catalog' : '' }}">
+    <x-loader />
     <a class="spims-skip-link" href="#main-content">{{ __('ui.skip_to_content') }}</a>
 
     @if($shellLess)
@@ -83,7 +96,7 @@
                         <a href="#spiritual">{{ __('home.nav_spiritual') }}</a>
                     </div>
                 @endif
-                <div class="d-flex align-items-center gap-2 ms-auto">
+                <div class="d-flex flex-wrap align-items-center justify-content-end gap-2 ms-auto">
                     <a href="{{ route('catalog.index') }}" class="btn btn-sm btn-outline-primary d-none d-lg-inline-flex">{{ __('ui.home_cta_catalog') }}</a>
                     @guest
                         <a href="{{ route('auth.login') }}" class="btn btn-sm btn-outline-primary">{{ __('ui.login') }}</a>
@@ -280,6 +293,7 @@
         </div>
     @endif
 
+    <script src="{{ asset('js/spims-ui.js') }}" defer></script>
     @stack('scripts')
 </body>
 </html>

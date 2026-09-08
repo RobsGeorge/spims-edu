@@ -16,7 +16,7 @@
     <x-empty-state :title="__('enrollment.waitlist_empty')" icon="bi-hourglass" />
 @else
     <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
+        <div class="table-responsive spims-table-wrap">
             <table class="table mb-0">
                 <thead>
                     <tr>

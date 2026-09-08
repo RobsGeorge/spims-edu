@@ -13,7 +13,7 @@
 
         <form method="POST" action="{{ route('admin.weeks.items', $week) }}" enctype="multipart/form-data" class="row g-2 mb-3">
             @csrf
-            <div class="col-md-2">
+            <div class="col-12 col-md-2">
                 <label class="form-label small mb-1">{{ __('offerings.item_type') }}</label>
                 <select name="type" class="form-select form-select-sm" required>
                     @foreach($contentTypes as $type)
@@ -21,31 +21,31 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label small mb-1">{{ __('academics.title') }}</label>
                 <input name="title" class="form-control form-control-sm" placeholder="{{ __('academics.title') }}" required>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label small mb-1">{{ __('offerings.video_url') }}</label>
                 <input name="video_url" class="form-control form-control-sm" placeholder="{{ __('offerings.video_url_ph') }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-md-2">
                 <label class="form-label small mb-1">{{ __('offerings.vimeo_id') }}</label>
                 <input name="vimeo_id" class="form-control form-control-sm" placeholder="{{ __('offerings.vimeo_id') }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-md-2">
                 <label class="form-label small mb-1">{{ __('offerings.external_url') }}</label>
                 <input name="file_url" class="form-control form-control-sm" placeholder="{{ __('offerings.external_url_ph') }}">
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label small mb-1">{{ __('offerings.upload_file') }}</label>
                 <input type="file" name="file" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,application/pdf,image/*">
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label small mb-1">{{ __('offerings.text_body') }}</label>
                 <textarea name="body" class="form-control form-control-sm" rows="2" placeholder="{{ __('offerings.text_body') }}"></textarea>
             </div>
-            <div class="col-md-2 d-flex align-items-end">
+            <div class="col-12 col-md-2 d-flex align-items-end">
                 <button class="btn btn-sm btn-primary w-100">{{ __('offerings.add_item') }}</button>
             </div>
             <div class="col-12">
@@ -106,7 +106,7 @@
                 <form method="POST" action="{{ route('admin.content-items.update', $item) }}" enctype="multipart/form-data" class="row g-2">
                     @csrf
                     @method('PUT')
-                    <div class="col-md-2">
+                    <div class="col-12 col-md-2">
                         <label class="form-label small mb-1">{{ __('offerings.item_type') }}</label>
                         <select name="type" class="form-select form-select-sm" required>
                             @foreach($contentTypes as $type)
@@ -114,31 +114,31 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-12 col-md-3">
                         <label class="form-label small mb-1">{{ __('academics.title') }}</label>
                         <input name="title" class="form-control form-control-sm" value="{{ $item->title }}" placeholder="{{ __('academics.title') }}" required>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-12 col-md-3">
                         <label class="form-label small mb-1">{{ __('offerings.video_url') }}</label>
                         <input name="video_url" class="form-control form-control-sm" placeholder="{{ __('offerings.video_url_ph') }}">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-12 col-md-2">
                         <label class="form-label small mb-1">{{ __('offerings.vimeo_id') }}</label>
                         <input name="vimeo_id" class="form-control form-control-sm" value="{{ $item->vimeo_id }}" placeholder="{{ __('offerings.vimeo_id') }}">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-12 col-md-2">
                         <label class="form-label small mb-1">{{ __('offerings.external_url') }}</label>
                         <input name="file_url" class="form-control form-control-sm" value="{{ $item->file_url }}" placeholder="{{ __('offerings.external_url_ph') }}">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-12 col-md-4">
                         <label class="form-label small mb-1">{{ __('offerings.upload_file') }}</label>
                         <input type="file" name="file" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,application/pdf,image/*">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label class="form-label small mb-1">{{ __('offerings.text_body') }}</label>
                         <textarea name="body" class="form-control form-control-sm" rows="2" placeholder="{{ __('offerings.text_body') }}">{{ $item->body }}</textarea>
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
+                    <div class="col-12 col-md-2 d-flex align-items-end">
                         <button class="btn btn-sm btn-outline-primary w-100">{{ __('ui.save_changes') }}</button>
                     </div>
                 </form>

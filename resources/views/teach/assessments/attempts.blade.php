@@ -115,15 +115,15 @@
                 @if($canGrade)
                     <form method="POST" action="{{ route('teach.assessments.grade', [$offering, $assessment, $answer]) }}" class="row g-2">
                         @csrf
-                        <div class="col-md-3">
+                        <div class="col-12 col-md-3">
                             <label class="form-text">{{ __('assessment.final_score') }}</label>
                             <input type="number" step="0.01" min="0" name="final_score" class="form-control form-control-sm" value="{{ $answer->final_score ?? $answer->ai_suggested_score }}" required>
                         </div>
-                        <div class="col-md-7">
+                        <div class="col-12 col-md-7">
                             <label class="form-text">{{ __('assessment.feedback') }}</label>
                             <input name="feedback" class="form-control form-control-sm" value="{{ $answer->feedback }}">
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
+                        <div class="col-12 col-md-2 d-flex align-items-end">
                             <button class="btn btn-sm btn-outline-primary w-100">{{ __('assessment.override_score') }}</button>
                         </div>
                     </form>

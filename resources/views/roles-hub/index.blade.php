@@ -17,7 +17,7 @@
         <span class="badge bg-danger fs-6 px-3 py-2">
             <i class="bi bi-shield-lock-fill"></i> {{ __('superadmin.role') }}
         </span>
-        <h1 class="spims-title mb-0">{{ __('roles_hub.title') }}</h1>
+        <x-page-header :title="__('roles_hub.title')" />
     </div>
     <p class="spims-text-dim mb-3">{{ __('roles_hub.desc') }}</p>
 

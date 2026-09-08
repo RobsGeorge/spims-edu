@@ -6,7 +6,7 @@
     /** @var \App\Models\Week|null $activeWeek */
     /** @var \App\Services\Offerings\LearningProgressService $progress */
 @endphp
-<aside class="col-lg-3 mb-3">
+<aside class="col-12 col-lg-3 mb-3">
     <div class="card border-0 shadow-sm">
         <div class="card-body">
             @php $progressPercent = (float) ($enrollment->progress_percent ?? 0); @endphp

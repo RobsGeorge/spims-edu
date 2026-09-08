@@ -10,14 +10,14 @@
 
 <div class="app-card p-4 mb-4">
     <dl class="row mb-0">
-        <dt class="col-sm-3">{{ __('completion.outcome') }}</dt>
-        <dd class="col-sm-9">
+        <dt class="col-12 col-sm-3">{{ __('completion.outcome') }}</dt>
+        <dd class="col-12 col-sm-9">
             <span class="badge {{ $outcome === \App\Enums\CompletionOutcome::Completed ? 'text-bg-success' : ($outcome === \App\Enums\CompletionOutcome::NotCompleted ? 'text-bg-danger' : 'text-bg-warning') }}">
                 {{ __('completion.outcome_'.$outcome->value) }}
             </span>
         </dd>
-        <dt class="col-sm-3">{{ __('completion.evaluated_at') }}</dt>
-        <dd class="col-sm-9">
+        <dt class="col-12 col-sm-3">{{ __('completion.evaluated_at') }}</dt>
+        <dd class="col-12 col-sm-9">
             @if($evaluatedAt)
                 {{ $evaluatedAt->timezone(config('app.timezone'))->format('Y-m-d H:i') }}
             @else

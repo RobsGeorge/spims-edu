@@ -8,6 +8,7 @@ use App\Enums\ProgramType;
 use App\Enums\RequirementType;
 use App\Models\AcademicYear;
 use App\Models\Course;
+use App\Support\Ui\CourseCoverLibrary;
 use App\Models\CourseOffering;
 use App\Models\GradingScheme;
 use App\Models\Program;
@@ -48,6 +49,7 @@ class SampleDataSeeder extends Seeder
             ['code' => 'DEMO101'],
             [
                 'title' => 'Introduction to Theology (Sample)',
+                'cover_image_url' => CourseCoverLibrary::urlForSeed('DEMO101'),
                 'credit_hours' => 3,
                 'default_price_usd' => 15000,
                 'default_price_egp' => 75000,

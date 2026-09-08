@@ -111,4 +111,5 @@ return [
     'file_drop_size_error' => 'الملف يتجاوز الحجم الأقصى: :max',
     'file_drop_type_error' => 'نوع الملف غير مقبول. المسموح به: :accept',
     'file_drop_browse' => 'استعراض الملفات',
+    'loader_label' => 'جاري تحميل SPIMS',
 ];

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', $assessment->title)
 @section('content')
-<h1 class="spims-title mb-3">{{ $assessment->title }}</h1>
+<x-page-header :title="$assessment->title" />
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 <p>{{ $assessment->mode->value }} · {{ $assessment->time_limit_minutes }} {{ __('assessment.minutes') }} · {{ __('assessment.attempts') }} {{ $assessment->attempts_allowed }}</p>
 <form method="POST" action="{{ route('assessments.start', $assessment) }}">@csrf

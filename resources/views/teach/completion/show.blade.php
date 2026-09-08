@@ -60,10 +60,10 @@
     @php $existing = $weekAssessments[$week->id][$selectedStudent->id] ?? null; @endphp
     <form method="POST" action="{{ route('teach.completion.assess', [$offering, $week, $selectedStudent]) }}" class="row g-2 mb-2">
         @csrf
-        <div class="col-md-4">{{ $week->title }}</div>
-        <div class="col-md-2"><input name="rating" type="number" min="1" max="5" class="form-control" value="{{ $existing?->rating ?? 3 }}" required></div>
-        <div class="col-md-4"><input name="comment" class="form-control" value="{{ $existing?->comment }}"></div>
-        <div class="col-md-2"><button class="btn btn-outline-primary w-100">{{ __('ui.save') }}</button></div>
+        <div class="col-12 col-md-4">{{ $week->title }}</div>
+        <div class="col-12 col-md-2"><input name="rating" type="number" min="1" max="5" class="form-control" value="{{ $existing?->rating ?? 3 }}" required></div>
+        <div class="col-12 col-md-4"><input name="comment" class="form-control" value="{{ $existing?->comment }}"></div>
+        <div class="col-12 col-md-2"><button class="btn btn-outline-primary w-100">{{ __('ui.save') }}</button></div>
     </form>
 @endforeach
 @endif

@@ -14,7 +14,7 @@
 @if($percents !== [])
     <div class="row g-3 mb-4">
         @foreach($percents as $row)
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <div class="app-card p-3">
                     <div class="small text-muted-theme">{{ $row['offering']->course->code }}</div>
                     <strong>{{ __('attendance.own_percent') }}: {{ $row['percent'] === null ? '—' : $row['percent'].'%' }}</strong>

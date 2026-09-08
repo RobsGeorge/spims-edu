@@ -8,17 +8,16 @@
 @endphp
 
 <div class="animate-in portal-dashboard">
-    <div class="mb-4">
-        <h1 class="display-6 page-title mb-1">
-            {{ __('dashboard.hello', ['name' => $user->first_name ?: __('dashboard.user_fallback')]) }}
-        </h1>
-        <p class="spims-text-dim mb-0">{{ __('ui.dashboard_subheading') }}</p>
-    </div>
+    <x-page-header
+        :title="__('dashboard.hello', ['name' => $user->first_name ?: __('dashboard.user_fallback')])"
+        :subtitle="__('ui.dashboard_subheading')"
+        icon="home"
+    />
 
     <div class="bento-grid mb-4">
         <section class="bento-courses app-card p-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 spims-title mb-0">{{ __('learning.my_courses') }}</h2>
+                <x-section-heading :title="__('learning.my_courses')" icon="course" class="h5 mb-0" />
                 <a href="{{ route('catalog.index') }}" class="small">{{ __('learning.browse_catalog') }}</a>
             </div>
             @if($enrollments->isEmpty())
@@ -31,7 +30,8 @@
                     @foreach($enrollments as $enrollment)
                         <li class="bento-course-row py-2 border-bottom border-opacity-25">
                             <div class="d-flex justify-content-between gap-2 align-items-start">
-                                <div>
+                                <x-course-cover :course="$enrollment->offering->course" class="bento-course-thumb" />
+                                <div class="min-w-0 flex-grow-1">
                                     <div class="fw-semibold">{{ $enrollment->offering->course->code }} · {{ $enrollment->offering->course->title }}</div>
                                     <div class="small spims-text-dim">{{ __('learning.progress', ['percent' => (int) $enrollment->progress_percent]) }}</div>
                                 </div>
@@ -44,7 +44,7 @@
         </section>
 
         <section class="bento-live feature-panel p-3">
-            <h2 class="h5 mb-3">{{ __('learning.next_live') }}</h2>
+            <x-section-heading :title="__('learning.next_live')" icon="live" class="h5 mb-3" />
             @if($next_live)
                 <p class="mb-1 fw-semibold">{{ $next_live->title }}</p>
                 <p class="small mb-3 opacity-75">{{ $next_live->offering->course->code }} · {{ __('learning.starts_at', ['when' => $next_live->scheduled_start->timezone(config('app.timezone'))->format('M j, H:i')]) }}</p>
@@ -55,7 +55,7 @@
         </section>
 
         <section class="bento-due app-card p-3">
-            <h2 class="h5 spims-title mb-3">{{ __('learning.due_soon') }}</h2>
+            <x-section-heading :title="__('learning.due_soon')" icon="assessment" class="h5 mb-3" />
             @forelse($due_assessments as $assessment)
                 <div class="d-flex justify-content-between gap-2 py-2 border-bottom border-opacity-25">
                     <div>
@@ -78,7 +78,7 @@
         </section>
 
         <section class="bento-wallet app-card p-3">
-            <h2 class="h5 spims-title mb-3">{{ __('learning.wallet') }}</h2>
+            <x-section-heading :title="__('learning.wallet')" icon="wallet" class="h5 mb-3" />
             <div class="row g-2 small">
                 <div class="col-6"><div class="wallet-chip">{{ __('learning.egp_money') }}<strong>{{ $wallet['egp_money'] }}</strong></div></div>
                 <div class="col-6"><div class="wallet-chip">{{ __('learning.usd_money') }}<strong>{{ $wallet['usd_money'] }}</strong></div></div>
@@ -90,7 +90,7 @@
 
         <section class="bento-notes app-card p-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 spims-title mb-0">{{ __('learning.notifications') }}</h2>
+                <x-section-heading :title="__('learning.notifications')" icon="notification" class="h5 mb-0" />
                 @if(($unread_notifications ?? 0) > 0)
                     <span class="badge-brand">{{ $unread_notifications }}</span>
                 @endif

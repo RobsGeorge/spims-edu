@@ -17,15 +17,15 @@
             <h2 class="h6 mb-0">{{ __('finance.pay_in_n', ['n' => 3]) }}</h2>
             <p class="small text-muted mb-0">{{ __('finance.plan_help') }}</p>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label" for="installment_count_{{ $invoice->id }}">{{ __('finance.installment_count') }}</label>
             <input id="installment_count_{{ $invoice->id }}" type="number" name="installment_count" class="form-control" value="3" min="2" max="12" required>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label" for="start_on_{{ $invoice->id }}">{{ __('finance.plan_start_on') }}</label>
             <input id="start_on_{{ $invoice->id }}" type="date" name="start_on" class="form-control" value="{{ now()->toDateString() }}">
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <button class="btn btn-outline-primary">{{ __('finance.create_plan') }}</button>
         </div>
     </div>

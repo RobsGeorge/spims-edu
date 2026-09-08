@@ -5,7 +5,7 @@
 
 <div {{ $attributes }}>
     {{-- Desktop: standard scrollable table --}}
-    <div class="spims-dt-wrap d-none d-md-block">
+    <div class="spims-dt-wrap spims-table-wrap d-none d-md-block">
         <table class="spims-dt-table">
             <thead>
                 <tr>

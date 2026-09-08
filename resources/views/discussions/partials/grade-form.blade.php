@@ -26,7 +26,7 @@
 
             <form method="POST" action="{{ route('teach.discussions.grade', [$offering, $thread]) }}" class="row g-2">
                 @csrf
-                <div class="col-md-5">
+                <div class="col-12 col-md-5">
                     <label class="form-label" for="discussion-grade-student-{{ $thread->id }}">{{ __('discussions.student') }}</label>
                     <select name="student_id" id="discussion-grade-student-{{ $thread->id }}" class="form-select" required>
                         <option value="">{{ __('discussions.student_placeholder') }}</option>
@@ -35,15 +35,15 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-12 col-md-2">
                     <label class="form-label" for="discussion-grade-score-{{ $thread->id }}">{{ __('discussions.score') }}</label>
                     <input type="number" name="score" id="discussion-grade-score-{{ $thread->id }}" class="form-control" min="0" max="100" step="0.01" required>
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="form-label" for="discussion-grade-feedback-{{ $thread->id }}">{{ __('discussions.feedback') }}</label>
                     <input type="text" name="feedback" id="discussion-grade-feedback-{{ $thread->id }}" class="form-control">
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
+                <div class="col-12 col-md-2 d-flex align-items-end">
                     <button class="btn btn-primary w-100">{{ __('discussions.submit_grade') }}</button>
                 </div>
             </form>

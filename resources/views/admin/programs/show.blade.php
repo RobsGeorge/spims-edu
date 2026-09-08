@@ -20,24 +20,24 @@
         <h2 class="h6">{{ __('academics.attach_course') }}</h2>
         <form method="POST" action="{{ route('admin.programs.attach-course', $program) }}" class="row g-2">
             @csrf
-            <div class="col-md-5">
+            <div class="col-12 col-md-5">
                 <select name="course_id" class="form-select" required>
                     @foreach($courses as $course)<option value="{{ $course->id }}">{{ $course->code }} — {{ $course->title }}</option>@endforeach
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <select name="requirement" class="form-select" required>
                     @foreach($requirements as $req)<option value="{{ $req->value }}">{{ $req->value }}</option>@endforeach
                 </select>
             </div>
-            <div class="col-md-2"><input type="number" name="year_level" class="form-control" placeholder="{{ __('academics.year_level') }}"></div>
-            <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('ui.save') }}</button></div>
+            <div class="col-12 col-md-2"><input type="number" name="year_level" class="form-control" placeholder="{{ __('academics.year_level') }}"></div>
+            <div class="col-12 col-md-2"><button class="btn btn-primary w-100">{{ __('ui.save') }}</button></div>
         </form>
     </div>
 </div>
 
 <div class="card border-0 shadow-sm app-card">
-    <div class="table-responsive">
+    <div class="table-responsive spims-table-wrap">
         <table class="table mb-0">
             <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('academics.title') }}</th><th>{{ __('academics.requirement') }}</th><th>{{ __('academics.year_level') }}</th><th></th></tr></thead>
             <tbody>

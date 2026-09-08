@@ -15,18 +15,18 @@
 
 <form method="POST" action="{{ route('teach.live-quiz.store', $offering) }}" class="row g-2 mb-4 mt-3">
     @csrf
-    <div class="col-md-4"><input name="title" class="form-control" required placeholder="{{ __('staff.live_quiz.title_placeholder') }}"></div>
-    <div class="col-md-8"><input name="prompt" class="form-control" placeholder="{{ __('staff.live_quiz.first_prompt') }}"></div>
-    <div class="col-md-3"><input name="options[]" class="form-control" placeholder="{{ __('staff.live_quiz.option_a') }}"></div>
-    <div class="col-md-3"><input name="options[]" class="form-control" placeholder="{{ __('staff.live_quiz.option_b') }}"></div>
-    <div class="col-md-2">
+    <div class="col-12 col-md-4"><input name="title" class="form-control" required placeholder="{{ __('staff.live_quiz.title_placeholder') }}"></div>
+    <div class="col-12 col-md-8"><input name="prompt" class="form-control" placeholder="{{ __('staff.live_quiz.first_prompt') }}"></div>
+    <div class="col-12 col-md-3"><input name="options[]" class="form-control" placeholder="{{ __('staff.live_quiz.option_a') }}"></div>
+    <div class="col-12 col-md-3"><input name="options[]" class="form-control" placeholder="{{ __('staff.live_quiz.option_b') }}"></div>
+    <div class="col-12 col-md-2">
         <select name="correct_index" class="form-select" aria-label="{{ __('staff.live_quiz.correct') }}">
             <option value="0">A</option>
             <option value="1">B</option>
         </select>
     </div>
-    <div class="col-md-2"><input type="number" name="time_limit_seconds" class="form-control" value="30" min="1" aria-label="{{ __('staff.live_quiz.seconds') }}"></div>
-    <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('staff.live_quiz.create') }}</button></div>
+    <div class="col-12 col-md-2"><input type="number" name="time_limit_seconds" class="form-control" value="30" min="1" aria-label="{{ __('staff.live_quiz.seconds') }}"></div>
+    <div class="col-12 col-md-2"><button class="btn btn-primary w-100">{{ __('staff.live_quiz.create') }}</button></div>
 </form>
 
 @forelse($quizzes as $quiz)
@@ -55,16 +55,16 @@
         @endforeach
         <form method="POST" action="{{ route('teach.live-quiz.questions.store', [$offering, $quiz]) }}" class="row g-2 mt-2">
             @csrf
-            <div class="col-md-4"><input name="prompt" class="form-control form-control-sm" required placeholder="{{ __('staff.live_quiz.prompt') }}"></div>
-            <div class="col-md-3"><input name="options[]" class="form-control form-control-sm" required placeholder="{{ __('staff.live_quiz.option_a') }}"></div>
-            <div class="col-md-3"><input name="options[]" class="form-control form-control-sm" required placeholder="{{ __('staff.live_quiz.option_b') }}"></div>
-            <div class="col-md-1">
+            <div class="col-12 col-md-4"><input name="prompt" class="form-control form-control-sm" required placeholder="{{ __('staff.live_quiz.prompt') }}"></div>
+            <div class="col-12 col-md-3"><input name="options[]" class="form-control form-control-sm" required placeholder="{{ __('staff.live_quiz.option_a') }}"></div>
+            <div class="col-12 col-md-3"><input name="options[]" class="form-control form-control-sm" required placeholder="{{ __('staff.live_quiz.option_b') }}"></div>
+            <div class="col-12 col-md-1">
                 <select name="correct_index" class="form-select form-select-sm">
                     <option value="0">A</option>
                     <option value="1">B</option>
                 </select>
             </div>
-            <div class="col-md-1"><button class="btn btn-sm btn-outline-primary w-100">{{ __('ui.save') }}</button></div>
+            <div class="col-12 col-md-1"><button class="btn btn-sm btn-outline-primary w-100">{{ __('ui.save') }}</button></div>
         </form>
     </div>
 @empty
