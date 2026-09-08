@@ -2,7 +2,6 @@
 
 namespace App\Support;
 
-use App\Enums\RoleType;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\Teach\TeachAccessService;
@@ -10,6 +9,15 @@ use Illuminate\Support\Facades\Route;
 
 class NavigationHub
 {
+    /** School-wide curriculum desk — shipped Academic Admin F. */
+    public const HUB_ACADEMIC = 'programs.manage';
+
+    /** People / registrar desk — shipped Administrative Admin F. */
+    public const HUB_ADMIN = 'users.manage';
+
+    /** Pricing desk — shipped Financial Admin F. */
+    public const HUB_FINANCE = 'offerings.pricing';
+
     public static function hasSuperadmin(?User $user): bool
     {
         return $user !== null && $user->isSuperAdmin();
@@ -17,32 +25,22 @@ class NavigationHub
 
     public static function hasAcademicAdmin(?User $user): bool
     {
-        if ($user === null) {
-            return false;
-        }
-
-        return $user->isSuperAdmin()
-            || $user->hasRole(RoleType::AcademicAdmin);
+        return self::allows($user, self::HUB_ACADEMIC);
     }
 
     public static function hasAdministrative(?User $user): bool
     {
-        if ($user === null) {
-            return false;
-        }
-
-        return $user->isSuperAdmin()
-            || $user->hasRole(RoleType::AdministrativeAdmin);
+        return self::allows($user, self::HUB_ADMIN);
     }
 
     public static function hasFinanceAdmin(?User $user): bool
     {
-        if ($user === null) {
-            return false;
-        }
+        return self::allows($user, self::HUB_FINANCE);
+    }
 
-        return $user->isSuperAdmin()
-            || $user->hasRole(RoleType::FinancialAdmin);
+    private static function allows(?User $user, string $key): bool
+    {
+        return app(AuthorizeService::class)->allows($user, $key);
     }
 
     public static function hasTeach(?User $user): bool
@@ -210,7 +208,7 @@ class NavigationHub
      */
     public static function academicLinks(User $user): array
     {
-        if (! self::hasAcademicAdmin($user) && ! $user->isSuperAdmin()) {
+        if (! self::hasAcademicAdmin($user)) {
             return [];
         }
 
@@ -238,7 +236,7 @@ class NavigationHub
      */
     public static function adminLinks(User $user): array
     {
-        if (! self::hasAdministrative($user) && ! $user->isSuperAdmin()) {
+        if (! self::hasAdministrative($user)) {
             return [];
         }
 

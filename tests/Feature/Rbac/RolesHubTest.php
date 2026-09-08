@@ -41,7 +41,7 @@ class RolesHubTest extends TestCase
             __('roles_hub.help_intro_title'),
             __('roles_hub.help_vs_title'),
             __('roles_hub.help_gap_holds'),
-            __('roles_hub.help_gap_hub_nav'),
+            __('roles_hub.help_nav_body'),
         ] as $needle) {
             $this->assertTrue(str_contains($help, $needle), 'Missing from role guide: '.$needle);
         }

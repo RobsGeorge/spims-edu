@@ -169,4 +169,6 @@ return [
     'help_gap_advising_holds' => 'Administrative admin can view advising but cannot place advising holds. Instructors hold and view assigned advisees only.',
     'help_gap_hub_nav' => 'Hub navigation still uses role-name checks (hasRole). Switching those links to permission keys is a follow-up, not a matrix change.',
     'help_gap_parent' => 'Parent / guardian is not a role. That work stays parked.',
+    'help_nav_title' => 'Hub navigation',
+    'help_nav_body' => 'Academic, Administration, and Finance admin links follow permission keys (programs.manage, users.manage, offerings.pricing). Teach stays TeachAccessService. Super Admin console stays Super Admin only.',
 ];
