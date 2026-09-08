@@ -12,25 +12,24 @@
     <div class="alert alert-success">{{ session('status') }}</div>
 @endif
 
-<div class="card border-0 shadow-sm mb-3">
-    <div class="card-body">
+<x-card variant="panel" class="mb-3">
         <ul class="mb-0">
         @foreach($application->values as $value)
             <li>
                 <strong>{{ $value->field->label }}:</strong>
                 @if($value->file_url)
-                    <span class="text-muted-theme">{{ __('admissions.document') }}:</span> {{ $value->file_url }}
+                    <span class="spims-text-dim">{{ __('admissions.document') }}:</span> {{ $value->file_url }}
                 @else
-                    {{ $value->value }}
+                    @php $fieldAnswer = $value->value; @endphp
+                    {{ $fieldAnswer }}
                 @endif
             </li>
         @endforeach
         </ul>
-    </div>
-</div>
-<form method="POST" action="{{ route('admin.applications.decide', $application) }}" class="card border-0 shadow-sm mt-3">
+</x-card>
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.applications.decide', $application) }}" class="mt-3">
     @csrf
-    <div class="card-body row g-2">
+    <div class="row g-2">
         <div class="col-md-4">
             <select name="decision" class="form-select" required>
                 <option value="ACCEPTED">ACCEPTED</option>
@@ -41,5 +40,5 @@
         <div class="col-md-6"><input name="decision_note" class="form-control" placeholder="{{ __('admissions.decision_note') }}"></div>
         <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('ui.save') }}</button></div>
     </div>
-</form>
+</x-card>
 @endsection

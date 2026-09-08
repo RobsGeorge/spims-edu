@@ -4,14 +4,13 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h1 class="spims-title mb-0">{{ $form->name }}</h1>
-        <p class="text-muted-theme mb-0">{{ $form->program->code }} · {{ $form->active ? __('academics.active') : __('academics.inactive') }}</p>
+        <p class="spims-text-dim mb-0">{{ $form->program->code }} · {{ $form->active ? __('academics.active') : __('academics.inactive') }}</p>
     </div>
     <a href="{{ route('admin.application-forms.index') }}" class="btn btn-outline-secondary">{{ __('ui.nav_app_forms') }}</a>
 </div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
-<div class="card border-0 shadow-sm mb-4" id="edit">
-    <div class="card-body">
+<x-card variant="panel" class="mb-4" id="edit">
         <h2 class="h6">{{ __('admissions.edit_form') }}</h2>
         <form method="POST" action="{{ route('admin.application-forms.update', $form) }}" class="row g-2">
             @csrf
@@ -27,11 +26,9 @@
             </div>
             <div class="col-md-3 mt-4"><button class="btn btn-primary w-100">{{ __('ui.save_changes') }}</button></div>
         </form>
-    </div>
-</div>
+</x-card>
 
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
+<x-card variant="panel" class="mb-4">
         <h2 class="h6">{{ __('admissions.add_field') }}</h2>
         <form method="POST" action="{{ route('admin.application-forms.fields.store', $form) }}" class="row g-2">
             @csrf
@@ -43,7 +40,8 @@
                 <label class="form-label">{{ __('academics.type') }}</label>
                 <select name="type" class="form-select" required>
                     @foreach($fieldTypes as $type)
-                        <option value="{{ $type->value }}">{{ $type->value }}</option>
+                        @php $typeVal = $type->value; @endphp
+                        <option value="{{ $typeVal }}">{{ $typeVal }}</option>
                     @endforeach
                 </select>
             </div>
@@ -53,17 +51,16 @@
             </div>
             <div class="col-12"><button class="btn btn-outline-primary">{{ __('admissions.add_field') }}</button></div>
         </form>
-    </div>
-</div>
+</x-card>
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
+<x-card variant="panel">
         <h2 class="h6">{{ __('admissions.fields') }}</h2>
         <ul class="mb-0 list-unstyled">
             @forelse($form->fields as $field)
                 <li class="d-flex justify-content-between align-items-center border-bottom py-2">
                     <span>
-                        {{ $field->label }} ({{ $field->type->value }})
+                        @php $ftVal = $field->type->value; @endphp
+                        {{ $field->label }} ({{ $ftVal }})
                         @if($field->required) · {{ __('admissions.required') }}@endif
                         · {{ $field->active ? __('academics.active') : __('academics.inactive') }}
                     </span>
@@ -75,9 +72,8 @@
                     @endif
                 </li>
             @empty
-                <li class="text-muted-theme">{{ __('admissions.no_fields') }}</li>
+                <li class="spims-text-dim">{{ __('admissions.no_fields') }}</li>
             @endforelse
         </ul>
-    </div>
-</div>
+</x-card>
 @endsection
