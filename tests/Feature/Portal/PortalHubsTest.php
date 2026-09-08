@@ -58,4 +58,46 @@ class PortalHubsTest extends TestCase
             ->assertSee(__('hubs.nav_learning'))
             ->assertSee(__('hubs.nav_superadmin'));
     }
+
+    #[Test]
+    public function superadmin_roles_hub_shows_role_guide(): void
+    {
+        $this->seed();
+        $sa = User::query()->where('email', env('SUPERADMIN_EMAIL'))->firstOrFail();
+
+        $html = $this->actingAs($sa)
+            ->get(route('roles.hub', ['section' => 'help']))
+            ->assertOk()
+            ->getContent();
+
+        foreach ([
+            __('roles_hub.section_help'),
+            __('roles_hub.help_levels_title'),
+            __('roles_hub.help_matrix_title'),
+            __('roles_hub.help_gaps_title'),
+            __('roles_hub.help_gap_unsuspend'),
+            __('roles_hub.role_INSTRUCTOR'),
+            __('roles_hub.role_STUDENT'),
+            'id="helpSection"',
+            'accordion-collapse collapse show',
+        ] as $needle) {
+            $this->assertTrue(str_contains($html, $needle), 'Missing from role guide: '.$needle);
+        }
+
+        $sa->forceFill(['preferred_locale' => 'ar'])->save();
+        $arHtml = $this->actingAs($sa->fresh())
+            ->get(route('roles.hub', ['section' => 'help']))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertTrue(str_contains($arHtml, 'dir="rtl"'), 'Role guide should be RTL in Arabic.');
+        $this->assertTrue(
+            str_contains($arHtml, __('roles_hub.section_help', [], 'ar')),
+            'Missing Arabic role-guide title'
+        );
+        $this->assertTrue(
+            str_contains($arHtml, __('roles_hub.help_gaps_title', [], 'ar')),
+            'Missing Arabic gaps heading'
+        );
+    }
 }
