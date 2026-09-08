@@ -29,7 +29,7 @@
 @endif
 
 <div class="row g-3 mb-3">
-    <div class="col-lg-6">
+    <div class="col-12 col-lg-6">
         <section class="app-card p-3 h-100">
             <h2 class="h5 spims-title">{{ __('advising.holds') }}</h2>
             @forelse($holds as $hold)
@@ -58,7 +58,7 @@
         </section>
     </div>
     @if($canHold)
-    <div class="col-lg-6">
+    <div class="col-12 col-lg-6">
         <section class="app-card p-3 h-100">
             <h2 class="h5 spims-title">{{ __('advising.place_hold') }}</h2>
             <form method="POST" action="{{ route('advising.holds.store', $student) }}" class="row g-2">

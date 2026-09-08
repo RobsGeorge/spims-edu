@@ -16,7 +16,7 @@
 @else
     <div class="row g-3">
         @foreach($offerings as $offering)
-            <div class="col-md-6 col-xl-4">
+            <div class="col-12 col-md-6 col-xl-4">
                 <a href="{{ route('teach.show', $offering) }}" class="teach-offering-card d-block h-100 text-decoration-none">
                     <div class="p-3">
                         <div class="d-flex justify-content-between gap-2 mb-2">

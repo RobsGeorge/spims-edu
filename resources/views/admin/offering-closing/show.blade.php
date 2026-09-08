@@ -35,8 +35,8 @@
         @forelse($enrollments as $enrollment)
             <div class="row g-2 mb-2">
                 <input type="hidden" name="student_id[]" value="{{ $enrollment->student_id }}">
-                <div class="col-md-6">{{ $enrollment->student?->email }}</div>
-                <div class="col-md-3"><input name="amount[]" type="number" step="0.01" class="form-control" value="{{ $graceMarks[$enrollment->student_id] ?? 0 }}"></div>
+                <div class="col-12 col-md-6">{{ $enrollment->student?->email }}</div>
+                <div class="col-12 col-md-3"><input name="amount[]" type="number" step="0.01" class="form-control" value="{{ $graceMarks[$enrollment->student_id] ?? 0 }}"></div>
             </div>
         @empty
             <p class="text-muted-theme mb-0">{{ __('completion.no_results') }}</p>

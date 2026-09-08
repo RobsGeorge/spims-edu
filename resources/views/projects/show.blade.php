@@ -94,15 +94,15 @@
             <input type="hidden" name="ratee_id" value="{{ $peer['id'] }}">
             <p class="mb-2">{{ __('projects.peer_rate') }}: <strong>{{ $peer['first_name'] }} {{ $peer['last_name'] }}</strong></p>
             <div class="row g-2">
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="form-label" for="score-{{ $peer['id'] }}">{{ __('projects.peer_score') }}</label>
                     <input id="score-{{ $peer['id'] }}" type="number" name="score" class="form-control" min="0" max="100" step="0.1" required>
                 </div>
-                <div class="col-md-7">
+                <div class="col-12 col-md-7">
                     <label class="form-label" for="comment-{{ $peer['id'] }}">{{ __('projects.peer_comment') }}</label>
                     <input id="comment-{{ $peer['id'] }}" name="comment" class="form-control">
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
+                <div class="col-12 col-md-2 d-flex align-items-end">
                     <button class="btn btn-outline-primary w-100">{{ __('projects.peer_submit') }}</button>
                 </div>
             </div>

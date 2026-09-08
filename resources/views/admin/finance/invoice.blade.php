@@ -27,17 +27,17 @@
 <form method="POST" action="{{ route('admin.finance.manual', $invoice) }}" class="card border-0 shadow-sm">
     @csrf
     <div class="card-body row g-2">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <select name="method" class="form-select">
                 <option value="MANUAL_CASH">CASH</option>
                 <option value="MANUAL_TRANSFER">TRANSFER</option>
                 <option value="MANUAL_CHEQUE">CHEQUE</option>
             </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <input type="number" name="amount_minor" class="form-control" value="{{ $invoice->amountDue() }}" min="1">
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <button class="btn btn-outline-primary">{{ __('finance.pay') }}</button>
         </div>
     </div>

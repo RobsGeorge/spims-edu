@@ -13,7 +13,7 @@
                     ->filter()
                     ->first();
             @endphp
-            <div class="col-md-6 col-xl-4">
+            <div class="col-12 col-md-6 col-xl-4">
                 <article class="catalog-card app-card h-100 p-3 d-flex flex-column">
                     <x-course-cover :course="$course" class="catalog-card-media {{ $index % 2 === 1 ? 'catalog-card-media--alt' : '' }}" />
                     <div class="d-flex flex-wrap gap-2 mb-2">

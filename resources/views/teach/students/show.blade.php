@@ -15,45 +15,45 @@
 @include('partials.offering-workspace-tabs', ['offering' => $offering, 'active' => 'roster', 'prefix' => 'teach'])
 
 <div class="row g-3 mt-1">
-    <div class="col-lg-6">
+    <div class="col-12 col-lg-6">
         <section class="app-card p-3 h-100">
             <h2 class="h6 spims-title mb-3">{{ __('teach.profile') }}</h2>
             <dl class="row mb-0">
-                <dt class="col-sm-4">{{ __('teach.first_name') }}</dt>
-                <dd class="col-sm-8">{{ $student->first_name }}</dd>
-                <dt class="col-sm-4">{{ __('teach.last_name') }}</dt>
-                <dd class="col-sm-8">{{ $student->last_name }}</dd>
-                <dt class="col-sm-4">{{ __('teach.email') }}</dt>
-                <dd class="col-sm-8">{{ $student->email }}</dd>
-                <dt class="col-sm-4">{{ __('teach.phone') }}</dt>
-                <dd class="col-sm-8">{{ $student->phone ?: '—' }}</dd>
-                <dt class="col-sm-4">{{ __('teach.date_of_birth') }}</dt>
-                <dd class="col-sm-8">{{ $student->date_of_birth?->toDateString() ?: '—' }}</dd>
-                <dt class="col-sm-4">{{ __('teach.preferred_locale') }}</dt>
-                <dd class="col-sm-8">{{ $student->preferred_locale ?: '—' }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.first_name') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $student->first_name }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.last_name') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $student->last_name }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.email') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $student->email }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.phone') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $student->phone ?: '—' }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.date_of_birth') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $student->date_of_birth?->toDateString() ?: '—' }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.preferred_locale') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $student->preferred_locale ?: '—' }}</dd>
             </dl>
         </section>
     </div>
-    <div class="col-lg-6">
+    <div class="col-12 col-lg-6">
         <section class="app-card p-3 h-100">
             <h2 class="h6 spims-title mb-3">{{ __('teach.enrollment') }}</h2>
             <dl class="row mb-0">
-                <dt class="col-sm-4">{{ __('teach.status') }}</dt>
-                <dd class="col-sm-8">
+                <dt class="col-12 col-sm-4">{{ __('teach.status') }}</dt>
+                <dd class="col-12 col-sm-8">
                     <x-status-badge :status="$enrollment->status->value" :label="$enrollment->status->value" />
                 </dd>
-                <dt class="col-sm-4">{{ __('teach.enrolled_at') }}</dt>
-                <dd class="col-sm-8">{{ $enrollment->enrolled_at?->toDayDateTimeString() ?: '—' }}</dd>
-                <dt class="col-sm-4">{{ __('teach.dropped_at') }}</dt>
-                <dd class="col-sm-8">{{ $enrollment->dropped_at?->toDayDateTimeString() ?: '—' }}</dd>
-                <dt class="col-sm-4">{{ __('teach.grade_status') }}</dt>
-                <dd class="col-sm-8">{{ $enrollment->grade_status?->value ?: '—' }}</dd>
-                <dt class="col-sm-4">{{ __('teach.final_percent') }}</dt>
-                <dd class="col-sm-8">{{ $enrollment->final_percent !== null ? number_format($enrollment->final_percent, 2).'%' : '—' }}</dd>
-                <dt class="col-sm-4">{{ __('teach.final_letter') }}</dt>
-                <dd class="col-sm-8">{{ $enrollment->final_letter ?: '—' }}</dd>
-                <dt class="col-sm-4">{{ __('teach.attendance_percent') }}</dt>
-                <dd class="col-sm-8">
+                <dt class="col-12 col-sm-4">{{ __('teach.enrolled_at') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $enrollment->enrolled_at?->toDayDateTimeString() ?: '—' }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.dropped_at') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $enrollment->dropped_at?->toDayDateTimeString() ?: '—' }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.grade_status') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $enrollment->grade_status?->value ?: '—' }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.final_percent') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $enrollment->final_percent !== null ? number_format($enrollment->final_percent, 2).'%' : '—' }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.final_letter') }}</dt>
+                <dd class="col-12 col-sm-8">{{ $enrollment->final_letter ?: '—' }}</dd>
+                <dt class="col-12 col-sm-4">{{ __('teach.attendance_percent') }}</dt>
+                <dd class="col-12 col-sm-8">
                     {{ $attendancePercent !== null ? number_format($attendancePercent, 2).'%' : __('teach.no_attendance') }}
                 </dd>
             </dl>

@@ -13,7 +13,7 @@
     <x-empty-state :title="__('academics.translations_inbox_empty')" />
 @else
     <div class="card border-0 shadow-sm mb-4">
-        <div class="table-responsive">
+        <div class="table-responsive spims-table-wrap">
             <table class="table mb-0 align-middle">
                 <thead>
                     <tr>
@@ -87,10 +87,10 @@
         <h2 class="h6">{{ __('academics.add_translation') }}</h2>
         <form method="POST" action="{{ route('admin.translations.store') }}" class="row g-2">
             @csrf
-            <div class="col-md-3"><input name="entity_type" class="form-control" placeholder="{{ __('academics.entity') }}" required></div>
-            <div class="col-md-3"><input name="entity_id" class="form-control" placeholder="{{ __('academics.entity_id') }}" required></div>
-            <div class="col-md-2"><input name="field" class="form-control" placeholder="{{ __('academics.field') }}" required></div>
-            <div class="col-md-2">
+            <div class="col-12 col-md-3"><input name="entity_type" class="form-control" placeholder="{{ __('academics.entity') }}" required></div>
+            <div class="col-12 col-md-3"><input name="entity_id" class="form-control" placeholder="{{ __('academics.entity_id') }}" required></div>
+            <div class="col-12 col-md-2"><input name="field" class="form-control" placeholder="{{ __('academics.field') }}" required></div>
+            <div class="col-12 col-md-2">
                 <select name="locale" class="form-select" required>
                     <option value="ar">AR</option>
                     <option value="en">EN</option>

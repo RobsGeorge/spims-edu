@@ -34,15 +34,15 @@
 <form method="POST" action="{{ route('settings.reminders.store') }}" class="app-card p-4 mb-4">
     @csrf
     <div class="row g-2">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('communications.reminder_subject_type') }}</label>
             <input name="subject_type" class="form-control" required>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('communications.reminder_subject_id') }}</label>
             <input name="subject_id" class="form-control" required>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('communications.remind_at') }}</label>
             <input type="datetime-local" name="remind_at" class="form-control" required>
         </div>

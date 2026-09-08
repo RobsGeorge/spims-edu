@@ -5,18 +5,18 @@
 <form method="POST" action="{{ route('donate.store') }}" class="card border-0 shadow-sm">
     @csrf
     <div class="card-body row g-2">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('finance.currency') }}</label>
             <select name="currency" class="form-select" required>
                 <option value="USD">USD</option>
                 <option value="EGP">EGP</option>
             </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('finance.amount_minor') }}</label>
             <input type="number" name="amount_minor" class="form-control" min="1" required>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('finance.designation') }}</label>
             <input type="text" name="designation" class="form-control">
         </div>

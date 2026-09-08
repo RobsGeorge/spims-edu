@@ -65,14 +65,14 @@
     </div>
 
     <div class="row g-4">
-        <div class="col-lg-6">
+        <div class="col-12 col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('audit.meta_title') }}</h2>
                 <dl class="row mb-0 small">
-                    <dt class="col-sm-4">{{ __('audit.col_when') }}</dt>
-                    <dd class="col-sm-8">{{ $log->created_at?->timezone(config('app.timezone'))->toIso8601String() }}</dd>
-                    <dt class="col-sm-4">{{ __('audit.col_actor') }}</dt>
-                    <dd class="col-sm-8">
+                    <dt class="col-12 col-sm-4">{{ __('audit.col_when') }}</dt>
+                    <dd class="col-12 col-sm-8">{{ $log->created_at?->timezone(config('app.timezone'))->toIso8601String() }}</dd>
+                    <dt class="col-12 col-sm-4">{{ __('audit.col_actor') }}</dt>
+                    <dd class="col-12 col-sm-8">
                         @if($log->actor)
                             {{ $log->actor->email }}
                             <p class="form-text mb-0">{{ $log->actor->displayName() }}</p>
@@ -80,14 +80,14 @@
                             {{ __('audit.system_actor') }}
                         @endif
                     </dd>
-                    <dt class="col-sm-4">{{ __('audit.col_actor_role') }}</dt>
-                    <dd class="col-sm-8"><code>{{ $log->actor_role ?: '—' }}</code></dd>
-                    <dt class="col-sm-4">{{ __('audit.col_action') }}</dt>
-                    <dd class="col-sm-8"><code>{{ $log->action }}</code></dd>
-                    <dt class="col-sm-4">{{ __('audit.col_entity_type') }}</dt>
-                    <dd class="col-sm-8">{{ $log->entity_type ?: '—' }}</dd>
-                    <dt class="col-sm-4">{{ __('audit.col_entity_id') }}</dt>
-                    <dd class="col-sm-8"><code>{{ $log->entity_id ?: '—' }}</code></dd>
+                    <dt class="col-12 col-sm-4">{{ __('audit.col_actor_role') }}</dt>
+                    <dd class="col-12 col-sm-8"><code>{{ $log->actor_role ?: '—' }}</code></dd>
+                    <dt class="col-12 col-sm-4">{{ __('audit.col_action') }}</dt>
+                    <dd class="col-12 col-sm-8"><code>{{ $log->action }}</code></dd>
+                    <dt class="col-12 col-sm-4">{{ __('audit.col_entity_type') }}</dt>
+                    <dd class="col-12 col-sm-8">{{ $log->entity_type ?: '—' }}</dd>
+                    <dt class="col-12 col-sm-4">{{ __('audit.col_entity_id') }}</dt>
+                    <dd class="col-12 col-sm-8"><code>{{ $log->entity_id ?: '—' }}</code></dd>
                 </dl>
             </section>
 
@@ -95,24 +95,24 @@
                 <h2 class="h6 page-title">{{ __('audit.context_title') }}</h2>
                 <p class="small text-muted-theme">{{ __('audit.context_help') }}</p>
                 <dl class="row mb-0 small">
-                    <dt class="col-sm-4">{{ __('audit.col_request_id') }}</dt>
-                    <dd class="col-sm-8">
+                    <dt class="col-12 col-sm-4">{{ __('audit.col_request_id') }}</dt>
+                    <dd class="col-12 col-sm-8">
                         @if($log->request_id)
                             <code>{{ $log->request_id }}</code>
                         @else
                             <span class="text-muted-theme">{{ __('audit.no_request_id') }}</span>
                         @endif
                     </dd>
-                    <dt class="col-sm-4">{{ __('audit.col_ip') }}</dt>
-                    <dd class="col-sm-8">
+                    <dt class="col-12 col-sm-4">{{ __('audit.col_ip') }}</dt>
+                    <dd class="col-12 col-sm-8">
                         @if($log->ip)
                             <code>{{ $log->ip }}</code>
                         @else
                             <span class="text-muted-theme">{{ __('audit.no_ip') }}</span>
                         @endif
                     </dd>
-                    <dt class="col-sm-4">{{ __('audit.col_user_agent') }}</dt>
-                    <dd class="col-sm-8">
+                    <dt class="col-12 col-sm-4">{{ __('audit.col_user_agent') }}</dt>
+                    <dd class="col-12 col-sm-8">
                         @if($log->user_agent)
                             <code class="small">{{ $log->user_agent }}</code>
                         @else
@@ -122,7 +122,7 @@
                 </dl>
             </section>
         </div>
-        <div class="col-lg-6">
+        <div class="col-12 col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('audit.payload_title') }}</h2>
                 <p class="small text-muted-theme">{{ __('audit.payload_help') }}</p>

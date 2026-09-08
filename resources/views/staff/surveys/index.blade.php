@@ -19,10 +19,10 @@
 
 <form method="POST" action="{{ $storeRoute }}" class="row g-2 mb-4 mt-3">
     @csrf
-    <div class="col-md-4"><input name="title" class="form-control" required placeholder="{{ __('staff.surveys.title_placeholder') }}"></div>
-    <div class="col-md-3"><input type="datetime-local" name="opens_at" class="form-control" aria-label="{{ __('staff.surveys.opens_at') }}"></div>
-    <div class="col-md-3"><input type="datetime-local" name="closes_at" class="form-control" aria-label="{{ __('staff.surveys.closes_at') }}"></div>
-    <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('staff.surveys.create') }}</button></div>
+    <div class="col-12 col-md-4"><input name="title" class="form-control" required placeholder="{{ __('staff.surveys.title_placeholder') }}"></div>
+    <div class="col-12 col-md-3"><input type="datetime-local" name="opens_at" class="form-control" aria-label="{{ __('staff.surveys.opens_at') }}"></div>
+    <div class="col-12 col-md-3"><input type="datetime-local" name="closes_at" class="form-control" aria-label="{{ __('staff.surveys.closes_at') }}"></div>
+    <div class="col-12 col-md-2"><button class="btn btn-primary w-100">{{ __('staff.surveys.create') }}</button></div>
     <div class="col-12">
         <label class="form-check">
             <input type="checkbox" name="anonymous_default" value="1" class="form-check-input" checked>

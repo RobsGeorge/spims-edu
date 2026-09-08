@@ -16,16 +16,16 @@
         <form method="POST" action="{{ route('admin.application-forms.update', $form) }}" class="row g-2">
             @csrf
             @method('PUT')
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label">{{ __('admissions.form_name') }}</label>
                 <input name="name" class="form-control" value="{{ old('name', $form->name) }}" required>
             </div>
-            <div class="col-md-3 form-check mt-4">
+            <div class="col-12 col-md-3 form-check mt-4">
                 <input type="hidden" name="active" value="0">
                 <input type="checkbox" name="active" value="1" class="form-check-input" id="form_active" @checked(old('active', $form->active))>
                 <label for="form_active" class="form-check-label">{{ __('academics.active') }}</label>
             </div>
-            <div class="col-md-3 mt-4"><button class="btn btn-primary w-100">{{ __('ui.save_changes') }}</button></div>
+            <div class="col-12 col-md-3 mt-4"><button class="btn btn-primary w-100">{{ __('ui.save_changes') }}</button></div>
         </form>
     </div>
 </div>
@@ -35,11 +35,11 @@
         <h2 class="h6">{{ __('admissions.add_field') }}</h2>
         <form method="POST" action="{{ route('admin.application-forms.fields.store', $form) }}" class="row g-2">
             @csrf
-            <div class="col-md-5">
+            <div class="col-12 col-md-5">
                 <label class="form-label">{{ __('admissions.field_label') }}</label>
                 <input name="label" class="form-control" required>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label">{{ __('academics.type') }}</label>
                 <select name="type" class="form-select" required>
                     @foreach($fieldTypes as $type)
@@ -47,7 +47,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-3 form-check mt-4">
+            <div class="col-12 col-md-3 form-check mt-4">
                 <input type="checkbox" name="required" value="1" class="form-check-input" id="field_required">
                 <label for="field_required" class="form-check-label">{{ __('admissions.required') }}</label>
             </div>

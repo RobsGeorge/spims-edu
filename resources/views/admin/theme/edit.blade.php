@@ -49,23 +49,23 @@
     @method('PUT')
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body row g-3">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label">{{ __('ui.theme_name') }}</label>
                 <input name="name" class="form-control" value="{{ old('name', $theme->name) }}" required>
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label">{{ __('ui.site_name') }}</label>
                 <input name="site_name" class="form-control" value="{{ old('site_name', $theme->site_name) }}" required>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label">{{ __('ui.logo_light_url') }}</label>
                 <input type="url" name="logo_light_url" class="form-control" value="{{ old('logo_light_url', $theme->logo_light_url) }}" placeholder="https://">
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label">{{ __('ui.logo_dark_url') }}</label>
                 <input type="url" name="logo_dark_url" class="form-control" value="{{ old('logo_dark_url', $theme->logo_dark_url) }}" placeholder="https://">
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label">{{ __('ui.favicon_url') }}</label>
                 <input type="url" name="favicon_url" class="form-control" value="{{ old('favicon_url', $theme->favicon_url) }}" placeholder="https://">
             </div>
@@ -82,7 +82,7 @@
         <div class="card-body">
             <h2 class="h6 mb-3">{{ __('ui.theme_tokens') }}</h2>
             <div class="row g-3">
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <h3 class="h6 text-muted-theme">{{ __('ui.theme_light') }}</h3>
                     <div class="row g-2">
                         <div class="col-4">
@@ -99,7 +99,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <h3 class="h6 text-muted-theme">{{ __('ui.theme_dark') }}</h3>
                     <div class="row g-2">
                         <div class="col-4">

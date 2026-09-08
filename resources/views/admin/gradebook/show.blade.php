@@ -20,16 +20,16 @@
 </div>
 
 <form method="POST" action="{{ route('admin.gradebook.components', $offering) }}" class="row g-2 mb-3">@csrf
-    <div class="col-md-3"><input name="name" class="form-control" placeholder="{{ __('assessment.component') }}" required></div>
-    <div class="col-md-2"><input type="number" step="0.01" name="weight_percent" class="form-control" placeholder="%" required></div>
-    <div class="col-md-3">
+    <div class="col-12 col-md-3"><input name="name" class="form-control" placeholder="{{ __('assessment.component') }}" required></div>
+    <div class="col-12 col-md-2"><input type="number" step="0.01" name="weight_percent" class="form-control" placeholder="%" required></div>
+    <div class="col-12 col-md-3">
         <select name="kind" class="form-select" aria-label="{{ __('assessment.component') }}">
             @foreach($componentKinds as $kind)
                 <option value="{{ $kind->value }}">{{ __('assessment.kind_'.$kind->value) }}</option>
             @endforeach
         </select>
     </div>
-    <div class="col-md-2"><button class="btn btn-primary">{{ __('ui.save') }}</button></div>
+    <div class="col-12 col-md-2"><button class="btn btn-primary">{{ __('ui.save') }}</button></div>
 </form>
 
 <p class="mb-2" data-weight-sum="{{ $weightSum }}">

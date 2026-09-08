@@ -43,21 +43,21 @@
     @endif
 
     <div class="row g-4">
-        <div class="col-lg-6">
+        <div class="col-12 col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.identity_title') }}</h2>
                 <p class="small text-muted-theme">{{ __('people.identity_help') }}</p>
                 <dl class="row mb-0 small">
-                    <dt class="col-sm-4">{{ __('ui.email') }}</dt>
-                    <dd class="col-sm-8">{{ $person->email }}</dd>
-                    <dt class="col-sm-4">{{ __('ui.phone') }}</dt>
-                    <dd class="col-sm-8">{{ $person->phone ?: '—' }}</dd>
-                    <dt class="col-sm-4">{{ __('people.locale') }}</dt>
-                    <dd class="col-sm-8">{{ $person->preferred_locale }}</dd>
-                    <dt class="col-sm-4">{{ __('people.reviewer_label') }}</dt>
-                    <dd class="col-sm-8">{{ $person->is_reviewer ? __('ui.confirm') : '—' }}</dd>
-                    <dt class="col-sm-4">{{ __('people.last_login') }}</dt>
-                    <dd class="col-sm-8">
+                    <dt class="col-12 col-sm-4">{{ __('ui.email') }}</dt>
+                    <dd class="col-12 col-sm-8">{{ $person->email }}</dd>
+                    <dt class="col-12 col-sm-4">{{ __('ui.phone') }}</dt>
+                    <dd class="col-12 col-sm-8">{{ $person->phone ?: '—' }}</dd>
+                    <dt class="col-12 col-sm-4">{{ __('people.locale') }}</dt>
+                    <dd class="col-12 col-sm-8">{{ $person->preferred_locale }}</dd>
+                    <dt class="col-12 col-sm-4">{{ __('people.reviewer_label') }}</dt>
+                    <dd class="col-12 col-sm-8">{{ $person->is_reviewer ? __('ui.confirm') : '—' }}</dd>
+                    <dt class="col-12 col-sm-4">{{ __('people.last_login') }}</dt>
+                    <dd class="col-12 col-sm-8">
                         {{ $lastLogin?->created_at?->timezone(config('app.timezone'))->format('Y-m-d H:i') ?? __('people.last_login_never') }}
                         <p class="form-text mb-0">{{ __('people.last_login_help') }}</p>
                     </dd>
@@ -99,20 +99,20 @@
                 <form method="POST" action="{{ route('admin.users.update', $person) }}" class="row g-3">
                     @csrf
                     @method('PUT')
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label class="form-label" for="edit-first">{{ __('ui.first_name') }}</label>
                         <input id="edit-first" name="first_name" class="form-control" value="{{ old('first_name', $person->first_name) }}" required>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label class="form-label" for="edit-last">{{ __('ui.last_name') }}</label>
                         <input id="edit-last" name="last_name" class="form-control" value="{{ old('last_name', $person->last_name) }}" required>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label class="form-label" for="edit-phone">{{ __('ui.phone') }}</label>
                         <input id="edit-phone" name="phone" class="form-control" value="{{ old('phone', $person->phone) }}">
                         <p class="form-text mb-0">{{ __('people.phone_help') }}</p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label class="form-label" for="edit-locale">{{ __('people.locale') }}</label>
                         <select id="edit-locale" name="preferred_locale" class="form-select">
                             @foreach($localeOptions as $code => $label)
@@ -121,11 +121,11 @@
                         </select>
                         <p class="form-text mb-0">{{ __('people.locale_help') }}</p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label class="form-label" for="edit-country">{{ __('ui.country_code') }}</label>
                         <input id="edit-country" name="country_code" class="form-control" maxlength="10" value="{{ old('country_code', $person->country_code) }}">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <label class="form-label" for="edit-dob">{{ __('attendance.date_of_birth') }}</label>
                         <input id="edit-dob" type="date" name="date_of_birth" class="form-control" value="{{ old('date_of_birth', $person->date_of_birth?->toDateString()) }}">
                     </div>
@@ -150,7 +150,7 @@
             </section>
         </div>
 
-        <div class="col-lg-6">
+        <div class="col-12 col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.roles_title') }}</h2>
                 <p class="small text-muted-theme">{{ __('people.roles_help') }}</p>
@@ -174,7 +174,7 @@
                 @if(!empty($capabilities['assign_roles']) && $assignableRoles !== [])
                     <form method="POST" action="{{ route('admin.users.roles.assign', $person) }}" class="row g-2 align-items-end">
                         @csrf
-                        <div class="col-md-8">
+                        <div class="col-12 col-md-8">
                             <label class="form-label" for="assign-role">{{ __('people.assign_role') }}</label>
                             <select id="assign-role" name="role" class="form-select" required>
                                 @foreach($assignableRoles as $role)
@@ -183,7 +183,7 @@
                             </select>
                             <p class="form-text mb-0">{{ __('people.assign_role_help') }}</p>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-12 col-md-4">
                             <button class="btn btn-outline-primary w-100">{{ __('people.assign_role') }}</button>
                         </div>
                     </form>
@@ -244,7 +244,7 @@
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-lg-5">
+        <div class="col-12 col-lg-5">
             <section class="app-card p-3 h-100">
                 <h2 class="h6 page-title">{{ __('enrollment.financial_hold_label') }}</h2>
                 <p class="small text-muted-theme">{{ __('people.hold_help') }}</p>
@@ -266,7 +266,7 @@
                 @endif
             </section>
         </div>
-        <div class="col-lg-7">
+        <div class="col-12 col-lg-7">
             <section class="app-card p-3 h-100">
                 <h2 class="h6 page-title">{{ __('enrollment.override_register') }}</h2>
                 <p class="small text-muted-theme">{{ __('people.enrollments_help') }}</p>
@@ -307,7 +307,7 @@
     </div>
 
     <div class="row g-4">
-        <div class="col-lg-6">
+        <div class="col-12 col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.enrollments_title') }}</h2>
                 <p class="small text-muted-theme">{{ __('people.enrollments_help') }}</p>
@@ -344,7 +344,7 @@
                 @endif
             </section>
         </div>
-        <div class="col-lg-6">
+        <div class="col-12 col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.invoices_title') }}</h2>
                 <p class="small text-muted-theme">{{ __('people.invoices_help') }}</p>

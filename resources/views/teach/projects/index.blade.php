@@ -15,17 +15,17 @@
 
 <form method="POST" action="{{ route('teach.projects.store', $offering) }}" class="row g-2 mb-4 mt-3">
     @csrf
-    <div class="col-md-4"><input name="title" class="form-control" required placeholder="{{ __('staff.projects.title_placeholder') }}"></div>
-    <div class="col-md-2"><input type="number" name="team_size_min" class="form-control" value="1" min="1" aria-label="{{ __('staff.projects.team_min') }}"></div>
-    <div class="col-md-2"><input type="number" name="team_size_max" class="form-control" value="4" min="1" aria-label="{{ __('staff.projects.team_max') }}"></div>
-    <div class="col-md-2">
+    <div class="col-12 col-md-4"><input name="title" class="form-control" required placeholder="{{ __('staff.projects.title_placeholder') }}"></div>
+    <div class="col-12 col-md-2"><input type="number" name="team_size_min" class="form-control" value="1" min="1" aria-label="{{ __('staff.projects.team_min') }}"></div>
+    <div class="col-12 col-md-2"><input type="number" name="team_size_max" class="form-control" value="4" min="1" aria-label="{{ __('staff.projects.team_max') }}"></div>
+    <div class="col-12 col-md-2">
         <select name="grading_mode" class="form-select" aria-label="{{ __('staff.projects.grading_mode') }}">
             @foreach($gradingModes as $mode)
                 <option value="{{ $mode->value }}">{{ __('staff.projects.mode_'.$mode->value) }}</option>
             @endforeach
         </select>
     </div>
-    <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('staff.projects.create') }}</button></div>
+    <div class="col-12 col-md-2"><button class="btn btn-primary w-100">{{ __('staff.projects.create') }}</button></div>
 </form>
 
 @forelse($assessments as $assessment)

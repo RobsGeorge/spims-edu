@@ -2,7 +2,7 @@
 @section('title', __('live_quiz.join_title'))
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-12 col-lg-6">
         <x-page-header :title="__('live_quiz.join_title')" :subtitle="__('live_quiz.join_help')" />
         <form method="POST" action="{{ route('live-quiz.join.store') }}" class="app-card p-4">
             @csrf

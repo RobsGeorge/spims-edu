@@ -17,16 +17,16 @@
         <p class="mb-3">{{ $event->description }}</p>
     @endif
     <dl class="row mb-0 small">
-        <dt class="col-sm-3">{{ __('events.starts') }}</dt>
-        <dd class="col-sm-9">{{ $event->starts_at?->timezone(config('app.timezone'))->format('M j, Y H:i') }}</dd>
-        <dt class="col-sm-3">{{ __('events.ends') }}</dt>
-        <dd class="col-sm-9">{{ $event->ends_at?->timezone(config('app.timezone'))->format('M j, Y H:i') }}</dd>
+        <dt class="col-12 col-sm-3">{{ __('events.starts') }}</dt>
+        <dd class="col-12 col-sm-9">{{ $event->starts_at?->timezone(config('app.timezone'))->format('M j, Y H:i') }}</dd>
+        <dt class="col-12 col-sm-3">{{ __('events.ends') }}</dt>
+        <dd class="col-12 col-sm-9">{{ $event->ends_at?->timezone(config('app.timezone'))->format('M j, Y H:i') }}</dd>
         @if($event->venue)
-            <dt class="col-sm-3">{{ __('events.venue') }}</dt>
-            <dd class="col-sm-9">{{ $event->venue }}</dd>
+            <dt class="col-12 col-sm-3">{{ __('events.venue') }}</dt>
+            <dd class="col-12 col-sm-9">{{ $event->venue }}</dd>
         @endif
-        <dt class="col-sm-3">{{ __('events.spots_label') }}</dt>
-        <dd class="col-sm-9">
+        <dt class="col-12 col-sm-3">{{ __('events.spots_label') }}</dt>
+        <dd class="col-12 col-sm-9">
             @if($event->capacity === null)
                 {{ __('events.unlimited') }}
             @else

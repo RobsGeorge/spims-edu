@@ -29,7 +29,7 @@
     </div>
 
     <div class="row g-4">
-        <div class="col-lg-8">
+        <div class="col-12 col-lg-8">
             <div class="accordion" id="playerWeeks">
                 @foreach($weeks as $week)
                     <div class="accordion-item app-card mb-2 border">
@@ -100,7 +100,7 @@
                 @endforeach
             </div>
         </div>
-        <div class="col-lg-4">
+        <div class="col-12 col-lg-4">
             <aside class="app-card p-3 mb-3">
                 <h2 class="h5 spims-title">{{ __('learning.announcements') }}</h2>
                 @forelse($announcements as $announcement)

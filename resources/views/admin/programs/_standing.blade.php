@@ -18,7 +18,7 @@
         @if(!empty($canManageStanding))
             <form method="POST" action="{{ route('admin.programs.standing.update', $program) }}" id="{{ $formId }}" class="row g-3">
                 @csrf
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <label class="form-label" for="standing_good_min">{{ __('reports.good_min') }}</label>
                     <input
                         id="standing_good_min"
@@ -34,7 +34,7 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <label class="form-label" for="standing_suspension_below">{{ __('reports.suspension_below') }}</label>
                     <input
                         id="standing_suspension_below"

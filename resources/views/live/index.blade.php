@@ -1,10 +1,12 @@
 @extends('layouts.app')
 @section('title', __('live.live_sessions'))
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
-    <x-page-header :title="__('live.live_sessions')" />
-    <a href="{{ route('live-quiz.join') }}" class="btn btn-outline-primary">{{ __('live.live_quiz') }}</a>
-</div>
+<x-page-header :title="__('live.live_sessions')">
+    <x-slot:actions>
+        <a href="{{ route('live-quiz.join') }}" class="btn btn-outline-primary">{{ __('live.live_quiz') }}</a>
+    </x-slot:actions>
+</x-page-header>
+<div class="spims-table-wrap">
 <table class="table">
     <thead><tr><th>Title</th><th>Course</th><th>Start</th><th></th></tr></thead>
     <tbody>
@@ -22,4 +24,5 @@
     @endforeach
     </tbody>
 </table>
+</div>
 @endsection

@@ -3,7 +3,7 @@
 @section('title', __('superadmin.scheduled_title'))
 
 @section('content')
-<div class="hub-page animate-in" style="max-width:800px;margin:0 auto;">
+<div class="hub-page animate-in">
     <div class="mb-3">
         <a href="{{ route('superadmin.index') }}" class="text-decoration-none text-muted-theme">
             @include('partials.superadmin-entry-tag', ['class' => 'me-1']) {{ __('superadmin.title') }}
@@ -14,7 +14,7 @@
     <p class="small text-muted-theme mb-4">{{ __('superadmin.scheduled_prune_help') }}</p>
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_scheduled')])
 
-    <div class="table-responsive app-card card shadow-sm">
+    <div class="table-responsive app-card card shadow-sm spims-table-wrap">
         <table class="table mb-0">
             <thead>
                 <tr>

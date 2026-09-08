@@ -21,11 +21,11 @@
 @if($board)
 <form method="POST" action="{{ route('discussions.threads.store', $offering) }}" enctype="multipart/form-data" class="card border-0 shadow-sm mb-4">@csrf
     <div class="card-body row g-2">
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <label class="form-label" for="thread-title">{{ __('discussions.thread_title') }}</label>
             <input id="thread-title" name="title" class="form-control" placeholder="{{ __('discussions.thread_title') }}" required>
         </div>
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <label class="form-label" for="thread-body">{{ __('discussions.opening_post') }}</label>
             <input id="thread-body" name="body" class="form-control" placeholder="{{ __('discussions.opening_post') }}">
         </div>

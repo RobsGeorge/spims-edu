@@ -14,12 +14,12 @@
         <x-section-heading :title="__('academics.add_prerequisite')" icon="add" class="h6 mb-3" />
         <form method="POST" action="{{ route('admin.courses.prerequisites', $course) }}" class="row g-2">
             @csrf
-            <div class="col-md-8">
+            <div class="col-12 col-md-8">
                 <select name="prerequisite_id" class="form-select" required>
                     @foreach($prerequisiteOptions as $c)<option value="{{ $c->id }}">{{ $c->code }} — {{ $c->title }}</option>@endforeach
                 </select>
             </div>
-            <div class="col-md-4"><button class="btn btn-primary w-100">{{ __('ui.save') }}</button></div>
+            <div class="col-12 col-md-4"><button class="btn btn-primary w-100">{{ __('ui.save') }}</button></div>
         </form>
         <ul class="mt-3 mb-0">
             @forelse($course->prerequisiteLinks as $link)

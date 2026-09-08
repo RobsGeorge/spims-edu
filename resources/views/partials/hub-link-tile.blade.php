@@ -1,6 +1,6 @@
 @php
     $href = $link['url'] ?? (isset($link['route']) ? route($link['route']) : '#');
-    $colClass = $col ?? 'col-sm-6';
+    $colClass = $col ?? 'col-12 col-sm-6';
 @endphp
 <div class="{{ $colClass }}">
     <a href="{{ $href }}"

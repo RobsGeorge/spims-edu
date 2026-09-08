@@ -22,7 +22,7 @@
 @if(session('status'))<div class="alert alert-success mt-3">{{ session('status') }}</div>@endif
 
 <div class="row g-3">
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
                 <h2 class="h6">{{ __('offerings.assign_staff') }}</h2>
@@ -57,15 +57,15 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
                 <h2 class="h6">{{ __('offerings.pricing') }}</h2>
                 <p class="small text-muted-theme">{{ __('offerings.resolved') }}: USD {{ $offering->resolvedPriceUsd() }} / EGP {{ $offering->resolvedPriceEgp() }}</p>
                 <form method="POST" action="{{ route('admin.offerings.pricing', $offering) }}" class="row g-2">
                     @csrf
-                    <div class="col-6"><input type="number" name="price_usd_override" class="form-control" placeholder="USD minor" value="{{ $offering->price_usd_override }}"></div>
-                    <div class="col-6"><input type="number" name="price_egp_override" class="form-control" placeholder="EGP minor" value="{{ $offering->price_egp_override }}"></div>
+                    <div class="col-12 col-sm-6"><input type="number" name="price_usd_override" class="form-control" placeholder="USD minor" value="{{ $offering->price_usd_override }}"></div>
+                    <div class="col-12 col-sm-6"><input type="number" name="price_egp_override" class="form-control" placeholder="EGP minor" value="{{ $offering->price_egp_override }}"></div>
                     <div class="col-12"><button class="btn btn-outline-primary btn-sm">{{ __('offerings.save_pricing') }}</button></div>
                 </form>
             </div>
@@ -80,7 +80,7 @@
             @csrf
             @method('PUT')
             @if($offering->mode->value === 'COHORT')
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label">{{ __('offerings.semester') }}</label>
                 <select name="semester_id" class="form-select">
                     <option value="">—</option>
@@ -90,19 +90,19 @@
                 </select>
             </div>
             @endif
-            <div class="col-md-2">
+            <div class="col-12 col-md-2">
                 <label class="form-label">{{ __('offerings.seat_capacity') }}</label>
                 <input type="number" name="seat_capacity" class="form-control" value="{{ $offering->seat_capacity }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-md-2">
                 <label class="form-label">{{ __('offerings.start_date') }}</label>
                 <input type="date" name="start_date" class="form-control" value="{{ $offering->start_date?->toDateString() }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-md-2">
                 <label class="form-label">{{ __('offerings.end_date') }}</label>
                 <input type="date" name="end_date" class="form-control" value="{{ $offering->end_date?->toDateString() }}">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label">{{ __('offerings.status') }}</label>
                 <select name="status" class="form-select" required>
                     @foreach($statuses as $status)

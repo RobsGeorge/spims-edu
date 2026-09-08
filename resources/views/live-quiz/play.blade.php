@@ -14,7 +14,7 @@
 @endphp
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-12 col-lg-8">
         <x-page-header
             :title="$snapshot['quiz']['title'] ?? __('live_quiz.play')"
             :subtitle="__('live_quiz.play')"

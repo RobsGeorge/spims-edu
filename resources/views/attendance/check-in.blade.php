@@ -2,7 +2,7 @@
 @section('title', __('attendance.check_in'))
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-12 col-lg-6">
         <x-page-header :title="__('attendance.check_in')" :subtitle="__('attendance.check_in_help')" />
         @if($errors->any())
             <div class="alert alert-danger">{{ $errors->first() }}</div>

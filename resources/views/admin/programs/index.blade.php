@@ -7,7 +7,7 @@
 </div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 <div class="card border-0 shadow-sm">
-    <div class="table-responsive">
+    <div class="table-responsive spims-table-wrap">
         <table class="table mb-0">
             <thead><tr><th>{{ __('academics.code') }}</th><th>{{ __('academics.name') }}</th><th>{{ __('academics.type') }}</th><th>{{ __('ui.status') }}</th></tr></thead>
             <tbody>

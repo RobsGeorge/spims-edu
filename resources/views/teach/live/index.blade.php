@@ -88,15 +88,15 @@
                 ></textarea>
                 <div class="form-text">{{ __('live.participants_rows_help') }}</div>
             </div>
-            <div class="col-md-5">
+            <div class="col-12 col-md-5">
                 <label class="form-label" for="participant_email_{{ $session->id }}">{{ __('live.participant_email') }}</label>
                 <input id="participant_email_{{ $session->id }}" name="participants[0][email]" type="email" class="form-control" autocomplete="off">
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label" for="participant_user_{{ $session->id }}">{{ __('live.participant_user_id') }}</label>
                 <input id="participant_user_{{ $session->id }}" name="participants[0][user_id]" class="form-control" autocomplete="off">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label" for="participant_minutes_{{ $session->id }}">{{ __('live.participant_minutes') }}</label>
                 <input id="participant_minutes_{{ $session->id }}" name="participants[0][minutes]" type="number" min="0" class="form-control">
             </div>

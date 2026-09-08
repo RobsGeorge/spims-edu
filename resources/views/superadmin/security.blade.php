@@ -3,7 +3,7 @@
 @section('title', __('superadmin.security_title'))
 
 @section('content')
-<div class="hub-page animate-in" style="max-width:720px;margin:0 auto;">
+<div class="hub-page animate-in">
     <div class="mb-3">
         <a href="{{ route('superadmin.index') }}" class="text-decoration-none text-muted-theme">
             @include('partials.superadmin-entry-tag', ['class' => 'me-1']) {{ __('superadmin.title') }}

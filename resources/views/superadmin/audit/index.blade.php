@@ -55,51 +55,51 @@
         </div>
 
         <form method="GET" action="{{ route('superadmin.audit.index') }}" class="row g-3 align-items-end">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label" for="audit-actor">{{ __('audit.filter_actor') }}</label>
                 <input id="audit-actor" name="actor" type="search" class="form-control"
                        value="{{ $filters['actor'] ?? '' }}"
                        placeholder="{{ __('audit.filter_actor_placeholder') }}" autocomplete="off">
                 <p class="form-text mb-0">{{ __('audit.filter_actor_help') }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label" for="audit-action">{{ __('audit.filter_action') }}</label>
                 <input id="audit-action" name="action" type="search" class="form-control"
                        value="{{ $filters['action'] ?? '' }}"
                        placeholder="{{ __('audit.filter_action_placeholder') }}" autocomplete="off">
                 <p class="form-text mb-0">{{ __('audit.filter_action_help') }}</p>
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-md-2">
                 <label class="form-label" for="audit-entity-type">{{ __('audit.filter_entity_type') }}</label>
                 <input id="audit-entity-type" name="entity_type" class="form-control"
                        value="{{ $filters['entity_type'] ?? '' }}">
                 <p class="form-text mb-0">{{ __('audit.filter_entity_type_help') }}</p>
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-md-2">
                 <label class="form-label" for="audit-entity-id">{{ __('audit.filter_entity_id') }}</label>
                 <input id="audit-entity-id" name="entity_id" class="form-control"
                        value="{{ $filters['entity_id'] ?? '' }}">
                 <p class="form-text mb-0">{{ __('audit.filter_entity_id_help') }}</p>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label" for="audit-from">{{ __('audit.filter_from') }}</label>
                 <input id="audit-from" name="from" type="date" class="form-control"
                        value="{{ $filters['from'] ?? '' }}">
                 <p class="form-text mb-0">{{ __('audit.filter_from_help') }}</p>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <label class="form-label" for="audit-to">{{ __('audit.filter_to') }}</label>
                 <input id="audit-to" name="to" type="date" class="form-control"
                        value="{{ $filters['to'] ?? '' }}">
                 <p class="form-text mb-0">{{ __('audit.filter_to_help') }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label" for="audit-request">{{ __('audit.filter_request_id') }}</label>
                 <input id="audit-request" name="request_id" class="form-control"
                        value="{{ $filters['request_id'] ?? '' }}">
                 <p class="form-text mb-0">{{ __('audit.filter_request_id_help') }}</p>
             </div>
-            <div class="col-md-2 d-flex flex-wrap gap-2">
+            <div class="col-12 col-md-2 d-flex flex-wrap gap-2">
                 <button class="btn btn-primary">{{ __('audit.apply_filters') }}</button>
                 <a class="btn btn-outline-secondary" href="{{ route('superadmin.audit.index') }}">{{ __('audit.clear_filters') }}</a>
             </div>
@@ -126,7 +126,7 @@
         <div class="alert alert-warning">{{ __('audit.export_over_cap', ['cap' => $exportCap, 'matched' => $matched]) }}</div>
     @endif
 
-    <div class="table-responsive app-card card shadow-sm">
+    <div class="table-responsive app-card card shadow-sm spims-table-wrap">
         <table class="table table-sm mb-0 align-middle">
             <thead>
                 <tr>

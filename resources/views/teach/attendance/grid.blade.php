@@ -18,16 +18,16 @@
 @endif
 
 <form method="GET" class="row g-2 mb-3">
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
         <input name="q" value="{{ $search }}" class="form-control" placeholder="{{ __('attendance.search_students') }}">
     </div>
-    <div class="col-md-2"><button class="btn btn-outline-primary w-100">{{ __('attendance.search_students') }}</button></div>
+    <div class="col-12 col-md-2"><button class="btn btn-outline-primary w-100">{{ __('attendance.search_students') }}</button></div>
 </form>
 
 <form method="POST" action="{{ route('teach.attendance.mark', [$offering, $session]) }}">
     @csrf
     <input type="hidden" name="lock_version" value="{{ $session->lock_version }}">
-    <div class="table-responsive mb-3">
+    <div class="table-responsive mb-3 spims-table-wrap">
         <table class="table align-middle">
             <thead>
                 <tr>

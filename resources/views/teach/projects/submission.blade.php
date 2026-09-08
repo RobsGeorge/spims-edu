@@ -31,13 +31,13 @@
 
 <form method="POST" action="{{ route('teach.projects.submissions.review', [$offering, $assessment, $submission]) }}" class="row g-2">
     @csrf
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
         <select name="review_status" class="form-select" required>
             @foreach($reviewStatuses as $status)
                 <option value="{{ $status->value }}" @selected($submission->review_status === $status)>{{ __('staff.projects.review_'.$status->value) }}</option>
             @endforeach
         </select>
     </div>
-    <div class="col-md-6"><button class="btn btn-primary">{{ __('staff.projects.save_review') }}</button></div>
+    <div class="col-12 col-md-6"><button class="btn btn-primary">{{ __('staff.projects.save_review') }}</button></div>
 </form>
 @endsection

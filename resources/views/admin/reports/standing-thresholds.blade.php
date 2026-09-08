@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('reports.thresholds_title'))
 @section('content')
-<div class="hub-page animate-in" style="max-width:920px;margin:0 auto;">
+<div class="hub-page animate-in">
     <x-page-header :title="__('reports.thresholds_title')" :subtitle="__('reports.thresholds_desc')">
         <x-slot:actions>
             <a href="{{ route('admin.reports.standing') }}" class="btn btn-outline-secondary">{{ __('reports.standing_title') }}</a>
@@ -17,7 +17,7 @@
         @csrf
         <p class="text-muted-theme mb-4">{{ __('reports.thresholds_help') }}</p>
         <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label" for="good_min">{{ __('reports.good_min') }}</label>
                 <input
                     id="good_min"
@@ -34,7 +34,7 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label" for="suspension_below">{{ __('reports.suspension_below') }}</label>
                 <input
                     id="suspension_below"
@@ -60,7 +60,7 @@
     <div class="app-card p-4 mt-4">
         <h2 class="h5 spims-title mb-2">{{ __('reports.program_overrides_title') }}</h2>
         <p class="text-muted-theme mb-3">{{ __('reports.program_overrides_desc') }}</p>
-        <div class="table-responsive">
+        <div class="table-responsive spims-table-wrap">
             <table class="table mb-0 align-middle">
                 <thead>
                     <tr>

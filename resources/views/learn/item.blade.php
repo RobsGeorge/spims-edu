@@ -12,7 +12,7 @@
 
 <div class="row">
     @include('learn.partials.week-nav')
-    <div class="col-lg-9">
+    <div class="col-12 col-lg-9">
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body">
                 @include('learn.partials.item-media', ['item' => $item])

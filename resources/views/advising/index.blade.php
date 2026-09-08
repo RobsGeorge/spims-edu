@@ -12,7 +12,7 @@
 
 <div class="row g-3">
     @if($canAssign)
-    <div class="col-lg-5">
+    <div class="col-12 col-lg-5">
         <div class="app-card p-3 h-100">
             <h2 class="h6 spims-title">{{ __('advising.assign_title') }}</h2>
             <form method="POST" action="{{ route('advising.assign') }}" class="row g-2">

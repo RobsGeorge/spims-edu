@@ -16,6 +16,7 @@
 @endif
 
 <h2 class="h6">Proctor events</h2>
+<div class="spims-table-wrap">
 <table class="table table-sm">
     <thead><tr><th>#</th><th>type</th><th>at</th></tr></thead>
     <tbody>
@@ -28,4 +29,5 @@
     @endforeach
     </tbody>
 </table>
+</div>
 @endsection

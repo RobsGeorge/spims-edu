@@ -10,12 +10,12 @@
                 <form method="POST" action="{{ route('auth.register') }}">
                     @csrf
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-12 col-md-6">
                             <label class="form-label" for="reg-first">{{ __('ui.first_name') }}</label>
                             <input id="reg-first" type="text" name="first_name" class="form-control @error('first_name') is-invalid @enderror" value="{{ old('first_name') }}" required>
                             @error('first_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-md-6">
                             <label class="form-label" for="reg-last">{{ __('ui.last_name') }}</label>
                             <input id="reg-last" type="text" name="last_name" class="form-control @error('last_name') is-invalid @enderror" value="{{ old('last_name') }}" required>
                             @error('last_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -25,12 +25,12 @@
                             <input id="reg-email" type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required>
                             @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-md-6">
                             <label class="form-label" for="reg-phone">{{ __('ui.phone') }}</label>
                             <input id="reg-phone" type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}">
                             @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-md-6">
                             <label class="form-label" for="reg-locale">{{ __('ui.locale') }}</label>
                             <select id="reg-locale" name="preferred_locale" class="form-select">
                                 @foreach(['ar' => 'العربية', 'en' => 'English', 'fr' => 'Français'] as $code => $label)

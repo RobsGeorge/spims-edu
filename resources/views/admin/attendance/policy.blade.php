@@ -8,7 +8,7 @@
 @endif
 
 <form method="GET" class="row g-2 mb-4">
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
         <select name="offering_id" class="form-select" onchange="this.form.submit()">
             <option value="">{{ __('attendance.global_policy') }}</option>
             @foreach($offerings as $item)
@@ -24,11 +24,11 @@
         <input type="hidden" name="offering_id" value="{{ $offering->id }}">
     @endif
     <div class="row g-3">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('attendance.min_percentage') }}</label>
             <input type="number" min="0" max="100" name="min_percentage" class="form-control" value="{{ old('min_percentage', $policy->min_percentage ?? 75) }}" required>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label">{{ __('attendance.late_grade_percentage') }}</label>
             <input type="number" min="0" max="100" name="late_grade_percentage" class="form-control" value="{{ old('late_grade_percentage', $policy->late_grade_percentage ?? 50) }}" required>
         </div>

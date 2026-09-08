@@ -28,11 +28,11 @@
 
     <form method="GET" action="{{ route('catalog.index') }}" class="catalog-filters app-card p-3 mb-4" data-catalog-loading aria-controls="catalog-results">
         <div class="row g-2 align-items-end">
-            <div class="col-md-4 col-lg-3">
+            <div class="col-12 col-md-4 col-lg-3">
                 <label class="form-label" for="catalog-q">{{ __('catalog.search_placeholder') }}</label>
                 <input id="catalog-q" type="search" name="q" value="{{ $filters['q'] }}" class="form-control" placeholder="{{ __('catalog.search_placeholder') }}">
             </div>
-            <div class="col-6 col-md-4 col-lg-2">
+            <div class="col-12 col-md-4 col-lg-2">
                 <label class="form-label" for="catalog-type">{{ __('catalog.programs') }}</label>
                 <select id="catalog-type" name="type" class="form-select">
                     <option value="all" @selected($filters['type']==='all')>{{ __('catalog.filter_all') }}</option>
@@ -40,7 +40,7 @@
                     <option value="program" @selected($filters['type']==='program')>{{ __('catalog.filter_program') }}</option>
                 </select>
             </div>
-            <div class="col-6 col-md-4 col-lg-2">
+            <div class="col-12 col-md-4 col-lg-2">
                 <label class="form-label" for="catalog-price">{{ __('catalog.filter_paid') }}</label>
                 <select id="catalog-price" name="price" class="form-select">
                     <option value="all" @selected($filters['price']==='all')>{{ __('catalog.filter_all') }}</option>
@@ -48,7 +48,7 @@
                     <option value="paid" @selected($filters['price']==='paid')>{{ __('catalog.filter_paid') }}</option>
                 </select>
             </div>
-            <div class="col-6 col-md-4 col-lg-2">
+            <div class="col-12 col-md-4 col-lg-2">
                 <label class="form-label" for="catalog-sort">{{ __('catalog.sort') }}</label>
                 <select id="catalog-sort" name="sort" class="form-select">
                     <option value="code" @selected($filters['sort']==='code')>{{ __('catalog.sort_code') }}</option>
@@ -56,7 +56,7 @@
                 </select>
             </div>
             @auth
-                <div class="col-6 col-md-4 col-lg-2">
+                <div class="col-12 col-md-4 col-lg-2">
                     <label class="form-label" for="catalog-interest">{{ __('catalog.interest_filter') }}</label>
                     <select id="catalog-interest" name="interest" class="form-select">
                         <option value="all" @selected($filters['interest']==='all')>{{ __('catalog.interest_all') }}</option>

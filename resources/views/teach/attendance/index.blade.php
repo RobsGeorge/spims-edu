@@ -30,7 +30,7 @@
         <x-empty-state :title="__('attendance.report_empty')" icon="bi-clipboard-data" />
     @else
         <p class="text-muted-theme">{{ __('attendance.session_count') }}: {{ $report['aggregate']['session_count'] }} · {{ __('attendance.student_count') }}: {{ $report['aggregate']['student_count'] }}</p>
-        <div class="table-responsive">
+        <div class="table-responsive spims-table-wrap">
             <table class="table">
                 <thead>
                     <tr>
@@ -76,31 +76,31 @@
     <h2 class="h6 mt-4">{{ __('attendance.roster_announce') }}</h2>
     <form method="POST" action="{{ route('teach.attendance.announce', $offering) }}" class="row g-2">
         @csrf
-        <div class="col-md-4"><input name="title" class="form-control" placeholder="{{ __('attendance.announcement_title') }}" required></div>
-        <div class="col-md-6"><input name="body" class="form-control" placeholder="{{ __('attendance.announcement_body') }}" required></div>
-        <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('ui.save') }}</button></div>
+        <div class="col-12 col-md-4"><input name="title" class="form-control" placeholder="{{ __('attendance.announcement_title') }}" required></div>
+        <div class="col-12 col-md-6"><input name="body" class="form-control" placeholder="{{ __('attendance.announcement_body') }}" required></div>
+        <div class="col-12 col-md-2"><button class="btn btn-primary w-100">{{ __('ui.save') }}</button></div>
     </form>
 @else
     <form method="POST" action="{{ route('teach.attendance.store', $offering) }}" class="row g-2 mb-4">
         @csrf
-        <div class="col-md-3"><input name="title" class="form-control" required placeholder="{{ __('attendance.new_session') }}"></div>
-        <div class="col-md-3"><input type="datetime-local" name="scheduled_start" class="form-control" required></div>
-        <div class="col-md-2"><input type="number" name="duration_minutes" class="form-control" value="60" min="15" required aria-label="{{ __('attendance.duration_minutes') }}"></div>
-        <div class="col-md-2">
+        <div class="col-12 col-md-3"><input name="title" class="form-control" required placeholder="{{ __('attendance.new_session') }}"></div>
+        <div class="col-12 col-md-3"><input type="datetime-local" name="scheduled_start" class="form-control" required></div>
+        <div class="col-12 col-md-2"><input type="number" name="duration_minutes" class="form-control" value="60" min="15" required aria-label="{{ __('attendance.duration_minutes') }}"></div>
+        <div class="col-12 col-md-2">
             <select name="mode" class="form-select" aria-label="{{ __('attendance.mode') }}">
                 @foreach($modes as $mode)
                     <option value="{{ $mode->value }}">{{ __('attendance.mode_'.$mode->value) }}</option>
                 @endforeach
             </select>
         </div>
-        <div class="col-md-2"><input name="location" class="form-control" placeholder="{{ __('attendance.location') }}"></div>
+        <div class="col-12 col-md-2"><input name="location" class="form-control" placeholder="{{ __('attendance.location') }}"></div>
         <div class="col-12">
             <label class="form-check">
                 <input type="checkbox" name="notify_students" value="1" class="form-check-input">
                 <span class="form-check-label">{{ __('attendance.notify_students') }}</span>
             </label>
         </div>
-        <div class="col-md-2"><button class="btn btn-primary">{{ __('ui.save') }}</button></div>
+        <div class="col-12 col-md-2"><button class="btn btn-primary">{{ __('ui.save') }}</button></div>
     </form>
 
     @forelse($sessions as $session)
