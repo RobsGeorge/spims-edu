@@ -8,18 +8,18 @@
 @endphp
 <div class="audit-explorer animate-in">
     <nav class="mb-3 small" aria-label="{{ __('audit.explorer_title') }}">
-        <a href="{{ route('superadmin.index') }}" class="text-decoration-none text-muted-theme">
+        <a href="{{ route('superadmin.index') }}" class="text-decoration-none spims-text-dim">
             @include('partials.superadmin-entry-tag', ['class' => 'me-1']) {{ __('audit.crumb_console') }}
         </a>
-        <span class="text-muted-theme mx-1">·</span>
-        <span class="text-muted-theme">{{ __('audit.explorer_title') }}</span>
+        <span class="spims-text-dim mx-1">·</span>
+        <span class="spims-text-dim">{{ __('audit.explorer_title') }}</span>
     </nav>
 
     <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
         <div>
             <h1 class="page-title mb-2">{{ __('audit.explorer_title') }}</h1>
-            <p class="text-muted-theme mb-2">{{ __('audit.explorer_lead') }}</p>
-            <p class="small text-muted-theme mb-0">{{ __('audit.explorer_help') }}</p>
+            <p class="spims-text-dim mb-2">{{ __('audit.explorer_lead') }}</p>
+            <p class="small spims-text-dim mb-0">{{ __('audit.explorer_help') }}</p>
         </div>
         <span class="audit-append-badge">{{ __('audit.append_only') }}</span>
     </header>
@@ -41,7 +41,7 @@
 
     <section class="app-card p-3 mb-4">
         <h2 class="h6 page-title">{{ __('audit.filter_title') }}</h2>
-        <p class="small text-muted-theme mb-3">{{ __('audit.filter_help') }}</p>
+        <p class="small spims-text-dim mb-3">{{ __('audit.filter_help') }}</p>
 
         <p class="small mb-2">{{ __('audit.prefix_hints_help') }}</p>
         <div class="audit-prefix-row mb-3" role="list">
@@ -109,7 +109,7 @@
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
         <div>
             <p class="mb-1">{{ __('audit.matched', ['count' => $matched]) }}</p>
-            <p class="small text-muted-theme mb-0">{{ __('audit.results_help') }}</p>
+            <p class="small spims-text-dim mb-0">{{ __('audit.results_help') }}</p>
         </div>
         @if($canExport)
             <div class="text-md-end">
@@ -149,7 +149,7 @@
                                     {{ $log->actor->email }}
                                 </a>
                             @else
-                                <span class="text-muted-theme">{{ __('audit.system_actor') }}</span>
+                                <span class="spims-text-dim">{{ __('audit.system_actor') }}</span>
                             @endif
                         </td>
                         <td class="small"><code>{{ $log->actor_role ?: '—' }}</code></td>
@@ -174,7 +174,7 @@
                     <tr>
                         <td colspan="7" class="p-3">
                             <p class="mb-1">{{ __('audit.empty') }}</p>
-                            <p class="small text-muted-theme mb-0">{{ __('audit.empty_help') }}</p>
+                            <p class="small spims-text-dim mb-0">{{ __('audit.empty_help') }}</p>
                         </td>
                     </tr>
                 @endforelse

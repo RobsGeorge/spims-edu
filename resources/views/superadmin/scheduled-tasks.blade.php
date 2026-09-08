@@ -5,13 +5,13 @@
 @section('content')
 <div class="hub-page animate-in" style="max-width:800px;margin:0 auto;">
     <div class="mb-3">
-        <a href="{{ route('superadmin.index') }}" class="text-decoration-none text-muted-theme">
+        <a href="{{ route('superadmin.index') }}" class="text-decoration-none spims-text-dim">
             @include('partials.superadmin-entry-tag', ['class' => 'me-1']) {{ __('superadmin.title') }}
         </a>
     </div>
     <h1 class="page-title">{{ __('superadmin.scheduled_title') }}</h1>
-    <p class="text-muted-theme mb-3">{{ __('superadmin.scheduled_desc') }}</p>
-    <p class="small text-muted-theme mb-4">{{ __('superadmin.scheduled_prune_help') }}</p>
+    <p class="spims-text-dim mb-3">{{ __('superadmin.scheduled_desc') }}</p>
+    <p class="small spims-text-dim mb-4">{{ __('superadmin.scheduled_prune_help') }}</p>
     @include('partials.audit-entrance-banner', ['caption' => __('audit.entrance_from_scheduled')])
 
     <div class="table-responsive app-card card shadow-sm">

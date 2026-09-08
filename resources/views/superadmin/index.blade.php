@@ -12,7 +12,7 @@
             </span>
             <div class="min-w-0 flex-grow-1">
                 <h1 class="page-title mb-2">{{ __('superadmin.title') }}</h1>
-                <p class="text-muted-theme mb-0">{{ __('superadmin.hub_desc') }}</p>
+                <p class="spims-text-dim mb-0">{{ __('superadmin.hub_desc') }}</p>
             </div>
         </div>
         <div class="sa-callout sa-callout-danger mt-3" role="note">
@@ -34,7 +34,7 @@
         <section id="sa-{{ $section['id'] }}" class="sa-section">
             <div class="sa-section-heading">
                 <h2 class="h5 page-title mb-1">{{ $section['title'] }}</h2>
-                <p class="text-muted-theme small mb-0">{{ $section['description'] }}</p>
+                <p class="spims-text-dim small mb-0">{{ $section['description'] }}</p>
             </div>
             <div class="row g-3">
                 @foreach($section['links'] as $link)
@@ -46,7 +46,7 @@
 
     <aside class="sa-roadmap app-card mt-4" aria-label="{{ __('superadmin.roadmap_title') }}">
         <h2 class="h6 page-title mb-2">{{ __('superadmin.roadmap_title') }}</h2>
-        <p class="text-muted-theme small mb-3">{{ __('superadmin.roadmap_desc') }}</p>
+        <p class="spims-text-dim small mb-3">{{ __('superadmin.roadmap_desc') }}</p>
         <ul class="sa-roadmap-list mb-0">
             <li class="is-done"><span class="sa-phase">SA1</span> {{ __('superadmin.roadmap_sa1_done') }}</li>
             <li class="is-done"><span class="sa-phase">SA2</span> {{ __('superadmin.roadmap_sa2_done') }}</li>

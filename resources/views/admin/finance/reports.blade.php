@@ -3,7 +3,7 @@
 @section('content')
 <div class="hub-page animate-in" style="max-width:1100px;margin:0 auto;">
     <div class="mb-3">
-        <a href="{{ route('admin.finance.index') }}" class="text-decoration-none text-muted-theme">
+        <a href="{{ route('admin.finance.index') }}" class="text-decoration-none spims-text-dim">
             {{ __('finance.admin_title') }}
         </a>
     </div>
@@ -22,7 +22,7 @@
                     <strong>{{ $row['formatted'] }}</strong>
                 </div>
             @empty
-                <p class="text-muted-theme">{{ __('finance.reports_empty') }}</p>
+                <p class="spims-text-dim">{{ __('finance.reports_empty') }}</p>
             @endforelse
         </div>
         <div class="col-md-6">
@@ -33,7 +33,7 @@
                     <strong>{{ $row['formatted'] }}</strong>
                 </div>
             @empty
-                <p class="text-muted-theme">{{ __('finance.reports_empty') }}</p>
+                <p class="spims-text-dim">{{ __('finance.reports_empty') }}</p>
             @endforelse
         </div>
     </div>
@@ -63,7 +63,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-muted-theme">{{ __('finance.reports_empty') }}</td>
+                        <td colspan="6" class="spims-text-dim">{{ __('finance.reports_empty') }}</td>
                     </tr>
                 @endforelse
             </tbody>

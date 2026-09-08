@@ -10,56 +10,50 @@
 
 <div class="row g-3 mb-4">
     <div class="col-lg-4">
-        <form method="POST" action="{{ route('admin.finance.invoices.store') }}" class="card border-0 shadow-sm">
+        <x-card variant="panel" tag="form" method="POST" action="{{ route('admin.finance.invoices.store') }}">
             @csrf
-            <div class="card-body">
-                <h2 class="h6">{{ __('finance.create_invoice') }}</h2>
-                <select name="student_id" class="form-select mb-2" required>
-                    <option value="">{{ __('finance.select_student') }}</option>
-                    @foreach($studentOptions as $student)
-                        <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }} — {{ $student->email }}</option>
-                    @endforeach
-                </select>
-                <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
-                <input type="number" name="total_minor" class="form-control mb-2" min="1" required>
-                <input name="description" class="form-control mb-2" required>
-                <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>
-            </div>
-        </form>
+            <h2 class="h6">{{ __('finance.create_invoice') }}</h2>
+            <select name="student_id" class="form-select mb-2" required>
+                <option value="">{{ __('finance.select_student') }}</option>
+                @foreach($studentOptions as $student)
+                    <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }} — {{ $student->email }}</option>
+                @endforeach
+            </select>
+            <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
+            <input type="number" name="total_minor" class="form-control mb-2" min="1" required>
+            <input name="description" class="form-control mb-2" required>
+            <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>
+        </x-card>
     </div>
     <div class="col-lg-4">
-        <form method="POST" action="{{ route('admin.finance.points') }}" class="card border-0 shadow-sm">
+        <x-card variant="panel" tag="form" method="POST" action="{{ route('admin.finance.points') }}">
             @csrf
-            <div class="card-body">
-                <h2 class="h6">{{ __('finance.grant_points') }}</h2>
-                <select name="student_id" class="form-select mb-2" required>
-                    <option value="">{{ __('finance.select_student') }}</option>
-                    @foreach($studentOptions as $student)
-                        <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }} — {{ $student->email }}</option>
-                    @endforeach
-                </select>
-                <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
-                <input type="number" name="amount_minor" class="form-control mb-2" min="1" required>
-                <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>
-            </div>
-        </form>
+            <h2 class="h6">{{ __('finance.grant_points') }}</h2>
+            <select name="student_id" class="form-select mb-2" required>
+                <option value="">{{ __('finance.select_student') }}</option>
+                @foreach($studentOptions as $student)
+                    <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }} — {{ $student->email }}</option>
+                @endforeach
+            </select>
+            <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
+            <input type="number" name="amount_minor" class="form-control mb-2" min="1" required>
+            <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>
+        </x-card>
     </div>
     <div class="col-lg-4">
-        <form method="POST" action="{{ route('admin.finance.top-up') }}" class="card border-0 shadow-sm">
+        <x-card variant="panel" tag="form" method="POST" action="{{ route('admin.finance.top-up') }}">
             @csrf
-            <div class="card-body">
-                <h2 class="h6">{{ __('finance.top_up') }}</h2>
-                <select name="student_id" class="form-select mb-2" required>
-                    <option value="">{{ __('finance.select_student') }}</option>
-                    @foreach($studentOptions as $student)
-                        <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }} — {{ $student->email }}</option>
-                    @endforeach
-                </select>
-                <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
-                <input type="number" name="amount_minor" class="form-control mb-2" min="1" required>
-                <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>
-            </div>
-        </form>
+            <h2 class="h6">{{ __('finance.top_up') }}</h2>
+            <select name="student_id" class="form-select mb-2" required>
+                <option value="">{{ __('finance.select_student') }}</option>
+                @foreach($studentOptions as $student)
+                    <option value="{{ $student->id }}">{{ $student->first_name }} {{ $student->last_name }} — {{ $student->email }}</option>
+                @endforeach
+            </select>
+            <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
+            <input type="number" name="amount_minor" class="form-control mb-2" min="1" required>
+            <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>
+        </x-card>
     </div>
 </div>
 
@@ -71,7 +65,7 @@
         <tr>
             <td>{{ $payment->id }}</td>
             <td>{{ $payment->student->email }}</td>
-            <td>{{ $payment->amount_minor }} {{ $payment->currency->value }}</td>
+            <td><x-money :minor="(int) $payment->amount_minor" :currency="$payment->currency" /></td>
             <td>
                 <form method="POST" action="{{ route('admin.finance.verify', $payment) }}">@csrf<button class="btn btn-sm btn-success">{{ __('finance.verify') }}</button></form>
             </td>
@@ -88,8 +82,8 @@
         <tr>
             <td><a href="{{ route('admin.finance.invoices.show', $invoice) }}">{{ $invoice->id }}</a></td>
             <td>{{ $invoice->student->email }}</td>
-            <td>{{ $invoice->total_minor }} {{ $invoice->currency->value }}</td>
-            <td>{{ $invoice->status->value }}</td>
+            <td><x-money :minor="(int) $invoice->total_minor" :currency="$invoice->currency" /></td>
+            <td><x-badge :value="$invoice->status" /></td>
             <td>
                 <form method="POST" action="{{ route('admin.finance.manual', $invoice) }}" class="d-flex gap-1">
                     @csrf
@@ -122,8 +116,8 @@
         <tr>
             <td>{{ $refund->id }}</td>
             <td>{{ $refund->student->email }}</td>
-            <td>{{ $refund->amount_minor }} {{ $refund->currency->value }}</td>
-            <td>{{ $refund->status->value }}</td>
+            <td><x-money :minor="(int) $refund->amount_minor" :currency="$refund->currency" /></td>
+            <td><x-badge :value="$refund->status" /></td>
             <td>
                 @if($refund->status->value === 'REQUESTED')
                 <form method="POST" action="{{ route('admin.finance.refunds.approve', $refund) }}">@csrf<button class="btn btn-sm btn-primary">{{ __('finance.approve') }}</button></form>
