@@ -269,7 +269,8 @@ class IntegrationSettingsTest extends TestCase
             ->assertSee(__('integrations.group_paymob'))
             ->assertSee(__('integrations.group_cashier'))
             ->assertSee(__('integrations.test_mail_title'))
-            ->assertSee(__('integrations.test_payment_title'));
+            ->assertSee(__('integrations.test_payment_title'))
+            ->assertDontSee('Stripe');
 
         $this->actingAs($sa)->get(route('dashboard'))
             ->assertOk()

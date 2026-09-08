@@ -32,7 +32,7 @@ return [
     'group_paymob' => 'Paymob',
     'group_paymob_help' => 'Used for EGP checkout. Integration id is the Accept integration. API key and HMAC are write-once.',
     'group_cashier' => 'Cashier',
-    'group_cashier_help' => 'Existing card gateway already in the payment router. Not a second Stripe product — enable, then set the Cashier secret write-once.',
+    'group_cashier_help' => 'Existing card gateway already in the payment router. Enable it, then set the Cashier secret write-once.',
     'host_default' => 'Host default',
     'host_hint' => 'Host .env currently has a value for this slot.',
     'inherited' => 'Using host / default until you save an override.',

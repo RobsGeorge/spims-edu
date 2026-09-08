@@ -32,7 +32,7 @@ return [
     'group_paymob' => 'Paymob',
     'group_paymob_help' => 'لدفع الجنيه المصري. معرّف التكامل هو تكامل Accept. مفتاح API وHMAC يُكتبان مرة.',
     'group_cashier' => 'Cashier',
-    'group_cashier_help' => 'بوابة البطاقات الموجودة في موجّه الدفع. ليست منتج Stripe ثانيًا — فعّل ثم عيّن سر Cashier مرة واحدة.',
+    'group_cashier_help' => 'بوابة البطاقات الموجودة في موجّه الدفع. فعّل ثم عيّن سر Cashier مرة واحدة.',
     'host_default' => 'افتراضي المضيف',
     'host_hint' => 'ملف .env على المضيف فيه قيمة لهذه الخانة.',
     'inherited' => 'يُستخدم المضيف / الافتراضي حتى تحفظ تجاوزًا.',

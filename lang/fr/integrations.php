@@ -32,7 +32,7 @@ return [
     'group_paymob' => 'Paymob',
     'group_paymob_help' => 'Pour le checkout EGP. L’integration id Accept. Clé API et HMAC s’écrivent une fois.',
     'group_cashier' => 'Cashier',
-    'group_cashier_help' => 'Passerelle carte déjà dans le routeur. Ce n’est pas un second produit Stripe — activez, puis définissez le secret Cashier une fois.',
+    'group_cashier_help' => 'Passerelle carte déjà dans le routeur. Activez, puis définissez le secret Cashier une fois.',
     'host_default' => 'Défaut hôte',
     'host_hint' => 'Le .env hôte a déjà une valeur pour ce créneau.',
     'inherited' => 'Hôte / défaut jusqu’à ce que vous enregistriez une surcharge.',
