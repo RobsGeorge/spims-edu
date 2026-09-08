@@ -5,6 +5,7 @@ Standalone Laravel SIS/LMS for Spims (Coptic Orthodox online school).
 Separate from Ava Pakhomios / Khedma multi-tenant platform.
 
 Full spec: docs/spims-spec-summary.md (traces to spims-spec v0.2).
+Role matrix (every permission key × role, scope rules): docs/role-matrix.md.
 Design gaps & next phases: docs/portal-design-gap-analysis.md.
 Academic roadmap (S0–S9, SIS gaps + mobile API): docs/academic-roadmap/.
 Super Admin remaining work: docs/superadmin-control-plane-plan.md.
