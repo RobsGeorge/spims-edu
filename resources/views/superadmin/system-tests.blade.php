@@ -9,7 +9,7 @@
             @include('partials.superadmin-entry-tag', ['class' => 'me-1']) {{ __('superadmin.title') }}
         </a>
     </div>
-    <h1 class="page-title">{{ __('superadmin.system_tests_title') }}</h1>
+    <x-page-header :title="__('superadmin.system_tests_title')" />
     <p class="text-muted-theme mb-4">{{ __('superadmin.system_tests_desc') }}</p>
 
     <div class="row g-3">

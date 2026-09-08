@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('assessment.assignment_title'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('assessment.assignment_title') }}</h1>
+<x-page-header :title="__('assessment.assignment_title')" />
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 @error('file_url')<div class="alert alert-danger">{{ $message }}</div>@enderror
 @error('file')<div class="alert alert-danger">{{ $message }}</div>@enderror

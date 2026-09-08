@@ -23,7 +23,7 @@
 
     <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
         <div>
-            <h1 class="page-title mb-1">{{ $person->displayName() }}</h1>
+            <x-page-header :title="$person->displayName()" />
             <p class="text-muted-theme mb-2">{{ $person->email }}</p>
             <p class="small text-muted-theme mb-0">{{ __('people.dossier_lead') }}</p>
         </div>

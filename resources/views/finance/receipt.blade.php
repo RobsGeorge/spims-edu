@@ -4,7 +4,7 @@
 @php
     use App\Support\Money;
 @endphp
-<h1 class="spims-title mb-3">{{ __('finance.receipt_title') }}</h1>
+<x-page-header :title="__('finance.receipt_title')" />
 
 <div class="card border-0 shadow-sm">
     <div class="card-body">

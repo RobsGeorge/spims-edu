@@ -5,7 +5,7 @@
 @section('content')
         <div class="card border-0 auth-card">
             <div class="card-body p-4 p-md-5">
-                <h1 class="h3 spims-title mb-2">{{ __('ui.verify_email') }}</h1>
+                <h1 class="h3 spims-title mb-2"><span class="spims-heading-icon-wrap" aria-hidden="true"><x-icon name="lock" class="spims-heading-icon" /></span><span>{{ __('ui.verify_email') }}</span></h1>
                 <p class="text-muted-theme auth-help mb-4">{{ __('ui.auth_help_verify') }}</p>
                 @if(!empty($devOtp))
                     <div class="alert alert-warning">{{ __('ui.dev_otp', ['code' => $devOtp]) }}</div>

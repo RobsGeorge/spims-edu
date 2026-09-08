@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('assessment.assessments'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('assessment.assessments') }} — {{ $offering->course->code }}</h1>
+<x-page-header :title="__('assessment.assessments').' — '.$offering->course->code" />
 <form method="POST" action="{{ route('admin.assessments.store', $offering) }}" class="card border-0 shadow-sm">@csrf
     <div class="card-body row g-2">
         <div class="col-md-6"><input name="title" class="form-control" placeholder="Title" required></div>

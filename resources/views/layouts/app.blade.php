@@ -32,6 +32,18 @@
         <style id="spims-theme-tokens">{!! $themeCssBlock !!}</style>
     @endif
     @stack('styles')
+    <script>
+        (function () {
+            try {
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    return;
+                }
+                if (!sessionStorage.getItem('spims.session.entered')) {
+                    document.documentElement.classList.add('spims-loader-pending', 'spims-session-enter');
+                }
+            } catch (e) {}
+        })();
+    </script>
 </head>
 @php
     use App\Support\NavigationHub;
@@ -64,6 +76,7 @@
     }
 @endphp
 <body class="theme-{{ $themeClass }} {{ $shellLess ? 'shell-guest' : 'shell-app' }}{{ $isPublicHome ? ' spims-public-home' : '' }}{{ $isPublicAuth ? ' spims-public-auth' : '' }}{{ $isPublicCatalog ? ' spims-public-catalog' : '' }}">
+    <x-loader />
     <a class="spims-skip-link" href="#main-content">{{ __('ui.skip_to_content') }}</a>
 
     @if($shellLess)
@@ -280,6 +293,7 @@
         </div>
     @endif
 
+    <script src="{{ asset('js/spims-ui.js') }}" defer></script>
     @stack('scripts')
 </body>
 </html>

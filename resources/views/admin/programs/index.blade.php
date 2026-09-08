@@ -2,7 +2,7 @@
 @section('title', __('ui.nav_programs'))
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="spims-title mb-0">{{ __('ui.nav_programs') }}</h1>
+    <x-page-header :title="__('ui.nav_programs')" />
     <a href="{{ route('admin.programs.create') }}" class="btn btn-primary">{{ __('academics.create_program') }}</a>
 </div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif

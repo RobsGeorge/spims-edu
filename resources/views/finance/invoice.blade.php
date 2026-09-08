@@ -13,7 +13,7 @@
         </ul>
     </div>
 @endif
-<h1 class="spims-title mb-3">{{ __('finance.checkout') }}</h1>
+<x-page-header :title="__('finance.checkout')" />
 <p>{{ $invoice->status->value }} — {{ $invoice->total_minor }} {{ $invoice->currency->value }}</p>
 <p>{{ __('finance.paid') }}: {{ $invoice->amountPaid() }} · {{ __('finance.due') }}: {{ $invoice->amountDue() }}</p>
 

@@ -8,8 +8,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
             <p class="text-muted-theme mb-1">{{ __('learning.player_title') }}</p>
-            <h1 class="spims-title mb-1">{{ $course->code }} · {{ $course->title }}</h1>
-            <p class="mb-0">{{ __('learning.progress', ['percent' => (int) $progress]) }}</p>
+            <x-page-header :title="$course->code.' · '.$course->title" :subtitle="__('learning.progress', ['percent' => (int) $progress])" />
         </div>
         <div class="d-flex flex-wrap gap-2">
             @if(!empty($hasPublishedProjects))

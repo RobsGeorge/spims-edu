@@ -24,6 +24,9 @@ class ComponentLibraryTest extends TestCase
             'empty-state.blade.php',
             'confirm-dialog.blade.php',
             'status-badge.blade.php',
+            'loader.blade.php',
+            'section-heading.blade.php',
+            'course-cover.blade.php',
         ];
 
         foreach ($required as $file) {

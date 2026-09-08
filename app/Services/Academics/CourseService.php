@@ -8,6 +8,7 @@ use App\Models\CoursePrerequisite;
 use App\Models\User;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use App\Support\Ui\CourseCoverLibrary;
 use Illuminate\Validation\ValidationException;
 
 class CourseService
@@ -22,9 +23,16 @@ class CourseService
         $this->authorize->authorize($actor, 'courses.manage');
 
         return $this->audit->withAudit($actor, 'courses.create', function () use ($data) {
+            $code = strtoupper($data['code']);
+            $cover = $data['cover_image_url'] ?? null;
+            if (! is_string($cover) || $cover === '') {
+                $cover = CourseCoverLibrary::urlForSeed($code);
+            }
+
             return Course::query()->create([
-                'code' => strtoupper($data['code']),
+                'code' => $code,
                 'title' => $data['title'],
+                'cover_image_url' => $cover,
                 'credit_hours' => $data['credit_hours'],
                 'default_price_usd' => $data['default_price_usd'] ?? 0,
                 'default_price_egp' => $data['default_price_egp'] ?? 0,
@@ -42,7 +50,7 @@ class CourseService
         $this->authorize->authorize($actor, 'courses.manage');
         $before = $course->toArray();
 
-        $course->update([
+        $payload = [
             'title' => $data['title'] ?? $course->title,
             'credit_hours' => $data['credit_hours'] ?? $course->credit_hours,
             'default_price_usd' => $data['default_price_usd'] ?? $course->default_price_usd,
@@ -52,7 +60,16 @@ class CourseService
             'passing_threshold' => array_key_exists('passing_threshold', $data) ? $data['passing_threshold'] : $course->passing_threshold,
             'assessment_template_id' => array_key_exists('assessment_template_id', $data) ? $data['assessment_template_id'] : $course->assessment_template_id,
             'active' => $data['active'] ?? $course->active,
-        ]);
+        ];
+
+        if (array_key_exists('cover_image_url', $data)) {
+            $cover = $data['cover_image_url'];
+            $payload['cover_image_url'] = (is_string($cover) && $cover !== '')
+                ? $cover
+                : CourseCoverLibrary::urlForSeed((string) $course->code);
+        }
+
+        $course->update($payload);
 
         $this->audit->write($actor, 'courses.update', 'Course', $course->id, $before, $course->fresh()->toArray());
 

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('finance.donate'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('finance.donate') }}</h1>
+<x-page-header :title="__('finance.donate')" />
 <form method="POST" action="{{ route('donate.store') }}" class="card border-0 shadow-sm">
     @csrf
     <div class="card-body row g-2">

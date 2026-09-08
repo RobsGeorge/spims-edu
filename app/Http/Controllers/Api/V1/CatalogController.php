@@ -129,6 +129,7 @@ class CatalogController extends Controller
             'id' => $course->id,
             'code' => $course->code,
             'title' => $course->title,
+            'cover_image_url' => $course->coverUrl(),
             'credit_hours' => $course->credit_hours,
             'is_free' => $course->is_free,
             'is_standalone' => $course->is_standalone,

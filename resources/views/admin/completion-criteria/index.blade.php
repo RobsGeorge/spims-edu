@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('completion.criteria_title'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('completion.criteria_title') }} — {{ $course->code }}</h1>
+<x-page-header :title="__('completion.criteria_title').' — '.$course->code" />
 @if(session('status'))<div class="alert alert-success" role="status">{{ session('status') }}</div>@endif
 
 <form method="POST" action="{{ route('admin.completion-criteria.store', $course) }}" class="card border-0 shadow-sm mb-4">

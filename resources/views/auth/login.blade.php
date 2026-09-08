@@ -10,7 +10,7 @@
 @endphp
         <div class="card border-0 auth-card">
             <div class="card-body p-4 p-md-5">
-                <h1 class="h3 spims-title mb-2">{{ __('ui.login') }}</h1>
+                <h1 class="h3 spims-title mb-2"><span class="spims-heading-icon-wrap" aria-hidden="true"><x-icon name="login" class="spims-heading-icon" /></span><span>{{ __('ui.login') }}</span></h1>
                 <p class="text-muted-theme auth-help mb-4">{{ __('ui.auth_help_login') }}</p>
 
                 @if(session('status'))

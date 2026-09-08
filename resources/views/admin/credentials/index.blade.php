@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('credentials.admin_title'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('credentials.admin_title') }}</h1>
+<x-page-header :title="__('credentials.admin_title')" />
 @if(session('status'))<div class="alert alert-success" role="status">{{ session('status') }}</div>@endif
 
 <form method="POST" action="{{ route('admin.credentials.store') }}" class="card border-0 shadow-sm mb-4">

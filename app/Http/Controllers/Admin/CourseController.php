@@ -105,6 +105,7 @@ class CourseController extends Controller
     {
         return [
             'title' => 'required|string|max:255',
+            'cover_image_url' => 'nullable|url|max:2048',
             'credit_hours' => 'required|integer|min:0',
             'default_price_usd' => 'nullable|integer|min:0',
             'default_price_egp' => 'nullable|integer|min:0',

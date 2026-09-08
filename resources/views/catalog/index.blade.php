@@ -2,12 +2,7 @@
 @section('title', __('ui.nav_catalog'))
 @section('content')
 <div class="animate-in">
-    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
-        <div>
-            <h1 class="spims-title mb-1">{{ __('ui.nav_catalog') }}</h1>
-            <p class="text-muted-theme mb-0">{{ __('hubs.catalog_desc') }}</p>
-        </div>
-    </div>
+    <x-page-header :title="__('ui.nav_catalog')" :subtitle="__('hubs.catalog_desc')" icon="catalog" />
 
     @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
@@ -27,7 +22,7 @@
                     <a class="btn btn-outline-primary" href="#catalog-results">{{ __('catalog.browse_all') }}</a>
                 </div>
             </div>
-            <div class="catalog-featured-media" aria-hidden="true"></div>
+            <x-course-cover :course="$featured" class="catalog-featured-media" />
         </section>
     @endif
 

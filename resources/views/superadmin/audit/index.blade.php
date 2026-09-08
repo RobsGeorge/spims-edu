@@ -17,7 +17,7 @@
 
     <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
         <div>
-            <h1 class="page-title mb-2">{{ __('audit.explorer_title') }}</h1>
+            <x-page-header :title="__('audit.explorer_title')" />
             <p class="text-muted-theme mb-2">{{ __('audit.explorer_lead') }}</p>
             <p class="small text-muted-theme mb-0">{{ __('audit.explorer_help') }}</p>
         </div>
