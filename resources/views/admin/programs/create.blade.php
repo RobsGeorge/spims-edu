@@ -2,14 +2,17 @@
 @section('title', __('academics.create_program'))
 @section('content')
 <h1 class="spims-title mb-3">{{ __('academics.create_program') }}</h1>
-<form method="POST" action="{{ route('admin.programs.store') }}" class="card border-0 shadow-sm">
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.programs.store') }}">
     @csrf
-    <div class="card-body row g-3">
+    <div class="row g-3">
         <div class="col-md-4"><label class="form-label">{{ __('academics.code') }}</label><input name="code" class="form-control @error('code') is-invalid @enderror" value="{{ old('code') }}" required>@error('code')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
         <div class="col-md-8"><label class="form-label">{{ __('academics.name') }}</label><input name="name" class="form-control" value="{{ old('name') }}" required></div>
         <div class="col-md-4"><label class="form-label">{{ __('academics.type') }}</label>
             <select name="type" class="form-select" required>
-                @foreach($types as $type)<option value="{{ $type->value }}">{{ $type->value }}</option>@endforeach
+                @foreach($types as $type)
+                    @php $typeVal = $type->value; @endphp
+                    <option value="{{ $typeVal }}">{{ $typeVal }}</option>
+                @endforeach
             </select>
         </div>
         <div class="col-md-4"><label class="form-label">{{ __('academics.max_credits') }}</label><input type="number" name="max_credits_per_semester" class="form-control" value="{{ old('max_credits_per_semester', 18) }}" required></div>
@@ -27,5 +30,5 @@
         <div class="col-md-6"><label class="form-label">{{ __('academics.signatory_title') }}</label><input name="signatory_title" class="form-control" value="{{ old('signatory_title') }}"></div>
         <div class="col-12"><button class="btn btn-primary">{{ __('ui.save') }}</button></div>
     </div>
-</form>
+</x-card>
 @endsection

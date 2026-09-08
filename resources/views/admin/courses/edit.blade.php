@@ -2,10 +2,10 @@
 @section('title', __('academics.edit_course'))
 @section('content')
 <h1 class="spims-title mb-3">{{ __('academics.edit_course') }}</h1>
-<form method="POST" action="{{ route('admin.courses.update', $course) }}" class="card border-0 shadow-sm">
+<x-card variant="panel" tag="form" method="POST" action="{{ route('admin.courses.update', $course) }}">
     @csrf
     @method('PUT')
-    <div class="card-body row g-3">
+    <div class="row g-3">
         <div class="col-md-3">
             <label class="form-label">{{ __('academics.code') }}</label>
             <input class="form-control" value="{{ $course->code }}" disabled>
@@ -48,5 +48,5 @@
             <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-outline-secondary">{{ __('ui.cancel') }}</a>
         </div>
     </div>
-</form>
+</x-card>
 @endsection

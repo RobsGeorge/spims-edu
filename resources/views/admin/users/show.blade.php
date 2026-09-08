@@ -11,21 +11,21 @@
 <div class="people-dossier animate-in">
     <nav class="mb-3 small" aria-label="{{ __('people.dossier_title') }}">
         @if(\App\Support\NavigationHub::hasSuperadmin(auth()->user()))
-            <a href="{{ route('superadmin.index') }}" class="text-decoration-none text-muted-theme">
+            <a href="{{ route('superadmin.index') }}" class="text-decoration-none spims-text-dim">
                 @include('partials.superadmin-entry-tag', ['class' => 'me-1']) {{ __('people.dossier_crumb_console') }}
             </a>
-            <span class="text-muted-theme mx-1">·</span>
+            <span class="spims-text-dim mx-1">·</span>
         @endif
         <a href="{{ route('admin.users.index') }}" class="text-decoration-none">{{ __('people.dossier_crumb_directory') }}</a>
-        <span class="text-muted-theme mx-1">·</span>
-        <span class="text-muted-theme">{{ $person->displayName() }}</span>
+        <span class="spims-text-dim mx-1">·</span>
+        <span class="spims-text-dim">{{ $person->displayName() }}</span>
     </nav>
 
     <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
         <div>
             <h1 class="page-title mb-1">{{ $person->displayName() }}</h1>
-            <p class="text-muted-theme mb-2">{{ $person->email }}</p>
-            <p class="small text-muted-theme mb-0">{{ __('people.dossier_lead') }}</p>
+            <p class="spims-text-dim mb-2">{{ $person->email }}</p>
+            <p class="small spims-text-dim mb-0">{{ __('people.dossier_lead') }}</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
             <span class="people-status people-status-{{ strtolower($statusKey) }}">{{ __('people.status_'.$statusKey) }}</span>
@@ -33,7 +33,7 @@
                 <span class="badge bg-danger">{{ __('people.protected_badge') }}</span>
             @endif
             @if($isSelf)
-                <span class="badge bg-secondary">{{ __('people.self_badge') }}</span>
+                <x-status-badge status="info" :label="__('people.self_badge')" />
             @endif
         </div>
     </header>
@@ -46,7 +46,7 @@
         <div class="col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.identity_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.identity_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.identity_help') }}</p>
                 <dl class="row mb-0 small">
                     <dt class="col-sm-4">{{ __('ui.email') }}</dt>
                     <dd class="col-sm-8">{{ $person->email }}</dd>
@@ -66,7 +66,7 @@
 
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.status_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.status_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.status_help') }}</p>
                 <p class="small mb-3">{{ __('people.status_'.strtolower($statusKey).'_help') }}</p>
                 <div class="d-flex flex-wrap gap-2">
                     @if($person->status === UserStatus::Active && $canMutateTarget && ! $isSelf)
@@ -95,7 +95,7 @@
 
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('ui.edit_user') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.profile_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.profile_help') }}</p>
                 <form method="POST" action="{{ route('admin.users.update', $person) }}" class="row g-3">
                     @csrf
                     @method('PUT')
@@ -153,11 +153,12 @@
         <div class="col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.roles_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.roles_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.roles_help') }}</p>
                 <ul class="list-unstyled mb-3">
                     @forelse($person->roleTypes() as $role)
+                        @php $roleDisplayVal = $role->value; @endphp
                         <li class="d-flex flex-wrap align-items-center justify-content-between gap-2 py-1 border-bottom border-opacity-25">
-                            <span>{{ __('people.role_'.$role->value) }} <code class="small">{{ $role->value }}</code></span>
+                            <span>{{ __('people.role_'.$role->value) }} <code class="small">{{ $roleDisplayVal }}</code></span>
                             @if(!empty($capabilities['assign_roles']) && $role !== RoleType::SuperAdmin)
                                 <form method="POST" action="{{ route('admin.users.roles.destroy', [$person, $role->value]) }}"
                                       onsubmit="return confirm(@json(__('people.revoke_confirm', ['role' => __('people.role_'.$role->value)])));">
@@ -168,7 +169,7 @@
                             @endif
                         </li>
                     @empty
-                        <li class="text-muted-theme">{{ __('people.no_roles') }}</li>
+                        <li class="spims-text-dim">{{ __('people.no_roles') }}</li>
                     @endforelse
                 </ul>
                 @if(!empty($capabilities['assign_roles']) && $assignableRoles !== [])
@@ -178,7 +179,8 @@
                             <label class="form-label" for="assign-role">{{ __('people.assign_role') }}</label>
                             <select id="assign-role" name="role" class="form-select" required>
                                 @foreach($assignableRoles as $role)
-                                    <option value="{{ $role->value }}">{{ __('people.role_'.$role->value) }}</option>
+                                    @php $roleOptVal = $role->value; @endphp
+                                    <option value="{{ $roleOptVal }}">{{ __('people.role_'.$role->value) }}</option>
                                 @endforeach
                             </select>
                             <p class="form-text mb-0">{{ __('people.assign_role_help') }}</p>
@@ -192,7 +194,7 @@
 
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.actions_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.actions_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.actions_help') }}</p>
 
                 @if(!empty($capabilities['reset_password']) && $canMutateTarget)
                     <form method="POST" action="{{ route('admin.users.password-reset', $person) }}" class="mb-3">
@@ -221,9 +223,9 @@
 
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.sessions_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.sessions_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.sessions_help') }}</p>
                 @if($identitySessions->isEmpty())
-                    <p class="small text-muted-theme mb-2">{{ __('people.sessions_empty') }}</p>
+                    <p class="small spims-text-dim mb-2">{{ __('people.sessions_empty') }}</p>
                 @else
                     <ul class="list-unstyled small mb-3">
                         @foreach($identitySessions as $session)
@@ -247,10 +249,10 @@
         <div class="col-lg-5">
             <section class="app-card p-3 h-100">
                 <h2 class="h6 page-title">{{ __('enrollment.financial_hold_label') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.hold_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.hold_help') }}</p>
                 <p class="mb-3">{{ $held ? __('enrollment.hold_on') : __('enrollment.hold_off') }}</p>
                 @if($hasFinancialHold && ! $held)
-                    <p class="small text-muted-theme">{{ __('people.hold_on') }}</p>
+                    <p class="small spims-text-dim">{{ __('people.hold_on') }}</p>
                 @endif
                 @if(!empty($capabilities['enrollment_override']))
                     <form method="POST" action="{{ route('admin.enrollments.financial-hold', $person) }}" class="d-flex flex-wrap gap-2">
@@ -269,7 +271,7 @@
         <div class="col-lg-7">
             <section class="app-card p-3 h-100">
                 <h2 class="h6 page-title">{{ __('enrollment.override_register') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.enrollments_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.enrollments_help') }}</p>
                 @if(!empty($capabilities['enrollment_override']))
                     <form method="POST" action="{{ route('admin.enrollments.override') }}" class="row g-2">
                         @csrf
@@ -310,9 +312,9 @@
         <div class="col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.enrollments_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.enrollments_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.enrollments_help') }}</p>
                 @if($enrollments->isEmpty())
-                    <p class="text-muted-theme mb-0">{{ __('people.enrollments_empty') }}</p>
+                    <p class="spims-text-dim mb-0">{{ __('people.enrollments_empty') }}</p>
                 @else
                     <ul class="list-unstyled mb-0">
                         @foreach($enrollments as $enrollment)
@@ -320,7 +322,7 @@
                                 <div class="fw-semibold">
                                     {{ $enrollment->offering?->course?->code }} · {{ $enrollment->offering?->course?->title }}
                                 </div>
-                                <div class="small text-muted-theme">{{ $enrollment->status?->value }}</div>
+                                <div class="small">@if($enrollment->status)<x-badge :value="$enrollment->status" />@endif</div>
                             </li>
                         @endforeach
                     </ul>
@@ -329,15 +331,15 @@
 
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.programs_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.programs_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.programs_help') }}</p>
                 @if($studentPrograms->isEmpty())
-                    <p class="text-muted-theme mb-0">{{ __('people.programs_empty') }}</p>
+                    <p class="spims-text-dim mb-0">{{ __('people.programs_empty') }}</p>
                 @else
                     <ul class="list-unstyled mb-0">
                         @foreach($studentPrograms as $programRow)
                             <li class="py-2 border-bottom border-opacity-25">
                                 <div class="fw-semibold">{{ $programRow->program?->name ?? $programRow->program?->code ?? $programRow->program_id }}</div>
-                                <div class="small text-muted-theme">{{ $programRow->status?->value }}</div>
+                                <div class="small">@if($programRow->status)<x-badge :value="$programRow->status" />@endif</div>
                             </li>
                         @endforeach
                     </ul>
@@ -347,9 +349,9 @@
         <div class="col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.invoices_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.invoices_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.invoices_help') }}</p>
                 @if($invoiceSummary === [])
-                    <p class="text-muted-theme mb-0">{{ __('people.invoices_empty') }}</p>
+                    <p class="spims-text-dim mb-0">{{ __('people.invoices_empty') }}</p>
                 @else
                     <ul class="list-unstyled mb-3">
                         @foreach($invoiceSummary as $row)
@@ -363,7 +365,7 @@
                     <ul class="list-unstyled small mb-0">
                         @foreach($invoices as $invoice)
                             <li class="py-1 border-bottom border-opacity-25">
-                                {{ $invoice->status->value }} ·
+                                <x-badge :value="$invoice->status" /> ·
                                 {{ \App\Support\Money::fromMinor((int) $invoice->total_minor, $invoice->currency)->format() }}
                             </li>
                         @endforeach
@@ -373,13 +375,13 @@
 
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('people.audit_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('people.audit_help') }}</p>
+                <p class="small spims-text-dim">{{ __('people.audit_help') }}</p>
                 @include('partials.audit-entrance-banner', [
                     'caption' => __('audit.entrance_from_people'),
                     'url' => route('superadmin.audit.index', ['actor' => $person->email]),
                 ])
                 @if($recentAudit->isEmpty())
-                    <p class="text-muted-theme mb-0">{{ __('people.audit_empty') }}</p>
+                    <p class="spims-text-dim mb-0">{{ __('people.audit_empty') }}</p>
                 @else
                     <ul class="list-unstyled small mb-2">
                         @foreach($recentAudit as $log)
