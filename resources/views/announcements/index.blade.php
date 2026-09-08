@@ -8,7 +8,7 @@
         <a href="{{ route('announcements.show', $announcement) }}" class="text-decoration-none">
             <h2 class="h6 mb-1">{{ $announcement->title }}</h2>
         </a>
-        <p class="mb-0 text-muted-theme">{{ \Illuminate\Support\Str::limit($announcement->localizedBody(), 160) }}</p>
+        <p class="mb-0 spims-text-dim">{{ \Illuminate\Support\Str::limit($announcement->localizedBody(), 160) }}</p>
     </article>
 @empty
     <x-empty-state :title="__('communications.inbox_empty')" icon="bi-megaphone" />

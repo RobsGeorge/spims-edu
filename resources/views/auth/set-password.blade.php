@@ -6,7 +6,7 @@
         <div class="card border-0 auth-card">
             <div class="card-body p-4 p-md-5">
                 <h1 class="h3 spims-title mb-2">{{ __('ui.set_password') }}</h1>
-                <p class="text-muted-theme auth-help mb-4">{{ __('ui.auth_help_set_password') }}</p>
+                <p class="spims-text-dim auth-help mb-4">{{ __('ui.auth_help_set_password') }}</p>
                 <form method="POST" action="{{ route('auth.password.create') }}">
                     @csrf
                     <div class="mb-3">

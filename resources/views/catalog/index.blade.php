@@ -5,7 +5,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
         <div>
             <h1 class="spims-title mb-1">{{ __('ui.nav_catalog') }}</h1>
-            <p class="text-muted-theme mb-0">{{ __('hubs.catalog_desc') }}</p>
+            <p class="spims-text-dim mb-0">{{ __('hubs.catalog_desc') }}</p>
         </div>
     </div>
 
@@ -19,7 +19,7 @@
             <div class="catalog-featured-copy">
                 <p class="catalog-featured-chip">{{ __('catalog.featured_chip') }}</p>
                 <h2 id="catalog-featured-title" class="catalog-featured-title">{{ $featured->title }}</h2>
-                <p class="text-muted-theme mb-3">{{ $featured->code }} · {{ __('catalog.credits', ['count' => $featured->credit_hours]) }}</p>
+                <p class="spims-text-dim mb-3">{{ $featured->code }} · {{ __('catalog.credits', ['count' => $featured->credit_hours]) }}</p>
                 <div class="d-flex flex-wrap gap-2">
                     @if($featuredOffering)
                         <a class="btn btn-primary" href="{{ route('offerings.preview', $featuredOffering) }}">{{ __('catalog.preview') }}</a>
