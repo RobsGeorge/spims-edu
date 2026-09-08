@@ -18,7 +18,7 @@
                     <strong>{{ $row['formatted'] }}</strong>
                 </div>
             @empty
-                <p class="text-muted-theme">{{ __('finance.reports_empty') }}</p>
+                <p class="spims-text-dim">{{ __('finance.reports_empty') }}</p>
             @endforelse
         </div>
         <div class="col-md-6">
@@ -29,7 +29,7 @@
                     <strong>{{ $row['formatted'] }}</strong>
                 </div>
             @empty
-                <p class="text-muted-theme">{{ __('finance.reports_empty') }}</p>
+                <p class="spims-text-dim">{{ __('finance.reports_empty') }}</p>
             @endforelse
         </div>
     </div>

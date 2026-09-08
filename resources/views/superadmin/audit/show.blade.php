@@ -17,20 +17,20 @@
 @endphp
 <div class="audit-explorer audit-detail animate-in">
     <nav class="mb-3 small" aria-label="{{ __('audit.detail_title') }}">
-        <a href="{{ route('superadmin.index') }}" class="text-decoration-none text-muted-theme">
+        <a href="{{ route('superadmin.index') }}" class="text-decoration-none spims-text-dim">
             @include('partials.superadmin-entry-tag', ['class' => 'me-1']) {{ __('audit.crumb_console') }}
         </a>
-        <span class="text-muted-theme mx-1">·</span>
+        <span class="spims-text-dim mx-1">·</span>
         <a href="{{ route('superadmin.audit.index') }}">{{ __('audit.explorer_title') }}</a>
-        <span class="text-muted-theme mx-1">·</span>
-        <span class="text-muted-theme"><code>{{ $log->action }}</code></span>
+        <span class="spims-text-dim mx-1">·</span>
+        <span class="spims-text-dim"><code>{{ $log->action }}</code></span>
     </nav>
 
     <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
         <div>
             <h1 class="page-title mb-2">{{ __('audit.detail_title') }}</h1>
-            <p class="text-muted-theme mb-2">{{ __('audit.detail_lead') }}</p>
-            <p class="small text-muted-theme mb-0">{{ __('audit.detail_help') }}</p>
+            <p class="spims-text-dim mb-2">{{ __('audit.detail_lead') }}</p>
+            <p class="small spims-text-dim mb-0">{{ __('audit.detail_help') }}</p>
         </div>
         <span class="audit-append-badge">{{ __('audit.append_only') }}</span>
     </header>
@@ -93,14 +93,14 @@
 
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('audit.context_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('audit.context_help') }}</p>
+                <p class="small spims-text-dim">{{ __('audit.context_help') }}</p>
                 <dl class="row mb-0 small">
                     <dt class="col-sm-4">{{ __('audit.col_request_id') }}</dt>
                     <dd class="col-sm-8">
                         @if($log->request_id)
                             <code>{{ $log->request_id }}</code>
                         @else
-                            <span class="text-muted-theme">{{ __('audit.no_request_id') }}</span>
+                            <span class="spims-text-dim">{{ __('audit.no_request_id') }}</span>
                         @endif
                     </dd>
                     <dt class="col-sm-4">{{ __('audit.col_ip') }}</dt>
@@ -108,7 +108,7 @@
                         @if($log->ip)
                             <code>{{ $log->ip }}</code>
                         @else
-                            <span class="text-muted-theme">{{ __('audit.no_ip') }}</span>
+                            <span class="spims-text-dim">{{ __('audit.no_ip') }}</span>
                         @endif
                     </dd>
                     <dt class="col-sm-4">{{ __('audit.col_user_agent') }}</dt>
@@ -116,7 +116,7 @@
                         @if($log->user_agent)
                             <code class="small">{{ $log->user_agent }}</code>
                         @else
-                            <span class="text-muted-theme">{{ __('audit.no_ua') }}</span>
+                            <span class="spims-text-dim">{{ __('audit.no_ua') }}</span>
                         @endif
                     </dd>
                 </dl>
@@ -125,16 +125,16 @@
         <div class="col-lg-6">
             <section class="app-card p-3 mb-4">
                 <h2 class="h6 page-title">{{ __('audit.payload_title') }}</h2>
-                <p class="small text-muted-theme">{{ __('audit.payload_help') }}</p>
+                <p class="small spims-text-dim">{{ __('audit.payload_help') }}</p>
                 <h3 class="h6">{{ __('audit.col_before') }}</h3>
                 @if($beforeJson === '')
-                    <p class="text-muted-theme small">{{ __('audit.payload_empty') }}</p>
+                    <p class="spims-text-dim small">{{ __('audit.payload_empty') }}</p>
                 @else
                     <pre class="audit-json" dir="ltr">{{ $beforeJson }}</pre>
                 @endif
                 <h3 class="h6">{{ __('audit.col_after') }}</h3>
                 @if($afterJson === '')
-                    <p class="text-muted-theme small mb-0">{{ __('audit.payload_empty') }}</p>
+                    <p class="spims-text-dim small mb-0">{{ __('audit.payload_empty') }}</p>
                 @else
                     <pre class="audit-json mb-0" dir="ltr">{{ $afterJson }}</pre>
                 @endif
