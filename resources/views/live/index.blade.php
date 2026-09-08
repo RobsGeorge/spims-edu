@@ -2,7 +2,7 @@
 @section('title', __('live.live_sessions'))
 @section('content')
 <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
-    <h1 class="spims-title mb-0">{{ __('live.live_sessions') }}</h1>
+    <x-page-header :title="__('live.live_sessions')" />
     <a href="{{ route('live-quiz.join') }}" class="btn btn-outline-primary">{{ __('live.live_quiz') }}</a>
 </div>
 <table class="table">

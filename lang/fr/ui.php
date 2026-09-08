@@ -111,4 +111,5 @@ return [
     'file_drop_size_error' => 'Le fichier dépasse la taille maximale de :max',
     'file_drop_type_error' => 'Type de fichier non accepté. Autorisé : :accept',
     'file_drop_browse' => 'Parcourir les fichiers',
+    'loader_label' => 'Chargement de SPIMS',
 ];

@@ -3,7 +3,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h1 class="spims-title mb-0">{{ $form->name }}</h1>
+        <x-page-header :title="$form->name" />
         <p class="text-muted-theme mb-0">{{ $form->program->code }} · {{ $form->active ? __('academics.active') : __('academics.inactive') }}</p>
     </div>
     <a href="{{ route('admin.application-forms.index') }}" class="btn btn-outline-secondary">{{ __('ui.nav_app_forms') }}</a>

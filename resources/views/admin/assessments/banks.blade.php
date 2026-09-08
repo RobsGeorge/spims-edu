@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('assessment.banks'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('assessment.banks') }} — {{ $course->code }}</h1>
+<x-page-header :title="__('assessment.banks').' — '.$course->code" />
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 <form method="POST" action="{{ route('admin.banks.store', $course) }}" class="row g-2 mb-4">@csrf
     <div class="col-auto"><input name="name" class="form-control" placeholder="Bank name" required></div>

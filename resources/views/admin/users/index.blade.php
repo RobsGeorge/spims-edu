@@ -18,7 +18,7 @@
         <span class="text-muted-theme">{{ __('people.directory_title') }}</span>
     </nav>
 
-    <h1 class="page-title mb-2">{{ __('people.directory_title') }}</h1>
+    <x-page-header :title="__('people.directory_title')" />
     <p class="text-muted-theme mb-2">{{ __('people.directory_lead') }}</p>
     <p class="small text-muted-theme mb-3">{{ __('people.directory_help') }}</p>
 

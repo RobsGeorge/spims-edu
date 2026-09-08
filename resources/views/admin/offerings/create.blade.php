@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('offerings.create_offering'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('offerings.create_offering') }}</h1>
+<x-page-header :title="__('offerings.create_offering')" />
 <form method="POST" action="{{ route('admin.offerings.store') }}" class="card border-0 shadow-sm">
     @csrf
     <div class="card-body row g-3">

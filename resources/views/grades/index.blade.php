@@ -2,8 +2,7 @@
 @section('title', __('learning.grades'))
 @section('content')
 <div class="animate-in">
-    <h1 class="spims-title mb-2">{{ __('learning.grades') }}</h1>
-    <p class="text-muted-theme mb-4">{{ __('learning.released_only') }}</p>
+    <x-page-header :title="__('learning.grades')" :subtitle="__('learning.released_only')" />
 
     @if(empty($rows))
         <div class="spims-empty app-card p-5 text-center">

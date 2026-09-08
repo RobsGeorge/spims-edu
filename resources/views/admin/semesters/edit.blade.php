@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('offerings.edit_semester'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('offerings.edit_semester') }}</h1>
+<x-page-header :title="__('offerings.edit_semester')" />
 <p class="text-muted-theme">{{ $semester->academicYear?->name }}</p>
 <form method="POST" action="{{ route('admin.semesters.update', $semester) }}" class="card border-0 shadow-sm">
     @csrf

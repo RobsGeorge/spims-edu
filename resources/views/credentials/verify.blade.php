@@ -2,7 +2,7 @@
 @section('title', __('credentials.verify_title'))
 @section('content')
 <div class="spims-hero p-4">
-    <h1 class="spims-title mb-3">{{ __('credentials.verify_title') }}</h1>
+    <x-page-header :title="__('credentials.verify_title')" />
     @if(!$credential)
         <div class="alert alert-danger" role="alert">{{ __('credentials.not_found') }}</div>
     @elseif(!$valid)

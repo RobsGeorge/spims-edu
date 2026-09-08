@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('academics.create_program'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('academics.create_program') }}</h1>
+<x-page-header :title="__('academics.create_program')" />
 <form method="POST" action="{{ route('admin.programs.store') }}" class="card border-0 shadow-sm">
     @csrf
     <div class="card-body row g-3">

@@ -5,7 +5,7 @@
 @section('content')
         <div class="card border-0 auth-card">
             <div class="card-body p-4 p-md-5">
-                <h1 class="h3 spims-title mb-2">{{ __('ui.register') }}</h1>
+                <h1 class="h3 spims-title mb-2"><span class="spims-heading-icon-wrap" aria-hidden="true"><x-icon name="register" class="spims-heading-icon" /></span><span>{{ __('ui.register') }}</span></h1>
                 <p class="text-muted-theme auth-help mb-4">{{ __('ui.auth_help_register') }}</p>
                 <form method="POST" action="{{ route('auth.register') }}">
                     @csrf

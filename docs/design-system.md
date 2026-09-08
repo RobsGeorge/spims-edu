@@ -175,7 +175,9 @@ Page title region. Existing usage must not change.
 
 **Required props:** `title` (string)
 
-**Optional props:** `subtitle` (string), `eyebrow` (string), `actions` slot
+**Optional props:** `subtitle` (string), `eyebrow` (string), `icon` (vocab key, `auto`, or `none`), `actions` slot
+
+`icon="auto"` (default) resolves a vocabulary key from the current route via `HeadingIcon`. Pass `none` to hide the mark.
 
 ```blade
 <x-page-header :title="__('courses.index_title')" :subtitle="__('courses.index_subtitle')">
@@ -332,6 +334,26 @@ Centred empty-state placeholder with icon, title, and optional message/actions.
 <x-empty-state :title="__('ui.no_results')" icon="bi-inbox" />
 ```
 
+### loader
+
+System-wide SPIMS loader. Mounted once in `layouts/app.blade.php`. First session visit shows it until paint; subsequent POST submits and navigations reuse the same overlay. `public/js/spims-ui.js` exposes `window.SpimsLoader.show()` / `.hide()`. Respects `prefers-reduced-motion`.
+
+### course-cover
+
+Renders a course hero/thumb. Uses the stored `cover_image_url`, or a deterministic Unsplash stand-in from `CourseCoverLibrary` when the course was created without an image.
+
+```blade
+<x-course-cover :course="$course" class="catalog-card-media" />
+```
+
+### section-heading
+
+Widget / card title with optional vocabulary icon and hover motion.
+
+```blade
+<x-section-heading :title="__('learning.my_courses')" icon="course" />
+```
+
 ### confirm-dialog
 
 Bootstrap modal for destructive actions. Accepts optional `confirm` slot to override the default submit button.
@@ -398,6 +420,43 @@ Use `<x-icon name="..." />` — never bare `<i class="bi-...">` unless unavailab
 | `warning` | `bi-exclamation-triangle` |
 | `success` | `bi-check-circle` |
 | `empty-state` | `bi-inbox` |
+| `home` | `bi-house` |
+| `catalog` | `bi-grid` |
+| `learning` | `bi-book-half` |
+| `teach` | `bi-easel2` |
+| `academic` | `bi-mortarboard` |
+| `admin` | `bi-building-gear` |
+| `superadmin` | `bi-shield-lock` |
+| `live` | `bi-broadcast` |
+| `discussion` | `bi-chat-dots` |
+| `announcement` | `bi-megaphone` |
+| `notification` | `bi-bell` |
+| `event` | `bi-calendar-event` |
+| `quiz` | `bi-ui-radios` |
+| `project` | `bi-kanban` |
+| `survey` | `bi-ui-checks` |
+| `advising` | `bi-compass` |
+| `application` | `bi-file-earmark-text` |
+| `report` | `bi-graph-up` |
+| `people` | `bi-people` |
+| `theme` | `bi-palette` |
+| `translation` | `bi-translate` |
+| `program` | `bi-diagram-3` |
+| `offering` | `bi-collection` |
+| `search` | `bi-search` |
+| `inbox` | `bi-inbox` |
+| `history` | `bi-clock-history` |
+| `check-in` | `bi-qr-code-scan` |
+| `roster` | `bi-person-lines-fill` |
+| `content` | `bi-folder2-open` |
+| `completion` | `bi-flag` |
+| `transcript` | `bi-file-text` |
+| `login` | `bi-box-arrow-in-right` |
+| `register` | `bi-person-plus` |
+| `lock` | `bi-lock` |
+| `page` | `bi-bookmark` |
+| `wallet` | `bi-wallet2` |
+| `calendar` | `bi-calendar3` |
 
 ---
 

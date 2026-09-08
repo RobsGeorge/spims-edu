@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('ui.nav_templates'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('ui.nav_templates') }}</h1>
+<x-page-header :title="__('ui.nav_templates')" />
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
 <div class="card border-0 shadow-sm mb-4">
