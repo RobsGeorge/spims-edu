@@ -2346,8 +2346,13 @@ code {
 .app-bottom-link span {
     max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.15;
 }
 
 .offering-workspace-tabs,
@@ -2434,6 +2439,12 @@ code {
         max-width: 4.75rem;
         padding-inline: 0.35rem;
         font-size: var(--text-xs);
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+        max-width: 100%;
+        row-gap: var(--space-2);
     }
 
     .spims-modal-body,

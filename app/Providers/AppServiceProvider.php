@@ -11,6 +11,7 @@ use App\Services\SuperAdmin\ImpersonationService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
 use App\Support\ThemeTokens;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Paginator::useBootstrapFive();
+
         View::composer('layouts.app', function ($view): void {
             $cookieTheme = request()->cookie('theme', 'system');
             if (! in_array($cookieTheme, ['light', 'dark', 'system'], true)) {

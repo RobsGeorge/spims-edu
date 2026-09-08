@@ -96,7 +96,7 @@
                         <a href="#spiritual">{{ __('home.nav_spiritual') }}</a>
                     </div>
                 @endif
-                <div class="d-flex align-items-center gap-2 ms-auto">
+                <div class="d-flex flex-wrap align-items-center justify-content-end gap-2 ms-auto">
                     <a href="{{ route('catalog.index') }}" class="btn btn-sm btn-outline-primary d-none d-lg-inline-flex">{{ __('ui.home_cta_catalog') }}</a>
                     @guest
                         <a href="{{ route('auth.login') }}" class="btn btn-sm btn-outline-primary">{{ __('ui.login') }}</a>

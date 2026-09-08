@@ -28,6 +28,9 @@ class ResponsiveContractTest extends TestCase
         $this->assertStringContainsString('.hub-page', $css);
         $this->assertStringContainsString('SPIMS mobile viewport contract', $public);
         $this->assertStringContainsString('.app-topbar .app-topbar-select', $shell);
+
+        $provider = (string) file_get_contents(app_path('Providers/AppServiceProvider.php'));
+        $this->assertStringContainsString('Paginator::useBootstrapFive()', $provider);
     }
 
     #[Test]
