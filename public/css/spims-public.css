@@ -808,3 +808,39 @@ html[dir='rtl'] .catalog-featured-title {
         animation: none;
     }
 }
+
+/* SPIMS mobile viewport contract — public surfaces */
+@media (max-width: 767.98px) {
+    .catalog-featured {
+        padding: var(--space-4);
+    }
+
+    .spims-public-nav .btn-sm {
+        min-height: 44px;
+    }
+
+    .spims-public-nav .form-select {
+        min-height: 44px;
+        max-width: 6.5rem;
+    }
+
+    .spims-landing {
+        padding-inline: var(--space-4);
+    }
+
+    .spims-landing-hero {
+        min-height: 16rem;
+        padding-block: var(--space-8);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .spims-auth-split {
+        width: calc(100% - 1rem);
+        margin-block: var(--space-4) var(--space-8);
+    }
+
+    .spims-public-nav .container-xl {
+        padding-inline: var(--space-3);
+    }
+}
