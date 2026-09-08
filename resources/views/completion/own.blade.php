@@ -21,7 +21,7 @@
             @if($evaluatedAt)
                 {{ $evaluatedAt->timezone(config('app.timezone'))->format('Y-m-d H:i') }}
             @else
-                <span class="text-muted-theme">{{ __('completion.not_yet_evaluated') }}</span>
+                <span class="spims-text-dim">{{ __('completion.not_yet_evaluated') }}</span>
             @endif
         </dd>
     </dl>
@@ -45,7 +45,7 @@
             <td>{{ ($row['passed'] ?? false) ? __('completion.passed') : __('completion.failed') }}</td>
         </tr>
     @empty
-        <tr><td colspan="3" class="text-muted-theme">{{ __('completion.own_pending') }}</td></tr>
+        <tr><td colspan="3" class="spims-text-dim">{{ __('completion.own_pending') }}</td></tr>
     @endforelse
     </tbody>
 </table>

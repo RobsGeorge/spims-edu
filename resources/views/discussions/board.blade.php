@@ -19,8 +19,8 @@
 @error('attachment')<div class="alert alert-danger">{{ $message }}</div>@enderror
 
 @if($board)
-<form method="POST" action="{{ route('discussions.threads.store', $offering) }}" enctype="multipart/form-data" class="card border-0 shadow-sm mb-4">@csrf
-    <div class="card-body row g-2">
+<x-card variant="panel" tag="form" method="POST" action="{{ route('discussions.threads.store', $offering) }}" enctype="multipart/form-data" class="mb-4">@csrf
+    <div class="row g-2">
         <div class="col-md-6">
             <label class="form-label" for="thread-title">{{ __('discussions.thread_title') }}</label>
             <input id="thread-title" name="title" class="form-control" placeholder="{{ __('discussions.thread_title') }}" required>
@@ -35,18 +35,18 @@
         </div>
         <div class="col-12"><button class="btn btn-primary">{{ __('discussions.new_thread') }}</button></div>
     </div>
-</form>
+</x-card>
 @if($threads->isEmpty())
     <x-empty-state :title="__('discussions.no_threads')" :message="__('discussions.no_threads_help')" icon="bi-chat-square-text" />
 @else
-    <div class="card border-0 shadow-sm">
+    <x-card variant="panel">
         <ul class="list-group list-group-flush">
         @foreach($threads as $thread)
             <li class="list-group-item d-flex justify-content-between flex-wrap gap-2">
                 <div>
                     @if($thread->pinned)<x-status-badge status="info" :label="__('discussions.pinned')" />@endif
                     <a href="{{ route('discussions.thread', $thread) }}">{{ $thread->title }}</a>
-                    <div class="small text-muted-theme">{{ $thread->author->email }}</div>
+                    <div class="small spims-text-dim">{{ $thread->author->email }}</div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     @if($thread->locked)<x-status-badge status="warning" :label="__('discussions.locked')" />@endif
@@ -54,7 +54,7 @@
             </li>
         @endforeach
         </ul>
-    </div>
+    </x-card>
     {{ $threads->links() }}
 @endif
 @else

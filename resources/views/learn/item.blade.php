@@ -4,7 +4,7 @@
 <div class="mb-3">
     <a href="{{ route('learn.week', [$offering, $activeWeek]) }}" class="btn btn-link px-0">{{ __('learn.week', ['number' => $activeWeek->number]) }}</a>
     <h1 class="spims-title mb-1">{{ $item->title }}</h1>
-    <p class="text-muted-theme mb-0"><span class="badge text-bg-light">{{ $item->type->value }}</span></p>
+    <p class="spims-text-dim mb-0"><x-badge :value="$item->type" /></p>
 </div>
 @include('offerings.partials.student-preview-banner')
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
@@ -13,11 +13,9 @@
 <div class="row">
     @include('learn.partials.week-nav')
     <div class="col-lg-9">
-        <div class="card border-0 shadow-sm mb-3">
-            <div class="card-body">
-                @include('learn.partials.item-media', ['item' => $item])
-            </div>
-        </div>
+        <x-card variant="panel" class="mb-3">
+            @include('learn.partials.item-media', ['item' => $item])
+        </x-card>
 
         @if(empty($studentPreview) && in_array($item->type->value, ['VIDEO', 'READING', 'TEXT', 'FILE'], true))
             @if($completed)

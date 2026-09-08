@@ -3,7 +3,7 @@
 @section('content')
 <h1 class="spims-title mb-3">{{ $assessment->title }}</h1>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
-<p>{{ $assessment->mode->value }} · {{ $assessment->time_limit_minutes }} {{ __('assessment.minutes') }} · {{ __('assessment.attempts') }} {{ $assessment->attempts_allowed }}</p>
+<p><x-badge :value="$assessment->mode" /> · {{ $assessment->time_limit_minutes }} {{ __('assessment.minutes') }} · {{ __('assessment.attempts') }} {{ $assessment->attempts_allowed }}</p>
 <form method="POST" action="{{ route('assessments.start', $assessment) }}">@csrf
     <button class="btn btn-primary">{{ __('assessment.start') }}</button>
 </form>
@@ -15,7 +15,7 @@
 <ul class="mt-3 list-unstyled">
 @forelse($attempts as $attempt)
     <li class="app-card p-3 mb-2">
-        <p class="mb-1">#{{ $attempt->attempt_no }} — {{ $attempt->status->value }}
+        <p class="mb-1">#{{ $attempt->attempt_no }} — <x-badge :value="$attempt->status" />
             @if($showScores)
                 — {{ __('assessment.total_score') }}: {{ $attempt->total_score }}
             @endif
@@ -39,7 +39,7 @@
         @endif
     </li>
 @empty
-    <li class="text-muted">{{ __('assessment.attempts_empty') }}</li>
+    <li class="spims-text-dim">{{ __('assessment.attempts_empty') }}</li>
 @endforelse
 </ul>
 @endsection
