@@ -11,7 +11,6 @@ use App\Services\SuperAdmin\IntegrationConfigService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -128,7 +127,9 @@ class IntegrationSettingsTest extends TestCase
     {
         $this->seed();
         $sa = User::query()->where('email', env('SUPERADMIN_EMAIL'))->firstOrFail();
-        Mail::fake();
+        $transport = app('mailer')->getSymfonyTransport();
+        $this->assertTrue(method_exists($transport, 'flush'));
+        $transport->flush();
 
         $this->actingAs($sa)->put(route('superadmin.integrations.update'), [
             'safe' => [
@@ -145,7 +146,13 @@ class IntegrationSettingsTest extends TestCase
             ->assertRedirect()
             ->assertSessionHas('status');
 
-        Mail::assertSentCount(1);
+        $messages = $transport->messages();
+        $this->assertCount(1, $messages);
+        $email = $messages->last()->getOriginalMessage();
+        $from = $email->getFrom()[0]->getAddress();
+        $this->assertSame('notify@spims-edu.com', $from);
+        $this->assertSame($sa->email, $email->getTo()[0]->getAddress());
+        $this->assertStringNotContainsString('Your verification code is:', $email->getTextBody());
 
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'integrations.test_mail',
@@ -229,7 +236,10 @@ class IntegrationSettingsTest extends TestCase
         );
         $config->refresh();
 
-        Mail::fake();
+        $transport = app('mailer')->getSymfonyTransport();
+        $this->assertTrue(method_exists($transport, 'flush'));
+        $transport->flush();
+
         $ok = app(TransactionalMailer::class)->send(
             'student@example.com',
             'Hello',
@@ -237,7 +247,13 @@ class IntegrationSettingsTest extends TestCase
             IntegrationConfigService::IDENTITY_NOTIFICATIONS
         );
         $this->assertTrue($ok);
-        Mail::assertSentCount(1);
+        $messages = $transport->messages();
+        $this->assertCount(1, $messages);
+        $email = $messages->last()->getOriginalMessage();
+        $this->assertSame('notify@spims-edu.com', $email->getFrom()[0]->getAddress());
+        $this->assertSame('student@example.com', $email->getTo()[0]->getAddress());
+        $this->assertSame('Hello', $email->getSubject());
+        $this->assertSame('Body without otp digits', $email->getTextBody());
     }
 
     #[Test]

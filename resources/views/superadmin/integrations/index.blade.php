@@ -61,6 +61,7 @@
                             $fieldId = 'safe-'.str_replace('.', '-', $row['key']);
                             $current = array_key_exists($row['key'], $oldSafe) ? $oldSafe[$row['key']] : $row['value'];
                             $fieldName = 'safe['.$row['key'].']';
+                            $type = $row['type'];
                             $labelKey = 'integrations.'.\Illuminate\Support\Str::after($row['key'], 'integrations.');
                         @endphp
                         <div class="col-12">
