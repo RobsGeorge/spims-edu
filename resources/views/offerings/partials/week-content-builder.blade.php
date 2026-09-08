@@ -7,7 +7,7 @@
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
             <div>
                 <h3 class="h6 mb-1">{{ __('teach.week_n', ['n' => $week->number]) }} — {{ $week->title }}</h3>
-                <p class="small text-muted-theme mb-0">{{ $week->items->count() }} {{ __('teach.items') }}</p>
+                <p class="small spims-text-dim mb-0">{{ $week->items->count() }} {{ __('teach.items') }}</p>
             </div>
         </div>
 
@@ -17,7 +17,8 @@
                 <label class="form-label small mb-1">{{ __('offerings.item_type') }}</label>
                 <select name="type" class="form-select form-select-sm" required>
                     @foreach($contentTypes as $type)
-                        <option value="{{ $type->value }}">{{ __('learning.item_'.strtolower($type->value)) }}</option>
+                        @php $typeVal = $type->value; @endphp
+                        <option value="{{ $typeVal }}">{{ __('learning.item_'.strtolower($typeVal)) }}</option>
                     @endforeach
                 </select>
             </div>
@@ -49,7 +50,7 @@
                 <button class="btn btn-sm btn-primary w-100">{{ __('offerings.add_item') }}</button>
             </div>
             <div class="col-12">
-                <p class="small text-muted-theme mb-0">{{ __('offerings.item_starts_draft') }}</p>
+                <p class="small spims-text-dim mb-0">{{ __('offerings.item_starts_draft') }}</p>
             </div>
         </form>
 
@@ -57,7 +58,7 @@
             <article class="border rounded-3 p-2 mb-2" data-item-id="{{ $item->id }}">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                     <div>
-                        <span class="badge text-bg-light">{{ __('learning.item_'.strtolower($item->type->value)) }}</span>
+                        <span class="badge text-bg-info">{{ __('learning.item_'.strtolower($item->type->value)) }}</span>
                         <strong>{{ $item->title }}</strong>
                         @if($item->isPublished())
                             <x-status-badge status="success" :label="__('offerings.status_published')" />
@@ -110,7 +111,8 @@
                         <label class="form-label small mb-1">{{ __('offerings.item_type') }}</label>
                         <select name="type" class="form-select form-select-sm" required>
                             @foreach($contentTypes as $type)
-                                <option value="{{ $type->value }}" @selected($item->type === $type)>{{ __('learning.item_'.strtolower($type->value)) }}</option>
+                                @php $typeVal = $type->value; @endphp
+                                <option value="{{ $typeVal }}" @selected($item->type === $type)>{{ __('learning.item_'.strtolower($typeVal)) }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -153,7 +155,7 @@
                 @endif
             </article>
         @empty
-            <p class="small text-muted-theme mb-0">{{ __('offerings.no_items_in_week') }}</p>
+            <p class="small spims-text-dim mb-0">{{ __('offerings.no_items_in_week') }}</p>
         @endforelse
     </div>
 @endforeach

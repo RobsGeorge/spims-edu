@@ -85,14 +85,14 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-muted-theme">{{ __('teach.no_grades') }}</td>
+                                    <td colspan="3" class="spims-text-dim">{{ __('teach.no_grades') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
             @else
-                <p class="mb-0 text-muted-theme">{{ __('teach.no_grades') }}</p>
+                <p class="mb-0 spims-text-dim">{{ __('teach.no_grades') }}</p>
             @endif
         </section>
     </div>

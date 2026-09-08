@@ -29,7 +29,7 @@
     @if(empty($report['students']))
         <x-empty-state :title="__('attendance.report_empty')" icon="bi-clipboard-data" />
     @else
-        <p class="text-muted-theme">{{ __('attendance.session_count') }}: {{ $report['aggregate']['session_count'] }} · {{ __('attendance.student_count') }}: {{ $report['aggregate']['student_count'] }}</p>
+        <p class="spims-text-dim">{{ __('attendance.session_count') }}: {{ $report['aggregate']['session_count'] }} · {{ __('attendance.student_count') }}: {{ $report['aggregate']['student_count'] }}</p>
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -67,7 +67,7 @@
     @forelse($birthdays as $row)
         <div class="border rounded-3 p-2 mb-2">
             <strong>{{ $row['student']->first_name }} {{ $row['student']->last_name }}</strong>
-            <span class="text-muted-theme">{{ $row['date_of_birth'] }} · {{ $row['days_until'] }}d</span>
+            <span class="spims-text-dim">{{ $row['date_of_birth'] }} · {{ $row['days_until'] }}d</span>
         </div>
     @empty
         <x-empty-state :title="__('attendance.birthdays_empty')" icon="bi-cake2" />
@@ -89,7 +89,8 @@
         <div class="col-md-2">
             <select name="mode" class="form-select" aria-label="{{ __('attendance.mode') }}">
                 @foreach($modes as $mode)
-                    <option value="{{ $mode->value }}">{{ __('attendance.mode_'.$mode->value) }}</option>
+                    @php $modeVal = $mode->value; @endphp
+                    <option value="{{ $modeVal }}">{{ __('attendance.mode_'.$modeVal) }}</option>
                 @endforeach
             </select>
         </div>
@@ -107,7 +108,7 @@
         <div class="d-flex justify-content-between align-items-center border rounded-3 p-3 mb-2">
             <div>
                 <strong>{{ $session->title }}</strong>
-                <div class="small text-muted-theme">
+                <div class="small spims-text-dim">
                     {{ $session->scheduled_start }} · {{ __('attendance.mode_'.$session->mode->value) }}
                     @if($session->isClosed())
                         <x-status-badge status="warning" :label="__('attendance.closed_badge')" />

@@ -23,9 +23,9 @@
 @forelse($stats as $row)
     <div class="border rounded-3 p-3 mb-3">
         <div class="d-flex justify-content-between flex-wrap gap-2">
-            <h3 class="h6 mb-2">{{ $row['title'] }} <span class="badge bg-secondary">{{ $row['delivery_mode'] }}</span></h3>
+            <h3 class="h6 mb-2">{{ $row['title'] }} <x-status-badge status="info" :label="$row['delivery_mode']" /></h3>
         </div>
-        <div class="d-flex flex-wrap gap-3 mb-3 small text-muted-theme">
+        <div class="d-flex flex-wrap gap-3 mb-3 small spims-text-dim">
             <span>{{ __('teach.assignments_enrolled') }}: {{ $row['enrolled_count'] }}</span>
             <span>{{ __('teach.assignments_submitted') }}: {{ $row['submitted_count'] }}</span>
             <span>{{ __('teach.assignments_ungraded') }}: {{ $row['ungraded_count'] }}</span>

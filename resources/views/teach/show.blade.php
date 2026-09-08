@@ -33,7 +33,7 @@
             <div class="spims-staff-row border rounded-3 p-2 mb-2">
                 <div>
                     <strong>{{ $assessment->title }}</strong>
-                    <div class="small text-muted-theme">{{ $assessment->mode->value }} · {{ __('teach.attempts_count', ['count' => $assessment->attempts_count]) }}</div>
+                    <div class="small spims-text-dim"><x-badge :value="$assessment->mode" /> · {{ __('teach.attempts_count', ['count' => $assessment->attempts_count]) }}</div>
                 </div>
                 <a class="btn btn-sm btn-outline-primary" href="{{ route('teach.assessments.attempts', [$offering, $assessment]) }}">{{ __('teach.open_attempts') }}</a>
             </div>
@@ -45,22 +45,20 @@
         <a class="btn btn-primary" href="{{ route('teach.assignments.index', $offering) }}">{{ __('teach.open_assignments') }}</a>
     @elseif($tab === 'gradebook')
         <x-page-header :title="__('teach.tab_gradebook')" :subtitle="__('teach.tab_gradebook_help')" />
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex flex-wrap gap-2 align-items-center">
-                    <x-status-badge
-                        :status="$gradebookLocked ? 'LOCKED' : 'OPEN'"
-                        :label="$gradebookLocked ? __('teach.gradebook_locked') : __('teach.gradebook_open')"
-                    />
-                    <a class="btn btn-primary btn-sm" href="{{ route('admin.gradebook.show', $offering) }}">{{ __('teach.open_gradebook') }}</a>
-                    @include('admin.gradebook._lock_reopen', [
-                        'offering' => $offering,
-                        'showLock' => $canLockGrades ?? false,
-                        'showReopen' => $canReopenGrades ?? false,
-                    ])
-                </div>
+        <x-card variant="panel">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <x-status-badge
+                    :status="$gradebookLocked ? 'LOCKED' : 'OPEN'"
+                    :label="$gradebookLocked ? __('teach.gradebook_locked') : __('teach.gradebook_open')"
+                />
+                <a class="btn btn-primary btn-sm" href="{{ route('admin.gradebook.show', $offering) }}">{{ __('teach.open_gradebook') }}</a>
+                @include('admin.gradebook._lock_reopen', [
+                    'offering' => $offering,
+                    'showLock' => $canLockGrades ?? false,
+                    'showReopen' => $canReopenGrades ?? false,
+                ])
             </div>
-        </div>
+        </x-card>
     @elseif($tab === 'live')
         <x-page-header :title="__('teach.tab_live')" :subtitle="__('teach.tab_live_help')" />
         <a class="btn btn-primary" href="{{ route('teach.live.index', $offering) }}">{{ __('teach.open_live') }}</a>
@@ -100,7 +98,7 @@
                     <h3 class="h6 mb-1">{{ $announcement->title }}</h3>
                     <x-status-badge :status="$announcement->status->value" :label="__('communications.status_'.strtolower($announcement->status->value))" />
                 </div>
-                <p class="mb-2 text-muted-theme">{{ $announcement->body }}</p>
+                <p class="mb-2 spims-text-dim">{{ $announcement->body }}</p>
                 <form method="POST" action="{{ route('teach.announcements.update', $announcement) }}" class="row g-2 mb-2">
                     @csrf
                     @method('PUT')
@@ -149,7 +147,7 @@
             <div class="d-flex justify-content-between align-items-center border rounded-3 p-2 mb-2">
                 <div>
                     <strong>{{ $enrollment->student->first_name }} {{ $enrollment->student->last_name }}</strong>
-                    <div class="small text-muted-theme">{{ $enrollment->student->email }}</div>
+                    <div class="small spims-text-dim">{{ $enrollment->student->email }}</div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <a class="btn btn-sm btn-outline-primary" href="{{ route('teach.students.show', [$offering, $enrollment->student]) }}">{{ __('teach.view_dossier') }}</a>
