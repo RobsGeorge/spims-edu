@@ -1,16 +1,16 @@
 @extends('layouts.app')
 @section('title', __('learning.settings'))
 @section('content')
-<div class="row justify-content-center animate-in">
+<div class="row justify-content-center animate-in settings-page">
     <div class="col-lg-7">
-        <h1 class="spims-title mb-3">{{ __('learning.settings') }}</h1>
-        @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
+        <x-page-header :title="__('learning.settings')" :subtitle="__('hubs.settings_desc')" />
+        @if(session('status'))<div class="alert alert-success academic-alert">{{ session('status') }}</div>@endif
         @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_settings')])
         @include('partials.people-entrance-banner')
 
-        <form method="POST" action="{{ route('settings.picture') }}" enctype="multipart/form-data" class="app-card p-4 mb-4">
+        <form method="POST" action="{{ route('settings.picture') }}" enctype="multipart/form-data" class="app-card academic-card academic-form p-4 mb-4">
             @csrf
-            <h2 class="h5 mb-3">{{ __('learning.profile_picture') }}</h2>
+            <h2 class="h5 spims-title mb-3">{{ __('learning.profile_picture') }}</h2>
             @if($avatarUrl)
                 <div class="mb-3">
                     <img src="{{ $avatarUrl }}" alt="{{ __('learning.profile_picture_current') }}" width="96" height="96" class="rounded-circle" style="object-fit: cover;">
@@ -27,7 +27,7 @@
             <button type="submit" class="btn btn-primary">{{ __('learning.profile_picture_save') }}</button>
         </form>
 
-        <form method="POST" action="{{ route('settings.update') }}" class="app-card p-4">
+        <form method="POST" action="{{ route('settings.update') }}" class="app-card academic-card academic-form p-4">
             @csrf
             @method('PUT')
             <div class="row g-3">

@@ -8,9 +8,9 @@
                 <h1 class="h3 spims-title mb-2">{{ __('ui.reset_password') }}</h1>
                 <p class="spims-text-dim auth-help mb-4">{{ __('ui.auth_help_reset') }}</p>
                 @if(!empty($devOtp))
-                    <div class="alert alert-warning">{{ __('ui.dev_otp', ['code' => $devOtp]) }}</div>
+                    <div class="alert alert-warning academic-alert">{{ __('ui.dev_otp', ['code' => $devOtp]) }}</div>
                 @endif
-                <form method="POST" action="{{ route('auth.password.reset') }}">
+                <form method="POST" action="{{ route('auth.password.reset') }}" class="academic-form">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label" for="reset-code">{{ __('ui.otp_code') }}</label>

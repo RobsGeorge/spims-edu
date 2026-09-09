@@ -7,7 +7,7 @@
             <div class="card-body p-4 p-md-5">
                 <h1 class="h3 spims-title mb-2">{{ __('ui.forgot_password') }}</h1>
                 <p class="spims-text-dim auth-help mb-4">{{ __('ui.auth_help_forgot') }}</p>
-                <form method="POST" action="{{ url('/forgot-password') }}">
+                <form method="POST" action="{{ url('/forgot-password') }}" class="academic-form">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label" for="forgot-email">{{ __('ui.email') }}</label>

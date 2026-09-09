@@ -6,20 +6,20 @@
 @php
     use App\Enums\RoleType;
 @endphp
-<div class="roles-hub sa-console animate-in">
+<div class="roles-hub sa-hub sa-console animate-in">
     <div class="mb-3">
         <a href="{{ route('superadmin.index') }}" class="text-decoration-none spims-text-dim">
             @include('partials.superadmin-entry-tag', ['class' => 'me-1']) {{ __('superadmin.title') }}
         </a>
     </div>
 
-    <div class="d-flex align-items-center gap-3 mb-2 flex-wrap">
-        <span class="badge bg-danger fs-6 px-3 py-2">
-            <i class="bi bi-shield-lock-fill"></i> {{ __('superadmin.role') }}
-        </span>
-        <h1 class="spims-title mb-0">{{ __('roles_hub.title') }}</h1>
-    </div>
-    <p class="spims-text-dim mb-3">{{ __('roles_hub.desc') }}</p>
+    <x-page-header :title="__('roles_hub.title')" :subtitle="__('roles_hub.desc')">
+        <x-slot:actions>
+            <span class="badge bg-danger fs-6 px-3 py-2">
+                <i class="bi bi-shield-lock-fill" aria-hidden="true"></i> {{ __('superadmin.role') }}
+            </span>
+        </x-slot:actions>
+    </x-page-header>
 
     @php
         $section = $section ?? 'templates';
@@ -42,11 +42,11 @@
     </div>
 
     @if(session('status'))
-        <div class="alert alert-success">{{ session('status') }}</div>
+        <div class="alert alert-success academic-alert">{{ session('status') }}</div>
     @endif
 
     <div class="accordion roles-hub-accordion" id="rolesHubAccordion">
-        <div class="accordion-item app-card mb-3 border-0">
+        <div class="accordion-item app-card academic-card mb-3 border-0">
             <h2 class="accordion-header">
                 <button class="accordion-button{{ $helpOpen ? '' : ' collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#helpSection" aria-expanded="{{ $helpOpen ? 'true' : 'false' }}" aria-controls="helpSection">
                     <x-icon name="course" size="sm" class="me-2" /> {{ __('roles_hub.section_help') }}
@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <div class="accordion-item app-card mb-3 border-0">
+        <div class="accordion-item app-card academic-card mb-3 border-0">
             <h2 class="accordion-header">
                 <button class="accordion-button{{ $templatesOpen ? '' : ' collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#templatesSection" aria-expanded="{{ $templatesOpen ? 'true' : 'false' }}" aria-controls="templatesSection">
                     <i class="bi bi-shield-check me-2"></i> {{ __('roles_hub.section_templates') }}
@@ -100,7 +100,7 @@
                                         <details class="roles-hub-subpanel mb-2" data-perm-group>
                                             <summary class="roles-hub-subsummary text-uppercase small">
                                                 {{ $group['label'] }}
-                                                <span class="spims-text-dim fw-normal">· {{ $group['id'] }}</span>
+                                                <span class="spims-text-dim fw-normal">Â· {{ $group['id'] }}</span>
                                             </summary>
                                             <div class="row g-2 mt-2">
                                                 @foreach($group['keys'] as $permKey)
@@ -125,7 +125,7 @@
             </div>
         </div>
 
-        <div class="accordion-item app-card mb-3 border-0">
+        <div class="accordion-item app-card academic-card mb-3 border-0">
             <h2 class="accordion-header">
                 <button class="accordion-button{{ $assignmentsOpen ? '' : ' collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#assignmentsSection" aria-expanded="{{ $assignmentsOpen ? 'true' : 'false' }}" aria-controls="assignmentsSection">
                     <i class="bi bi-people me-2"></i> {{ __('roles_hub.section_assignments') }}

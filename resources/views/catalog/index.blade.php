@@ -10,7 +10,7 @@
     />
 
     @if(session('status'))
-        <div class="alert alert-success">{{ session('status') }}</div>
+        <div class="alert alert-success academic-alert">{{ session('status') }}</div>
     @endif
 
     {{-- ── Featured standalone courses ────────────────────────────────── --}}
@@ -54,7 +54,7 @@
         {{-- ── Shared filter form ─────────────────────────────────────────── --}}
         <form method="GET"
               action="{{ route('catalog.index') }}"
-              class="catalog-filters mb-4"
+              class="catalog-filters academic-form spims-filter-bar mb-4"
               aria-controls="catalog-results-courses catalog-results-standalone">
 
             <x-card variant="quiet" class="p-3">
