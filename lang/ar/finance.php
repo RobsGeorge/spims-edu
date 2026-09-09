@@ -89,4 +89,10 @@ return [
     'plan_sum_mismatch' => 'يجب أن يساوي مجموع الأقساط إجمالي الفاتورة.',
     'dunning_subject' => 'تذكير بقسط متأخر',
     'dunning_body' => 'قسط بمبلغ :amount :currency استُحق في :due_on. يُرجى سداده من صفحة المالية.',
+    'tx_date' => 'التاريخ',
+    'tx_direction' => 'الاتجاه',
+    'tx_amount' => 'المبلغ',
+    'tx_kind' => 'النوع',
+    'tx_reason' => 'السبب',
+    'invoice_date' => 'التاريخ',
 ];
