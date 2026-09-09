@@ -223,6 +223,21 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/teach/{offering}/assignments/{assignment}/remind', [TeachAssignmentController::class, 'remind'])->name('teach.assignments.remind');
     Route::post('/teach/{offering}/assignments/{assignment}/mark-received', [TeachAssignmentController::class, 'markReceived'])->name('teach.assignments.mark-received');
     Route::post('/teach/{offering}/assignments/{assignment}/bulk-grade', [TeachAssignmentController::class, 'bulkGradeOffline'])->name('teach.assignments.bulk-grade');
+    Route::get('/teach/{offering}/assignments/{assignment}/submissions', [TeachAssignmentController::class, 'submissions'])
+        ->middleware('permission:assignments.grade')
+        ->name('teach.assignments.submissions.index');
+    Route::get('/teach/{offering}/assignments/{assignment}/submissions/next-ungraded', [TeachAssignmentController::class, 'nextUngraded'])
+        ->middleware('permission:assignments.grade')
+        ->name('teach.assignments.submissions.next-ungraded');
+    Route::get('/teach/{offering}/assignments/{assignment}/submissions/{submission}', [TeachAssignmentController::class, 'showSubmission'])
+        ->middleware('permission:assignments.grade')
+        ->name('teach.assignments.submissions.show');
+    Route::post('/teach/{offering}/assignments/{assignment}/submissions/{submission}/grade', [TeachAssignmentController::class, 'gradeSubmission'])
+        ->middleware('permission:assignments.grade')
+        ->name('teach.assignments.submissions.grade');
+    Route::post('/teach/{offering}/assignments/{assignment}/submissions/{submission}/ai-suggest', [TeachAssignmentController::class, 'aiSuggest'])
+        ->middleware('permission:assignments.grade')
+        ->name('teach.assignments.submissions.ai-suggest');
 
     Route::get('/teach/{offering}/discussions', [TeachDiscussionController::class, 'index'])
         ->name('teach.discussions.index');
