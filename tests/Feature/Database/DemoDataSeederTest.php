@@ -3,27 +3,61 @@
 namespace Tests\Feature\Database;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\AttemptStatus;
+use App\Enums\ContentItemType;
+use App\Enums\Currency;
+use App\Enums\EventReservationStatus;
 use App\Enums\FeedbackQuestionKind;
+use App\Enums\GradeStatus;
+use App\Enums\LiveQuizSessionState;
+use App\Enums\OfferingClosingStatus;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStatus;
+use App\Enums\PaymentPlanInstallmentStatus;
+use App\Enums\ProjectReviewStatus;
+use App\Enums\WalletKind;
+use App\Models\AdvisingHold;
+use App\Models\AdvisorAssignment;
 use App\Models\Announcement;
 use App\Models\Application;
+use App\Models\Assessment;
+use App\Models\AssessmentAttempt;
+use App\Models\AssessmentTemplate;
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
+use App\Models\CertificateTemplate;
 use App\Models\ClassSession;
+use App\Models\CommunicationLog;
+use App\Models\CompletionCriterion;
+use App\Models\CompletionResult;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Credential;
+use App\Models\EmailTemplate;
 use App\Models\Enrollment;
 use App\Models\Event;
+use App\Models\EventCheckIn;
+use App\Models\EventReservation;
+use App\Models\FeedbackIdentityRevealRequest;
+use App\Models\FeedbackSubmissionIdentity;
 use App\Models\FeedbackSurvey;
 use App\Models\Invoice;
 use App\Models\LiveQuiz;
+use App\Models\LiveQuizSession;
+use App\Models\Notification;
 use App\Models\OfferingStaff;
+use App\Models\PaymentPlan;
 use App\Models\Program;
 use App\Models\ProjectAssessment;
+use App\Models\ProjectDeliverableSubmission;
 use App\Models\ProjectMembership;
 use App\Models\Semester;
+use App\Models\Translation;
 use App\Models\User;
+use App\Models\WalletAccount;
+use App\Models\WalletTransaction;
+use App\Services\Completion\OfferingClosingService;
 use Database\Seeders\DemoDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -62,6 +96,72 @@ class DemoDataSeederTest extends TestCase
         );
         $this->assertTrue(
             Enrollment::query()->where('student_id', $dual->id)->exists()
+        );
+    }
+
+    #[Test]
+    public function phase_a_seeds_assignment_quiz_attempt_and_locked_th101_grades(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $assignmentItem = ContentItem::query()
+            ->where('title', 'TH101 Week 1 reflection')
+            ->where('type', ContentItemType::Assignment)
+            ->first();
+        $this->assertNotNull($assignmentItem);
+        $this->assertTrue($assignmentItem->isPublished());
+
+        $assignment = Assignment::query()->where('content_item_id', $assignmentItem->id)->first();
+        $this->assertNotNull($assignment);
+
+        $this->assertGreaterThanOrEqual(
+            1,
+            AssignmentSubmission::query()->where('assignment_id', $assignment->id)->count()
+        );
+        $this->assertTrue(
+            AssignmentSubmission::query()
+                ->where('assignment_id', $assignment->id)
+                ->where('student_id', $student1->id)
+                ->whereNotNull('final_score')
+                ->exists(),
+            'student1 should have a graded assignment submission'
+        );
+        $this->assertTrue(
+            AssignmentSubmission::query()
+                ->where('assignment_id', $assignment->id)
+                ->whereNull('final_score')
+                ->exists(),
+            'at least one assignment submission should still be pending review'
+        );
+
+        $assessment = Assessment::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Week 1 check')
+            ->first();
+        $this->assertNotNull($assessment);
+
+        $attempt = AssessmentAttempt::query()
+            ->where('assessment_id', $assessment->id)
+            ->where('student_id', $student1->id)
+            ->whereIn('status', [
+                AttemptStatus::Submitted,
+                AttemptStatus::AutoSubmitted,
+                AttemptStatus::Graded,
+            ])
+            ->first();
+        $this->assertNotNull($attempt, 'student1 should have a submitted/graded quiz attempt on TH101');
+
+        $this->assertTrue(
+            Enrollment::query()
+                ->where('offering_id', $th101->id)
+                ->where('grade_status', GradeStatus::Locked)
+                ->exists(),
+            'TH101 enrollments should be grade-locked after Phase A seed'
         );
     }
 
@@ -200,7 +300,7 @@ class DemoDataSeederTest extends TestCase
     }
 
     #[Test]
-    public function seeded_live_quiz_is_in_ready_status(): void
+    public function seeded_live_quiz_has_lobby_session(): void
     {
         $this->seed();
 
@@ -215,8 +315,63 @@ class DemoDataSeederTest extends TestCase
         $this->assertNotNull($quiz);
         $this->assertGreaterThanOrEqual(1, $quiz->questions()->count());
 
-        // No active session started (not yet started).
-        $this->assertNull($quiz->sessions()->where('ended_at', null)->where('started_at', '!=', null)->first());
+        $session = LiveQuizSession::query()
+            ->where('quiz_id', $quiz->id)
+            ->where('state', '!=', LiveQuizSessionState::Ended->value)
+            ->first();
+
+        $this->assertNotNull($session);
+        $this->assertSame(LiveQuizSessionState::Lobby, $session->state);
+        $this->assertNotEmpty($session->join_code);
+    }
+
+    #[Test]
+    public function seeded_email_and_assessment_templates_exist(): void
+    {
+        $this->seed();
+
+        $email = EmailTemplate::query()
+            ->where('key', 'announcement.published')
+            ->where('locale', 'en')
+            ->whereNull('scope_type')
+            ->whereNull('scope_id')
+            ->first();
+
+        $this->assertNotNull($email);
+        $this->assertStringContainsString('SPIMS demo', $email->subject);
+
+        $template = AssessmentTemplate::query()
+            ->where('name', 'Demo Standard Rollup')
+            ->first();
+
+        $this->assertNotNull($template);
+        $this->assertCount(3, $template->components);
+        $this->assertEquals(100, $template->components->sum('weight_percent'));
+    }
+
+    #[Test]
+    public function secondary_offerings_have_week_one_content(): void
+    {
+        $this->seed();
+
+        foreach (['BI102' => 'Welcome to New Testament Survey', 'LI101' => 'Welcome to Coptic Liturgy Basics'] as $code => $title) {
+            $offering = $this->cohortOffering($code);
+            $this->assertNotNull($offering, "Expected cohort offering {$code}");
+
+            $item = ContentItem::query()
+                ->where('title', $title)
+                ->whereHas('week', fn ($q) => $q->where('offering_id', $offering->id)->where('number', 1))
+                ->first();
+
+            $this->assertNotNull($item, "Expected Week 1 content on {$code}");
+            $this->assertTrue($item->isPublished());
+
+            $readingCount = ContentItem::query()
+                ->whereHas('week', fn ($q) => $q->where('offering_id', $offering->id)->where('number', 1))
+                ->count();
+
+            $this->assertGreaterThanOrEqual(2, $readingCount, "{$code} Week 1 should have TEXT + READING");
+        }
     }
 
     #[Test]
@@ -316,6 +471,162 @@ class DemoDataSeederTest extends TestCase
             'student1 should have a Withdrawn application');
     }
 
+    // ─── Phase C gate tests ───────────────────────────────────────────────────
+
+    #[Test]
+    public function seeded_advising_has_assignment_active_hold_and_released_hold(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+        $student6 = User::query()->where('email', 'student6@spims.test')->firstOrFail();
+        $ins1 = User::query()->where('email', 'ins1@spims.test')->firstOrFail();
+
+        $this->assertTrue(
+            AdvisorAssignment::query()
+                ->where('student_id', $student1->id)
+                ->where('advisor_id', $ins1->id)
+                ->exists(),
+            'student1 should be assigned to ins1 as advisor'
+        );
+
+        $this->assertTrue(
+            AdvisingHold::query()
+                ->where('student_id', $student6->id)
+                ->whereNull('released_at')
+                ->exists(),
+            'student6 should have an active advising hold'
+        );
+
+        $this->assertTrue(
+            AdvisingHold::query()
+                ->where('student_id', $student1->id)
+                ->whereNotNull('released_at')
+                ->exists(),
+            'student1 should have a released hold variant'
+        );
+        $this->assertFalse(
+            AdvisingHold::query()
+                ->where('student_id', $student1->id)
+                ->whereNull('released_at')
+                ->exists(),
+            'student1 must not remain on an active hold after seed'
+        );
+    }
+
+    #[Test]
+    public function seeded_certificate_templates_exist_for_admin_fixture(): void
+    {
+        $this->seed();
+
+        $this->assertTrue(
+            CertificateTemplate::query()->whereNull('course_id')->where('locale', 'en')->exists(),
+            'Expected a global EN certificate template'
+        );
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+        $this->assertTrue(
+            CertificateTemplate::query()
+                ->where('course_id', $th101->course_id)
+                ->where('locale', 'en')
+                ->exists(),
+            'Expected a TH101-scoped EN certificate template'
+        );
+    }
+
+    #[Test]
+    public function seeded_communication_logs_exist_for_admin_report(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $this->assertGreaterThanOrEqual(
+            1,
+            CommunicationLog::query()->where('recipient_id', $student1->id)->count(),
+            'Expected communication log rows for student1 (announcement or fallback dispatch)'
+        );
+        $this->assertTrue(
+            CommunicationLog::query()->where('type', 'announcement.published')->exists()
+        );
+    }
+
+    #[Test]
+    public function seeded_completion_criteria_are_evaluated(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+
+        $this->assertGreaterThanOrEqual(
+            1,
+            CompletionCriterion::query()
+                ->where(function ($q) use ($th101) {
+                    $q->where('offering_id', $th101->id)
+                        ->orWhere('course_id', $th101->course_id);
+                })
+                ->count()
+        );
+        $this->assertGreaterThanOrEqual(
+            1,
+            CompletionResult::query()->where('offering_id', $th101->id)->count()
+        );
+        // Closing stays OPEN: lockGrades would mark enrollments Completed and
+        // break the student attendance walkthrough history.
+        $this->assertSame(
+            OfferingClosingStatus::Open,
+            app(OfferingClosingService::class)->statusFor($th101)
+        );
+    }
+
+    #[Test]
+    public function seeded_file_content_item_has_stored_path(): void
+    {
+        $this->seed();
+
+        $item = ContentItem::query()
+            ->where('title', 'TH101 Week 2 reference sheet (PDF)')
+            ->first();
+
+        $this->assertNotNull($item);
+        $this->assertSame(ContentItemType::File, $item->type);
+        $this->assertTrue($item->isStoredFile(), 'FILE demo item should store a real path for download');
+        $this->assertTrue($item->isStoredPdf());
+    }
+
+    #[Test]
+    public function seeded_project_deliverable_is_submitted_and_accepted(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $assessment = ProjectAssessment::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Group Research Project')
+            ->first();
+        $this->assertNotNull($assessment);
+
+        $membership = ProjectMembership::query()
+            ->whereHas('project', fn ($q) => $q->where('project_assessment_id', $assessment->id))
+            ->where('student_id', $student1->id)
+            ->whereNull('left_at')
+            ->first();
+        $this->assertNotNull($membership);
+
+        $submission = ProjectDeliverableSubmission::query()
+            ->where('project_id', $membership->project_id)
+            ->first();
+
+        $this->assertNotNull($submission, 'student1 should have a deliverable submission');
+        $this->assertSame(ProjectReviewStatus::Accepted, $submission->review_status);
+        $this->assertGreaterThanOrEqual(1, $submission->files()->count());
+    }
+
     #[Test]
     public function demo_reset_command_is_idempotent(): void
     {
@@ -331,6 +642,150 @@ class DemoDataSeederTest extends TestCase
 
         $this->assertEquals($counts1, $counts2,
             'Running spims:demo-reset twice must produce identical record counts.');
+    }
+
+    // ─── Phase B fixtures ────────────────────────────────────────────────────
+
+    #[Test]
+    public function seeded_survey_has_student1_submission_and_optional_reveal(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $survey = FeedbackSurvey::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Week 1 Feedback')
+            ->first();
+        $this->assertNotNull($survey);
+
+        $identity = FeedbackSubmissionIdentity::query()
+            ->where('student_id', $student1->id)
+            ->whereHas('submission', fn ($q) => $q->where('survey_id', $survey->id))
+            ->first();
+
+        $this->assertNotNull($identity, 'student1 should have submitted the TH101 feedback survey');
+        $this->assertGreaterThanOrEqual(1, $identity->submission->answers()->count());
+
+        // Identity reveal is optional but seeded when the instructor may request it.
+        $this->assertTrue(
+            FeedbackIdentityRevealRequest::query()
+                ->where('submission_id', $identity->submission_id)
+                ->exists()
+        );
+    }
+
+    #[Test]
+    public function seeded_event_has_student1_reservation_and_check_in(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+        $event = Event::query()->where('title', 'Theology Orientation Day')->firstOrFail();
+
+        $reservation = EventReservation::query()
+            ->where('event_id', $event->id)
+            ->where('student_id', $student1->id)
+            ->where('status', EventReservationStatus::Reserved)
+            ->first();
+
+        $this->assertNotNull($reservation);
+        $this->assertTrue(
+            EventCheckIn::query()->where('reservation_id', $reservation->id)->exists()
+        );
+    }
+
+    #[Test]
+    public function seeded_payment_plan_has_installment_states_for_student1(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $plan = PaymentPlan::query()
+            ->whereHas('invoice', fn ($q) => $q->where('student_id', $student1->id))
+            ->with('installments')
+            ->first();
+
+        $this->assertNotNull($plan);
+        $this->assertGreaterThanOrEqual(2, $plan->installments->count());
+        $this->assertTrue(
+            $plan->installments->contains(
+                fn ($row) => $row->status === PaymentPlanInstallmentStatus::Due
+            ),
+            'Expected at least one Due installment'
+        );
+        $this->assertTrue(
+            $plan->installments->contains(
+                fn ($row) => $row->status === PaymentPlanInstallmentStatus::Pending
+            ),
+            'Expected at least one Pending installment'
+        );
+    }
+
+    #[Test]
+    public function seeded_wallet_points_ledger_exists_for_student1(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+        $wallet = WalletAccount::query()->where('user_id', $student1->id)->first();
+
+        $this->assertNotNull($wallet);
+        $this->assertGreaterThan(0, $wallet->balance(Currency::Egp, WalletKind::Points));
+        $this->assertTrue(
+            WalletTransaction::query()
+                ->where('wallet_id', $wallet->id)
+                ->where('kind', WalletKind::Points)
+                ->exists()
+        );
+    }
+
+    #[Test]
+    public function seeded_translations_cover_course_and_program_locales(): void
+    {
+        $this->seed();
+
+        $th101 = Course::query()->where('code', 'TH101')->firstOrFail();
+        $diploma = Program::query()->where('code', 'DIP-THEO')->firstOrFail();
+
+        $courseLocales = Translation::query()
+            ->where('entity_type', 'Course')
+            ->where('entity_id', $th101->id)
+            ->where('field', 'title')
+            ->pluck('locale')
+            ->all();
+
+        $programLocales = Translation::query()
+            ->where('entity_type', 'Program')
+            ->where('entity_id', $diploma->id)
+            ->where('field', 'name')
+            ->pluck('locale')
+            ->all();
+
+        $this->assertContains('ar', $courseLocales);
+        $this->assertContains('fr', $courseLocales);
+        $this->assertContains('ar', $programLocales);
+        $this->assertContains('fr', $programLocales);
+    }
+
+    #[Test]
+    public function seeded_in_app_notifications_exist_for_student1(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $types = Notification::query()
+            ->where('user_id', $student1->id)
+            ->pluck('type')
+            ->unique()
+            ->all();
+
+        $this->assertContains('announcement.published', $types);
+        $this->assertContains('finance.invoice_issued', $types);
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────────────

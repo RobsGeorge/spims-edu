@@ -2,12 +2,13 @@
 
 namespace App\Services\Offerings;
 
-use App\Enums\OfferingStatus;
+use App\Enums\SemesterStatus;
 use App\Models\AcademicYear;
 use App\Models\Semester;
 use App\Models\User;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use Illuminate\Validation\ValidationException;
 
 class SemesterService
 {
@@ -41,13 +42,11 @@ class SemesterService
             'add_drop_end_week' => $data['add_drop_end_week'],
             'last_withdrawal_week' => $data['last_withdrawal_week'],
             'withdrawal_refund_percent' => $data['withdrawal_refund_percent'] ?? 0,
-            'status' => OfferingStatus::from($data['status'] ?? OfferingStatus::Draft->value),
+            'status' => SemesterStatus::from($data['status'] ?? SemesterStatus::Draft->value),
         ]), 'Semester');
     }
 
-    /**
-     * @param  array<string, mixed>  $data
-     */
+    /** @param array<string, mixed> $data */
     public function updateYear(User $actor, AcademicYear $year, array $data): AcademicYear
     {
         $this->authorize->authorize($actor, 'semesters.manage');
@@ -65,9 +64,7 @@ class SemesterService
         return $fresh;
     }
 
-    /**
-     * @param  array<string, mixed>  $data
-     */
+    /** @param array<string, mixed> $data */
     public function updateSemester(User $actor, Semester $semester, array $data): Semester
     {
         $this->authorize->authorize($actor, 'semesters.manage');
@@ -83,12 +80,50 @@ class SemesterService
             'last_withdrawal_week' => $data['last_withdrawal_week'] ?? $semester->last_withdrawal_week,
             'withdrawal_refund_percent' => $data['withdrawal_refund_percent'] ?? $semester->withdrawal_refund_percent,
             'status' => isset($data['status'])
-                ? OfferingStatus::from($data['status'])
+                ? SemesterStatus::from($data['status'])
                 : $semester->status,
         ]);
 
         $fresh = $semester->fresh();
         $this->audit->write($actor, 'semesters.update', 'Semester', $semester->id, $before, $fresh->toArray());
+
+        return $fresh;
+    }
+
+    /**
+     * Transition a semester through the state machine.
+     * Legal:   DRAFT->OPEN, OPEN->IN_PROGRESS, IN_PROGRESS->CLOSED
+     * Illegal: all other transitions — throws ValidationException
+     *
+     * @throws ValidationException
+     */
+    public function transitionStatus(User $actor, Semester $semester, SemesterStatus $to): Semester
+    {
+        $this->authorize->authorize($actor, 'semesters.manage');
+
+        $from = $semester->status;
+
+        if (! $from->canTransitionTo($to)) {
+            throw ValidationException::withMessages([
+                'status' => __('semesters.illegal_transition', [
+                    'from' => $from->value,
+                    'to'   => $to->value,
+                ]),
+            ]);
+        }
+
+        $before = ['status' => $from->value];
+        $semester->update(['status' => $to]);
+        $fresh = $semester->fresh();
+
+        $this->audit->write(
+            $actor,
+            'semesters.status_transition',
+            'Semester',
+            $semester->id,
+            $before,
+            ['status' => $to->value],
+        );
 
         return $fresh;
     }
