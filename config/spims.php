@@ -3,6 +3,13 @@
 return [
     'force_https' => (bool) env('FORCE_HTTPS', false),
 
+    // Demo mode — NEVER enabled in production regardless of env var.
+    // Set SPIMS_DEMO_MODE=true in .env only in dev/staging environments.
+    'demo_mode' => env('APP_ENV') === 'production' ? false : (bool) env('SPIMS_DEMO_MODE', false),
+
+    // Rate limit for /demo/login: max requests per minute per IP
+    'demo_rate_limit' => (int) env('SPIMS_DEMO_RATE_LIMIT', 10),
+
     'seed_sample_data' => (bool) env('SEED_SAMPLE_DATA', true),
 
     'seed_demo_data' => (bool) env('SEED_DEMO_DATA', true),

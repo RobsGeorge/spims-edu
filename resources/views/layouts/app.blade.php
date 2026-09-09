@@ -40,19 +40,17 @@
     $bottomNav = NavigationHub::bottomNav($navUser);
     $unreadCount = NavigationHub::unreadNotificationCount($navUser);
     $hasSuperadminNav = NavigationHub::hasSuperadmin($navUser);
-    $themeClass = in_array($cookieTheme ?? 'light', ['light', 'dark', 'system'], true)
+    $themeClass = in_array($cookieTheme ?? 'system', ['light', 'dark', 'system'], true)
         ? $cookieTheme
-        : 'light';
+        : 'system';
     $isPublicHome = request()->routeIs('home');
     $isPublicAuth = request()->routeIs('auth.*');
     $isPublicCatalog = request()->routeIs('catalog.*');
     $logoUrl = null;
-    $logoLightUrl = null;
-    $logoDarkUrl = null;
     if ($activeTheme) {
-        $logoLightUrl = $activeTheme->logo_light_url ?: $activeTheme->logo_dark_url;
-        $logoDarkUrl = $activeTheme->logo_dark_url ?: $activeTheme->logo_light_url;
-        $logoUrl = $themeClass === 'dark' ? $logoDarkUrl : $logoLightUrl;
+        $logoUrl = $themeClass === 'dark'
+            ? ($activeTheme->logo_dark_url ?: $activeTheme->logo_light_url)
+            : ($activeTheme->logo_light_url ?: $activeTheme->logo_dark_url);
     }
     $shellLess = request()->routeIs('home') || request()->routeIs('auth.*') || !auth()->check();
     $userInitials = '';
@@ -102,7 +100,6 @@
                             @endforeach
                         </select>
                     </form>
-                    @include('partials.theme-toggle')
                 </div>
             </div>
         </nav>
@@ -169,6 +166,7 @@
             </div>
 
             <div class="app-main-column">
+                @include('partials.demo-banner')
                 @include('partials.impersonation-banner')
                 <header class="app-topbar sticky-top" aria-label="{{ __('ui.nav_dashboard') }}">
                     <button class="btn btn-outline-secondary app-menu-btn d-lg-none" type="button"
@@ -253,7 +251,15 @@
                                 @endforeach
                             </select>
                         </form>
-                        @include('partials.theme-toggle')
+                        <form method="POST" action="{{ route('theme.update') }}" class="d-inline">
+                            @csrf
+                            <label class="visually-hidden" for="theme-select">{{ __('ui.theme') }}</label>
+                            <select id="theme-select" name="theme" class="form-select form-select-sm app-topbar-select" onchange="this.form.submit()">
+                                <option value="light" @selected(($cookieTheme ?? 'system') === 'light')>{{ __('ui.theme_light') }}</option>
+                                <option value="dark" @selected(($cookieTheme ?? 'system') === 'dark')>{{ __('ui.theme_dark') }}</option>
+                                <option value="system" @selected(($cookieTheme ?? 'system') === 'system')>{{ __('ui.theme_system') }}</option>
+                            </select>
+                        </form>
                     </div>
                 </header>
 
