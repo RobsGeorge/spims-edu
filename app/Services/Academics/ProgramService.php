@@ -48,13 +48,18 @@ class ProgramService
         $program->update([
             'name' => $data['name'] ?? $program->name,
             'type' => isset($data['type']) ? ProgramType::from($data['type']) : $program->type,
+            'level' => array_key_exists('level', $data) ? $data['level'] : $program->level,
             'passing_threshold' => $data['passing_threshold'] ?? $program->passing_threshold,
+            'require_all_courses_to_graduate' => array_key_exists('require_all_courses_to_graduate', $data) ? (bool) $data['require_all_courses_to_graduate'] : $program->require_all_courses_to_graduate,
             'max_credits_per_semester' => $data['max_credits_per_semester'] ?? $program->max_credits_per_semester,
             'max_courses_per_semester' => $data['max_courses_per_semester'] ?? $program->max_courses_per_semester,
             'max_semesters_to_graduate' => $data['max_semesters_to_graduate'] ?? $program->max_semesters_to_graduate,
             'elective_credits_required' => $data['elective_credits_required'] ?? $program->elective_credits_required,
+            'enforce_year_sequence' => array_key_exists('enforce_year_sequence', $data) ? (bool) $data['enforce_year_sequence'] : $program->enforce_year_sequence,
             'signatory_name' => $data['signatory_name'] ?? $program->signatory_name,
             'signatory_title' => $data['signatory_title'] ?? $program->signatory_title,
+            'certificate_template' => array_key_exists('certificate_template', $data) ? $data['certificate_template'] : $program->certificate_template,
+            'issue_credential_on_completion' => array_key_exists('issue_credential_on_completion', $data) ? (bool) $data['issue_credential_on_completion'] : $program->issue_credential_on_completion,
             'grading_scheme_id' => array_key_exists('grading_scheme_id', $data) ? $data['grading_scheme_id'] : $program->grading_scheme_id,
             'active' => $data['active'] ?? $program->active,
         ]);

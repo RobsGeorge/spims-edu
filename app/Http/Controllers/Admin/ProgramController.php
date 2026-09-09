@@ -87,6 +87,9 @@ class ProgramController extends Controller
     {
         $data = $request->validate($this->programRules());
         $data['active'] = $request->boolean('active');
+        $data['enforce_year_sequence'] = $request->boolean('enforce_year_sequence');
+        $data['require_all_courses_to_graduate'] = $request->boolean('require_all_courses_to_graduate');
+        $data['issue_credential_on_completion'] = $request->boolean('issue_credential_on_completion');
 
         $service->update($request->user(), $program, $data);
 
@@ -153,13 +156,18 @@ class ProgramController extends Controller
         return [
             'name' => 'required|string|max:255',
             'type' => 'required|in:'.implode(',', array_column(ProgramType::cases(), 'value')),
+            'level' => 'nullable|string|max:128',
             'passing_threshold' => 'nullable|numeric|min:0|max:100',
+            'require_all_courses_to_graduate' => 'sometimes|boolean',
             'max_credits_per_semester' => 'required|integer|min:1',
             'max_courses_per_semester' => 'required|integer|min:1',
             'max_semesters_to_graduate' => 'required|integer|min:1',
+            'enforce_year_sequence' => 'sometimes|boolean',
             'elective_credits_required' => 'nullable|integer|min:0',
             'signatory_name' => 'nullable|string|max:255',
             'signatory_title' => 'nullable|string|max:255',
+            'certificate_template' => 'nullable|string|max:255',
+            'issue_credential_on_completion' => 'sometimes|boolean',
             'grading_scheme_id' => 'nullable|exists:grading_schemes,id',
             'active' => 'sometimes|boolean',
         ];
