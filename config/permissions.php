@@ -211,6 +211,7 @@ return [
      */
     'assessments.proctor' => [
         'INSTRUCTOR' => 'O',
+        'ACADEMIC_ADMIN' => 'F',
     ],
     'assessments.announce_results' => [
         'INSTRUCTOR' => 'O',

@@ -967,6 +967,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/offerings/{offering}/gradebook/reopen', [GradebookController::class, 'reopen'])
             ->middleware('permission:gradebook.reopen')
             ->name('gradebook.reopen');
+        // ## step-14: per-cell score edit (requires gradebook.configure; blocked when locked)
+        Route::post('/offerings/{offering}/gradebook/cell', [GradebookController::class, 'updateCell'])
+            ->middleware('permission:gradebook.configure')
+            ->name('gradebook.cell');
         Route::post('/content-items/{item}/assignments', [GradebookController::class, 'storeAssignment'])
             ->middleware('permission:assignments.manage')
             ->name('assignments.store');

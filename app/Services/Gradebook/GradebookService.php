@@ -21,11 +21,14 @@ use App\Models\DiscussionThread;
 use App\Models\Enrollment;
 use App\Models\GradeBand;
 use App\Models\GradebookComponent;
+use App\Models\GradebookComponentScore;
 use App\Models\GradingScheme;
 use App\Models\ProgramCourse;
 use App\Models\ProgramRequirementFulfillment;
 use App\Models\StudentProgram;
 use App\Models\User;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\ValidationException;
 use App\Services\Assessment\AttemptService;
 use App\Services\Assessment\ResultsVisibilityService;
 use App\Services\Live\AttendanceService;
@@ -406,6 +409,10 @@ class GradebookService
                 $this->postAcademicRecord($enrollment);
             }
 
+            // Set offering-level lock timestamp so the UI can show the banner
+            // and the cell-edit endpoint can reject writes in O(1) without loading enrollments.
+            $offering->update(['gradebook_locked_at' => now()]);
+
             $this->audit->write($actor, 'gradebook.lock', 'CourseOffering', $offering->id);
         });
     }
@@ -432,12 +439,73 @@ class GradebookService
                     'grade_locked_at' => null,
                 ]);
 
+            // Clear offering-level lock timestamp so cells are editable again.
+            $offering->update(['gradebook_locked_at' => null]);
+
             $this->audit->write($actor, 'gradebook.reopen', 'CourseOffering', $offering->id);
         });
     }
 
+    /**
+     * Directly set a student's score for one gradebook component (0–100 percent).
+     * Blocked when the offering's gradebook is locked.
+     * Writes an AuditLog entry with before/after values.
+     *
+     * @throws HttpResponseException  when offering is locked (403)
+     * @throws ValidationException   when score is out of range
+     */
+    public function setCellScore(User $actor, CourseOffering $offering, GradebookComponent $component, User $student, float $score): GradebookComponentScore
+    {
+        $this->authorize->authorize($actor, 'gradebook.configure', $offering);
+
+        // Defence in depth: reject even if the banner was bypassed.
+        if ($offering->gradebook_locked_at !== null) {
+            abort(403, __('assessment.gradebook_locked_banner_title'));
+        }
+
+        if ($score < 0 || $score > 100) {
+            throw ValidationException::withMessages([
+                'score' => [__('assessment.cell_score_range')],
+            ]);
+        }
+
+        // Read old value before updating.
+        $existing = GradebookComponentScore::query()
+            ->where('component_id', $component->id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        $oldScore = $existing?->score;
+
+        $record = GradebookComponentScore::query()->updateOrCreate(
+            ['component_id' => $component->id, 'student_id' => $student->id],
+            ['score' => round($score, 4), 'updated_by_id' => $actor->id],
+        );
+
+        $this->audit->write(
+            $actor,
+            'gradebook.cell_update',
+            'GradebookComponentScore',
+            $record->id,
+            before: ['score' => $oldScore],
+            after: ['score' => round($score, 4), 'component_id' => $component->id, 'student_id' => $student->id],
+        );
+
+        return $record;
+    }
+
     public function componentPercent(GradebookComponent $component, User $student): ?float
     {
+        // Staff-entered direct override takes precedence over computed score.
+        $override = GradebookComponentScore::query()
+            ->where('component_id', $component->id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        if ($override !== null) {
+            return (float) $override->score;
+        }
+
         if ($component->kind === ComponentKind::Attendance) {
             if ($this->cachedFor($component->offering_id)) {
                 return $this->offeringCache['attendance'][$student->id] ?? null;
