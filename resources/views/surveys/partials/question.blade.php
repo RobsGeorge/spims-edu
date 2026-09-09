@@ -17,11 +17,11 @@
         $scaleMax = max($numeric);
     }
 @endphp
-<fieldset class="app-card border rounded-3 p-3 mb-3" @disabled($disabled)>
+<x-card variant="quiet" tag="fieldset" class="mb-3" :disabled="$disabled">
     <legend class="h6 mb-2">
         {{ $question->position }}. {{ $question->prompt }}
         @if($question->required)
-            <span class="small text-muted-theme">· {{ __('feedback.required') }}</span>
+            <span class="small spims-text-dim">&middot; {{ __('feedback.required') }}</span>
         @endif
         <span class="visually-hidden">{{ __('feedback.kind_'.$kind) }}</span>
     </legend>
@@ -88,4 +88,4 @@
             @endfor
         </div>
     @endif
-</fieldset>
+</x-card>
