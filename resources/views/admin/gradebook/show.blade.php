@@ -13,16 +13,30 @@
 
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
+{{-- Locked gradebook banner --}}
+@if($offering->gradebook_locked_at)
+<div class="alert alert-warning d-flex align-items-start gap-2 mb-3" role="alert" data-gradebook-locked-banner="1">
+    <i class="bi bi-lock-fill fs-5 flex-shrink-0 mt-1" aria-hidden="true"></i>
+    <div>
+        <strong>{{ __('assessment.gradebook_locked_banner_title') }}</strong>
+        <p class="mb-0">{{ __('assessment.gradebook_locked_banner_body', ['date' => $offering->gradebook_locked_at->isoFormat('LL LT')]) }}</p>
+    </div>
+</div>
+@endif
+
 <div class="d-flex gap-2 mb-3 flex-wrap">
-    <form method="POST" action="{{ route('admin.gradebook.seed', $offering) }}">@csrf<button class="btn btn-sm btn-outline-primary">{{ __('assessment.seed_template') }}</button></form>
-    <form method="POST" action="{{ route('admin.gradebook.submit', $offering) }}">@csrf<button class="btn btn-sm btn-warning">{{ __('assessment.submit_grades') }}</button></form>
+    @unless($offering->gradebook_locked_at)
+        <form method="POST" action="{{ route('admin.gradebook.seed', $offering) }}">@csrf<button class="btn btn-sm btn-outline-primary">{{ __('assessment.seed_template') }}</button></form>
+        <form method="POST" action="{{ route('admin.gradebook.submit', $offering) }}">@csrf<button class="btn btn-sm btn-warning">{{ __('assessment.submit_grades') }}</button></form>
+    @endunless
     @include('admin.gradebook._lock_reopen', ['offering' => $offering])
 </div>
 
+@unless($offering->gradebook_locked_at)
 <form method="POST" action="{{ route('admin.gradebook.components', $offering) }}" class="row g-2 mb-3">@csrf
-    <div class="col-md-3"><input name="name" class="form-control" placeholder="{{ __('assessment.component') }}" required></div>
-    <div class="col-md-2"><input type="number" step="0.01" name="weight_percent" class="form-control" placeholder="%" required></div>
-    <div class="col-md-3">
+    <div class="col-12 col-md-3"><input name="name" class="form-control" placeholder="{{ __('assessment.component') }}" required></div>
+    <div class="col-6 col-md-2"><input type="number" step="0.01" name="weight_percent" class="form-control" placeholder="%" required></div>
+    <div class="col-6 col-md-3">
         <select name="kind" class="form-select" aria-label="{{ __('assessment.component') }}">
             @foreach($componentKinds as $kind)
                 @php $kindVal = $kind->value; @endphp
@@ -30,8 +44,9 @@
             @endforeach
         </select>
     </div>
-    <div class="col-md-2"><button class="btn btn-primary">{{ __('ui.save') }}</button></div>
+    <div class="col-12 col-md-2"><button class="btn btn-primary w-100 w-md-auto">{{ __('ui.save') }}</button></div>
 </form>
+@endunless
 
 <p class="mb-2" data-weight-sum="{{ $weightSum }}">
     {{ __('assessment.weight_sum', ['sum' => $weightSum]) }}
@@ -45,5 +60,6 @@
     'components' => $components,
     'enrollments' => $enrollments,
     'gradeUrls' => $gradeUrls,
+    'locked' => (bool) $offering->gradebook_locked_at,
 ])
 @endsection

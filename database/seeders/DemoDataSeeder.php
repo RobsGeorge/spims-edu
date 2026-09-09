@@ -24,8 +24,8 @@ use App\Enums\LiveQuizSessionState;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStaffRole;
 use App\Enums\OfferingStatus;
-use App\Enums\SemesterStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\SemesterStatus;
 use App\Enums\ProjectDeliverableKind;
 use App\Enums\ProjectGradingMode;
 use App\Enums\ProjectReviewStatus;
@@ -474,7 +474,7 @@ class DemoDataSeeder extends Seeder
             ]
         );
 
-        // CLOSED semester — the prior year fall has finished the status machine
+        // CLOSED semester — the prior year fall is closed
         $prior = AcademicYear::query()->updateOrCreate(
             ['name' => '2025/2026'],
             ['start_date' => '2025-09-01', 'end_date' => '2026-06-30']

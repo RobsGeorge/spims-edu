@@ -28,6 +28,7 @@ class CourseOffering extends Model
         'status',
         'start_date',
         'end_date',
+        'gradebook_locked_at',
     ];
 
     protected $casts = [
@@ -39,6 +40,7 @@ class CourseOffering extends Model
         'attendance_threshold_percent' => 'float',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'gradebook_locked_at' => 'datetime',
     ];
 
     public function course(): BelongsTo

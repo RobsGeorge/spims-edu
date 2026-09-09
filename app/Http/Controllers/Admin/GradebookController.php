@@ -7,9 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\AssignmentSubmission;
 use App\Models\ContentItem;
 use App\Models\CourseOffering;
+use App\Models\Enrollment;
+use App\Models\GradeBand;
 use App\Models\GradebookComponent;
+use App\Models\GradingScheme;
+use App\Models\User;
 use App\Services\Assessment\AssignmentService;
 use App\Services\Gradebook\GradebookService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -97,6 +102,65 @@ class GradebookController extends Controller
         $assignments->create($request->user(), $item, $data);
 
         return back()->with('status', __('assessment.assignment_created'));
+    }
+
+    /**
+     * Update a single gradebook cell (student × component) with a staff-entered
+     * percentage score (0–100). Blocked when the offering's gradebook is locked.
+     * Returns JSON so the grid can update the cell inline without a full page reload.
+     */
+    public function updateCell(Request $request, CourseOffering $offering, GradebookService $gradebook): JsonResponse
+    {
+        // 422 banner gate: offering-level lock exposed as a validation error so the
+        // front-end can display the reason without a hard redirect.
+        if ($offering->gradebook_locked_at !== null) {
+            return response()->json([
+                'message' => __('assessment.gradebook_locked_banner_title'),
+                'errors' => ['gradebook' => [__('assessment.gradebook_locked_banner_body')]],
+            ], 422);
+        }
+
+        $data = $request->validate([
+            'student_id' => 'required|ulid|exists:users,id',
+            'component_id' => 'required|ulid|exists:gradebook_components,id',
+            'score' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $component = GradebookComponent::query()
+            ->where('id', $data['component_id'])
+            ->where('offering_id', $offering->id)
+            ->firstOrFail();
+
+        $student = User::query()->findOrFail($data['student_id']);
+
+        $gradebook->setCellScore($request->user(), $offering, $component, $student, (float) $data['score']);
+
+        // Recompute the enrollment summary so the grid can refresh the final row.
+        $enrollment = Enrollment::query()
+            ->where('offering_id', $offering->id)
+            ->where('student_id', $student->id)
+            ->with(['studentProgram.program'])
+            ->firstOrFail();
+        $computed = $gradebook->computeEnrollment($enrollment);
+
+        $schemeId = $enrollment->studentProgram?->program?->grading_scheme_id
+            ?? GradingScheme::query()->where('is_default', true)->value('id');
+
+        $letter = null;
+        if ($schemeId && $computed['percent'] !== null) {
+            $band = GradeBand::query()
+                ->where('scheme_id', $schemeId)
+                ->where('min_percent', '<=', $computed['percent'])
+                ->where('max_percent', '>=', $computed['percent'])
+                ->first();
+            $letter = $band?->letter;
+        }
+
+        return response()->json([
+            'percent' => $computed['percent'],
+            'letter' => $letter,
+            'message' => __('assessment.cell_score_saved'),
+        ]);
     }
 
     public function gradeSubmission(Request $request, AssignmentSubmission $submission, AssignmentService $assignments): RedirectResponse

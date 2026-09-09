@@ -2348,3 +2348,33 @@ progress.spims-progress--danger::-moz-progress-bar  { background: var(--color-da
 .settings-page .academic-card {
     padding: var(--space-4, 1rem);
 }
+
+/* ── Step 14: Gradebook cell edit ─────────────────────────────────────── */
+.gradebook-cell {
+    min-width: 5rem;
+}
+
+.gradebook-cell-display {
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-decoration-color: var(--color-text-muted);
+    text-underline-offset: 2px;
+}
+
+.gradebook-cell-display:hover,
+.gradebook-cell-display:focus-visible {
+    text-decoration-style: solid;
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm);
+}
+
+[x-cloak] {
+    display: none !important;
+}
+/* ── Step 14: Proctor timeline ─────────────────────────────────────────── */
+.proctor-warning-count {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-warning);
+}

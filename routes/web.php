@@ -223,6 +223,21 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/teach/{offering}/assignments/{assignment}/remind', [TeachAssignmentController::class, 'remind'])->name('teach.assignments.remind');
     Route::post('/teach/{offering}/assignments/{assignment}/mark-received', [TeachAssignmentController::class, 'markReceived'])->name('teach.assignments.mark-received');
     Route::post('/teach/{offering}/assignments/{assignment}/bulk-grade', [TeachAssignmentController::class, 'bulkGradeOffline'])->name('teach.assignments.bulk-grade');
+    Route::get('/teach/{offering}/assignments/{assignment}/submissions', [TeachAssignmentController::class, 'submissions'])
+        ->middleware('permission:assignments.grade')
+        ->name('teach.assignments.submissions.index');
+    Route::get('/teach/{offering}/assignments/{assignment}/submissions/next-ungraded', [TeachAssignmentController::class, 'nextUngraded'])
+        ->middleware('permission:assignments.grade')
+        ->name('teach.assignments.submissions.next-ungraded');
+    Route::get('/teach/{offering}/assignments/{assignment}/submissions/{submission}', [TeachAssignmentController::class, 'showSubmission'])
+        ->middleware('permission:assignments.grade')
+        ->name('teach.assignments.submissions.show');
+    Route::post('/teach/{offering}/assignments/{assignment}/submissions/{submission}/grade', [TeachAssignmentController::class, 'gradeSubmission'])
+        ->middleware('permission:assignments.grade')
+        ->name('teach.assignments.submissions.grade');
+    Route::post('/teach/{offering}/assignments/{assignment}/submissions/{submission}/ai-suggest', [TeachAssignmentController::class, 'aiSuggest'])
+        ->middleware('permission:assignments.grade')
+        ->name('teach.assignments.submissions.ai-suggest');
 
     Route::get('/teach/{offering}/discussions', [TeachDiscussionController::class, 'index'])
         ->name('teach.discussions.index');
@@ -967,6 +982,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/offerings/{offering}/gradebook/reopen', [GradebookController::class, 'reopen'])
             ->middleware('permission:gradebook.reopen')
             ->name('gradebook.reopen');
+        // ## step-14: per-cell score edit (requires gradebook.configure; blocked when locked)
+        Route::post('/offerings/{offering}/gradebook/cell', [GradebookController::class, 'updateCell'])
+            ->middleware('permission:gradebook.configure')
+            ->name('gradebook.cell');
         Route::post('/content-items/{item}/assignments', [GradebookController::class, 'storeAssignment'])
             ->middleware('permission:assignments.manage')
             ->name('assignments.store');

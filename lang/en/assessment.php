@@ -147,4 +147,23 @@ return [
     'attach' => 'Attach',
     'questions' => 'Questions',
     'minutes_meta' => ':count min',
+
+    // Step 14 — gradebook cell entry
+    'cell_score_saved' => 'Score saved.',
+    'cell_score_error' => 'Could not save the score. Please try again.',
+    'cell_score_range' => 'Score must be between 0 and 100.',
+    'cell_score_input' => 'Enter score (0–100)',
+    'cell_edit_aria' => 'Edit score for :component — :student',
+    'gradebook_locked_banner_title' => 'Gradebook is locked',
+    'gradebook_locked_banner_body' => 'This gradebook was locked on :date. Contact an academic administrator to reopen it.',
+
+    // Step 14 — proctor review
+    'proctor_events' => 'Proctor events',
+    'proctor_event_type' => 'Event type',
+    'proctor_event_at' => 'Time',
+    'proctor_event_number' => '#',
+    'proctor_focus_loss_count' => 'Focus loss count',
+    'proctor_event_type_FOCUS_LOSS' => 'Focus lost',
+    'proctor_event_type_TAB_SWITCH' => 'Tab switch',
+    'proctor_event_type_unknown' => 'Unknown event',
 ];

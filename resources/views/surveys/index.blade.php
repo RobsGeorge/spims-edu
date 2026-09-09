@@ -8,11 +8,11 @@
         $isSubmitted = isset($submittedIds[$survey->id]);
         $open = $survey->isAcceptingSubmissions() && ! $isSubmitted;
     @endphp
-    <div class="app-card border rounded-3 p-3 mb-2">
+    <x-card variant="quiet" class="mb-3">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
             <div>
                 <strong>{{ $survey->title }}</strong>
-                <div class="small text-muted-theme">
+                <div class="small spims-text-dim mt-1">
                     <x-status-badge :status="$survey->status->value" :label="$survey->statusLabel()" />
                     @if($survey->offering?->course)
                         {{ $survey->offering->course->code }}
@@ -20,7 +20,7 @@
                         {{ __('feedback.school_wide') }}
                     @endif
                     @if($survey->anonymous_default)
-                        · {{ __('feedback.anonymous_badge') }}
+                        &middot; {{ __('feedback.anonymous_badge') }}
                     @endif
                 </div>
             </div>
@@ -35,7 +35,7 @@
                 </a>
             </div>
         </div>
-    </div>
+    </x-card>
 @empty
     <x-empty-state :title="__('feedback.inbox_empty')" icon="bi-clipboard-check" />
 @endforelse

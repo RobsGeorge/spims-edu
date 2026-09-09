@@ -31,6 +31,10 @@ $colorMap = [
     'approved'  => 'success',
     'rejected'  => 'danger',
     'suspended' => 'danger',
+    // SubmissionStatus (step-13)
+    'not_submitted' => 'secondary',
+    'submitted'     => 'warning',
+    'graded'        => 'success',
 ];
 
 $tone = $colorMap[$value->value] ?? 'default';
