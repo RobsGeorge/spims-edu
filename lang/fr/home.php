@@ -2,7 +2,7 @@
 
 return [
     'hero_chip' => 'Candidatures ouvertes',
-    'hero_display' => 'Approfondir les sciences coptes orthodoxes à l'âge moderne',
+    'hero_display' => "Approfondir les sciences coptes orthodoxes à l'âge moderne",
     'nav_programs' => 'Programmes',
     'nav_admissions' => 'Admissions',
     'nav_academics' => 'Académie',
@@ -12,7 +12,7 @@ return [
     'stat_faculty' => 'Réseau enseignant',
     'stat_faculty_value' => 'Mondial',
     'featured_title' => 'Cours mis en avant',
-    'featured_lead' => 'Explorez le tronc commun : langue, théologie et vie de l'Église.',
+    'featured_lead' => "Explorez le tronc commun : langue, théologie et vie de l'Église.",
     'featured_tile_badge' => 'À la une',
     'featured_standalone_blurb' => 'Un cours indépendant à prévisualiser sans candidature à un programme complet.',
     'featured_program_blurb' => 'Un cours de parcours — candidatez lorsque vous êtes prêt à étudier en séquence.',

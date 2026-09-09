@@ -159,11 +159,11 @@ return [
 
     // Step 14 — proctor review
     'proctor_events' => 'Événements de surveillance',
-    'proctor_event_type' => 'Type d'événement',
+    'proctor_event_type' => "Type d'événement",
     'proctor_event_at' => 'Heure',
     'proctor_event_number' => '#',
     'proctor_focus_loss_count' => 'Nombre de pertes de focus',
     'proctor_event_type_FOCUS_LOSS' => 'Perte de focus',
-    'proctor_event_type_TAB_SWITCH' => 'Changement d'onglet',
+    'proctor_event_type_TAB_SWITCH' => "Changement d'onglet",
     'proctor_event_type_unknown' => 'Événement inconnu',
 ];
