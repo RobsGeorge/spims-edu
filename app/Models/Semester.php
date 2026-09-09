@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\OfferingStatus;
+use App\Enums\SemesterStatus;
 use App\Models\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,7 +35,7 @@ class Semester extends Model
         'add_drop_end_week' => 'integer',
         'last_withdrawal_week' => 'integer',
         'withdrawal_refund_percent' => 'float',
-        'status' => OfferingStatus::class,
+        'status' => SemesterStatus::class,
     ];
 
     public function academicYear(): BelongsTo
