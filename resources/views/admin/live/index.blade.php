@@ -112,9 +112,15 @@
     </ul>
     <form method="POST" action="{{ route('admin.live.attendance.override', $session) }}" class="row g-1">
         @csrf
-        <div class="col-md-4"><input name="student_id" class="form-control form-control-sm" placeholder="student ULID" required></div>
-        <div class="col-md-2"><select name="status" class="form-select form-select-sm"><option>PRESENT</option><option>ABSENT</option></select></div>
+        <div class="col-md-4"><input name="student_id" class="form-control form-control-sm" placeholder="{{ __('live.student_ulid') }}" required aria-label="{{ __('live.student_ulid') }}"></div>
+        <div class="col-md-2">
+            <select name="status" class="form-select form-select-sm" aria-label="{{ __('ui.status') }}">
+                <option value="PRESENT">{{ __('live.present') }}</option>
+                <option value="ABSENT">{{ __('live.absent') }}</option>
+            </select>
+        </div>
         <div class="col-md-2"><button class="btn btn-sm btn-outline-primary">{{ __('live.override') }}</button></div>
+        <div class="col-12"><p class="form-text mb-0">{{ __('live.student_ulid_hint') }}</p></div>
     </form>
 </x-card>
 @endforeach

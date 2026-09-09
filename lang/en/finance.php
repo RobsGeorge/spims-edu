@@ -95,4 +95,11 @@ return [
     'tx_kind' => 'Kind',
     'tx_reason' => 'Reason',
     'invoice_date' => 'Date',
+    'minor_units_hint' => 'Amounts use integer minor units. USD/EGP: 100 = 1.00. Example: 2500 = 25.00.',
+    'total_minor' => 'Total (minor units)',
+    'payment' => 'Payment',
+    'id' => 'ID',
+    'method_cash' => 'Cash',
+    'method_transfer' => 'Transfer',
+    'method_cheque' => 'Cheque',
 ];

@@ -67,7 +67,7 @@
                     @php $roleChkVal = $role->value; @endphp
                     <label class="me-3">
                         <input type="checkbox" name="roles[]" value="{{ $roleChkVal }}">
-                        {{ __('people.role_'.$role->value) }}
+                        {{ __('roles_hub.role_'.$role->value) }}
                     </label>
                 @endforeach
                 <p class="form-text">{{ __('people.assign_role_help') }}</p>
@@ -100,7 +100,7 @@
                     @foreach($roleOptions as $role)
                         @php $roleOptVal = $role->value; @endphp
                         <option value="{{ $roleOptVal }}" @selected(($filters['role'] ?? '') === $roleOptVal)>
-                            {{ __('people.role_'.$role->value) }}
+                            {{ __('roles_hub.role_'.$role->value) }}
                         </option>
                     @endforeach
                 </select>
@@ -160,7 +160,7 @@
                             <a href="{{ route('admin.users.show', $user) }}">{{ $user->displayName() }}</a>
                         </td>
                         <td>
-                            {{ $user->roleTypes()->map(fn ($role) => __('people.role_'.$role->value))->join(', ') }}
+                            {{ $user->roleTypes()->map(fn ($role) => __('roles_hub.role_'.$role->value))->join(', ') }}
                         </td>
                         <td>
                             <span class="people-status people-status-{{ strtolower($user->status->value) }}">

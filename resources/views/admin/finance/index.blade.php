@@ -20,8 +20,9 @@
                 @endforeach
             </select>
             <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
-            <input type="number" name="total_minor" class="form-control mb-2" min="1" required>
-            <input name="description" class="form-control mb-2" required>
+            <input type="number" name="total_minor" class="form-control mb-1" min="1" required aria-label="{{ __('finance.total_minor') }}" placeholder="{{ __('finance.total_minor') }}">
+            <p class="form-text">{{ __('finance.minor_units_hint') }}</p>
+            <input name="description" class="form-control mb-2" required aria-label="{{ __('finance.description') }}" placeholder="{{ __('finance.description') }}">
             <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>
         </x-card>
     </div>
@@ -36,7 +37,8 @@
                 @endforeach
             </select>
             <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
-            <input type="number" name="amount_minor" class="form-control mb-2" min="1" required>
+            <input type="number" name="amount_minor" class="form-control mb-1" min="1" required aria-label="{{ __('finance.amount_minor') }}" placeholder="{{ __('finance.amount_minor') }}">
+            <p class="form-text">{{ __('finance.minor_units_hint') }}</p>
             <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>
         </x-card>
     </div>
@@ -51,7 +53,8 @@
                 @endforeach
             </select>
             <select name="currency" class="form-select mb-2"><option>USD</option><option>EGP</option></select>
-            <input type="number" name="amount_minor" class="form-control mb-2" min="1" required>
+            <input type="number" name="amount_minor" class="form-control mb-1" min="1" required aria-label="{{ __('finance.amount_minor') }}" placeholder="{{ __('finance.amount_minor') }}">
+            <p class="form-text">{{ __('finance.minor_units_hint') }}</p>
             <button class="btn btn-primary btn-sm">{{ __('ui.save') }}</button>
         </x-card>
     </div>
@@ -59,7 +62,7 @@
 
 <h2 class="h5">{{ __('finance.pending_manual') }}</h2>
 <table class="table table-sm">
-    <thead><tr><th>Payment</th><th>{{ __('finance.student') }}</th><th>{{ __('finance.total') }}</th><th></th></tr></thead>
+    <thead><tr><th>{{ __('finance.payment') }}</th><th>{{ __('finance.student') }}</th><th>{{ __('finance.total') }}</th><th></th></tr></thead>
     <tbody>
     @foreach($pendingManual as $payment)
         <tr>
@@ -76,7 +79,7 @@
 
 <h2 class="h5">{{ __('finance.invoices') }}</h2>
 <table class="table table-sm">
-    <thead><tr><th>ID</th><th>{{ __('finance.student') }}</th><th>{{ __('finance.total') }}</th><th>{{ __('ui.status') }}</th><th></th></tr></thead>
+    <thead><tr><th>{{ __('finance.id') }}</th><th>{{ __('finance.student') }}</th><th>{{ __('finance.total') }}</th><th>{{ __('ui.status') }}</th><th></th></tr></thead>
     <tbody>
     @foreach($invoices as $invoice)
         <tr>
@@ -88,9 +91,9 @@
                 <form method="POST" action="{{ route('admin.finance.manual', $invoice) }}" class="d-flex gap-1">
                     @csrf
                     <select name="method" class="form-select form-select-sm">
-                        <option value="MANUAL_CASH">CASH</option>
-                        <option value="MANUAL_TRANSFER">TRANSFER</option>
-                        <option value="MANUAL_CHEQUE">CHEQUE</option>
+                        <option value="MANUAL_CASH">{{ __('finance.method_cash') }}</option>
+                        <option value="MANUAL_TRANSFER">{{ __('finance.method_transfer') }}</option>
+                        <option value="MANUAL_CHEQUE">{{ __('finance.method_cheque') }}</option>
                     </select>
                     <input type="number" name="amount_minor" class="form-control form-control-sm" value="{{ $invoice->amountDue() }}" min="1">
                     <button class="btn btn-sm btn-outline-primary">{{ __('finance.pay') }}</button>
@@ -110,7 +113,7 @@
 
 <h2 class="h5">{{ __('finance.refunds') }}</h2>
 <table class="table table-sm">
-    <thead><tr><th>ID</th><th>{{ __('finance.student') }}</th><th>{{ __('finance.total') }}</th><th>{{ __('ui.status') }}</th><th></th></tr></thead>
+    <thead><tr><th>{{ __('finance.id') }}</th><th>{{ __('finance.student') }}</th><th>{{ __('finance.total') }}</th><th>{{ __('ui.status') }}</th><th></th></tr></thead>
     <tbody>
     @foreach($refunds as $refund)
         <tr>

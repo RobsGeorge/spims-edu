@@ -7,21 +7,22 @@
 <x-card variant="panel" tag="form" method="POST" action="{{ route('admin.credentials.store') }}" class="mb-4">
     @csrf
     <div class="row g-2">
-        <div class="col-md-3"><input name="student_id" class="form-control" placeholder="student ULID" required aria-label="{{ __('credentials.student') }}"></div>
+        <div class="col-md-3"><input name="student_id" class="form-control" placeholder="{{ __('credentials.student_ulid') }}" required aria-label="{{ __('credentials.student') }}"></div>
         <div class="col-md-2">
             <select name="type" class="form-select" required aria-label="{{ __('credentials.type') }}">
-                <option value="TRANSCRIPT">TRANSCRIPT</option>
-                <option value="PROGRAM_CERTIFICATE">PROGRAM_CERTIFICATE</option>
-                <option value="STANDALONE_CERTIFICATE">STANDALONE_CERTIFICATE</option>
-                <option value="OFFERING_COMPLETION">OFFERING_COMPLETION</option>
+                <option value="TRANSCRIPT">{{ __('credentials.type_transcript') }}</option>
+                <option value="PROGRAM_CERTIFICATE">{{ __('credentials.type_program_certificate') }}</option>
+                <option value="STANDALONE_CERTIFICATE">{{ __('credentials.type_standalone_certificate') }}</option>
+                <option value="OFFERING_COMPLETION">{{ __('credentials.type_offering_completion') }}</option>
             </select>
         </div>
-        <div class="col-md-2"><input name="program_id" class="form-control" placeholder="program ULID"></div>
-        <div class="col-md-2"><input name="offering_id" class="form-control" placeholder="offering ULID"></div>
+        <div class="col-md-2"><input name="program_id" class="form-control" placeholder="{{ __('credentials.program_ulid') }}" aria-label="{{ __('credentials.program') }}"></div>
+        <div class="col-md-2"><input name="offering_id" class="form-control" placeholder="{{ __('credentials.offering_ulid') }}" aria-label="{{ __('credentials.course') }}"></div>
         <div class="col-md-1">
-            <select name="language" class="form-select"><option>en</option><option>ar</option><option>fr</option></select>
+            <select name="language" class="form-select" aria-label="{{ __('people.locale') }}"><option>en</option><option>ar</option><option>fr</option></select>
         </div>
         <div class="col-md-2"><button class="btn btn-primary w-100">{{ __('credentials.issue') }}</button></div>
+        <div class="col-12"><p class="form-text mb-0">{{ __('credentials.ulid_hint') }}</p></div>
     </div>
 </x-card>
 
@@ -36,7 +37,7 @@
             @php $credType = $c->type->value; @endphp
             <td>{{ $credType }}</td>
             <td class="d-flex gap-1">
-                <a class="btn btn-sm btn-outline-secondary" href="{{ $c->verifyUrl() }}">QR</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{{ $c->verifyUrl() }}">{{ __('credentials.verify_qr') }}</a>
                 <a class="btn btn-sm btn-outline-secondary" href="{{ route('credentials.download', $c) }}">{{ __('credentials.download') }}</a>
                 @if(!$c->revoked_at)
                 <form method="POST" action="{{ route('admin.credentials.regenerate', $c) }}">@csrf

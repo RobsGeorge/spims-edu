@@ -95,4 +95,11 @@ return [
     'tx_kind' => 'النوع',
     'tx_reason' => 'السبب',
     'invoice_date' => 'التاريخ',
+    'minor_units_hint' => 'المبالغ بوحدات صغرى صحيحة. دولار/جنيه: 100 = 1.00. مثال: 2500 = 25.00.',
+    'total_minor' => 'الإجمالي (وحدات صغرى)',
+    'payment' => 'دفعة',
+    'id' => 'المعرّف',
+    'method_cash' => 'نقداً',
+    'method_transfer' => 'تحويل',
+    'method_cheque' => 'شيك',
 ];
