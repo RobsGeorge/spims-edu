@@ -34,27 +34,29 @@ Backend acceptance from the original build brief is mostly met. Frontend accepta
 
 ## 2. Design-system gaps (highest visibility)
 
-Original **Sacred Academic** system vs current `public/css/spims-theme.css`:
+**Token foundation (shipped):** `public/css/spims-theme.css` and `ThemeTokens` follow Sacred Academic —
+cool near-white field `#f8f9ff`, liturgical burgundy primary `#5d0326` / spine `#380014`, and academic
+gold `#eac167` / `#e9c16d` as **accent only** (never primary or body text). Warm parchment / cream
+backgrounds remain banned. Named type roles (`--text-display` … `--text-label-sm`), spacing
+(`--space-xs` … `--space-2xl`), and recipe classes (`.academic-card`, `.academic-form`,
+`.academic-alert`, `.academic-modal`) are available alongside Bootstrap theming.
+
+Remaining gaps are mostly **surface / IA fidelity**, not the core palette:
 
 | Spec (DESIGN.md / PRODUCT.md) | Current Laravel UI | Gap |
 |---|---|---|
-| Cool near-white field `#f8f9ff` | Warm parchment `#faf6ee` / gold cream gradient | **Violates Cool-Field Rule** (explicit anti-reference) |
-| Liturgical burgundy `#5d0326` primary | Gold `#b8860b` as primary | Brand spine missing |
-| Academic gold as **accent** only | Gold used as primary + title color | One-Burgundy Rule broken |
-| Playfair Display + Inter (Latin) | Cairo only | No scholarly display voice |
-| IBM Plex Sans Arabic for Arabic | Cairo for all locales | Arabic-Is-Sans partially ok; Latin wrong |
-| Pill primary buttons, tonal surface ramp | Bootstrap defaults + translucent cards | Component language missing |
-| Soft Lift shadow + hairline rose borders | Generic Bootstrap shadows | Elevation wrong |
-| Sidebar 280px + sticky topbar | Top navbar only | Shell architecture wrong |
-| Mobile drawer + bottom-nav | Collapse hamburger only | Mobile IA incomplete |
-| Bento student dashboard | Uniform hub tiles | Signature component missing |
-| Theme tokens + logos from `/api/branding` | Theme editor: name + active only; logos unused | Branding incomplete |
-| SYSTEM theme follows OS | `system` cookie forced to `theme-dark` | Broken |
-| Skeletons / teaching empty states | Bare tables / empty text | Missing |
-| Auth / landing / catalog screens from design-reference | Marketing landing + split auth + catalog featured/skeletons (`docs/design/d2-screenshot-parity.md`) | Authenticated Teach/player screens still thinner than the ~62-pack |
+| Cool field + burgundy spine + gold accent | Shipped in CSS / ThemeTokens | — |
+| Playfair Display + Inter (Latin); IBM Plex Sans Arabic (RTL) | Shipped (locale-aware) | — |
+| Pill primary buttons, tonal surface ramp, Soft Lift + hairline | Cards / buttons themed; recipes present | Apply recipes consistently on remaining CRUD surfaces |
+| Sidebar 280px + sticky topbar; mobile drawer + bottom-nav | D1 shell shipped | Some admin orphans still thin |
+| Bento student dashboard | Hub tiles / dashboard thinner than Stitch | Signature layout incomplete |
+| Theme tokens + logos from branding / Theme Editor | Editor expanded; logos partially wired | Branding polish ongoing |
+| Skeletons / teaching empty states | `<x-empty-state>` exists | Coverage uneven across Teach / player |
+| Auth / landing / catalog from design-reference | Marketing landing + split auth + catalog featured/skeletons (`docs/design/d2-screenshot-parity.md`) | Authenticated Teach/player screens still thinner than the ~62-pack |
 
-**Bottom line:** the shipped theme reads as warm parchment-gold (exactly the AI-default aesthetic
-PRODUCT.md rejects). Re-skinning to burgundy / cool-field is a prerequisite for all later UI work.
+**Bottom line:** Sacred Academic cool-field + burgundy + gold-accent tokens are live. Phase B+ work
+is applying those recipes across Blade surfaces (dashboard, Teach, Course Player, admin consoles)
+rather than re-skinning the palette.
 
 ---
 

@@ -31,6 +31,14 @@
     --text-2xl: clamp(1.5rem, 1.317rem + 0.917vw, 1.875rem);
     --text-3xl: clamp(1.875rem, 1.623rem + 1.261vw, 2.25rem);
     --text-4xl: clamp(2.25rem, 1.872rem + 1.889vw, 3rem);
+    /* — Named type roles (DESIGN.md; alias numeric scale) — */
+    --text-display: var(--text-4xl);
+    --text-headline-lg: var(--text-3xl);
+    --text-headline-md: var(--text-2xl);
+    --text-body-lg: var(--text-lg);
+    --text-body-md: var(--text-base);
+    --text-label-md: var(--text-sm);
+    --text-label-sm: var(--text-xs);
     /* — Paired line-heights — */
     --leading-xs: 1.5;
     --leading-sm: 1.5;
@@ -53,6 +61,13 @@
     --space-16: 4rem;
     --space-20: 5rem;
     --space-24: 6rem;
+    /* — Named spacing roles (DESIGN.md; alias numeric scale) — */
+    --space-xs: var(--space-1);   /* 4px */
+    --space-sm: var(--space-2);   /* 8px */
+    --space-md: var(--space-4);   /* 16px */
+    --space-lg: var(--space-6);   /* 24px */
+    --space-xl: var(--space-8);   /* 32px */
+    --space-2xl: var(--space-12); /* 48px */
     /* — Focus ring — */
     --focus-ring: 0 0 0 3px var(--color-primary, #5d0326);
     /* — Motion — */
@@ -99,6 +114,7 @@ body.theme-system {
     --color-success: #10b981;
     --color-warning: #f59e0b;
     --color-danger: #ef4444;
+    --color-info: #3b82f6;
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
     --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.08);
     --bs-primary-rgb: 93, 3, 38;
@@ -131,6 +147,7 @@ body.theme-dark {
     --color-success: #10b981;
     --color-warning: #f59e0b;
     --color-danger: #ef4444;
+    --color-info: #60a5fa;
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
     --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.38);
     --bs-primary-rgb: 255, 177, 192;
@@ -200,6 +217,7 @@ body.theme-dark {
         --color-success: #10b981;
         --color-warning: #f59e0b;
         --color-danger: #ef4444;
+        --color-info: #60a5fa;
         --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
         --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.38);
         --bs-primary-rgb: 255, 177, 192;
@@ -266,11 +284,16 @@ html[dir='rtl'] .display-6 {
 
 .spims-hero,
 .card,
-.app-card {
+.app-card,
+.academic-card {
     background: var(--color-surface);
     border: 1px solid var(--color-hairline) !important;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lift);
+}
+
+.academic-card:hover {
+    border-color: var(--color-surface-border) !important;
 }
 
 .form-control,
@@ -285,6 +308,26 @@ html[dir='rtl'] .display-6 {
 .form-select:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+/* Recipe: stacked form layout + themed controls (DESIGN.md) */
+.academic-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.academic-form .form-label {
+    font-weight: 600;
+    font-size: var(--text-label-md);
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.academic-form .form-text,
+.academic-form .spims-field-hint {
+    color: var(--color-text-muted);
+    font-size: var(--text-label-sm);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -610,6 +653,32 @@ html[dir='rtl'] .app-tile h3 {
     --bs-alert-bg: color-mix(in srgb, var(--color-danger) 14%, var(--color-surface));
     --bs-alert-border-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
     --bs-alert-color: var(--color-text);
+}
+
+.alert-warning {
+    --bs-alert-bg: color-mix(in srgb, var(--color-warning) 14%, var(--color-surface));
+    --bs-alert-border-color: color-mix(in srgb, var(--color-warning) 35%, transparent);
+    --bs-alert-color: var(--color-text);
+}
+
+.alert-info {
+    --bs-alert-bg: color-mix(in srgb, var(--color-info) 14%, var(--color-surface));
+    --bs-alert-border-color: color-mix(in srgb, var(--color-info) 35%, transparent);
+    --bs-alert-color: var(--color-text);
+}
+
+/* Recipe: themed alert chrome (DESIGN.md) */
+.academic-alert,
+.alert {
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+}
+
+.academic-alert {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--color-surface-border);
+    background: var(--color-surface);
+    color: var(--color-text);
 }
 
 .dropdown-menu {
@@ -1735,7 +1804,9 @@ html[dir='rtl'] .sa-impersonation-stop {
 .spims-modal-md { max-width: 42rem; }
 .spims-modal-lg { max-width: 58rem; }
 
-.spims-modal-content {
+.spims-modal-content,
+.academic-modal .modal-content,
+.academic-modal.modal-content {
     background: var(--color-surface);
     border: 1px solid var(--color-surface-border);
     border-radius: var(--radius-lg);
@@ -1744,6 +1815,28 @@ html[dir='rtl'] .sa-impersonation-stop {
     flex-direction: column;
     max-height: 90vh;
     overflow: hidden;
+}
+
+.academic-modal .modal-header,
+.academic-modal .spims-modal-header {
+    border-bottom-color: var(--color-surface-border);
+}
+
+.academic-modal .modal-footer,
+.academic-modal .spims-modal-footer {
+    border-top-color: var(--color-surface-border);
+}
+
+.academic-modal .modal-title,
+.academic-modal .spims-modal-title {
+    color: var(--color-title);
+    font-family: var(--font-display);
+    font-weight: 700;
+}
+
+html[dir='rtl'] .academic-modal .modal-title,
+html[dir='rtl'] .academic-modal .spims-modal-title {
+    font-family: var(--font-arabic);
 }
 
 .spims-modal-header {

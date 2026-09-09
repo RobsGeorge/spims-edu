@@ -85,4 +85,35 @@ class PortalD0TokensTest extends TestCase
         $this->assertArrayHasKey('--color-hairline', $vars);
         $this->assertStringContainsString('219, 192, 196', $vars['--color-hairline']);
     }
+
+    #[Test]
+    public function named_type_spacing_roles_and_academic_recipes_exist(): void
+    {
+        $css = $this->stylesheet();
+
+        foreach ([
+            '--text-display',
+            '--text-headline-lg',
+            '--text-headline-md',
+            '--text-body-lg',
+            '--text-body-md',
+            '--text-label-md',
+            '--text-label-sm',
+            '--space-xs',
+            '--space-sm',
+            '--space-md',
+            '--space-lg',
+            '--space-xl',
+            '--space-2xl',
+        ] as $token) {
+            $this->assertStringContainsString($token, $css);
+        }
+
+        foreach (['.academic-card', '.academic-form', '.academic-alert', '.academic-modal'] as $recipe) {
+            $this->assertStringContainsString($recipe, $css);
+        }
+
+        $this->assertStringContainsString('--color-info:', $css);
+        $this->assertStringNotContainsString('#faf6ee', $css);
+    }
 }
