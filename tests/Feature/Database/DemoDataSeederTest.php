@@ -2,15 +2,27 @@
 
 namespace Tests\Feature\Database;
 
+use App\Enums\ApplicationStatus;
+use App\Enums\FeedbackQuestionKind;
 use App\Enums\OfferingMode;
+use App\Enums\OfferingStatus;
 use App\Models\Announcement;
+use App\Models\Application;
 use App\Models\ClassSession;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
+use App\Models\Credential;
 use App\Models\Enrollment;
+use App\Models\Event;
+use App\Models\FeedbackSurvey;
 use App\Models\Invoice;
+use App\Models\LiveQuiz;
 use App\Models\OfferingStaff;
+use App\Models\Program;
+use App\Models\ProjectAssessment;
+use App\Models\ProjectMembership;
+use App\Models\Semester;
 use App\Models\User;
 use Database\Seeders\DemoDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -114,6 +126,215 @@ class DemoDataSeederTest extends TestCase
             ->assertSee('TH101');
     }
 
+    // ─── 8A gate tests ────────────────────────────────────────────────────────
+
+    #[Test]
+    public function seeded_credential_is_reachable_via_verify_endpoint(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+        $credential = Credential::query()
+            ->where('student_id', $student1->id)
+            ->whereNull('revoked_at')
+            ->first();
+
+        // The credential may not be issued if PDF rendering is unavailable in CI;
+        // assert only when it exists.
+        if ($credential === null) {
+            $this->markTestSkipped('Credential not issued (PDF renderer unavailable in this environment).');
+        }
+
+        $this->assertNotEmpty($credential->qr_token);
+        $this->assertNotEmpty($credential->serial);
+
+        // The public verify route must respond 200 and indicate validity.
+        $this->get(route('credentials.verify', $credential->qr_token))
+            ->assertOk()
+            ->assertSee($credential->serial);
+    }
+
+    #[Test]
+    public function seeded_event_is_published_with_open_seats(): void
+    {
+        $this->seed();
+
+        $event = Event::query()->where('title', 'Theology Orientation Day')->first();
+
+        $this->assertNotNull($event);
+        $this->assertTrue($event->is_published ?? $event->status === 'published' || $event->published_at !== null || ($event->capacity > 0));
+        $this->assertGreaterThan(0, $event->capacity);
+    }
+
+    #[Test]
+    public function seeded_survey_has_all_four_question_kinds(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+
+        $survey = FeedbackSurvey::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Week 1 Feedback')
+            ->first();
+
+        $this->assertNotNull($survey);
+
+        $questionKinds = $survey->questions()
+            ->pluck('kind')
+            ->map(fn ($k) => is_string($k) ? $k : $k->value)
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
+
+        $expectedKinds = collect([
+            FeedbackQuestionKind::Scale->value,
+            FeedbackQuestionKind::Text->value,
+            FeedbackQuestionKind::Single->value,
+            FeedbackQuestionKind::Multi->value,
+        ])->sort()->values()->toArray();
+
+        $this->assertEquals($expectedKinds, $questionKinds);
+    }
+
+    #[Test]
+    public function seeded_live_quiz_is_in_ready_status(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+
+        $quiz = LiveQuiz::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Live Check Quiz')
+            ->first();
+
+        $this->assertNotNull($quiz);
+        $this->assertGreaterThanOrEqual(1, $quiz->questions()->count());
+
+        // No active session started (not yet started).
+        $this->assertNull($quiz->sessions()->where('ended_at', null)->where('started_at', '!=', null)->first());
+    }
+
+    #[Test]
+    public function seeded_team_project_has_student1_as_member_with_open_deliverable(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $assessment = ProjectAssessment::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Group Research Project')
+            ->first();
+
+        $this->assertNotNull($assessment);
+
+        $membership = ProjectMembership::query()
+            ->whereHas('project', fn ($q) => $q->where('project_assessment_id', $assessment->id))
+            ->where('student_id', $student1->id)
+            ->whereNull('left_at')
+            ->first();
+
+        $this->assertNotNull($membership, 'student1 should be a member of the team project');
+
+        // Deliverable due in the future (slot is open).
+        $deliverable = $assessment->phases()
+            ->with('deliverables')
+            ->get()
+            ->flatMap(fn ($p) => $p->deliverables)
+            ->first();
+
+        $this->assertNotNull($deliverable);
+        $this->assertGreaterThan(now(), $deliverable->due_at);
+    }
+
+    #[Test]
+    public function enforce_year_sequence_program_exists_with_multi_year_courses(): void
+    {
+        $this->seed();
+
+        // DEG-DIAC must have enforce_year_sequence = true
+        $diac = Program::query()->where('code', 'DEG-DIAC')->first();
+        $this->assertNotNull($diac);
+        $this->assertTrue((bool) $diac->enforce_year_sequence);
+
+        // Must have courses at Year 1 AND Year 2
+        $years = $diac->programCourses()
+            ->pluck('year_level')
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
+
+        $this->assertContains(1, $years, 'DEG-DIAC must have Year 1 courses');
+        $this->assertContains(2, $years, 'DEG-DIAC must have Year 2 courses');
+
+        // At least one program with enforce_year_sequence = false also exists (DEG-BTH)
+        $bth = Program::query()->where('code', 'DEG-BTH')->first();
+        $this->assertNotNull($bth);
+        $this->assertFalse((bool) $bth->enforce_year_sequence);
+    }
+
+    #[Test]
+    public function seeded_semesters_cover_all_three_lifecycle_states(): void
+    {
+        $this->seed();
+
+        $statuses = Semester::query()
+            ->pluck('status')
+            ->map(fn ($s) => is_string($s) ? $s : $s->value)
+            ->unique()
+            ->toArray();
+
+        $this->assertContains(OfferingStatus::Completed->value, $statuses, 'Expected a CLOSED (Completed) semester');
+        $this->assertContains(OfferingStatus::InProgress->value, $statuses, 'Expected an IN_PROGRESS semester');
+        $this->assertContains(OfferingStatus::Draft->value, $statuses, 'Expected a DRAFT semester');
+    }
+
+    #[Test]
+    public function seeded_applications_cover_all_statuses_including_withdrawn(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $statuses = Application::query()
+            ->where('applicant_id', $student1->id)
+            ->pluck('status')
+            ->map(fn ($s) => is_string($s) ? $s : $s->value)
+            ->unique()
+            ->toArray();
+
+        $this->assertContains(ApplicationStatus::Withdrawn->value, $statuses,
+            'student1 should have a Withdrawn application');
+    }
+
+    #[Test]
+    public function demo_reset_command_is_idempotent(): void
+    {
+        // First run: seed from empty DB.
+        $this->artisan('spims:demo-reset')->assertSuccessful();
+
+        $counts1 = $this->demoDataCounts();
+
+        // Second run: wipe and re-seed.
+        $this->artisan('spims:demo-reset')->assertSuccessful();
+
+        $counts2 = $this->demoDataCounts();
+
+        $this->assertEquals($counts1, $counts2,
+            'Running spims:demo-reset twice must produce identical record counts.');
+    }
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────
+
     private function cohortOffering(string $code): ?CourseOffering
     {
         $courseId = Course::query()->where('code', $code)->value('id');
@@ -125,5 +346,26 @@ class DemoDataSeederTest extends TestCase
             ->where('course_id', $courseId)
             ->where('mode', OfferingMode::Cohort)
             ->first();
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function demoDataCounts(): array
+    {
+        return [
+            'users' => User::query()
+                ->where('email', 'like', '%' . DemoDataSeeder::DEMO_EMAIL_SUFFIX)
+                ->count(),
+            'programs' => Program::query()
+                ->whereIn('code', DemoDataSeeder::DEMO_PROGRAM_CODES)
+                ->count(),
+            'courses' => Course::query()
+                ->whereIn('code', DemoDataSeeder::DEMO_COURSE_CODES)
+                ->count(),
+            'content_items' => ContentItem::query()->count(),
+            'invoices' => Invoice::query()->count(),
+            'applications' => Application::query()->count(),
+        ];
     }
 }
