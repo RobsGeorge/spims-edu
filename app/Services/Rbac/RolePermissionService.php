@@ -74,6 +74,8 @@ class RolePermissionService
             }
         });
 
+        $this->authorize->forgetMatrixCache();
+
         return $written;
     }
 

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Modals &amp; Dialogs - Arabic &amp; Light Mode</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#251a00",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "on-secondary-container": "#795a03",
+                        "error": "#ba1a1a",
+                        "tertiary": "#001d09",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "tertiary-container": "#003415",
+                        "surface-bright": "#f8f9ff",
+                        "background": "#f8f9ff",
+                        "primary-fixed": "#ffd9df",
+                        "outline-variant": "#dbc0c4",
+                        "inverse-surface": "#213146",
+                        "surface-tint": "#a03b57",
+                        "surface-container": "#e6eeff",
+                        "on-primary-fixed-variant": "#812340",
+                        "secondary": "#785a02",
+                        "outline": "#887175",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "tertiary-fixed": "#bbefc1",
+                        "surface-variant": "#d3e3ff",
+                        "surface-container-high": "#dde9ff",
+                        "primary-fixed-dim": "#ffb1c1",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#ebf1ff",
+                        "on-surface": "#0b1c30",
+                        "secondary-container": "#ffd578",
+                        "primary-container": "#5d0326",
+                        "on-primary-container": "#e26f8b",
+                        "surface-dim": "#cbdbf6",
+                        "on-tertiary-fixed": "#00210b",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#554245",
+                        "inverse-primary": "#ffb1c1",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "secondary-fixed": "#ffdf9c",
+                        "primary": "#380014",
+                        "secondary-fixed-dim": "#eac166",
+                        "on-background": "#0b1c30",
+                        "on-primary-fixed": "#3f0017",
+                        "on-tertiary-container": "#6d9f76",
+                        "surface-container-highest": "#d3e3ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "xs": "0.25rem",
+                        "md": "1rem",
+                        "2xl": "3rem",
+                        "lg": "1.5rem",
+                        "container-max": "1440px",
+                        "sidebar-width": "280px",
+                        "xl": "2rem",
+                        "sm": "0.5rem"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Cairo", "Inter", "sans-serif"],
+                        "label-sm": ["Cairo", "Inter", "sans-serif"],
+                        "display-lg": ["Cairo", "Inter", "sans-serif"],
+                        "body-lg": ["Cairo", "Inter", "sans-serif"],
+                        "headline-md": ["Cairo", "Inter", "sans-serif"],
+                        "label-md": ["Cairo", "Inter", "sans-serif"],
+                        "headline-lg": ["Cairo", "Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "700" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            background-color: #eff4ff; /* surface-container-low fallback */
+        }
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low text-on-surface antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar (Predicted JSON Integration) -->
+<nav class="bg-surface-container text-secondary font-label-md text-label-md h-screen w-64 fixed left-0 top-0 bg-surface-container-low flat no shadows flex flex-col py-base border-r border-outline-variant z-40 md:flex hidden" style="border-right: 1px solid var(--tw-colors-outline-variant, #dbc0c4);">
+<div class="px-md mb-xl flex items-center justify-between">
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold truncate">Spims Documentation</h1>
+<p class="text-on-surface-variant text-label-sm mt-xs">v2.4.0</p>
+</div>
+<img alt="Spims Logo" class="h-10 w-10 rounded-full bg-primary-container object-cover" data-alt="A small, circular logo image for a software documentation site, utilizing a deep burgundy and warm gold color palette to signify an academic and authoritative tone, set against a pristine light surface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD902NzeeHGQLM8EoI1KOTbd2wV0E2wk-39r7F23bS2QmwR-LKeuvAABw36gCjWl5XAuB8x0SBtbvaSXBm2cE9nXc_4Qdn9UGJFrIj6dCqe1GepSiH883TxA8eZnqyhbgj9eX_8HVmAiI1MExv7VmNp_H8giyVSD_x3vGhGrqChXuTx-EuE4NjoWenE3MKRIS1elUoXhUXF_YlVBL4JakwF74h4JKgQ4WayT8uds5FNzfqLzrZDEbD13_ACvWEe8N49fuJdWqlMCuT"/>
+</div>
+<button class="mx-md mb-xl bg-primary text-on-primary py-sm px-md rounded-full font-label-md hover:bg-primary-container transition-colors duration-200 active:scale-95 shadow-soft flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+            New Updates
+        </button>
+<div class="flex-1 overflow-y-auto px-md space-y-sm">
+<!-- Inactive -->
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+                Introduction
+            </a>
+<!-- Inactive -->
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+                Foundations
+            </a>
+<!-- Active (Modals & Dialogs implies Components) -->
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-secondary font-semibold border-r-2 border-secondary bg-surface-variant/10 hover:bg-surface-container-high transition-all duration-150 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="category" style="font-variation-settings: 'FILL' 1;">category</span>
+                Components
+            </a>
+<!-- Inactive -->
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="extension">extension</span>
+                Patterns
+            </a>
+<!-- Inactive -->
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+                Resources
+            </a>
+</div>
+<div class="mt-auto px-md pt-md border-t border-outline-variant space-y-sm">
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
+                Support
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:mr-64 relative w-full">
+<!-- TopNavBar (Predicted JSON Integration) -->
+<header class="bg-surface text-primary font-body-md text-body-md docked full-width top-0 border-b border-outline-variant flat no shadows flex justify-between items-center w-full px-gutter h-16 z-50 sticky top-0 md:pl-gutter pl-16">
+<div class="flex items-center gap-md">
+<!-- Mobile Menu Button (Visible only on small screens) -->
+<button class="md:hidden p-xs rounded-full hover:bg-surface-variant transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">menu</span>
+</button>
+<span class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Spims</span>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-DEFAULT focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-body-md transition-shadow w-64 shadow-soft" placeholder="بحث..." type="text"/>
+</div>
+<div class="flex items-center gap-xs">
+<button aria-label="Feedback" class="p-2 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-primary transition-colors duration-200 active:opacity-80 cursor-pointer">
+<span class="font-label-md text-label-md">Feedback</span>
+</button>
+<button aria-label="dark_mode" class="p-2 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-primary transition-colors duration-200 active:opacity-80 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<button aria-label="help" class="p-2 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-primary transition-colors duration-200 active:opacity-80 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button aria-label="account_circle" class="p-2 rounded-full text-on-surface-variant hover:bg-surface-variant hover:text-primary transition-colors duration-200 active:opacity-80 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 overflow-y-auto p-md md:p-xl scroll-smooth">
+<div class="max-w-container-max mx-auto space-y-xl">
+<!-- Page Header -->
+<header class="mb-xl">
+<div class="flex items-center gap-sm mb-xs">
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container rounded-sm font-label-sm uppercase tracking-wider shadow-soft">مكونات</span>
+<span class="px-2 py-1 bg-surface-variant text-on-surface-variant rounded-sm font-label-sm uppercase tracking-wider shadow-soft border border-outline-variant/30">تصميم عربي</span>
+</div>
+<h2 class="font-display-lg text-display-lg text-on-surface font-bold mb-sm">النوافذ المنبثقة والحوارات</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">
+                        تُستخدم النوافذ المنبثقة (Modals) لتأكيد الإجراءات، أو عرض معلومات مهمة، أو طلب إدخال من المستخدم مع مقاطعة سير العمل الحالي. صُممت هذه المكونات لتوفير الوضوح وتقليل الأخطاء عبر تقديم تدرج هرمي بصري قوي واستخدام مساحات بيضاء واسعة.
+                    </p>
+</header>
+<!-- Bento Grid Layout for Modals -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-xl">
+<!-- 1. Standard Dialog (Informational) -->
+<div class="flex flex-col gap-md">
+<h3 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant/50 pb-sm">حوار إعلامي قياسي</h3>
+<p class="text-body-md text-on-surface-variant mb-md">يُستخدم لتأكيد نجاح عملية ما أو تقديم معلومات غير حرجة.</p>
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/50 p-xl flex items-center justify-center min-h-[400px] relative overflow-hidden">
+<!-- Background decoration -->
+<div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(circle at center, var(--tw-colors-primary-container) 0%, transparent 70%);"></div>
+<!-- Modal Card -->
+<div class="bg-surface-container-lowest w-full max-w-md rounded-lg shadow-soft border border-outline-variant/30 p-lg relative z-10">
+<div class="flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full bg-tertiary-fixed flex items-center justify-center mb-md shadow-soft border border-tertiary-fixed-dim/50">
+<span class="material-symbols-outlined text-on-tertiary-fixed text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-sm">تم حفظ المخطوطة</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl">
+                                        تم حفظ التغييرات الأخيرة على المخطوطة الأكاديمية بنجاح في قاعدة البيانات المركزية. يمكنك الآن العودة إلى لوحة التحكم بأمان.
+                                    </p>
+<button class="w-full bg-primary text-on-primary py-3 px-6 rounded-full font-label-md hover:bg-primary-container transition-all duration-200 active:scale-95 shadow-soft">
+                                        إقرار المتابعة
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- 2. Confirmation Dialog -->
+<div class="flex flex-col gap-md">
+<h3 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant/50 pb-sm">حوار التأكيد</h3>
+<p class="text-body-md text-on-surface-variant mb-md">يُستخدم عندما يحتاج المستخدم إلى اتخاذ قرار بين خيارين، مع تسليط الضوء على العواقب المحتملة.</p>
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/50 p-xl flex items-center justify-center min-h-[400px] relative overflow-hidden">
+<!-- Background decoration -->
+<div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(circle at center, var(--tw-colors-secondary-container) 0%, transparent 70%);"></div>
+<!-- Modal Card -->
+<div class="bg-surface-container-lowest w-full max-w-md rounded-lg shadow-soft border border-outline-variant/30 p-lg relative z-10">
+<div class="flex flex-col items-start text-right w-full">
+<div class="flex items-center gap-md mb-md">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center shadow-soft">
+<span class="material-symbols-outlined text-on-secondary-container text-2xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface m-0">تجاهل التغييرات؟</h4>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl pr-16 border-r-2 border-secondary-container mr-6">
+                                        يحتوي هذا المستند على تعديلات غير محفوظة. إذا قمت بالتجاهل الآن، سيتم فقدان كل العمل الذي قمت به في هذه الجلسة بشكل دائم. هل أنت متأكد أنك تريد الاستمرار؟
+                                    </p>
+<div class="flex gap-md w-full justify-end mt-auto">
+<button class="bg-transparent text-on-surface border border-outline-variant py-2 px-6 rounded-full font-label-md hover:bg-surface-variant transition-all duration-200 active:scale-95">
+                                            إلغاء
+                                        </button>
+<button class="bg-error text-on-error py-2 px-6 rounded-full font-label-md hover:bg-error/90 transition-all duration-200 active:scale-95 shadow-soft flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">delete</span>
+                                            تجاهل التغييرات
+                                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 3. Destructive Action (Type-to-Confirm) -->
+<div class="flex flex-col gap-md lg:col-span-2 mt-xl">
+<h3 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant/50 pb-sm">إجراء مدمر (اكتب للتأكيد)</h3>
+<p class="text-body-md text-on-surface-variant mb-md">يُستخدم للإجراءات العالية المخاطر التي لا يمكن التراجع عنها. يضيف احتكاكًا مقصودًا لضمان وعي المستخدم التام.</p>
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/50 p-xl flex items-center justify-center relative overflow-hidden">
+<!-- Background decoration -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: repeating-linear-gradient(45deg, var(--tw-colors-error-container) 0px, var(--tw-colors-error-container) 2px, transparent 2px, transparent 8px);"></div>
+<!-- Modal Card -->
+<div class="bg-surface-container-lowest w-full max-w-2xl rounded-lg shadow-soft border-2 border-error/20 p-lg relative z-10 flex flex-col md:flex-row gap-lg">
+<!-- Left/Icon area -->
+<div class="flex flex-col items-center justify-center bg-error-container rounded-lg p-md md:w-1/3 text-center border border-error/10">
+<span class="material-symbols-outlined text-on-error-container text-6xl mb-sm" style="font-variation-settings: 'FILL' 1;">delete_forever</span>
+<span class="font-label-md text-on-error-container uppercase tracking-wider">تحذير حرج</span>
+</div>
+<!-- Right/Content area -->
+<div class="flex flex-col justify-between flex-1 text-right">
+<div>
+<h4 class="font-headline-md text-headline-md text-error mb-xs">حذف دليل الدورة</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">
+                                            أنت على وشك حذف <strong>مقدمة في الفلسفة الحديثة (PHIL101)</strong> وجميع المواد والمخطوطات المرتبطة به. هذا الإجراء دائم ولا يمكن التراجع عنه.
+                                        </p>
+</div>
+<div class="space-y-sm bg-surface-variant/30 p-md rounded-DEFAULT border border-outline-variant/50">
+<label class="font-label-sm text-label-sm text-on-surface block" for="confirm-delete">لتأكيد هذا الإجراء، يرجى كتابة كلمة "DELETE" أدناه:</label>
+<div class="relative">
+<input class="w-full pl-4 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-DEFAULT focus:outline-none focus:border-error focus:ring-1 focus:ring-error text-body-md transition-shadow uppercase text-center tracking-[0.2em] shadow-inner font-mono text-on-surface" id="confirm-delete" placeholder="اكتب DELETE" type="text"/>
+</div>
+</div>
+<div class="flex gap-md w-full justify-end mt-lg pt-md border-t border-outline-variant/50">
+<button class="bg-transparent text-on-surface py-2 px-6 rounded-full font-label-md hover:bg-surface-variant transition-all duration-200 active:scale-95">
+                                            إلغاء
+                                        </button>
+<!-- Disabled state applied visually via opacity and cursor -->
+<button class="bg-error text-on-error py-2 px-6 rounded-full font-label-md opacity-50 cursor-not-allowed shadow-none flex items-center gap-sm">
+                                            تأكيد الحذف النهائي
+                                            <span class="material-symbols-outlined text-sm">lock</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

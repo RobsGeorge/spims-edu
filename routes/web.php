@@ -25,6 +25,8 @@ use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SemesterController;
 use App\Http\Controllers\Admin\SurveyController as AdminSurveyController;
+use App\Http\Controllers\Admin\HelpArticleAdminController;
+use App\Http\Controllers\Admin\HelpCategoryController;
 use App\Http\Controllers\Admin\ThemeEditorController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
@@ -60,6 +62,7 @@ use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FoundationDemoController;
 use App\Http\Controllers\GradesController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HubController;
 use App\Http\Controllers\LearnController;
@@ -114,6 +117,11 @@ Route::get('/offerings/{offering}/preview/items/{item}/file', [ContentItemFileCo
 Route::get('/api/offerings/{offering}/preview', [OfferingPreviewController::class, 'json'])->name('api.offerings.preview');
 Route::get('/api/offerings/{offering}/pricing', [OfferingPreviewController::class, 'pricing'])->name('api.offerings.pricing');
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+
+Route::get('/help', [HelpController::class, 'index'])->name('help.index');
+Route::get('/help/c/{category}', [HelpController::class, 'category'])->name('help.category');
+Route::get('/help/role/{role}', [HelpController::class, 'byRole'])->name('help.role');
+Route::get('/help/{slug}', [HelpController::class, 'show'])->name('help.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('auth.register');
@@ -610,6 +618,29 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/theme/{theme}', [ThemeEditorController::class, 'update'])
             ->middleware('permission:theme.manage')
             ->name('theme.update');
+
+        Route::prefix('help')->name('help.')->middleware('permission:help.manage')->group(function () {
+            Route::get('/', [HelpArticleAdminController::class, 'index'])->name('index');
+            Route::post('/preview-markdown', [HelpArticleAdminController::class, 'previewMarkdown'])
+                ->name('preview-markdown');
+
+            Route::get('/categories', [HelpCategoryController::class, 'index'])->name('categories.index');
+            Route::post('/categories', [HelpCategoryController::class, 'store'])->name('categories.store');
+            Route::get('/categories/{category}/edit', [HelpCategoryController::class, 'edit'])->name('categories.edit');
+            Route::put('/categories/{category}', [HelpCategoryController::class, 'update'])->name('categories.update');
+            Route::delete('/categories/{category}', [HelpCategoryController::class, 'destroy'])->name('categories.destroy');
+
+            Route::get('/articles', [HelpArticleAdminController::class, 'index'])->name('articles.index');
+            Route::get('/articles/create', [HelpArticleAdminController::class, 'create'])->name('articles.create');
+            Route::post('/articles', [HelpArticleAdminController::class, 'store'])->name('articles.store');
+            Route::get('/articles/{article}/edit', [HelpArticleAdminController::class, 'edit'])->name('articles.edit');
+            Route::put('/articles/{article}', [HelpArticleAdminController::class, 'update'])->name('articles.update');
+            Route::post('/articles/{article}/publish', [HelpArticleAdminController::class, 'publish'])->name('articles.publish');
+            Route::post('/articles/{article}/archive', [HelpArticleAdminController::class, 'archive'])->name('articles.archive');
+            Route::post('/articles/{article}/media', [HelpArticleAdminController::class, 'storeMedia'])->name('articles.media.store');
+            Route::post('/articles/{article}/media/attach', [HelpArticleAdminController::class, 'attachMediaPath'])->name('articles.media.attach');
+            Route::delete('/articles/{article}/media/{media}', [HelpArticleAdminController::class, 'destroyMedia'])->name('articles.media.destroy');
+        });
 
         Route::get('/programs', [ProgramController::class, 'index'])
             ->middleware('permission:programs.view')

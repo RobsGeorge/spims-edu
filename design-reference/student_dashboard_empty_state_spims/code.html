@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Dashboard - Spims</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#ffb1c1",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#dde9ff",
+                        "tertiary-fixed": "#bbefc1",
+                        "surface-variant": "#d3e3ff",
+                        "on-surface": "#0b1c30",
+                        "inverse-on-surface": "#ebf1ff",
+                        "primary-container": "#5d0326",
+                        "on-primary-container": "#e26f8b",
+                        "secondary-container": "#ffd578",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#554245",
+                        "inverse-primary": "#ffb1c1",
+                        "secondary-fixed": "#ffdf9c",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "surface-dim": "#cbdbf6",
+                        "on-tertiary-fixed": "#00210b",
+                        "on-primary-fixed": "#3f0017",
+                        "surface-container-highest": "#d3e3ff",
+                        "outline-variant": "#dbc0c4",
+                        "on-tertiary-container": "#6d9f76",
+                        "primary": "#380014",
+                        "on-background": "#0b1c30",
+                        "secondary-fixed-dim": "#eac166",
+                        "surface": "#f8f9ff",
+                        "tertiary": "#001d09",
+                        "on-secondary-container": "#795a03",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#251a00",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-bright": "#f8f9ff",
+                        "background": "#f8f9ff",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#003415",
+                        "surface-tint": "#a03b57",
+                        "primary-fixed": "#ffd9df",
+                        "inverse-surface": "#213146",
+                        "outline": "#887175",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "on-primary-fixed-variant": "#812340",
+                        "surface-container": "#e6eeff",
+                        "secondary": "#785a02"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "2rem",
+                        "sm": "0.5rem",
+                        "lg": "1.5rem",
+                        "container-max": "1440px",
+                        "sidebar-width": "280px",
+                        "2xl": "3rem",
+                        "gutter": "24px",
+                        "xs": "0.25rem",
+                        "md": "1rem"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex">
+<!-- SideNavBar (Web Only) -->
+<aside class="hidden md:flex bg-surface-container-low dark:bg-surface-container border-r border-outline-variant/30 fixed left-0 top-0 h-screen flex-col p-md z-40 w-sidebar-width rounded-r-lg shadow-soft transition-transform duration-300">
+<div class="flex items-center gap-md mb-xl px-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="school">school</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim truncate">Sacred Academic</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Learning Portal</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-sm">
+<!-- Active Tab -->
+<a class="bg-primary-container text-on-primary-container rounded-md flex items-center gap-md px-md py-sm font-label-md text-label-md translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span>Dashboard</span>
+</a>
+<!-- Inactive Tabs -->
+<a class="text-on-surface-variant dark:text-surface-variant flex items-center gap-md px-md py-sm hover:bg-primary-fixed/20 dark:hover:bg-primary-fixed-dim/10 rounded-md font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span>Courses</span>
+</a>
+<a class="text-on-surface-variant dark:text-surface-variant flex items-center gap-md px-md py-sm hover:bg-primary-fixed/20 dark:hover:bg-primary-fixed-dim/10 rounded-md font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="local_library">local_library</span>
+<span>Library</span>
+</a>
+<a class="text-on-surface-variant dark:text-surface-variant flex items-center gap-md px-md py-sm hover:bg-primary-fixed/20 dark:hover:bg-primary-fixed-dim/10 rounded-md font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span>Schedule</span>
+</a>
+<a class="text-on-surface-variant dark:text-surface-variant flex items-center gap-md px-md py-sm hover:bg-primary-fixed/20 dark:hover:bg-primary-fixed-dim/10 rounded-md font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-sm pt-md border-t border-outline-variant/30">
+<button class="w-full bg-primary text-on-primary rounded-full py-sm px-md font-label-md text-label-md hover:scale-95 duration-200 transition-transform flex justify-center items-center gap-sm">
+                View Grades
+            </button>
+<a class="text-on-surface-variant dark:text-surface-variant flex items-center gap-md px-md py-sm hover:bg-primary-fixed/20 dark:hover:bg-primary-fixed-dim/10 rounded-md font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Help Center</span>
+</a>
+<a class="text-on-surface-variant dark:text-surface-variant flex items-center gap-md px-md py-sm hover:bg-primary-fixed/20 dark:hover:bg-primary-fixed-dim/10 rounded-md font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-[280px] flex flex-col min-h-screen">
+<!-- TopNavBar (Mobile Only / Responsive header) -->
+<header class="md:hidden flex justify-between items-center w-full px-lg py-sm sticky top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface shadow-soft">
+<div class="flex items-center gap-sm">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Sacred Academic</span>
+</div>
+<div class="flex items-center gap-sm">
+<button class="text-primary dark:text-primary-fixed-dim p-sm rounded-full hover:bg-surface-container-low dark:hover:bg-surface-variant/10 transition-colors">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+</header>
+<!-- Top Header Actions (Web) -->
+<header class="hidden md:flex justify-between items-center w-full px-lg py-sm sticky top-0 z-30 bg-surface-container-lowest/80 backdrop-blur-md shadow-soft">
+<div class="flex-1 max-w-md ml-lg">
+<!-- Search could go here -->
+</div>
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant p-sm rounded-full hover:bg-surface-container-low transition-colors" title="Language">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<button class="text-on-surface-variant p-sm rounded-full hover:bg-surface-container-low transition-colors" title="Dark Mode">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<button class="text-on-surface-variant p-sm rounded-full hover:bg-surface-container-low transition-colors relative" title="Notifications">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="ml-sm w-10 h-10 rounded-full bg-surface-variant border border-outline-variant/30 overflow-hidden flex items-center justify-center">
+<img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK60Je9W-darbbGK6I2KcO39kdBYGzWRNsWIX5Aqfs1zqNo_Qv-dnAqkKcAz0rK1KqnH1UvMOq55g4KeveldDs1Ebyt4YkMA9hHwz0h-vNac0T7rgvZHFmMf6ot2i1rhcOJXb1Qg_GIzU-tFW0cup1gskk53RitB5VJQhmyrngjsA-zzPsKhuPirDLPJloJ3-CB8rSZ1KygqlixUvvYh6VE6_4s1ug53uETlb_thUF7Zo_b-jawzJM6Uz_fCgYHeinP6mAIBEb02fP"/>
+</button>
+</div>
+</header>
+<div class="p-md lg:p-xl flex-1 flex flex-col gap-xl max-w-container-max mx-auto w-full">
+<!-- Page Header -->
+<div class="flex flex-col gap-xs">
+<h2 class="font-headline-lg text-headline-lg text-on-background">Welcome back, Student!</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Here is an overview of your academic progress.</p>
+</div>
+<!-- Bento Grid Layout for Empty States -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md lg:gap-lg">
+<!-- Main Empty State Card (Spans 2 cols on md) -->
+<div class="md:col-span-2 bg-surface-container-lowest rounded-lg p-lg lg:p-xl shadow-soft border border-outline-variant/30 flex flex-col items-center justify-center text-center min-h-[400px]">
+<div class="w-48 h-48 mb-xl bg-surface-container-low rounded-full flex items-center justify-center relative overflow-hidden">
+<!-- Abstract illustration placeholder using shapes -->
+<div class="absolute inset-0 bg-gradient-to-tr from-surface-variant to-primary-fixed opacity-50"></div>
+<span class="material-symbols-outlined text-primary text-6xl z-10" data-icon="explore" style="font-size: 80px;">explore</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-background mb-sm">Your academic journey begins here.</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md mx-auto mb-xl">You haven't enrolled in any courses yet. Discover our catalog to find the perfect path for your goals.</p>
+<button class="bg-primary text-on-primary rounded-full py-md px-xl font-label-md text-label-md hover:scale-95 duration-200 transition-transform shadow-soft flex items-center gap-sm">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+                        Browse Course Catalog
+                    </button>
+</div>
+<!-- Secondary Empty States Column -->
+<div class="flex flex-col gap-md lg:gap-lg">
+<!-- Announcements Empty State -->
+<div class="bg-surface-container-lowest rounded-lg p-lg shadow-soft border border-outline-variant/30 flex-1 flex flex-col">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary" data-icon="campaign">campaign</span>
+<h4 class="font-label-md text-label-md text-on-background uppercase tracking-wider">Announcements</h4>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center text-center py-xl">
+<div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-on-surface-variant opacity-50" data-icon="notifications_off">notifications_off</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">No new announcements at this time. Check back later.</p>
+</div>
+</div>
+<!-- Wallet/Finance Empty State -->
+<div class="bg-surface-container-lowest rounded-lg p-lg shadow-soft border border-outline-variant/30 flex-1 flex flex-col">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary" data-icon="account_balance_wallet">account_balance_wallet</span>
+<h4 class="font-label-md text-label-md text-on-background uppercase tracking-wider">Wallet &amp; Billing</h4>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center text-center py-xl">
+<div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-on-surface-variant opacity-50" data-icon="receipt_long">receipt_long</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">No pending invoices or active payment plans found.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Links / Suggestions Area (Optional context for empty state) -->
+<div class="mt-xl">
+<h4 class="font-headline-sm text-headline-sm text-on-background mb-md">Getting Started Guide</h4>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-sm">
+<a class="bg-surface-container-low p-md rounded-DEFAULT hover:shadow-soft transition-shadow border border-transparent hover:border-outline-variant/30 group" href="#">
+<span class="material-symbols-outlined text-primary mb-sm block group-hover:scale-110 transition-transform" data-icon="menu_book">menu_book</span>
+<span class="font-label-md text-label-md text-on-surface block">How to Enroll</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block mt-xs">Step-by-step guide</span>
+</a>
+<a class="bg-surface-container-low p-md rounded-DEFAULT hover:shadow-soft transition-shadow border border-transparent hover:border-outline-variant/30 group" href="#">
+<span class="material-symbols-outlined text-primary mb-sm block group-hover:scale-110 transition-transform" data-icon="event">event</span>
+<span class="font-label-md text-label-md text-on-surface block">Academic Calendar</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block mt-xs">Important dates</span>
+</a>
+<a class="bg-surface-container-low p-md rounded-DEFAULT hover:shadow-soft transition-shadow border border-transparent hover:border-outline-variant/30 group" href="#">
+<span class="material-symbols-outlined text-primary mb-sm block group-hover:scale-110 transition-transform" data-icon="support_agent">support_agent</span>
+<span class="font-label-md text-label-md text-on-surface block">Student Support</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block mt-xs">Contact advising</span>
+</a>
+<a class="bg-surface-container-low p-md rounded-DEFAULT hover:shadow-soft transition-shadow border border-transparent hover:border-outline-variant/30 group" href="#">
+<span class="material-symbols-outlined text-primary mb-sm block group-hover:scale-110 transition-transform" data-icon="devices">devices</span>
+<span class="font-label-md text-label-md text-on-surface block">Tech Setup</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block mt-xs">System requirements</span>
+</a>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container-lowest dark:bg-inverse-surface shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 pb-safe">
+<div class="flex justify-around items-center h-16">
+<a class="flex flex-col items-center justify-center w-full h-full text-primary" href="#">
+<div class="bg-primary-container px-xl py-xs rounded-full mb-1">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+</div>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="school">school</span>
+<span class="font-label-sm text-label-sm">Courses</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="local_library">local_library</span>
+<span class="font-label-sm text-label-sm">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="menu">menu</span>
+<span class="font-label-sm text-label-sm">More</span>
+</a>
+</div>
+</nav>
+</body></html>

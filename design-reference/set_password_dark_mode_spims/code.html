@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Set Password - Spims</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Source+Serif+4:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#0d1322",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "on-secondary": "#402d00",
+                        "on-primary-fixed-variant": "#81233f",
+                        "surface-container-lowest": "#080e1d",
+                        "on-primary-fixed": "#3f0017",
+                        "error-container": "#93000a",
+                        "surface-container": "#191f2f",
+                        "secondary-fixed-dim": "#e9c16d",
+                        "secondary-container": "#6a4e00",
+                        "tertiary": "#c1c7cf",
+                        "surface-bright": "#33394a",
+                        "on-error": "#690005",
+                        "tertiary-fixed": "#dde3eb",
+                        "on-tertiary-container": "#a9afb7",
+                        "secondary-fixed": "#ffdea0",
+                        "primary-fixed-dim": "#ffb1c0",
+                        "surface-container-highest": "#2f3445",
+                        "tertiary-container": "#3c4349",
+                        "surface-tint": "#ffb1c0",
+                        "primary-fixed": "#ffd9df",
+                        "background": "#0d1322",
+                        "outline": "#a38b8e",
+                        "secondary": "#e9c16d",
+                        "on-secondary-fixed": "#261a00",
+                        "on-secondary-container": "#e9c16d",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-tertiary": "#2b3137",
+                        "error": "#ffb4ab",
+                        "on-background": "#dde2f8",
+                        "primary-container": "#7b1e3b",
+                        "inverse-primary": "#a03b57",
+                        "surface": "#0d1322",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#242a3a",
+                        "on-surface-variant": "#dbc0c4",
+                        "on-primary": "#63082a",
+                        "surface-variant": "#2f3445",
+                        "on-primary-container": "#ff8ca6",
+                        "primary": "#ffb1c0",
+                        "outline-variant": "#554245",
+                        "on-tertiary-fixed": "#161c22",
+                        "inverse-on-surface": "#2a3040",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "inverse-surface": "#dde2f8",
+                        "surface-container-low": "#151b2b",
+                        "on-surface": "#dde2f8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem",
+                        "2xl": "1rem"
+                    },
+                    "spacing": {
+                        "container-padding": "24px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["\"Source Serif 4\""],
+                        "display-lg": ["EB Garamond"],
+                        "body-md": ["\"Source Serif 4\""],
+                        "title-md": ["\"Source Serif 4\""],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["EB Garamond"],
+                        "headline-lg-mobile": ["EB Garamond"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md antialiased selection:bg-secondary selection:text-on-secondary">
+<!-- Top App Bar (Simplified for Transactional Flow) -->
+<header class="flex justify-between items-center px-container-padding py-base w-full absolute top-0 z-50 bg-transparent flat no shadows">
+<div class="flex items-center gap-4">
+<span class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed-dim">Spims</span>
+</div>
+<div class="flex items-center gap-4">
+<button aria-label="Help" class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-primary dark:text-inverse-primary">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button aria-label="Language" class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-primary dark:text-inverse-primary">
+<span class="material-symbols-outlined">language</span>
+</button>
+</div>
+</header>
+<main class="min-h-screen flex w-full">
+<!-- Left Brand Panel (Desktop) -->
+<div class="hidden lg:flex w-1/2 bg-surface-container relative items-center justify-center overflow-hidden border-r border-outline-variant/30">
+<!-- Decorative Background Element -->
+<div class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjMGQxMzIyIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDBMOCA4Wk04IDBMMCA4WiIgc3Ryb2tlPSIjZTljMTZkIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1vcGFjaXR5PSIwLjMiPjwvcGF0aD4KPC9zdmc+')]"></div>
+<div class="relative z-10 flex flex-col items-center text-center max-w-md px-container-padding">
+<div class="w-32 h-32 mb-8 rounded-full border border-secondary flex items-center justify-center bg-surface shadow-[0_0_40px_rgba(233,193,109,0.1)]">
+<span class="material-symbols-outlined text-display-lg text-secondary" style="font-size: 64px;">account_balance</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-4">Secure Access</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                    Establish your credentials within the academic registry. Ensure your key meets all rigorous standards for institutional security.
+                </p>
+</div>
+</div>
+<!-- Right Content Panel -->
+<div class="w-full lg:w-1/2 flex items-center justify-center p-margin-mobile md:p-margin-desktop relative">
+<div class="w-full max-w-md bg-surface-container-low rounded-2xl p-8 border border-outline-variant/30 relative">
+<!-- Decorative Top Border -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-50 rounded-t-2xl"></div>
+<div class="mb-8">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2 font-display-lg">Set Password</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Create a strong password for your Spims account.</p>
+</div>
+<form class="space-y-6" onsubmit="event.preventDefault();">
+<!-- New Password Input -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="new-password">New Password</label>
+<div class="relative">
+<input class="w-full bg-surface-dim border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 text-on-surface font-body-md py-3 px-4 transition-colors placeholder:text-on-surface-variant/50 rounded-t-lg" id="new-password" placeholder="Enter new password" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-secondary transition-colors" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Password Strength Meter -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Password Strength</span>
+<span class="font-label-md text-label-md text-secondary">Moderate</span>
+</div>
+<div class="flex gap-1 h-1.5 w-full rounded-full overflow-hidden bg-surface-dim">
+<div class="h-full w-1/3 bg-error transition-all duration-300"></div>
+<div class="h-full w-1/3 bg-secondary transition-all duration-300"></div>
+<div class="h-full w-1/3 bg-transparent transition-all duration-300"></div>
+</div>
+</div>
+<!-- Rules Checklist -->
+<div class="space-y-2 py-2">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+<span class="font-body-md text-sm">At least 8 characters</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant/50">
+<span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+<span class="font-body-md text-sm">One uppercase letter</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant/50">
+<span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+<span class="font-body-md text-sm">One number or symbol</span>
+</div>
+</div>
+<!-- Confirm Password Input -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="confirm-password">Confirm Password</label>
+<div class="relative">
+<input class="w-full bg-surface-dim border-0 border-b border-outline-variant focus:border-secondary focus:ring-0 text-on-surface font-body-md py-3 px-4 transition-colors placeholder:text-on-surface-variant/50 rounded-t-lg" id="confirm-password" placeholder="Re-enter password" type="password"/>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full bg-secondary text-on-secondary py-3 px-6 rounded-lg font-label-md text-label-md hover:bg-secondary-fixed transition-colors mt-8 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(233,193,109,0.2)]" type="submit">
+<span>Set Password</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</form>
+</div>
+</div>
+</main>
+<footer class="bg-surface-container-lowest dark:bg-surface-container-highest border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center px-xl py-lg w-full mt-auto">
+<div class="font-label-md text-label-md text-primary mb-4 md:mb-0">
+            © 2024 Spims Academic. All rights reserved.
+        </div>
+<div class="flex gap-6">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Contact Support</a>
+</div>
+</footer>
+</body></html>

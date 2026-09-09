@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sacred Academic - Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&amp;family=Inter:wght@400;500;600&amp;family=Source+Serif+4:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#c1c7cf",
+                        "on-tertiary-fixed": "#161c22",
+                        "on-background": "#dde2f8",
+                        "background": "#0d1322",
+                        "surface-container": "#191f2f",
+                        "tertiary-container": "#3c4349",
+                        "on-error-container": "#ffdad6",
+                        "secondary-container": "#6a4e00",
+                        "outline-variant": "#554245",
+                        "inverse-surface": "#dde2f8",
+                        "on-primary": "#63082a",
+                        "surface-container-low": "#151b2b",
+                        "tertiary-fixed": "#dde3eb",
+                        "on-tertiary": "#2b3137",
+                        "on-primary-fixed-variant": "#81233f",
+                        "on-error": "#690005",
+                        "on-primary-container": "#ff8ca6",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "surface-tint": "#ffb1c0",
+                        "surface-bright": "#33394a",
+                        "surface": "#0d1322",
+                        "outline": "#a38b8e",
+                        "secondary": "#e9c16d",
+                        "on-surface": "#dde2f8",
+                        "surface-container-highest": "#2f3445",
+                        "on-secondary-fixed": "#261a00",
+                        "surface-container-high": "#242a3a",
+                        "primary-fixed-dim": "#ffb1c0",
+                        "on-secondary": "#402d00",
+                        "error-container": "#93000a",
+                        "on-tertiary-container": "#a9afb7",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "primary-fixed": "#ffd9df",
+                        "on-primary-fixed": "#3f0017",
+                        "surface-variant": "#2f3445",
+                        "surface-container-lowest": "#080e1d",
+                        "secondary-fixed": "#ffdea0",
+                        "inverse-on-surface": "#2a3040",
+                        "secondary-fixed-dim": "#e9c16d",
+                        "inverse-primary": "#a03b57",
+                        "surface-dim": "#0d1322",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "on-surface-variant": "#dbc0c4",
+                        "on-secondary-container": "#e9c16d",
+                        "primary-container": "#7b1e3b",
+                        "primary": "#ffb1c0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "container-padding": "24px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "64px",
+                        "base": "8px",
+                        "sidebar-width": "280px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["\"Source Serif 4\""],
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["EB Garamond"],
+                        "title-md": ["\"Source Serif 4\""],
+                        "display-lg": ["EB Garamond"],
+                        "body-md": ["\"Source Serif 4\""]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #0d1322; color: #dde2f8; }
+        .glass-panel {
+            background: rgba(21, 27, 43, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .input-academic {
+            background-color: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(85, 66, 69, 0.5);
+            color: #dde2f8;
+            padding: 8px 0;
+            transition: all 0.3s ease;
+        }
+        .input-academic:focus {
+            outline: none;
+            border-bottom-color: #e9c16d;
+            box-shadow: 0 1px 0 0 #e9c16d;
+        }
+        .input-academic::placeholder { color: #a9afb7; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0d1322; }
+        ::-webkit-scrollbar-thumb { background: #2f3445; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3c4349; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex selection:bg-primary-container selection:text-on-primary-container overflow-hidden">
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex bg-surface-container-low dark:bg-surface-container-low w-sidebar-width h-screen flex-col bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant/30 shadow-none fixed left-0 top-0 h-full w-sidebar-width py-lg flex flex-col justify-between z-20">
+<div>
+<!-- Header -->
+<div class="px-container-padding py-8 flex items-center gap-4 border-b border-outline-variant/20 mb-8">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Sacred Academic</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-80">Coptic LMS</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<ul class="px-gutter space-y-2">
+<li>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant px-md py-sm hover:bg-secondary-fixed/20 dark:hover:bg-secondary-fixed-dim/10 rounded-lg transition-all active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant px-md py-sm hover:bg-secondary-fixed/20 dark:hover:bg-secondary-fixed-dim/10 rounded-lg transition-all active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-md text-label-md">Courses</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant px-md py-sm hover:bg-secondary-fixed/20 dark:hover:bg-secondary-fixed-dim/10 rounded-lg transition-all active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-label-md text-label-md">Library</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant px-md py-sm hover:bg-secondary-fixed/20 dark:hover:bg-secondary-fixed-dim/10 rounded-lg transition-all active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-label-md">Schedule</span>
+</a>
+</li>
+<!-- Active Item -->
+<li>
+<a class="flex items-center gap-md bg-secondary-container dark:bg-secondary-container text-on-secondary-container dark:text-on-secondary-container rounded-lg px-md py-sm active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</li>
+</ul>
+</div>
+<!-- Footer Actions -->
+<div class="px-gutter pb-8 space-y-2 border-t border-outline-variant/20 pt-6 mt-auto">
+<button class="w-full flex justify-center items-center gap-2 border border-primary-container text-primary-fixed-dim px-4 py-2 rounded-DEFAULT hover:bg-primary-container/20 transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">support_agent</span> Support
+            </button>
+<ul class="pt-4 space-y-1">
+<li>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant px-md py-sm hover:bg-secondary-fixed/20 dark:hover:bg-secondary-fixed-dim/10 rounded-lg transition-all active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Help</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant px-md py-sm hover:bg-secondary-fixed/20 dark:hover:bg-secondary-fixed-dim/10 rounded-lg transition-all active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-[280px] w-full h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-lowest w-full h-16 shadow-soft dark:shadow-soft border-b border-outline-variant/30 flex justify-between items-center px-gutter shrink-0 z-10 relative">
+<div class="flex items-center gap-4">
+<!-- Mobile Menu Toggle (Hidden on Desktop) -->
+<button class="md:hidden text-on-surface-variant hover:bg-surface-variant/20 rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="font-headline-md text-headline-md text-primary dark:text-primary-fixed md:hidden">Sacred Academic</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-2">
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/10 rounded-full p-2 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/10 rounded-full p-2 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined">translate</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/10 rounded-full p-2 transition-colors active:scale-95 duration-200 hidden md:block">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<div class="h-8 w-px bg-outline-variant/40 mx-2"></div>
+<!-- Profile Avatar -->
+<button class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/50 hover:border-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-secondary/50">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A distinguished older scholar with a neat white beard and glasses, wearing a dark tweed jacket, photographed against a deep, moody library background. The lighting is low and sophisticated, emphasizing wisdom and academic authority, fitting a dark-mode premium interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALSVihJoawKYjeWwzmSHtGPZE3zfJx92zFDu2r7gGpjgReRrDj0CGfGcIJsFLlDyBF4xqL9RDD3bXPxE-yfbBe8r6tnCX02nc_FGAM9h8JnnEqgkOWlZH9ZA3Y-ODJ1YKj2vfLiWnPobvnAkSr9ffvP3BwddNTewylAbCJoNop7Vf1jqITYZVtVDKjpe2eDZfFmGSJKoNY4SECV__MH6B2WnND-pRy0NGZT5xuVtn3SXPLE59LfrJKAXvSjik6uo20jYhfLs1Ne4Wp"/>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 overflow-y-auto px-margin-mobile md:px-margin-desktop py-8 md:py-12 relative">
+<!-- Subtle background pattern/glow -->
+<div class="absolute top-0 left-1/4 w-1/2 h-64 bg-primary-container/10 blur-[100px] rounded-full pointer-events-none"></div>
+<div class="max-w-5xl mx-auto space-y-8 relative z-10">
+<!-- Page Header -->
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Profile &amp; Settings</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage your scholarly identity, security preferences, and system notifications.</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Navigation / Tab List -->
+<div class="lg:col-span-3 space-y-2">
+<button class="w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 bg-surface-container text-secondary border-l-2 border-secondary transition-all font-label-md text-label-md shadow-sm">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">person</span>
+                            Profile Details
+                        </button>
+<button class="w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-label-md text-label-md border-l-2 border-transparent">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+                            Security
+                        </button>
+<button class="w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-label-md text-label-md border-l-2 border-transparent">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+                            Preferences
+                        </button>
+<button class="w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all font-label-md text-label-md border-l-2 border-transparent">
+<span class="material-symbols-outlined text-[20px]">notifications_active</span>
+                            Notifications
+                        </button>
+</div>
+<!-- Right Column: Active Tab Content (Profile) -->
+<div class="lg:col-span-9 space-y-6">
+<!-- Avatar Section Card -->
+<div class="glass-panel rounded-xl p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6 border-t border-t-outline-variant/30 relative overflow-hidden">
+<!-- Subtle card background accent -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-[50px] rounded-full pointer-events-none"></div>
+<div class="relative group cursor-pointer shrink-0">
+<div class="w-24 h-24 rounded-full overflow-hidden border-2 border-outline-variant/50 group-hover:border-secondary transition-colors">
+<img alt="User profile photo large" class="w-full h-full object-cover" data-alt="Close up of a distinguished older scholar with a neat white beard and glasses, emphasizing texture and moody dramatic lighting. The background is a very dark navy, almost black, fitting a premium academic interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBocvKKpZgJr9PHuSBT5paJsyvat05ipsVFCPES5YTpsr5NcQQ4D4DNEZfysO-tjT_BOWcr5u4bIuQLq0Gd7KnrHyonzycH3CAIMMIzjTC83qeM1jRbeGPrBEXIOFsctZX6h6vjZ7c4aYDLEfQaU6kLHYTyJIWhnTbCPlTX63UgqgDttBO9k5PYLHxU2JnTQBhqn_aZcu8j8GL9QNAlTsNyXyrc3KZvWRLZ9GJjVzHRVkAAB1oSY5R1e2uvV9wIsj33ms8BZqWanIhJ"/>
+</div>
+<div class="absolute inset-0 bg-background/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-secondary">photo_camera</span>
+</div>
+</div>
+<div class="flex-1 text-center md:text-left">
+<h3 class="font-title-md text-title-md text-on-surface mb-1">Dr. Elias Thorne</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Department of Antiquities</p>
+<div class="flex flex-wrap justify-center md:justify-start gap-3">
+<button class="bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded-DEFAULT hover:bg-primary-fixed transition-colors shadow-sm">
+                                        Upload New
+                                    </button>
+<button class="bg-transparent border border-outline-variant text-on-surface-variant font-label-md text-label-md px-4 py-2 rounded-DEFAULT hover:border-outline hover:text-on-surface transition-colors">
+                                        Remove
+                                    </button>
+</div>
+</div>
+<div class="hidden md:block shrink-0">
+<span class="inline-flex items-center gap-1.5 bg-primary-container text-on-primary-container font-label-md text-[12px] px-2 py-1 rounded-sm">
+<span class="material-symbols-outlined text-[14px]">verified</span> Validated Faculty
+                                </span>
+</div>
+</div>
+<!-- Form Section Card -->
+<div class="glass-panel rounded-xl p-6 md:p-8 border-t border-t-secondary/30 relative">
+<h3 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-6 border-b border-outline-variant/30 pb-4">Personal Information</h3>
+<form class="space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-secondary tracking-widest uppercase text-[10px]">First Name</label>
+<input class="input-academic w-full font-body-lg text-body-lg" placeholder="Enter first name" type="text" value="Elias"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-secondary tracking-widest uppercase text-[10px]">Last Name</label>
+<input class="input-academic w-full font-body-lg text-body-lg" placeholder="Enter last name" type="text" value="Thorne"/>
+</div>
+<div class="space-y-1 md:col-span-2">
+<label class="font-label-md text-label-md text-secondary tracking-widest uppercase text-[10px]">Academic Title</label>
+<input class="input-academic w-full font-body-lg text-body-lg" placeholder="Enter title" type="text" value="Professor of Early Christian History"/>
+</div>
+<div class="space-y-1 md:col-span-2">
+<label class="font-label-md text-label-md text-secondary tracking-widest uppercase text-[10px]">Email Address</label>
+<div class="relative">
+<input class="input-academic w-full font-body-lg text-body-lg pr-10" placeholder="Enter email" type="email" value="e.thorne@sacredacademic.edu"/>
+<span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline-variant">mail</span>
+</div>
+</div>
+<div class="space-y-1 md:col-span-2">
+<label class="font-label-md text-label-md text-secondary tracking-widest uppercase text-[10px]">Biography / Focus</label>
+<textarea class="input-academic w-full font-body-lg text-body-lg resize-none" placeholder="Brief academic bio..." rows="3">Specializing in Coptic manuscripts of the 4th century. Primary researcher for the Alexandria Digitization Project.</textarea>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="flex items-center justify-end gap-4 pt-6 border-t border-outline-variant/30 mt-8">
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors px-4 py-2" type="button">
+                                        Discard
+                                    </button>
+<button class="bg-secondary text-on-secondary-fixed font-label-md text-label-md px-6 py-2.5 rounded-DEFAULT shadow-[0_0_15px_rgba(233,193,109,0.2)] hover:shadow-[0_0_20px_rgba(233,193,109,0.4)] hover:bg-secondary-fixed transition-all active:scale-95 flex items-center gap-2" type="submit">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                                        Save Changes
+                                    </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

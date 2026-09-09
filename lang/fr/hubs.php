@@ -94,4 +94,6 @@ return [
     'reports_desc' => 'Effectifs, assiduité, notes, vieillissement financier et statut.',
     'advising' => 'Conseil académique',
     'advising_desc' => 'Affectations, liste d’étudiants et holds d’inscription.',
+    'help_center' => 'Centre d\'aide',
+    'help_center_desc' => 'Gérer articles, catégories et langues d\'aide.',
 ];

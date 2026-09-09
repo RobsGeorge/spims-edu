@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims Academic - Set Password</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#003415",
+                        "surface-tint": "#a03b57",
+                        "background": "#f8f9ff",
+                        "primary-fixed": "#ffd9df",
+                        "outline": "#887175",
+                        "secondary": "#785a02",
+                        "on-secondary-container": "#795a03",
+                        "on-tertiary-container": "#6d9f76",
+                        "secondary-fixed": "#ffdf9c",
+                        "primary-fixed-dim": "#d4af37",
+                        "surface-container-highest": "#d3e3ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#3f0017",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#001d09",
+                        "surface-dim": "#cbdbf6",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "on-primary-fixed-variant": "#812340",
+                        "primary": "#380014",
+                        "surface-container-low": "#eff4ff",
+                        "outline-variant": "#dbc0c4",
+                        "on-tertiary-fixed": "#00210b",
+                        "inverse-on-surface": "#ebf1ff",
+                        "inverse-surface": "#213146",
+                        "on-primary-container": "#e26f8b",
+                        "error": "#ba1a1a",
+                        "on-background": "#0b1c30",
+                        "inverse-primary": "#ffb1c1",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "on-secondary-fixed": "#251a00",
+                        "surface-container": "#e6eeff",
+                        "secondary-fixed-dim": "#eac166",
+                        "secondary-container": "#ffd578",
+                        "tertiary-fixed": "#bbefc1",
+                        "surface-bright": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "on-surface": "#0b1c30",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#554245",
+                        "surface-variant": "#d3e3ff",
+                        "surface": "#f8f9ff",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#dde9ff",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#5d0326"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sidebar-width": "280px",
+                        "container-max": "1440px",
+                        "md": "1rem",
+                        "lg": "1.5rem",
+                        "xl": "2rem",
+                        "xs": "0.25rem",
+                        "gutter": "24px",
+                        "sm": "0.5rem",
+                        "2xl": "3rem"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .geometric-bg {
+            background-image: 
+                radial-gradient(circle at center, rgba(255, 217, 223, 0.05) 0%, transparent 70%),
+                linear-gradient(45deg, rgba(212, 175, 55, 0.02) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.02) 75%, rgba(212, 175, 55, 0.02)),
+                linear-gradient(45deg, rgba(212, 175, 55, 0.02) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.02) 75%, rgba(212, 175, 55, 0.02));
+            background-size: 100% 100%, 60px 60px, 60px 60px;
+            background-position: 0 0, 0 0, 30px 30px;
+        }
+        
+        /* Subtle Coptic-inspired motif overlay */
+        .coptic-motif {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 10 L60 40 L90 50 L60 60 L50 90 L40 60 L10 50 L40 40 Z' fill='none' stroke='rgba(255,217,223,0.03)' stroke-width='1'/%3E%3Ccircle cx='50' cy='50' r='15' fill='none' stroke='rgba(212,175,55,0.03)' stroke-width='1'/%3E%3C/svg%3E");
+            background-size: 120px 120px;
+        }
+
+        .meter-fill {
+            transition: width 0.3s ease-in-out, background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen font-body-md text-on-surface antialiased flex items-center justify-center p-md lg:p-xl">
+<!-- Main Container: Split Layout -->
+<main class="w-full max-w-container-max bg-surface-container-lowest rounded-xl shadow-soft overflow-hidden flex flex-col md:flex-row min-h-[600px] border border-outline-variant/30">
+<!-- Left Panel: Brand & Motif (Hidden on mobile, flex on desktop) -->
+<div class="hidden md:flex flex-col md:w-5/12 lg:w-1/2 bg-primary text-on-primary p-xl relative overflow-hidden geometric-bg coptic-motif">
+<!-- Top Controls (Language / Help) - Desktop -->
+<div class="absolute top-md right-md flex gap-sm z-10">
+<button aria-label="Help" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-on-primary">help</span>
+</button>
+<button aria-label="Language" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-on-primary">language</span>
+</button>
+</div>
+<!-- Brand Content -->
+<div class="relative z-10 flex flex-col h-full justify-between">
+<div>
+<h1 class="font-headline-lg text-headline-lg font-bold tracking-tight mb-sm">Spims Academic</h1>
+<p class="font-body-lg text-body-lg text-primary-fixed/80 max-w-md">Secure your access to the prestigious academic portal.</p>
+</div>
+<div class="mt-auto">
+<!-- Optional decorative element or quote could go here -->
+<div class="w-16 h-1 bg-primary-fixed-dim rounded-full mb-md"></div>
+<p class="font-body-md text-body-md text-primary-fixed/70">"Excellence in every endeavor."</p>
+</div>
+</div>
+</div>
+<!-- Right Panel: Form Canvas -->
+<div class="w-full md:w-7/12 lg:w-1/2 p-lg md:p-2xl flex flex-col justify-center relative bg-surface-container-lowest">
+<!-- Mobile Top Controls -->
+<div class="md:hidden absolute top-md right-md flex gap-sm">
+<button aria-label="Help" class="w-10 h-10 rounded-full hover:bg-surface-container-low flex items-center justify-center transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button aria-label="Language" class="w-10 h-10 rounded-full hover:bg-surface-container-low flex items-center justify-center transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">language</span>
+</button>
+</div>
+<!-- Mobile Brand Header -->
+<div class="md:hidden mb-xl mt-md">
+<h1 class="font-headline-md text-headline-md font-bold text-primary mb-xs">Spims Academic</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Set your secure password.</p>
+</div>
+<div class="max-w-md w-full mx-auto md:mx-0">
+<div class="mb-xl hidden md:block">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Set Password</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Create a strong password to secure your academic account.</p>
+</div>
+<form class="space-y-lg" id="password-form" onsubmit="event.preventDefault();">
+<!-- New Password Field -->
+<div class="space-y-xs">
+<label class="block font-label-md text-label-md text-on-surface" for="new-password">New Password</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded DEFAULT px-md py-sm font-body-md text-body-md text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-shadow placeholder:text-outline" id="new-password" placeholder="••••••••" type="password"/>
+<button aria-label="Toggle password visibility" class="absolute right-sm top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Password Strength Meter -->
+<div class="space-y-sm bg-surface-container-low p-md rounded-DEFAULT border border-outline-variant/30">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Strength</span>
+<span class="font-label-sm text-label-sm text-outline font-medium" id="strength-text">Weak</span>
+</div>
+<!-- Visual Bar -->
+<div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden flex gap-1">
+<div class="h-full w-1/4 bg-error meter-fill" id="bar-1"></div>
+<div class="h-full w-1/4 bg-transparent meter-fill" id="bar-2"></div>
+<div class="h-full w-1/4 bg-transparent meter-fill" id="bar-3"></div>
+<div class="h-full w-1/4 bg-transparent meter-fill" id="bar-4"></div>
+</div>
+<!-- Rules Checklist -->
+<ul class="mt-sm space-y-xs font-body-md text-body-md text-[14px]">
+<li class="flex items-center gap-xs text-on-surface-variant" id="rule-length">
+<span class="material-symbols-outlined text-[16px]">radio_button_unchecked</span>
+                                At least 8 characters
+                            </li>
+<li class="flex items-center gap-xs text-on-surface-variant" id="rule-number">
+<span class="material-symbols-outlined text-[16px]">radio_button_unchecked</span>
+                                Includes a number
+                            </li>
+<li class="flex items-center gap-xs text-on-surface-variant" id="rule-symbol">
+<span class="material-symbols-outlined text-[16px]">radio_button_unchecked</span>
+                                Includes a special symbol
+                            </li>
+<li class="flex items-center gap-xs text-on-surface-variant" id="rule-case">
+<span class="material-symbols-outlined text-[16px]">radio_button_unchecked</span>
+                                Upper &amp; lowercase letters
+                            </li>
+</ul>
+</div>
+<!-- Confirm Password Field -->
+<div class="space-y-xs">
+<label class="block font-label-md text-label-md text-on-surface" for="confirm-password">Confirm Password</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded DEFAULT px-md py-sm font-body-md text-body-md text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-shadow placeholder:text-outline" id="confirm-password" placeholder="••••••••" type="password"/>
+<span class="absolute right-sm top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] text-transparent transition-colors" id="match-indicator">check_circle</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="pt-md">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-md rounded-full hover:bg-primary-container hover:text-on-primary-container active:scale-95 transition-all shadow-soft flex items-center justify-center gap-sm" type="submit">
+                            Set Password
+                            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+<!-- Footer Links (within form panel) -->
+<div class="mt-auto pt-xl text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                    Need help? <a class="text-primary hover:underline font-medium" href="#">Contact Support</a>
+</p>
+</div>
+</div>
+</main>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pwdInput = document.getElementById('new-password');
+            const confirmInput = document.getElementById('confirm-password');
+            const matchIndicator = document.getElementById('match-indicator');
+            const strengthText = document.getElementById('strength-text');
+            
+            // Rules
+            const rules = {
+                length: { el: document.getElementById('rule-length'), test: v => v.length >= 8 },
+                number: { el: document.getElementById('rule-number'), test: v => /\d/.test(v) },
+                symbol: { el: document.getElementById('rule-symbol'), test: v => /[!@#$%^&*(),.?":{}|<>]/.test(v) },
+                case: { el: document.getElementById('rule-case'), test: v => /[a-z]/.test(v) && /[A-Z]/.test(v) }
+            };
+
+            // Bars
+            const bars = [
+                document.getElementById('bar-1'),
+                document.getElementById('bar-2'),
+                document.getElementById('bar-3'),
+                document.getElementById('bar-4')
+            ];
+
+            const colors = ['bg-error', 'bg-secondary', 'bg-tertiary-container', 'bg-tertiary-container'];
+            const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+            const labelColors = ['text-error', 'text-secondary', 'text-on-tertiary-container', 'text-on-tertiary-container'];
+
+            pwdInput.addEventListener('input', (e) => {
+                const val = e.target.value;
+                let score = 0;
+
+                // Evaluate rules
+                Object.values(rules).forEach(rule => {
+                    const icon = rule.el.querySelector('span');
+                    if (rule.test(val)) {
+                        score++;
+                        icon.textContent = 'check_circle';
+                        icon.className = 'material-symbols-outlined text-[16px] text-on-tertiary-container transition-colors';
+                        rule.el.className = 'flex items-center gap-xs text-on-surface transition-colors';
+                    } else {
+                        icon.textContent = 'radio_button_unchecked';
+                        icon.className = 'material-symbols-outlined text-[16px] transition-colors';
+                        rule.el.className = 'flex items-center gap-xs text-on-surface-variant transition-colors';
+                    }
+                });
+
+                // Update Bars
+                bars.forEach((bar, index) => {
+                    if (index < score) {
+                        // Keep previous classes but update color
+                        bar.className = `h-full w-1/4 meter-fill ${colors[score - 1]}`;
+                    } else {
+                        bar.className = 'h-full w-1/4 bg-transparent meter-fill';
+                    }
+                });
+
+                // Update Text
+                if (val.length === 0) {
+                    strengthText.textContent = 'Empty';
+                    strengthText.className = 'font-label-sm text-label-sm text-outline font-medium';
+                    bars[0].className = 'h-full w-1/4 bg-surface-variant meter-fill'; // reset first bar
+                } else {
+                    const idx = Math.max(0, score - 1);
+                    strengthText.textContent = labels[idx];
+                    strengthText.className = `font-label-sm text-label-sm font-medium ${labelColors[idx]}`;
+                }
+
+                checkMatch();
+            });
+
+            confirmInput.addEventListener('input', checkMatch);
+
+            function checkMatch() {
+                if (confirmInput.value.length > 0) {
+                    if (confirmInput.value === pwdInput.value) {
+                        matchIndicator.className = 'absolute right-sm top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] text-on-tertiary-container transition-colors';
+                    } else {
+                        matchIndicator.className = 'absolute right-sm top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] text-error transition-colors';
+                        matchIndicator.textContent = 'error';
+                    }
+                } else {
+                    matchIndicator.className = 'absolute right-sm top-1/2 -translate-y-1/2 material-symbols-outlined text-[20px] text-transparent transition-colors';
+                    matchIndicator.textContent = 'check_circle';
+                }
+            }
+        });
+    </script>
+</body></html>

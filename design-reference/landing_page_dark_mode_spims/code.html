@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims - Coptic Orthodox Online School</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Inter:wght@100..900&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "surface-container-lowest": "#080e1d",
+                            "primary": "#ffb1c0",
+                            "on-primary-fixed": "#3f0017",
+                            "inverse-primary": "#a03b57",
+                            "surface-dim": "#0d1322",
+                            "on-primary": "#63082a",
+                            "on-tertiary-fixed": "#161c22",
+                            "on-error": "#690005",
+                            "surface-container": "#191f2f",
+                            "surface-tint": "#ffb1c0",
+                            "on-tertiary": "#2b3137",
+                            "on-tertiary-container": "#a9afb7",
+                            "inverse-surface": "#dde2f8",
+                            "on-tertiary-fixed-variant": "#41474e",
+                            "error-container": "#93000a",
+                            "on-surface-variant": "#dbc0c4",
+                            "on-primary-fixed-variant": "#81233f",
+                            "surface": "#0d1322",
+                            "surface-variant": "#2f3445",
+                            "on-error-container": "#ffdad6",
+                            "secondary-fixed-dim": "#e9c16d",
+                            "outline-variant": "#554245",
+                            "surface-container-low": "#151b2b",
+                            "inverse-on-surface": "#2a3040",
+                            "primary-container": "#7b1e3b",
+                            "on-background": "#dde2f8",
+                            "surface-bright": "#33394a",
+                            "primary-fixed-dim": "#ffb1c0",
+                            "tertiary-fixed-dim": "#c1c7cf",
+                            "on-secondary-fixed-variant": "#5c4300",
+                            "on-secondary": "#402d00",
+                            "primary-fixed": "#ffd9df",
+                            "background": "#0d1322",
+                            "surface-container-highest": "#2f3445",
+                            "on-secondary-container": "#e9c16d",
+                            "tertiary-fixed": "#dde3eb",
+                            "secondary": "#e9c16d",
+                            "error": "#ffb4ab",
+                            "secondary-container": "#6a4e00",
+                            "on-secondary-fixed": "#261a00",
+                            "tertiary-container": "#3c4349",
+                            "surface-container-high": "#242a3a",
+                            "secondary-fixed": "#ffdea0",
+                            "tertiary": "#c1c7cf",
+                            "outline": "#a38b8e",
+                            "on-surface": "#dde2f8",
+                            "on-primary-container": "#ff8ca6",
+                            "brand-gold": "#FFD57F",
+                            "brand-navy-deep": "#0B1120",
+                            "brand-navy-surface": "#0F172A",
+                            "brand-slate-ghost": "#334155",
+                            "brand-burgundy": "#81233f"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.125rem",
+                            "lg": "0.25rem",
+                            "xl": "0.5rem",
+                            "full": "0.75rem",
+                            "2xl": "1rem"
+                    },
+                    "spacing": {
+                            "margin-mobile": "16px",
+                            "gutter": "16px",
+                            "margin-desktop": "64px",
+                            "container-padding": "24px",
+                            "base": "8px"
+                    },
+                    "fontFamily": {
+                            "body-md": [
+                                    "\"Source Serif 4\""
+                            ],
+                            "label-md": [
+                                    "Inter"
+                            ],
+                            "headline-lg": [
+                                    "EB Garamond"
+                            ],
+                            "body-lg": [
+                                    "\"Source Serif 4\""
+                            ],
+                            "title-md": [
+                                    "\"Source Serif 4\""
+                            ],
+                            "headline-lg-mobile": [
+                                    "EB Garamond"
+                            ],
+                            "display-lg": [
+                                    "EB Garamond"
+                            ]
+                    },
+                    "fontSize": {
+                            "body-md": [
+                                    "16px",
+                                    {
+                                            "lineHeight": "24px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "label-md": [
+                                    "14px",
+                                    {
+                                            "lineHeight": "20px",
+                                            "letterSpacing": "0.05em",
+                                            "fontWeight": "500"
+                                    }
+                            ],
+                            "headline-lg": [
+                                    "32px",
+                                    {
+                                            "lineHeight": "40px",
+                                            "fontWeight": "500"
+                                    }
+                            ],
+                            "body-lg": [
+                                    "18px",
+                                    {
+                                            "lineHeight": "28px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "title-md": [
+                                    "20px",
+                                    {
+                                            "lineHeight": "28px",
+                                            "fontWeight": "600"
+                                    }
+                            ],
+                            "headline-lg-mobile": [
+                                    "28px",
+                                    {
+                                            "lineHeight": "36px",
+                                            "fontWeight": "500"
+                                    }
+                            ],
+                            "display-lg": [
+                                    "56px",
+                                    {
+                                            "lineHeight": "64px",
+                                            "letterSpacing": "-0.02em",
+                                            "fontWeight": "600"
+                                    }
+                            ]
+                    }
+            },
+                },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0B1120;
+            color: #dde2f8;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col pt-24 md:pt-32">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-lowest shadow-soft fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter py-md max-w-container-max mx-auto border-b border-brand-slate-ghost/30">
+<div class="flex items-center gap-6 lg:gap-12 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16">
+<a class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary tracking-tight" href="#">
+                Spims
+            </a>
+<nav class="hidden md:flex gap-8">
+<a class="font-label-md text-label-md text-primary dark:text-inverse-primary border-b-2 border-primary dark:border-inverse-primary pb-1 active:scale-95 transition-transform duration-150" href="#">Programs</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors duration-200" href="#">Admissions</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors duration-200" href="#">Academics</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors duration-200" href="#">Spiritual Life</a>
+</nav>
+<div class="hidden md:flex items-center gap-4 ml-auto">
+<button class="font-label-md text-label-md text-brand-burgundy border border-brand-burgundy px-4 py-2 rounded-lg hover:bg-brand-burgundy/10 transition-colors">
+                    Browse courses
+                </button>
+<button class="font-label-md text-label-md bg-brand-gold text-brand-navy-deep px-5 py-2 rounded-lg font-semibold hover:bg-brand-gold/90 transition-colors shadow-sm">
+                    Apply
+                </button>
+</div>
+<button class="md:hidden ml-auto text-on-surface">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+</header>
+<main class="flex-grow flex flex-col gap-16 md:gap-32 pb-32">
+<!-- Hero Section -->
+<section class="relative px-gutter md:px-margin-desktop w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 mt-8">
+<div class="w-full lg:w-1/2 flex flex-col gap-6 relative z-10">
+<div class="inline-flex items-center gap-2 bg-brand-navy-surface border border-brand-slate-ghost px-3 py-1 rounded-full w-fit">
+<span class="w-2 h-2 rounded-full bg-brand-gold animate-pulse"></span>
+<span class="font-label-md text-[12px] text-brand-gold uppercase tracking-wider">Fall Admissions Open</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface">
+                    Deepening Coptic Orthodox Scholarship in a <span class="text-brand-gold italic">Modern Age</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
+                    A rigorous academic environment dedicated to the study of early Christian texts, patristics, and liturgical theology, accessible globally.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4 mt-4">
+<button class="font-label-md text-label-md bg-brand-gold text-brand-navy-deep px-8 py-3 rounded-lg font-semibold hover:bg-brand-gold/90 transition-colors shadow-sm flex items-center justify-center gap-2">
+                        Apply Now
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<button class="font-label-md text-label-md text-brand-burgundy border border-brand-burgundy px-8 py-3 rounded-lg hover:bg-brand-burgundy/10 transition-colors flex items-center justify-center">
+                        Browse Programs
+                    </button>
+</div>
+</div>
+<div class="w-full lg:w-1/2 relative">
+<div class="absolute inset-0 bg-brand-gold/5 blur-3xl rounded-full"></div>
+<div class="relative rounded-2xl overflow-hidden border border-brand-slate-ghost shadow-2xl aspect-[4/3] bg-surface-container-low flex items-center justify-center">
+<img alt="Library" class="w-full h-full object-cover opacity-80" data-alt="A grand, dimly lit ancient library with towering wooden bookshelves filled with old manuscripts. Rays of soft, golden light filter through high stained-glass windows, illuminating dust motes in the air. In the foreground, a heavy oak table holds an open, illuminated manuscript with intricate Coptic script. The atmosphere is quiet, scholarly, and deeply reverent, utilizing a palette of deep navy shadows and rich, warm gold accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5f8IdzixWtZzTZkApPp3X97do70DT1n6OLR0Hqn9BpVdRm7JWMzEgfZbhvKvXTr_70VMihBtWDj2Vr7LNPAMlVPEJB8nTcwwn18Tz5SIl5pHlkyVqVLPgWDLXEFSRNkpAWLraZmv0f1Chbakcf43jwcGbCmryr_TyI0qFe9Yxt6L__LHIyGU-TZ_EG89v4DYjpBIcKOQ-CYOyZDAbS4CpOGz-FTB5uWaomnhohBpLwmdo7IBc3d3mTmc_-2KqMxHCrkEmOX_y7V-f"/>
+<div class="absolute inset-0 bg-gradient-to-t from-brand-navy-deep/80 to-transparent"></div>
+</div>
+</div>
+</section>
+<!-- Featured Programs (Bento Grid) -->
+<section class="px-gutter md:px-margin-desktop w-full max-w-7xl mx-auto flex flex-col gap-8">
+<div class="flex flex-col gap-2">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Featured Programs</h2>
+<div class="w-12 h-1 bg-brand-gold rounded-full"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Main Feature -->
+<div class="md:col-span-2 relative bg-surface-container-low border border-brand-slate-ghost rounded-2xl p-8 flex flex-col justify-end min-h-[400px] overflow-hidden group hover:border-brand-gold/50 transition-colors">
+<img alt="Patristics Study" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-500" data-alt="A close-up of a scholar's desk in a dark, moody environment. A fountain pen rests on a thick, textured parchment document filled with elegant handwriting. A small, warm desk lamp casts a focused golden pool of light on the paper, leaving the surrounding edges in deep, rich navy shadow. The scene evokes intense focus, academic rigor, and timeless tradition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7toMlLvcwqqxKmpWahrnNJpRwS9DeWAjy1nnezeiFok9wWlD4rnbss5AU9K29D9YySLDt0fNSGN38JqmH0ImRFEh4sGaLgmM2-rWLFICxpllFW6tOpV5n_0pnz703d0bwfXiUKnzshLjN35Drken7EB_Bfdgk7ytbIRM01NIYLf684w5NmsmZU7VXd6bszKushxADOOBTFIG4Ab8ktcQobybBw5pNQV12GdzPXOKYQSPFLn5myQAdKf1A7oOVAGtAxCHPrXygFcr2"/>
+<div class="absolute inset-0 bg-gradient-to-t from-brand-navy-deep via-brand-navy-deep/80 to-transparent"></div>
+<div class="relative z-10 flex flex-col gap-4">
+<span class="bg-brand-burgundy text-white font-label-md text-[12px] px-3 py-1 rounded w-fit">Master of Arts</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface leading-tight">Patristic Theology &amp; History</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg">
+                            A comprehensive exploration of the Church Fathers, focusing on the Alexandrian tradition and its enduring impact on global Christianity.
+                        </p>
+<a class="inline-flex items-center gap-2 text-brand-gold font-label-md text-label-md mt-2 hover:underline w-fit" href="#">
+                            Explore Curriculum <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Secondary Cards -->
+<div class="bg-surface-container-low border border-brand-slate-ghost rounded-2xl p-6 flex flex-col gap-4 hover:border-brand-slate-ghost/80 transition-colors">
+<div class="w-10 h-10 rounded-full bg-brand-navy-surface flex items-center justify-center border border-brand-slate-ghost">
+<span class="material-symbols-outlined text-brand-gold">menu_book</span>
+</div>
+<span class="bg-brand-navy-surface text-brand-gold font-label-md text-[12px] px-3 py-1 rounded w-fit border border-brand-slate-ghost">Certificate</span>
+<h3 class="font-title-md text-title-md text-on-surface">Coptic Language</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">
+                        Master the Bohairic and Sahidic dialects to engage directly with original liturgical and historical texts.
+                    </p>
+</div>
+<div class="bg-surface-container-low border border-brand-slate-ghost rounded-2xl p-6 flex flex-col gap-4 hover:border-brand-slate-ghost/80 transition-colors">
+<div class="w-10 h-10 rounded-full bg-brand-navy-surface flex items-center justify-center border border-brand-slate-ghost">
+<span class="material-symbols-outlined text-brand-gold">church</span>
+</div>
+<span class="bg-brand-navy-surface text-brand-gold font-label-md text-[12px] px-3 py-1 rounded w-fit border border-brand-slate-ghost">Diploma</span>
+<h3 class="font-title-md text-title-md text-on-surface">Liturgical Studies</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">
+                        Deep dive into the rites, hymns, and theological foundations of the Coptic Orthodox Divine Liturgy.
+                    </p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-primary dark:bg-primary-container w-full px-gutter py-2xl flex flex-col md:flex-row justify-between items-center gap-md border-t border-brand-slate-ghost/30 mt-auto">
+<div class="font-headline-sm text-headline-sm font-bold text-on-primary dark:text-on-primary-container">
+            Spims
+        </div>
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="font-body-md text-body-md text-on-primary dark:text-on-primary-container opacity-80 hover:opacity-100 hover:text-secondary-fixed dark:hover:text-secondary-fixed-dim transition-opacity" href="#">About Us</a>
+<a class="font-body-md text-body-md text-on-primary dark:text-on-primary-container opacity-80 hover:opacity-100 hover:text-secondary-fixed dark:hover:text-secondary-fixed-dim transition-opacity" href="#">Contact</a>
+<a class="font-body-md text-body-md text-on-primary dark:text-on-primary-container opacity-80 hover:opacity-100 hover:text-secondary-fixed dark:hover:text-secondary-fixed-dim transition-opacity" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-primary dark:text-on-primary-container opacity-80 hover:opacity-100 hover:text-secondary-fixed dark:hover:text-secondary-fixed-dim transition-opacity" href="#">Terms of Service</a>
+<a class="font-body-md text-body-md text-on-primary dark:text-on-primary-container opacity-80 hover:opacity-100 hover:text-secondary-fixed dark:hover:text-secondary-fixed-dim transition-opacity" href="#">Give</a>
+</nav>
+<div class="font-body-md text-body-md text-on-primary dark:text-on-primary-container opacity-60 text-sm text-center md:text-right">
+            © 2024 Spims Coptic Orthodox Online School. All rights reserved.
+        </div>
+</footer>
+</body></html>

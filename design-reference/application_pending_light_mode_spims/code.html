@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims - Application Pending</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#cbdbf6",
+                        "primary": "#380014",
+                        "on-tertiary-fixed": "#00210b",
+                        "secondary-fixed-dim": "#eac166",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#812340",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#ffd9df",
+                        "inverse-surface": "#213146",
+                        "on-primary-container": "#e26f8b",
+                        "surface-container": "#e6eeff",
+                        "primary-fixed-dim": "#d4af37",
+                        "on-tertiary-container": "#6d9f76",
+                        "surface-variant": "#d3e3ff",
+                        "secondary-container": "#ffd578",
+                        "on-secondary-container": "#795a03",
+                        "on-surface-variant": "#554245",
+                        "tertiary": "#001d09",
+                        "surface": "#f8f9ff",
+                        "on-background": "#0b1c30",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#785a02",
+                        "on-secondary-fixed": "#251a00",
+                        "primary-container": "#5d0326",
+                        "outline-variant": "#dbc0c4",
+                        "on-surface": "#0b1c30",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#ebf1ff",
+                        "background": "#f8f9ff",
+                        "tertiary-fixed": "#bbefc1",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-highest": "#d3e3ff",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "inverse-primary": "#ffb1c1",
+                        "tertiary-container": "#003415",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "on-primary-fixed": "#3f0017",
+                        "outline": "#887175",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#a03b57",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#dde9ff",
+                        "secondary-fixed": "#ffdf9c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "0.25rem",
+                        "md": "1rem",
+                        "container-max": "1440px",
+                        "xl": "2rem",
+                        "sidebar-width": "280px",
+                        "2xl": "3rem",
+                        "gutter": "24px",
+                        "sm": "0.5rem",
+                        "lg": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-transparent docked full-width top-0 z-50">
+<div class="flex justify-between items-center w-full px-lg py-md max-w-container-max mx-auto">
+<div class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed-dim">
+                Spims
+            </div>
+<div class="flex items-center gap-md text-primary dark:text-primary-fixed-dim">
+<button aria-label="Language" class="p-sm rounded-full hover:bg-surface-container-low dark:hover:bg-surface-dark transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button aria-label="Dark Mode" class="p-sm rounded-full hover:bg-surface-container-low dark:hover:bg-surface-dark transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas (Navigation Suppressed for Transactional Intent) -->
+<main class="flex-grow flex items-center justify-center p-md md:p-xl">
+<div class="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-xl h-full min-h-[600px]">
+<!-- Left Panel: Brand / Welcoming -->
+<div class="bg-primary rounded-xl overflow-hidden relative flex flex-col justify-between p-xl text-on-primary shadow-soft" data-alt="A grand, traditional academic university building bathed in warm morning sunlight, featuring majestic stone columns and a serene, scholarly atmosphere. The image is filtered to feel authoritative yet welcoming, with a subtle overlay of Spims primary deep maroon (#380014) to maintain brand cohesion and a reverent tone." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCXedO0CesKoEwM8S8enfdTvfKddxwuwGk8jLL5yFptmeCRD2shsK23P3Gc4BAdTnk_qcfY-ZGzM_NyqgSeuJKFzTWc3N-qMKGfW2VuNwGj75Mo2z4ty6goAusktP3Xlus_jA-oV4HXZb69n759uNkbOSBgbKAMH_p2XOMEg1ZnfgpiB7js3JqjeJnJEE35Js1s3ca6Fz8wnJtF5X2Isb3bd6wvg7BP5wC8FtIen5Kk_nWyR_oQsYjLH3e21Wc0bRCPs-4B1Q0Z7MDb'); background-size: cover; background-position: center;">
+<!-- Overlay to ensure text readability against background -->
+<div class="absolute inset-0 bg-primary/80 mix-blend-multiply"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-transparent"></div>
+<div class="relative z-10">
+<h1 class="font-display-lg text-display-lg mb-md text-on-primary">A Tradition of Excellence</h1>
+<p class="font-body-lg text-body-lg text-primary-fixed opacity-90 max-w-md">Your journey towards academic mastery begins here. We are meticulously reviewing your credentials.</p>
+</div>
+<div class="relative z-10 mt-auto pt-xl">
+<div class="inline-flex items-center gap-sm bg-surface-container-lowest/10 backdrop-blur-sm px-md py-sm rounded-full border border-outline-variant/30 text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assured_workload</span>
+<span class="font-label-md text-label-md">Spims Admissions Office</span>
+</div>
+</div>
+</div>
+<!-- Right Panel: Status Card -->
+<div class="bg-surface-container-lowest rounded-xl p-xl shadow-soft border border-outline-variant/30 flex flex-col justify-center">
+<div class="mb-xl text-center md:text-left">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-low text-primary mb-md">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">hourglass_top</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Application Pending</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Thank you for applying to Spims. Your application is currently under thorough review by our admissions committee.</p>
+</div>
+<!-- Progress Timeline -->
+<div class="mb-xl px-sm relative">
+<!-- Vertical Line for Desktop, hidden on mobile -->
+<div class="hidden md:block absolute left-[27px] top-4 bottom-4 w-0.5 bg-outline-variant/30 z-0"></div>
+<div class="space-y-lg relative z-10">
+<!-- Step 1: Completed -->
+<div class="flex items-start gap-md">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center z-10 border-4 border-surface-container-lowest">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</div>
+<div class="pt-1">
+<h3 class="font-label-md text-label-md text-on-surface">Application Submitted</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">October 12, 2024</p>
+</div>
+</div>
+<!-- Step 2: Active -->
+<div class="flex items-start gap-md">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center z-10 border-4 border-surface-container-lowest shadow-sm">
+<div class="w-2.5 h-2.5 bg-secondary rounded-full animate-pulse"></div>
+</div>
+<div class="pt-1">
+<h3 class="font-label-md text-label-md text-on-surface">Under Review</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Our committee is evaluating your academic records and essays.</p>
+</div>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex items-start gap-md opacity-50">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center z-10 border-4 border-surface-container-lowest">
+<span class="material-symbols-outlined text-sm">mail</span>
+</div>
+<div class="pt-1">
+<h3 class="font-label-md text-label-md text-on-surface">Decision Notification</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Expected within 2-4 weeks.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-md mt-auto pt-md border-t border-outline-variant/30">
+<button class="flex-1 bg-primary text-on-primary font-label-md text-label-md py-3 px-xl rounded-full hover:bg-primary-container hover:text-on-primary-container transition-colors active:scale-95 duration-150 flex justify-center items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">home</span>
+                        Return Home
+                    </button>
+<button class="flex-1 bg-surface-container-low text-primary font-label-md text-label-md py-3 px-xl rounded-full border border-outline-variant hover:bg-surface-variant transition-colors active:scale-95 duration-150 flex justify-center items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">help</span>
+                        Contact Admissions
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-light dark:bg-surface-dark w-full py-lg px-xl flex flex-col md:flex-row justify-between items-center gap-md border-t border-outline-variant dark:border-outline mt-auto">
+<div class="font-headline-sm text-headline-sm text-primary">
+            Spims
+        </div>
+<div class="font-body-sm text-body-sm text-on-surface-variant dark:text-surface-variant text-center md:text-left">
+            © 2024 Spims Learning Management System. All rights reserved.
+        </div>
+<div class="flex flex-wrap justify-center gap-md font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant">
+<a class="hover:text-primary dark:hover:text-primary-fixed-dim underline transition-all duration-200" href="#">Privacy Policy</a>
+<a class="hover:text-primary dark:hover:text-primary-fixed-dim underline transition-all duration-200" href="#">Terms of Service</a>
+<a class="hover:text-primary dark:hover:text-primary-fixed-dim underline transition-all duration-200" href="#">Help Center</a>
+</div>
+</footer>
+</body></html>

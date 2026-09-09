@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="light" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>تأكيد الهوية - Spims</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#00210b",
+                        "surface-dim": "#cbdbf6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#3f0017",
+                        "surface": "#f8f9ff",
+                        "inverse-surface": "#213146",
+                        "primary-fixed-dim": "#d4af37",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "outline-variant": "#dbc0c4",
+                        "primary-container": "#5d0326",
+                        "on-background": "#0b1c30",
+                        "on-surface": "#0b1c30",
+                        "on-primary-container": "#e26f8b",
+                        "tertiary-container": "#003415",
+                        "surface-container-high": "#dde9ff",
+                        "secondary-fixed": "#ffdf9c",
+                        "on-secondary-fixed": "#251a00",
+                        "tertiary": "#001d09",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#ffd9df",
+                        "on-surface-variant": "#554245",
+                        "surface-container": "#e6eeff",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "inverse-primary": "#ffb1c1",
+                        "primary": "#380014",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#812340",
+                        "surface-variant": "#d3e3ff",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#6d9f76",
+                        "surface-tint": "#a03b57",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "secondary-fixed-dim": "#eac166",
+                        "inverse-on-surface": "#ebf1ff",
+                        "secondary-container": "#ffd578",
+                        "outline": "#887175",
+                        "tertiary-fixed": "#bbefc1",
+                        "secondary": "#785a02",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#d3e3ff",
+                        "on-secondary-container": "#795a03"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "sm": "0.5rem",
+                        "xl": "2rem",
+                        "xs": "0.25rem",
+                        "md": "1rem",
+                        "lg": "1.5rem",
+                        "container-max": "1440px",
+                        "sidebar-width": "280px",
+                        "2xl": "3rem"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Cairo", "Inter", "sans-serif"],
+                        "label-sm": ["Cairo", "Inter", "sans-serif"],
+                        "body-md": ["Cairo", "Inter", "sans-serif"],
+                        "label-md": ["Cairo", "Inter", "sans-serif"],
+                        "headline-lg": ["Cairo", "Inter", "sans-serif"],
+                        "display-lg": ["Cairo", "Inter", "sans-serif"],
+                        "headline-md": ["Cairo", "Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom styles for animations and specific RTL tweaks if needed */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Hide arrows on number inputs */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex items-center justify-center font-body-md overflow-x-hidden">
+<main class="w-full min-h-screen flex flex-col lg:flex-row">
+<!-- Right Panel: Brand & Imagery (Split Screen) -->
+<div class="hidden lg:flex lg:w-1/2 bg-surface-container-low relative overflow-hidden flex-col justify-between p-xl border-l border-outline-variant/30">
+<!-- Decorative Background Element -->
+<div class="absolute -top-1/4 -right-1/4 w-96 h-96 bg-primary-fixed rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse"></div>
+<div class="absolute -bottom-1/4 -left-1/4 w-96 h-96 bg-secondary-fixed rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse" style="animation-delay: 2s;"></div>
+<!-- Brand Header -->
+<div class="relative z-10 flex items-center gap-sm">
+<span class="material-symbols-outlined text-display-lg text-primary" style="font-variation-settings: 'FILL' 1;">local_library</span>
+<span class="font-display-lg text-display-lg text-primary tracking-tight">Spims</span>
+</div>
+<!-- Central Content -->
+<div class="relative z-10 flex flex-col justify-center flex-grow">
+<h1 class="font-display-lg text-display-lg text-primary mb-md fade-in-up">تأكيد الهوية</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md fade-in-up" style="animation-delay: 0.1s;">
+                    نحن نحمي بياناتك الأكاديمية والشخصية بأعلى معايير الأمان. يرجى إدخال الرمز لتأمين حسابك.
+                </p>
+<!-- Abstract Academic Illustration Placeholder -->
+<div class="mt-xl w-full max-w-sm rounded-lg overflow-hidden shadow-soft fade-in-up" style="animation-delay: 0.2s;">
+<img alt="Academic Building" class="w-full h-auto object-cover" data-alt="A refined, modern architectural detail of an academic building bathed in warm, soft sunlight, representing a light-mode aesthetic. The composition features clean geometric lines and arches, constructed from light-colored stone or concrete. Subtle shadows create depth, while the overall mood is prestigious, calm, and institutional. A deep burgundy (primary color) accent is subtly woven into the scene, perhaps in a banner or structural element, ensuring cohesion with a sophisticated corporate/academic design language." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmvbLGqvRu0B-xrJaEVmBE7vCKI_vK4MuEGIgWvfxYua9iXf6KRMHEcBi4glOLfMMmY-PMIItH6bS808BNKMQ_zOXeOjy0ioVRKKG7Y6v2QkVJTu533IXMRV232kopvmF_mT1_xGqEvlrL2_IOi2wiMNjNzZv-wNGoo7eF7FUfz4JLbq6X2-WhI-NAsqQ4BJaIpSJ5MUr2AMZZD_nxWWth6PPcrFqvBvrwalgd_Em_l0QH3T9ULTusg9HU6L-UOhXj0Kyhv-DrWiNx"/>
+</div>
+</div>
+<!-- Footer -->
+<div class="relative z-10 font-label-sm text-label-sm text-on-surface-variant flex items-center gap-md">
+<span>© 2024 Spims Learning Management System</span>
+</div>
+</div>
+<!-- Left Panel: Input Card -->
+<div class="w-full lg:w-1/2 flex items-center justify-center p-md sm:p-xl bg-surface-container-lowest relative z-20 shadow-[rgba(0,0,0,0.05)_-20px_0_40px]">
+<!-- Mobile Brand Header (Visible only on small screens) -->
+<div class="absolute top-md right-md flex lg:hidden items-center gap-xs">
+<span class="material-symbols-outlined text-headline-lg text-primary" style="font-variation-settings: 'FILL' 1;">local_library</span>
+<span class="font-headline-lg text-headline-lg text-primary font-bold">Spims</span>
+</div>
+<div class="w-full max-w-md bg-surface-container-lowest rounded-lg p-lg sm:p-xl shadow-soft border border-outline-variant/30 fade-in-up">
+<!-- Icon & Titles -->
+<div class="text-center mb-xl">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-fixed text-primary mb-md">
+<span class="material-symbols-outlined text-display-lg" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-sm">تأكيد البريد الإلكتروني</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        أرسلنا رمزاً مكوناً من 6 أرقام إلى <br/>
+<span class="font-label-md text-label-md text-primary" dir="ltr">scholar@example.com</span>
+</p>
+</div>
+<!-- Form -->
+<form class="flex flex-col gap-xl" id="otp-form">
+<!-- OTP Inputs -->
+<div class="flex justify-between gap-sm rtl:flex-row" dir="ltr"> <!-- Force LTR for number visual order, but keep physical layout flex -->
+<input autofocus="" class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md text-on-surface bg-surface-container-low border border-outline-variant rounded DEFAULT focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200" inputmode="numeric" maxlength="1" pattern="[0-9]" required="" type="number"/>
+<input class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md text-on-surface bg-surface-container-low border border-outline-variant rounded DEFAULT focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200" inputmode="numeric" maxlength="1" pattern="[0-9]" required="" type="number"/>
+<input class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md text-on-surface bg-surface-container-low border border-outline-variant rounded DEFAULT focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200" inputmode="numeric" maxlength="1" pattern="[0-9]" required="" type="number"/>
+<input class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md text-on-surface bg-surface-container-low border border-outline-variant rounded DEFAULT focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200" inputmode="numeric" maxlength="1" pattern="[0-9]" required="" type="number"/>
+<input class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md text-on-surface bg-surface-container-low border border-outline-variant rounded DEFAULT focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200" inputmode="numeric" maxlength="1" pattern="[0-9]" required="" type="number"/>
+<input class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md text-on-surface bg-surface-container-low border border-outline-variant rounded DEFAULT focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200" inputmode="numeric" maxlength="1" pattern="[0-9]" required="" type="number"/>
+</div>
+<!-- Actions -->
+<div class="flex flex-col gap-md">
+<button class="w-full py-md px-lg bg-primary text-on-primary rounded-full font-label-md text-label-md hover:bg-on-primary-fixed-variant active:scale-95 transition-all duration-150 shadow-soft flex items-center justify-center gap-sm" type="submit">
+<span>تأكيد</span>
+<span class="material-symbols-outlined text-body-md rtl:rotate-180">arrow_forward</span>
+</button>
+<div class="text-center font-body-md text-body-md text-on-surface-variant flex items-center justify-center gap-xs">
+<span id="resend-text">إعادة إرسال خلال</span>
+<span class="font-label-md text-label-md text-primary w-12 inline-block text-right" dir="ltr" id="countdown">0:59</span>
+</div>
+</div>
+<div class="text-center mt-sm">
+<a class="font-label-sm text-label-sm text-secondary hover:text-primary transition-colors duration-200 underline" href="#">هل أدخلت بريداً خاطئاً؟</a>
+</div>
+</form>
+</div>
+</div>
+</main>
+<script>
+        // OTP Input Logic
+        const inputs = document.querySelectorAll('#otp-form input[type="number"]');
+        
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length > 1) {
+                    e.target.value = e.target.value.slice(0, 1);
+                }
+                if (e.target.value !== '' && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+            
+            // Allow paste
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').slice(0, inputs.length).replace(/[^0-9]/g, '');
+                if (pastedData) {
+                    for (let i = 0; i < pastedData.length; i++) {
+                        if (index + i < inputs.length) {
+                            inputs[index + i].value = pastedData[i];
+                        }
+                    }
+                    const nextIndex = Math.min(index + pastedData.length, inputs.length - 1);
+                    inputs[nextIndex].focus();
+                }
+            });
+        });
+
+        // Countdown Timer Logic
+        let timeLeft = 59;
+        const countdownEl = document.getElementById('countdown');
+        const resendTextEl = document.getElementById('resend-text');
+        
+        const timerId = setInterval(() => {
+            timeLeft--;
+            const seconds = timeLeft < 10 ? `0${timeLeft}` : timeLeft;
+            countdownEl.textContent = `0:${seconds}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerId);
+                resendTextEl.innerHTML = `<button type="button" class="font-label-md text-label-md text-primary hover:underline bg-transparent border-none p-0 cursor-pointer">إعادة إرسال الرمز</button>`;
+                countdownEl.style.display = 'none';
+            }
+        }, 1000);
+    </script>
+</body></html>

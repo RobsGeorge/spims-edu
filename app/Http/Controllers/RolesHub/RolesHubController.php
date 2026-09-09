@@ -4,6 +4,8 @@ namespace App\Http\Controllers\RolesHub;
 
 use App\Enums\RoleType;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelpController;
+use App\Services\Help\HelpCatalogService;
 use App\Services\Rbac\RolePermissionService;
 use App\Support\AuthorizeService;
 use Illuminate\Http\RedirectResponse;
@@ -13,7 +15,7 @@ use Illuminate\View\View;
 
 class RolesHubController extends Controller
 {
-    public function index(Request $request, RolePermissionService $rbac, AuthorizeService $authorize): View
+    public function index(Request $request, RolePermissionService $rbac, AuthorizeService $authorize, HelpCatalogService $helpCatalog): View
     {
         $authorize->authorize($request->user(), 'roles.manage_matrix');
 
@@ -26,12 +28,21 @@ class RolesHubController extends Controller
             ];
         }
 
+        
+        $locale = app()->getLocale();
+        $roleGuides = [];
+        foreach (HelpController::guideRoles() as $role) {
+            $roleGuides[$role->value] = $helpCatalog->articlesForRoleGuide($role, $locale);
+        }
         return view('roles-hub.index', [
             'groups' => $groups,
             'matrix' => $rbac->matrix(),
             'roles' => $rbac->editableRoles(),
             'grantLevels' => RolePermissionService::GRANT_LEVELS,
             'section' => $request->query('section', 'templates'),
+            'roleGuides' => $roleGuides,
+            'guideRoles' => HelpController::guideRoles(),
+            'helpLocale' => $locale,
         ]);
     }
 

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims - Coptic Orthodox Online School</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "primary": "#380014",
+                            "surface-container-low": "#eff4ff",
+                            "inverse-primary": "#ffb1c1",
+                            "on-primary": "#ffffff",
+                            "surface-container": "#e6eeff",
+                            "surface-tint": "#a03b57",
+                            "on-tertiary": "#ffffff",
+                            "on-tertiary-container": "#6d9f76",
+                            "error-container": "#ffdad6",
+                            "on-surface-variant": "#554245",
+                            "on-tertiary-fixed-variant": "#21502e",
+                            "surface-variant": "#d3e3ff",
+                            "on-primary-fixed-variant": "#812340",
+                            "on-error-container": "#93000a",
+                            "primary-fixed-dim": "#ffb1c1",
+                            "surface-container-lowest": "#ffffff",
+                            "inverse-on-surface": "#ebf1ff",
+                            "outline-variant": "#dbc0c4",
+                            "secondary-fixed-dim": "#eac166",
+                            "on-secondary-fixed-variant": "#5b4300",
+                            "surface-bright": "#f8f9ff",
+                            "surface-container-highest": "#d3e3ff",
+                            "on-secondary-container": "#795a03",
+                            "on-secondary": "#ffffff",
+                            "background": "#f8f9ff",
+                            "secondary": "#785a02",
+                            "tertiary-fixed": "#bbefc1",
+                            "outline": "#887175",
+                            "secondary-container": "#ffd578",
+                            "on-primary-fixed": "#3f0017",
+                            "surface-dim": "#cbdbf6",
+                            "on-tertiary-fixed": "#00210b",
+                            "on-error": "#ffffff",
+                            "inverse-surface": "#213146",
+                            "surface": "#f8f9ff",
+                            "primary-container": "#5d0326",
+                            "on-background": "#0b1c30",
+                            "tertiary-fixed-dim": "#9fd3a6",
+                            "primary-fixed": "#ffd9df",
+                            "error": "#ba1a1a",
+                            "tertiary": "#001d09",
+                            "on-secondary-fixed": "#251a00",
+                            "tertiary-container": "#003415",
+                            "surface-container-high": "#dde9ff",
+                            "secondary-fixed": "#ffdf9c",
+                            "on-primary-container": "#e26f8b",
+                            "on-surface": "#0b1c30"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "1rem",
+                            "lg": "2rem",
+                            "xl": "3rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "xl": "2rem",
+                            "gutter": "24px",
+                            "sm": "0.5rem",
+                            "2xl": "3rem",
+                            "sidebar-width": "280px",
+                            "xs": "0.25rem",
+                            "md": "1rem",
+                            "lg": "1.5rem",
+                            "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                            "display-lg": ["Inter"],
+                            "headline-md": ["Inter"],
+                            "body-lg": ["Inter"],
+                            "label-sm": ["Inter"],
+                            "body-md": ["Inter"],
+                            "label-md": ["Inter"],
+                            "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                            "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                            "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                            "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                            "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                            "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                            "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface-container-lowest shadow-soft fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter py-md max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-primary">Spims</div>
+<div class="hidden md:flex items-center space-x-xl">
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1" href="#">Programs</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors duration-200 px-sm py-xs rounded-DEFAULT" href="#">Admissions</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors duration-200 px-sm py-xs rounded-DEFAULT" href="#">Academics</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors duration-200 px-sm py-xs rounded-DEFAULT" href="#">Spiritual Life</a>
+</div>
+<div class="flex items-center space-x-md">
+<button class="hidden lg:block font-label-md text-label-md text-primary hover:bg-surface-container-low transition-colors duration-200 px-md py-sm rounded-full active:scale-95 transition-transform duration-150">Browse courses</button>
+<button class="font-label-md text-label-md bg-primary text-on-primary hover:bg-primary-container transition-colors duration-200 px-md py-sm rounded-full active:scale-95 transition-transform duration-150">Apply</button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[88px] w-full max-w-container-max mx-auto px-gutter flex flex-col gap-2xl pb-2xl">
+<!-- Hero Section -->
+<section class="relative bg-surface-container-lowest rounded-xl shadow-soft overflow-hidden min-h-[600px] flex items-center mt-lg">
+<div class="absolute inset-0 z-0">
+<img alt="Hero Background" class="w-full h-full object-cover opacity-20" data-alt="A serene, light-filled academic library or study hall with tall arched windows casting soft, modern light. The aesthetic is clean and prestigious, utilizing a subtle light-mode palette of warm whites and pale neutrals. The composition conveys a sense of deep scholarship and tradition blended seamlessly into a modern digital learning environment, evoking clarity and authoritative knowledge." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZJM9gKDs4suk5Y9K4RhSz90roY0Al6f4o0ExDWfuY6lD91B-j-9aFtM74yMrAoM4K8T-yzZvqrF8QUPCbfe7Erryzkyx0zbd-p1TfS7GbSIbeEKqxrKm8akvzo8wv8ZXDuqL8tB_sg-oKxj89TyUPXLQSXnRw-00e5EoFw6oc5tLxKadzr6MJySfa7rx8681BZ0QqESp-CM5HnEpF9j83OfFtMYTVJiW5cDDS0KCsaIgF9Wa_xoKVBdq9TB1-_Ns_9zGXgZXJEPy1"/>
+</div>
+<div class="relative z-10 w-full max-w-3xl mx-auto text-center px-lg py-2xl">
+<div class="inline-flex items-center justify-center space-x-2 bg-surface-container-low text-primary px-sm py-xs rounded-full mb-md">
+<span class="material-symbols-outlined text-[18px]">school</span>
+<span class="font-label-sm text-label-sm">Now accepting Fall applications</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-primary mb-lg">Deepening Coptic Orthodox Scholarship in a Modern Age</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-xl max-w-2xl mx-auto">Access rigorous theological education from anywhere. Engage with world-class faculty in a comprehensive digital learning environment designed for modern scholars.</p>
+<div class="flex flex-col sm:flex-row justify-center items-center gap-md">
+<button class="w-full sm:w-auto font-label-md text-label-md bg-primary text-on-primary hover:bg-primary-container px-xl py-md rounded-full active:scale-95 transition-transform duration-150">Apply Now</button>
+<button class="w-full sm:w-auto font-label-md text-label-md bg-surface-container text-primary hover:bg-surface-container-high px-xl py-md rounded-full border border-outline-variant active:scale-95 transition-transform duration-150">Browse Programs</button>
+</div>
+</div>
+</section>
+<!-- Stats Section (Credibility) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="bg-surface-container-lowest p-xl rounded-DEFAULT shadow-soft border border-outline-variant/30 flex flex-col items-center text-center hover:-translate-y-1 transition-transform duration-300">
+<span class="material-symbols-outlined text-[40px] text-secondary mb-md" data-weight="fill">group</span>
+<div class="font-headline-lg text-headline-lg text-primary mb-xs">1,200+</div>
+<div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Active Students</div>
+</div>
+<div class="bg-surface-container-lowest p-xl rounded-DEFAULT shadow-soft border border-outline-variant/30 flex flex-col items-center text-center hover:-translate-y-1 transition-transform duration-300">
+<span class="material-symbols-outlined text-[40px] text-secondary mb-md" data-weight="fill">auto_stories</span>
+<div class="font-headline-lg text-headline-lg text-primary mb-xs">45+</div>
+<div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Comprehensive Courses</div>
+</div>
+<div class="bg-surface-container-lowest p-xl rounded-DEFAULT shadow-soft border border-outline-variant/30 flex flex-col items-center text-center hover:-translate-y-1 transition-transform duration-300">
+<span class="material-symbols-outlined text-[40px] text-secondary mb-md" data-weight="fill">public</span>
+<div class="font-headline-lg text-headline-lg text-primary mb-xs">Global</div>
+<div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Faculty Network</div>
+</div>
+</section>
+<!-- Featured Programs (Bento Grid) -->
+<section class="flex flex-col gap-xl">
+<div class="text-center max-w-2xl mx-auto">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-sm">Featured Programs</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Explore our core curriculum designed to provide a comprehensive understanding of Coptic tradition and history.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+<!-- Course Card 1 -->
+<div class="bg-surface-container-lowest rounded-DEFAULT shadow-soft border border-outline-variant/30 overflow-hidden flex flex-col group cursor-pointer hover:shadow-lg transition-shadow duration-300">
+<div class="h-48 relative overflow-hidden">
+<img alt="Coptic Language" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Close up of ancient illuminated manuscript pages resting on a clean, modern white desk. Soft, high-key lighting illuminates the intricate text. The scene blends historical reverence with a sleek, contemporary academic setting, featuring subtle burgundy accents against a bright, airy background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfYmw27b2OI12Rsm2AKyLpBSR5nC1GRAMKkRTWLScUWfSvNS-rN5zI3hoFlfZvJRE5hexI1SxC_Pl9hfgySwsY2ULwwp_GrD8JM9dIGf-ghPuZxsOI_Ua2AtI1g-P6MAZQJL6XnL0q1S_gMBqheDd-h8jS26n1j5Pt9kpr3gubj0uas0Xs97tiZtbZFlv5-Rn0tcmr2ANReXqtHH7diS9Rw_k61SMl39OKamg6QLHXlhxmUtQjQvk_BcO-oXP6o-ditPjJw7TO3BS6"/>
+<div class="absolute top-md left-md bg-surface-container-lowest/90 backdrop-blur-sm px-sm py-xs rounded-DEFAULT font-label-sm text-label-sm text-primary">Language</div>
+</div>
+<div class="p-lg flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md text-primary mb-sm group-hover:text-surface-tint transition-colors">Coptic Language I &amp; II</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg flex-grow">A structured introduction to the grammar, vocabulary, and syntax of the Sahidic dialect.</p>
+<div class="flex justify-between items-center border-t border-outline-variant/30 pt-md">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">schedule</span> 16 Weeks</span>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Course Card 2 -->
+<div class="bg-surface-container-lowest rounded-DEFAULT shadow-soft border border-outline-variant/30 overflow-hidden flex flex-col group cursor-pointer hover:shadow-lg transition-shadow duration-300">
+<div class="h-48 relative overflow-hidden">
+<img alt="Patristic Studies" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A modern minimalist view of classical architecture or statues, bathed in bright, soft sunlight. The aesthetic is pristine and scholarly, utilizing pure whites and light greys with crisp contrast. The composition is clean, reducing cognitive load while evoking a deep sense of historical study and institutional prestige." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq36e3PGTDDkZvn68Bca4ylCeB9swamotDay29rJKS_OorI2VfTPqjdZVmgqZlNgpRgEaA4WWbrogZJM2sm7RLa7siXHBIdEKCt9AO0CVF1Nnsb6k3ppf46TOaelmiGlmfMlcZnj5vVmnk65urUHgkk9JV_LkyDqwDf96waaXwCRjoJ43itjzS1f2twCAhtMMowryygw5-mryHimVV22UNEVdREaXBbSR5kE7ZInOg9UNpdbt5WBVMZK-TlqszwolPbhxVWRzgVqvV"/>
+<div class="absolute top-md left-md bg-surface-container-lowest/90 backdrop-blur-sm px-sm py-xs rounded-DEFAULT font-label-sm text-label-sm text-primary">Theology</div>
+</div>
+<div class="p-lg flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md text-primary mb-sm group-hover:text-surface-tint transition-colors">Patristic Studies</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg flex-grow">Deep dive into the writings and theology of the early Church Fathers and desert ascetics.</p>
+<div class="flex justify-between items-center border-t border-outline-variant/30 pt-md">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">schedule</span> 12 Weeks</span>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Course Card 3 -->
+<div class="bg-primary text-on-primary rounded-DEFAULT shadow-soft overflow-hidden flex flex-col justify-between p-xl group cursor-pointer relative">
+<div class="absolute right-0 top-0 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[200px]" data-weight="fill">account_balance</span>
+</div>
+<div class="relative z-10">
+<div class="inline-flex items-center justify-center space-x-2 bg-on-primary/20 backdrop-blur-md text-on-primary px-sm py-xs rounded-DEFAULT mb-md font-label-sm text-label-sm">
+                            Featured
+                        </div>
+<h3 class="font-headline-lg text-headline-lg mb-sm">Church History</h3>
+<p class="font-body-md text-body-md opacity-90 mb-xl">Trace the resilient journey of the Coptic Orthodox Church from St. Mark to the modern era.</p>
+</div>
+<button class="font-label-md text-label-md bg-on-primary text-primary hover:bg-surface-container-lowest px-md py-sm rounded-full w-fit flex items-center gap-sm active:scale-95 transition-all">
+                        View Curriculum <span class="material-symbols-outlined text-[18px]">east</span>
+</button>
+</div>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="bg-surface-container-low rounded-xl p-xl shadow-soft">
+<div class="text-center max-w-2xl mx-auto mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-sm">Your Academic Journey</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">A streamlined process to begin your theological studies.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-xl relative">
+<!-- Connector Line (Desktop) -->
+<div class="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-[2px] bg-outline-variant -z-0 -translate-y-1/2"></div>
+<div class="relative z-10 flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-surface-container-lowest rounded-full shadow-soft flex items-center justify-center mb-md border-2 border-primary">
+<span class="material-symbols-outlined text-[32px] text-primary">app_registration</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-sm">1. Register</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Create your student profile and submit your academic background.</p>
+</div>
+<div class="relative z-10 flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-primary rounded-full shadow-soft flex items-center justify-center mb-md text-on-primary">
+<span class="material-symbols-outlined text-[32px]">checklist</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-sm">2. Enroll</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Select your programs and finalize your term schedule.</p>
+</div>
+<div class="relative z-10 flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-surface-container-lowest rounded-full shadow-soft flex items-center justify-center mb-md border-2 border-primary">
+<span class="material-symbols-outlined text-[32px] text-primary">local_library</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-sm">3. Study</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Access digital lectures, submit assignments, and engage with peers.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full px-gutter py-2xl flex flex-col md:flex-row justify-between items-center gap-md bg-primary text-on-primary">
+<div class="font-headline-sm text-headline-sm font-bold text-on-primary">Spims</div>
+<div class="flex flex-wrap justify-center gap-md font-body-md text-body-md">
+<a class="text-on-primary opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-opacity" href="#">About Us</a>
+<a class="text-on-primary opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-opacity" href="#">Contact</a>
+<a class="text-on-primary opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-opacity" href="#">Privacy Policy</a>
+<a class="text-on-primary opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-opacity" href="#">Terms of Service</a>
+<a class="text-on-primary opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-opacity" href="#">Give</a>
+</div>
+<div class="font-body-md text-body-md text-on-primary opacity-80">
+            © 2024 Spims Coptic Orthodox Online School. All rights reserved.
+        </div>
+</footer>
+</body></html>

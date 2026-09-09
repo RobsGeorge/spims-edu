@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OTP Verification - Spims</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#00210b",
+                        "surface-dim": "#cbdbf6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#3f0017",
+                        "surface": "#f8f9ff",
+                        "inverse-surface": "#213146",
+                        "primary-fixed-dim": "#d4af37",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "outline-variant": "#dbc0c4",
+                        "primary-container": "#5d0326",
+                        "on-background": "#0b1c30",
+                        "on-surface": "#0b1c30",
+                        "on-primary-container": "#e26f8b",
+                        "tertiary-container": "#003415",
+                        "surface-container-high": "#dde9ff",
+                        "secondary-fixed": "#ffdf9c",
+                        "on-secondary-fixed": "#251a00",
+                        "tertiary": "#001d09",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#ffd9df",
+                        "on-surface-variant": "#554245",
+                        "surface-container": "#e6eeff",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "inverse-primary": "#ffb1c1",
+                        "primary": "#380014",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#812340",
+                        "surface-variant": "#d3e3ff",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#6d9f76",
+                        "surface-tint": "#a03b57",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "secondary-fixed-dim": "#eac166",
+                        "inverse-on-surface": "#ebf1ff",
+                        "secondary-container": "#ffd578",
+                        "outline": "#887175",
+                        "tertiary-fixed": "#bbefc1",
+                        "secondary": "#785a02",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#d3e3ff",
+                        "on-secondary-container": "#795a03"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "sm": "0.5rem",
+                        "xl": "2rem",
+                        "xs": "0.25rem",
+                        "md": "1rem",
+                        "lg": "1.5rem",
+                        "container-max": "1440px",
+                        "sidebar-width": "280px",
+                        "2xl": "3rem"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .geometric-bg {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%235d0326' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex items-center justify-center p-md lg:p-xl">
+<!-- Top App Bar (Minimal Context) -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-transparent flex justify-between items-center w-full px-lg py-md max-w-container-max mx-auto flat no shadows">
+<div class="font-headline-lg text-headline-lg font-bold text-primary">Spims</div>
+<div class="flex gap-md">
+<button aria-label="Language" class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">language</span>
+</button>
+<button aria-label="Dark Mode" class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dark_mode</span>
+</button>
+</div>
+</header>
+<main class="w-full max-w-[1000px] flex flex-col md:flex-row bg-surface-container-lowest rounded-xl shadow-soft overflow-hidden border border-outline-variant/30 mt-16 md:mt-0">
+<!-- Left Panel: Brand & Motif -->
+<div class="w-full md:w-5/12 bg-primary-fixed relative overflow-hidden flex flex-col justify-center p-xl geometric-bg border-r border-outline-variant/30">
+<div class="relative z-10 flex flex-col items-start gap-lg">
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-soft inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1; font-size: 48px;">school</span>
+</div>
+<div>
+<h1 class="font-display-lg text-display-lg text-primary mb-sm">Spims</h1>
+<p class="font-headline-md text-headline-md text-primary-container">Verify your identity</p>
+</div>
+<div class="mt-xl hidden md:block">
+<img alt="Academic architecture" class="rounded-xl shadow-soft object-cover w-full h-48 border border-outline-variant/30 grayscale-[20%] opacity-80 mix-blend-multiply" data-alt="A soft-focus image of classical academic architecture, featuring a grand library interior bathed in warm, diffused light. The scene is pristine and sophisticated, evoking tradition and knowledge. The color palette emphasizes warm whites, subtle golds, and deep wood tones, perfectly aligning with the Spims elegant corporate academic aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQ43U72Jq7JXAyJj3_3NwFJA6QbrJ6NAsSIdwn21AgSkDsSQ06AcvwwMD4Tdvw23D4_linC9ePkpcL132x3v-hNH5MXlgqgyI3D_6ZmNiMVQQfTfqSwqoKvK6TZWXUzWWaR4advuqLG6e50G-PC3oNLcIsIy7a2hXF8Jc4J4JV-QIjBYtl_M96liqXzt4yokYHjVySIblzRWp1CNnHVX1R1_qTVTAPqLAGELO_XUYVij_s1w8qvpYeJDOy79L9LYtjPtD0q5JTqwQf"/>
+</div>
+</div>
+</div>
+<!-- Right Panel: Interaction Form -->
+<div class="w-full md:w-7/12 p-xl md:p-2xl flex flex-col justify-center bg-surface-container-lowest">
+<div class="max-w-md mx-auto w-full">
+<div class="mb-xl text-center md:text-left">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Verify Email</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">We sent a 6-digit code to <span class="font-medium text-primary">scholar@example.com</span></p>
+</div>
+<form class="flex flex-col gap-xl" id="otp-form">
+<!-- OTP Inputs -->
+<div class="flex justify-between gap-2 sm:gap-sm" dir="ltr">
+<input aria-label="Digit 1" class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md bg-surface border border-outline-variant rounded-DEFAULT focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all text-on-surface shadow-inner" inputmode="numeric" maxlength="1" type="text"/>
+<input aria-label="Digit 2" class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md bg-surface border border-outline-variant rounded-DEFAULT focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all text-on-surface shadow-inner" inputmode="numeric" maxlength="1" type="text"/>
+<input aria-label="Digit 3" class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md bg-surface border border-outline-variant rounded-DEFAULT focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all text-on-surface shadow-inner" inputmode="numeric" maxlength="1" type="text"/>
+<input aria-label="Digit 4" class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md bg-surface border border-outline-variant rounded-DEFAULT focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all text-on-surface shadow-inner" inputmode="numeric" maxlength="1" type="text"/>
+<input aria-label="Digit 5" class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md bg-surface border border-outline-variant rounded-DEFAULT focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all text-on-surface shadow-inner" inputmode="numeric" maxlength="1" type="text"/>
+<input aria-label="Digit 6" class="w-12 h-14 sm:w-14 sm:h-16 text-center font-headline-md text-headline-md bg-surface border border-outline-variant rounded-DEFAULT focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all text-on-surface shadow-inner" inputmode="numeric" maxlength="1" type="text"/>
+</div>
+<!-- Actions -->
+<div class="flex flex-col gap-md">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-4 rounded-full shadow-soft hover:bg-primary-container transition-colors active:scale-95 duration-150 flex justify-center items-center gap-2" type="button">
+                            Verify
+                            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>
+</button>
+<div class="text-center">
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled="" type="button">
+                                Resend code in <span class="font-medium text-primary" id="countdown">0:59</span>
+</button>
+</div>
+</div>
+</form>
+<div class="mt-xl text-center">
+<a class="inline-flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+                        Back to login
+                    </a>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 right-0 w-full py-lg px-xl flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-low border-t border-outline-variant/30 flat no shadows z-40">
+<div class="font-headline-sm text-headline-sm text-primary">Spims</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 Spims Learning Management System. All rights reserved.</p>
+<div class="flex gap-md">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all duration-200" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all duration-200" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all duration-200" href="#">Help Center</a>
+</div>
+</footer>
+<script>
+        // Simple OTP input logic
+        const inputs = document.querySelectorAll('#otp-form input[type="text"]');
+        
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                // Ensure only numbers
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                
+                // Auto advance
+                if (e.target.value !== '' && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                // Backspace logic
+                if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+            
+            // Paste logic
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+                pastedData.split('').forEach((char, i) => {
+                    if(inputs[i]) {
+                        inputs[i].value = char;
+                        if(i < 5) inputs[i+1].focus();
+                    }
+                });
+            });
+        });
+
+        // Simple countdown logic
+        let timeLeft = 59;
+        const countdownEl = document.getElementById('countdown');
+        const timer = setInterval(() => {
+            timeLeft--;
+            if(timeLeft < 0) {
+                clearInterval(timer);
+                countdownEl.parentElement.disabled = false;
+                countdownEl.parentElement.innerHTML = "Resend code now";
+            } else {
+                const seconds = timeLeft < 10 ? `0${timeLeft}` : timeLeft;
+                countdownEl.innerText = `0:${seconds}`;
+            }
+        }, 1000);
+    </script>
+</body></html>

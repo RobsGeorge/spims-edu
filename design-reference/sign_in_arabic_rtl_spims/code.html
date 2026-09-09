@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims - تسجيل الدخول</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#eac166",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#ffd578",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface-dim": "#cbdbf6",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-container": "#795a03",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#d4af37",
+                        "outline-variant": "#dbc0c4",
+                        "tertiary-container": "#003415",
+                        "tertiary": "#001d09",
+                        "inverse-surface": "#213146",
+                        "inverse-primary": "#ffb1c1",
+                        "on-surface-variant": "#554245",
+                        "on-surface": "#0b1c30",
+                        "surface-container-highest": "#d3e3ff",
+                        "surface-variant": "#d3e3ff",
+                        "surface-container-high": "#dde9ff",
+                        "on-tertiary-container": "#6d9f76",
+                        "on-primary-fixed": "#3f0017",
+                        "primary-fixed": "#ffd9df",
+                        "on-secondary-fixed": "#251a00",
+                        "tertiary-fixed": "#bbefc1",
+                        "secondary": "#785a02",
+                        "on-primary-container": "#e26f8b",
+                        "surface-tint": "#a03b57",
+                        "primary": "#380014",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "background": "#f8f9ff",
+                        "on-tertiary-fixed": "#00210b",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed-variant": "#812340",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#5d0326",
+                        "secondary-fixed": "#ffdf9c",
+                        "surface-container": "#e6eeff",
+                        "outline": "#887175",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-background": "#0b1c30",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "2xl": "3rem",
+                        "xs": "0.25rem",
+                        "xl": "2rem",
+                        "md": "1rem",
+                        "lg": "1.5rem",
+                        "sm": "0.5rem",
+                        "sidebar-width": "280px",
+                        "container-max": "1440px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Tajawal", "sans-serif"],
+                        "label-md": ["Tajawal", "sans-serif"],
+                        "headline-lg": ["Tajawal", "sans-serif"],
+                        "label-sm": ["Tajawal", "sans-serif"],
+                        "body-md": ["Tajawal", "sans-serif"],
+                        "body-lg": ["Tajawal", "sans-serif"],
+                        "display-lg": ["Tajawal", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface-container-low min-h-screen flex flex-col text-on-surface">
+<!-- Header (Minimal for Auth) -->
+<header class="w-full flex justify-between items-center px-lg py-md absolute top-0 z-50 bg-transparent">
+<div class="font-headline-md text-headline-md font-bold text-primary">Spims</div>
+<div class="flex items-center gap-sm">
+<button class="text-primary hover:bg-surface-container transition-colors rounded-full p-2 scale-95 active:duration-100 flex items-center justify-center w-10 h-10">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+</button>
+<button class="text-primary hover:bg-surface-container transition-colors rounded-full p-2 scale-95 active:duration-100 flex items-center justify-center w-10 h-10">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">language</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex items-center justify-center p-md md:p-xl">
+<div class="w-full max-w-5xl bg-surface-container-lowest rounded-xl shadow-soft border border-outline-variant/30 flex flex-col md:flex-row overflow-hidden relative z-10">
+<!-- Form Section (Left side visually, Right side logically due to RTL) -->
+<div class="w-full md:w-1/2 p-xl flex flex-col justify-center">
+<div class="max-w-md w-full mx-auto">
+<h1 class="font-headline-lg text-headline-lg text-primary mb-sm">أهلاً بك مجدداً</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl">يرجى إدخال بيانات الاعتماد الخاصة بك للوصول إلى حسابك.</p>
+<form class="space-y-lg">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="email">البريد الإلكتروني</label>
+<input class="w-full rounded bg-surface border-outline-variant text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary px-4 py-3 transition-colors" id="email" placeholder="name@example.com" required="" type="email"/>
+</div>
+<div>
+<div class="flex justify-between items-center mb-xs">
+<label class="block font-label-md text-label-md text-on-surface" for="password">كلمة المرور</label>
+<a class="font-label-sm text-label-sm text-primary hover:text-primary-container transition-colors" href="#">نسيت كلمة المرور؟</a>
+</div>
+<input class="w-full rounded bg-surface border-outline-variant text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary px-4 py-3 transition-colors" id="password" placeholder="••••••••" required="" type="password"/>
+</div>
+<div class="flex items-center">
+<input class="w-4 h-4 text-primary bg-surface border-outline-variant rounded focus:ring-primary focus:ring-2" id="remember-me" type="checkbox"/>
+<label class="mr-2 block font-body-md text-body-md text-on-surface-variant" for="remember-me">تذكرني</label>
+</div>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md rounded-full py-3 px-4 hover:bg-primary-container transition-colors scale-95 active:duration-100 mt-xl shadow-soft" type="submit">
+                            تسجيل الدخول
+                        </button>
+</form>
+<p class="mt-lg text-center font-body-md text-body-md text-on-surface-variant">
+                        ليس لديك حساب؟ <a class="text-primary font-label-md text-label-md hover:underline" href="#">سجل الآن</a>
+</p>
+</div>
+</div>
+<!-- Brand Panel (Right side visually, Left side logically due to RTL) -->
+<div class="hidden md:flex w-full md:w-1/2 bg-surface-container relative overflow-hidden flex-col items-center justify-center p-xl text-center">
+<!-- Abstract Academic Background Decoration -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#380014 1px, transparent 1px); background-size: 20px 20px;"></div>
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary-container/20 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-24 -left-24 w-80 h-80 bg-secondary-container/20 rounded-full blur-3xl"></div>
+<div class="relative z-10 flex flex-col items-center">
+<span class="material-symbols-outlined text-primary text-6xl mb-md" style="font-size: 4rem; font-variation-settings: 'FILL' 1;">account_balance</span>
+<h2 class="font-display-lg text-display-lg text-primary mb-sm">Spims</h2>
+<p class="font-headline-md text-headline-md text-on-surface-variant max-w-xs leading-relaxed">
+                        ادخل إلى رحاب المعرفة
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="flex flex-col md:flex-row justify-between items-center px-xl py-lg w-full mt-auto bg-surface-container-lowest border-t border-outline-variant/30">
+<div class="font-label-md text-label-md text-primary mb-4 md:mb-0">
+            © 2024 Spims Academic. All rights reserved.
+        </div>
+<div class="flex gap-xl">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Contact Support</a>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims Design System - تخطيط (Layout)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-container": "#e6eeff",
+                "outline-variant": "#dbc0c4",
+                "on-error-container": "#93000a",
+                "on-secondary-fixed-variant": "#5b4300",
+                "outline": "#887175",
+                "on-primary-fixed-variant": "#812340",
+                "on-tertiary": "#ffffff",
+                "surface-bright": "#f8f9ff",
+                "secondary-fixed-dim": "#eac166",
+                "secondary": "#785a02",
+                "surface-container-lowest": "#ffffff",
+                "primary-fixed-dim": "#d4af37",
+                "on-surface": "#0b1c30",
+                "on-secondary": "#ffffff",
+                "surface-dim": "#cbdbf6",
+                "inverse-on-surface": "#ebf1ff",
+                "surface-container-low": "#eff4ff",
+                "tertiary-fixed-dim": "#9fd3a6",
+                "on-surface-variant": "#554245",
+                "primary": "#380014",
+                "primary-container": "#5d0326",
+                "error-container": "#ffdad6",
+                "on-primary": "#ffffff",
+                "inverse-primary": "#ffb1c1",
+                "surface-container-high": "#dde9ff",
+                "secondary-container": "#ffd578",
+                "on-background": "#0b1c30",
+                "on-tertiary-container": "#6d9f76",
+                "error": "#ba1a1a",
+                "inverse-surface": "#213146",
+                "on-tertiary-fixed": "#00210b",
+                "background": "#f8f9ff",
+                "secondary-fixed": "#ffdf9c",
+                "on-error": "#ffffff",
+                "on-secondary-container": "#795a03",
+                "on-primary-fixed": "#3f0017",
+                "on-tertiary-fixed-variant": "#21502e",
+                "surface-tint": "#a03b57",
+                "tertiary-fixed": "#bbefc1",
+                "on-secondary-fixed": "#251a00",
+                "on-primary-container": "#e26f8b",
+                "surface": "#f8f9ff",
+                "tertiary": "#001d09",
+                "surface-variant": "#d3e3ff",
+                "primary-fixed": "#ffd9df",
+                "surface-container-highest": "#d3e3ff",
+                "tertiary-container": "#003415"
+        },
+        "borderRadius": {
+                "DEFAULT": "1rem",
+                "lg": "2rem",
+                "xl": "3rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "container-max": "1440px",
+                "sm": "0.5rem",
+                "sidebar-width": "280px",
+                "xl": "2rem",
+                "gutter": "24px",
+                "2xl": "3rem",
+                "lg": "1.5rem",
+                "md": "1rem",
+                "xs": "0.25rem"
+        },
+        "fontFamily": {
+                "display-lg": [
+                        "Inter"
+                ],
+                "headline-lg": [
+                        "Inter"
+                ],
+                "headline-md": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "label-md": [
+                        "Inter"
+                ],
+                "label-sm": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "1.3",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "1.3",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "1",
+                                "letterSpacing": "0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "1",
+                                "letterSpacing": "0.02em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }]
+        },
+        "boxShadow": {
+            'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+            'glow': '0 0 0 4px rgba(56, 0, 20, 0.1)',
+        }
+    },
+  }
+}
+</script>
+<style>
+        /* Force dark mode styles for preview purposes since the config handles it but needs the class */
+        .dark {
+            color-scheme: dark;
+        }
+        /* Grid Overlay helper */
+        .grid-overlay {
+            background-image: repeating-linear-gradient(to right, transparent, transparent calc(100% / 12 - 24px), rgba(212, 175, 55, 0.1) calc(100% / 12 - 24px), rgba(212, 175, 55, 0.1) calc(100% / 12));
+        }
+    </style>
+</head>
+<body class="bg-[#121212] text-on-surface font-body-md min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar (Right side for RTL) -->
+<nav class="hidden lg:flex flex-col h-full border-l border-outline-variant/30 p-md bg-[#1e1e1e] docked h-screen w-sidebar-width fixed right-0 top-0 z-40">
+<div class="mb-xl">
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary-fixed-dim">Spims Design System</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-sm">v2.4.0 (Stable)</p>
+</div>
+<div class="flex items-center gap-md mb-xl p-sm bg-surface-container/10 rounded-lg">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">System Operator</p>
+</div>
+</div>
+<ul class="flex-1 space-y-xs">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-[#2c2c2c] transition-all active:scale-98" href="#">
+<span class="material-symbols-outlined">smart_button</span>
+<span class="font-label-md text-label-md">Buttons</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-[#2c2c2c] transition-all active:scale-98" href="#">
+<span class="material-symbols-outlined">toggle_on</span>
+<span class="font-label-md text-label-md">Controls</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-[#2c2c2c] transition-all active:scale-98" href="#">
+<span class="material-symbols-outlined">menu</span>
+<span class="font-label-md text-label-md">Navigation</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-[#2c2c2c] transition-all active:scale-98" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-md text-label-md">Feedback</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container rounded-lg active:scale-98 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-label-md text-label-md">Layout</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto space-y-xs pt-md border-t border-outline-variant/30">
+<button class="w-full flex items-center justify-center gap-sm bg-primary-container text-on-primary-container px-md py-sm rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity mb-md active:scale-95 duration-200">
+                View Documentation
+            </button>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-[#2c2c2c] transition-all active:scale-98" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-[#2c2c2c] transition-all active:scale-98" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 lg:mr-[280px] min-h-screen pb-2xl">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-30 bg-[#121212]/90 backdrop-blur-md border-b border-outline-variant/10 shadow-soft">
+<div class="max-w-container-max mx-auto px-gutter py-md flex justify-between items-center">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-primary-fixed-dim lg:hidden">Spims</span>
+<nav class="hidden md:flex gap-lg">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors duration-200" href="#">Reference</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors duration-200" href="#">Components</a>
+<a class="text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1 font-body-md text-body-md" href="#">Patterns</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors duration-200" href="#">Guidelines</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="hidden md:flex items-center gap-sm border border-primary-fixed-dim text-primary-fixed-dim px-md py-sm rounded-lg font-label-md text-label-md hover:bg-primary-fixed-dim hover:text-on-primary-fixed active:scale-95 transition-all duration-200">
+                        Download SDK
+                    </button>
+<button class="lg:hidden text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="max-w-container-max mx-auto px-gutter pt-xl">
+<!-- Page Header -->
+<div class="mb-2xl border-b border-outline-variant/20 pb-xl">
+<div class="flex items-center gap-sm mb-sm">
+<span class="px-sm py-xs bg-primary-fixed-dim/10 text-primary-fixed-dim rounded font-label-sm text-label-sm border border-primary-fixed-dim/20">الأنماط الأساسية</span>
+<span class="text-on-surface-variant text-sm">/</span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">الهيكلية</span>
+</div>
+<h2 class="font-display-lg text-display-lg text-[#eaf1ff] mb-md">تخطيط (Layout)</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl leading-relaxed">
+                    يعتمد نظام "Spims" على شبكة ذات 12 عموداً كقاعدة ثابتة، مع التركيز على المساحات البيضاء السخية لتعزيز الإحساس بالأهمية الأكاديمية والوضوح المنهجي في الوضع الداكن.
+                </p>
+</div>
+<!-- Bento Grid Showcase -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-2xl">
+<!-- Grid Visualization Card -->
+<div class="lg:col-span-8 bg-[#1e1e1e] rounded-xl border border-outline-variant/20 shadow-soft p-xl relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary-fixed-dim/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="flex items-center justify-between mb-lg relative z-10">
+<h3 class="font-headline-md text-headline-md text-[#eaf1ff] flex items-center gap-sm">
+<span class="w-8 h-8 rounded bg-primary-container/30 border border-primary-fixed-dim/30 flex items-center justify-center text-primary-fixed-dim">
+<span class="material-symbols-outlined text-sm">view_column</span>
+</span>
+                            الشبكة (12 عمود)
+                        </h3>
+<span class="font-label-sm text-label-sm px-sm py-xs bg-[#2c2c2c] rounded text-on-surface-variant border border-outline-variant/10">Max-width: 1440px</span>
+</div>
+<div class="bg-[#121212] rounded-lg border border-outline-variant/10 p-md relative h-64 flex flex-col justify-center">
+<!-- Simulated 12 Column Grid -->
+<div class="grid grid-cols-12 gap-gutter h-full w-full opacity-60">
+<!-- Columns -->
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+<div class="bg-primary-fixed-dim/10 rounded-sm h-full border border-primary-fixed-dim/20"></div>
+</div>
+<!-- Overlay Content to show layout usage -->
+<div class="absolute inset-0 p-md grid grid-cols-12 gap-gutter pointer-events-none">
+<div class="col-span-4 bg-[#2c2c2c]/80 backdrop-blur-sm rounded-lg border border-outline-variant/30 flex items-center justify-center shadow-lg">
+<span class="font-label-sm text-label-sm text-[#eaf1ff]">4 Columns</span>
+</div>
+<div class="col-span-8 bg-[#2c2c2c]/80 backdrop-blur-sm rounded-lg border border-outline-variant/30 flex items-center justify-center shadow-lg">
+<span class="font-label-sm text-label-sm text-[#eaf1ff]">8 Columns</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Spacing Tokens Card -->
+<div class="lg:col-span-4 bg-[#1e1e1e] rounded-xl border border-outline-variant/20 shadow-soft p-xl">
+<h3 class="font-headline-md text-headline-md text-[#eaf1ff] mb-lg flex items-center gap-sm">
+<span class="w-8 h-8 rounded bg-primary-container/30 border border-primary-fixed-dim/30 flex items-center justify-center text-primary-fixed-dim">
+<span class="material-symbols-outlined text-sm">space_bar</span>
+</span>
+                        المسافات
+                    </h3>
+<ul class="space-y-md">
+<li class="flex items-center gap-md">
+<div class="w-16 text-left font-label-md text-label-md text-primary-fixed-dim" dir="ltr">xs (4px)</div>
+<div class="h-4 w-1 bg-primary-fixed-dim/40 rounded-full"></div>
+</li>
+<li class="flex items-center gap-md">
+<div class="w-16 text-left font-label-md text-label-md text-primary-fixed-dim" dir="ltr">sm (8px)</div>
+<div class="h-4 w-2 bg-primary-fixed-dim/50 rounded-full"></div>
+</li>
+<li class="flex items-center gap-md">
+<div class="w-16 text-left font-label-md text-label-md text-primary-fixed-dim" dir="ltr">md (16px)</div>
+<div class="h-4 w-4 bg-primary-fixed-dim/60 rounded-sm"></div>
+</li>
+<li class="flex items-center gap-md">
+<div class="w-16 text-left font-label-md text-label-md text-primary-fixed-dim" dir="ltr">lg (24px)</div>
+<div class="h-4 w-6 bg-primary-fixed-dim/70 rounded-sm"></div>
+</li>
+<li class="flex items-center gap-md">
+<div class="w-16 text-left font-label-md text-label-md text-primary-fixed-dim" dir="ltr">xl (32px)</div>
+<div class="h-4 w-8 bg-primary-fixed-dim/80 rounded-sm"></div>
+</li>
+<li class="flex items-center gap-md">
+<div class="w-16 text-left font-label-md text-label-md text-primary-fixed-dim" dir="ltr">2xl (48px)</div>
+<div class="h-4 w-12 bg-primary-fixed-dim/90 rounded-sm"></div>
+</li>
+</ul>
+</div>
+<!-- Surface Hierarchy (Elevations) -->
+<div class="lg:col-span-12 bg-[#1e1e1e] rounded-xl border border-outline-variant/20 shadow-soft p-xl">
+<div class="flex items-center justify-between mb-xl">
+<h3 class="font-headline-md text-headline-md text-[#eaf1ff] flex items-center gap-sm">
+<span class="w-8 h-8 rounded bg-primary-container/30 border border-primary-fixed-dim/30 flex items-center justify-center text-primary-fixed-dim">
+<span class="material-symbols-outlined text-sm">layers</span>
+</span>
+                            تسلسل الأسطح (Dark Mode)
+                        </h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Level 0: Background -->
+<div class="bg-[#121212] rounded-lg p-lg border border-outline-variant/5 min-h-[160px] flex flex-col justify-between">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-[#eaf1ff]">المستوى 0</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">الخلفية الأساسية (#121212)</p>
+</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant/50 self-end">No Shadow</div>
+</div>
+<!-- Level 1: Surface Container Low -->
+<div class="bg-[#1e1e1e] rounded-lg p-lg border border-outline-variant/10 shadow-soft min-h-[160px] flex flex-col justify-between transform -translate-y-2">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-[#eaf1ff]">المستوى 1</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">حاوية السطح (#1e1e1e)</p>
+</div>
+<div class="font-label-sm text-label-sm text-primary-fixed-dim/70 self-end">Shadow-soft</div>
+</div>
+<!-- Level 2: Surface Container High / Hover -->
+<div class="bg-[#2c2c2c] rounded-lg p-lg border border-outline-variant/20 shadow-lg min-h-[160px] flex flex-col justify-between transform -translate-y-4">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-[#eaf1ff]">المستوى 2</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">التفاعل / القوائم (#2c2c2c)</p>
+</div>
+<div class="font-label-sm text-label-sm text-primary-fixed-dim self-end">Shadow-lg + Border</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

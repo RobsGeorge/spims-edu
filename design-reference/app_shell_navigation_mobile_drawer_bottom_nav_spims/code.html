@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="light" dir="ltr" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sacred Academic - Mobile Navigation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#bbefc1",
+                    "tertiary-container": "#003415",
+                    "surface-variant": "#d3e3ff",
+                    "primary-fixed-dim": "#d4af37",
+                    "secondary-container": "#ffd578",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#6d9f76",
+                    "inverse-on-surface": "#ebf1ff",
+                    "secondary-fixed": "#ffdf9c",
+                    "on-primary-container": "#e26f8b",
+                    "on-tertiary-fixed": "#00210b",
+                    "primary-container": "#5d0326",
+                    "on-secondary-fixed-variant": "#5b4300",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#3f0017",
+                    "on-surface-variant": "#554245",
+                    "surface-container-highest": "#d3e3ff",
+                    "primary": "#380014",
+                    "on-error-container": "#93000a",
+                    "background": "#f8f9ff",
+                    "surface-container-low": "#eff4ff",
+                    "secondary": "#785a02",
+                    "surface-bright": "#f8f9ff",
+                    "outline": "#887175",
+                    "surface-container-high": "#dde9ff",
+                    "surface-container": "#e6eeff",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed-variant": "#21502e",
+                    "error": "#ba1a1a",
+                    "tertiary": "#001d09",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#ffd9df",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#ffb1c1",
+                    "on-secondary-fixed": "#251a00",
+                    "inverse-surface": "#213146",
+                    "tertiary-fixed-dim": "#9fd3a6",
+                    "on-background": "#0b1c30",
+                    "outline-variant": "#dbc0c4",
+                    "on-surface": "#0b1c30",
+                    "on-primary-fixed-variant": "#812340",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#a03b57",
+                    "surface-dim": "#cbdbf6",
+                    "secondary-fixed-dim": "#eac166",
+                    "surface": "#f8f9ff",
+                    "on-secondary-container": "#795a03"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "2rem",
+                    "sm": "0.5rem",
+                    "md": "1rem",
+                    "xs": "0.25rem",
+                    "container-max": "1440px",
+                    "gutter": "24px",
+                    "sidebar-width": "280px",
+                    "lg": "1.5rem",
+                    "2xl": "3rem",
+                    "safe": "env(safe-area-inset-bottom)"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            },
+            "boxShadow": {
+              "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Hide scrollbar for neatness in this demo */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-hidden min-h-screen relative flex flex-col">
+<!-- OVERLAY (visible when drawer is active) -->
+<div aria-hidden="true" class="fixed inset-0 bg-on-background/20 z-40 backdrop-blur-sm transition-opacity duration-300"></div>
+<!-- SIDE DRAWER (Mobile) - Active State -->
+<nav aria-label="Main Navigation" class="fixed top-0 left-0 h-screen w-sidebar-width bg-surface-container-low z-50 flex flex-col p-md gap-sm shadow-soft transform translate-x-0 transition-transform duration-300 rtl:right-0 rtl:left-auto rtl:translate-x-0">
+<!-- Header -->
+<div class="flex items-center gap-sm mb-lg px-sm">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-container text-2xl">school</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-[18px] leading-tight text-primary font-semibold">Sacred Academic</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Coptic Orthodox LMS</span>
+</div>
+<!-- Close button for demo purposes -->
+<button class="ml-auto w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-high text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Links -->
+<div class="flex flex-col gap-1 overflow-y-auto">
+<!-- Active Link -->
+<a aria-current="page" class="flex items-center gap-md px-4 py-3 bg-primary text-on-primary rounded-2xl active:scale-[0.98] transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<!-- Inactive Links -->
+<a class="flex items-center gap-md px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-2xl transition-all active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-md text-label-md">Courses</span>
+</a>
+<a class="flex items-center gap-md px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-2xl transition-all active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</a>
+<a class="flex items-center gap-md px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-2xl transition-all active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined">grade</span>
+<span class="font-label-md text-label-md">Grades</span>
+</a>
+<a class="flex items-center gap-md px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-2xl transition-all active:scale-[0.98] duration-200" href="#">
+<span class="material-symbols-outlined">local_library</span>
+<span class="font-label-md text-label-md">Library</span>
+</a>
+<a class="flex items-center gap-md px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-2xl transition-all active:scale-[0.98] duration-200 mt-auto" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+<!-- CTA -->
+<div class="mt-4 pt-4 border-t border-outline-variant/30 px-2">
+<button class="w-full flex items-center justify-center gap-sm py-3 px-4 bg-secondary-container text-on-secondary-container rounded-full font-label-md text-label-md active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">help</span>
+                Support Portal
+            </button>
+</div>
+</nav>
+<!-- TOP APP BAR (Simplified for mobile) -->
+<header class="flex justify-between items-center px-lg py-sm w-full sticky top-0 z-30 bg-surface shadow-soft">
+<div class="flex items-center gap-sm">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant transition-colors active:scale-95">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-headline-md text-headline-md text-primary tracking-tight">Spims</span>
+</div>
+<div class="flex items-center gap-xs">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant transition-colors active:scale-95">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant transition-colors active:scale-95 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant ml-2 overflow-hidden border border-outline-variant/30">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A close-up portrait of a young professional student with a neutral expression, warm lighting, soft background focus, institutional academic setting, bright clear day." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoxrsAWnseB7-GP1z1kEi0WXwFtsSuGdpEoq6PfcdbFMM5l9lHE5E3b53AQZIfBwVOhBK0IYJvE81Hm4iiRY9LtoBzSD-1taEZIpKK9BnElmxVJOAJfYwU9iJOLsL8pCFwDauGhfWhDEAxcMCrEFLBKArI78FvXC19X6qVHqu5WLiMKbzuqmGFq85qt05f525iBHn_JkthPYdAvfG9Ko5ZeLglBOxEEo6_50A5mTa7X1JSwOkBIOEZh5YZyHt_i5_Yp0ybEQ2UzXaZ"/>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT AREA (Canvas) -->
+<main class="flex-1 overflow-y-auto p-md pb-[100px]"> <!-- Extra padding bottom for bottom nav -->
+<div class="max-w-md mx-auto space-y-md pt-4">
+<!-- Welcome Card -->
+<div class="bg-surface-container-lowest rounded-DEFAULT p-lg shadow-soft border border-outline-variant/30 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-8 -mt-8"></div>
+<h1 class="font-headline-md text-headline-md text-on-surface mb-2 relative z-10">Good Morning, Alex</h1>
+<p class="font-body-md text-body-md text-on-surface-variant relative z-10">You have 2 upcoming assignments due this week.</p>
+</div>
+<!-- Bento Grid Stats -->
+<div class="grid grid-cols-2 gap-md">
+<div class="bg-surface-container-low rounded-DEFAULT p-md flex flex-col items-start gap-2 shadow-soft">
+<div class="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-container">pending_actions</span>
+</div>
+<span class="font-headline-md text-headline-md text-on-surface">3</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Pending Tasks</span>
+</div>
+<div class="bg-surface-container-low rounded-DEFAULT p-md flex flex-col items-start gap-2 shadow-soft">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">trending_up</span>
+</div>
+<span class="font-headline-md text-headline-md text-on-surface">3.8</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Current GPA</span>
+</div>
+</div>
+<!-- Recent Course Card -->
+<div class="bg-surface-container-lowest rounded-DEFAULT p-md shadow-soft border border-outline-variant/30 flex gap-4 items-center">
+<div class="w-16 h-16 rounded-lg bg-surface-variant overflow-hidden shrink-0">
+<img alt="Book" class="w-full h-full object-cover" data-alt="A neatly arranged stack of classic hardcover books on a wooden desk, warm sunlight streaming through a window, soft focus background, academic study aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNNB008mtTcGecV3tSiU37rRHnrejYxGxgYjbF1vVwyJys1jjSQjzHY5SKtLWmTQWb1CZFfq7SdPaBXK5nClsvBvkQdUUZGpx0tLxYZdNlGQjZCu4sOy-FGIskVhXcL6GFJPPA9xhbtZExjMJi4eRB1QyW6mMitaT9xAb3Pw-ODBshVCGlXpIryUt7ptDyhxdmsmZLBK6EJfvsESTJ8fVlVKUd5BCqdiUdzBGfvTGKIq7Jk25o_BI_bJjeyWaFUvnyLX9wbDJvKHdW"/>
+</div>
+<div class="flex-1">
+<span class="font-label-sm text-label-sm text-primary mb-1 block">Theology 101</span>
+<h3 class="font-label-md text-label-md text-on-surface mb-1">Introduction to Dogmatics</h3>
+<div class="w-full bg-surface-container h-1.5 rounded-full mt-2">
+<div class="bg-primary h-1.5 rounded-full" style="width: 65%;"></div>
+</div>
+</div>
+</div>
+<!-- spacer to ensure scrolling under overlay looks okay -->
+<div class="h-32"></div>
+</div>
+</main>
+<!-- BOTTOM NAV BAR (Mobile) -->
+<nav aria-label="Bottom Navigation" class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface border-t border-outline-variant/30 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+<!-- Active: Home (Dashboard intent) -->
+<a class="flex flex-col items-center justify-center gap-1 min-w-[64px] active:scale-95 transition-all" href="#">
+<div class="flex items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Home</span>
+</a>
+<!-- Inactive: Courses -->
+<a class="flex flex-col items-center justify-center gap-1 min-w-[64px] text-on-surface-variant active:scale-95 transition-all hover:text-on-surface" href="#">
+<div class="flex items-center justify-center px-4 py-1 rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">book</span>
+</div>
+<span class="font-label-sm text-label-sm">Courses</span>
+</a>
+<!-- Inactive: Calendar -->
+<a class="flex flex-col items-center justify-center gap-1 min-w-[64px] text-on-surface-variant active:scale-95 transition-all hover:text-on-surface" href="#">
+<div class="flex items-center justify-center px-4 py-1 rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">event</span>
+</div>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</a>
+<!-- Inactive: Library -->
+<a class="flex flex-col items-center justify-center gap-1 min-w-[64px] text-on-surface-variant active:scale-95 transition-all hover:text-on-surface" href="#">
+<div class="flex items-center justify-center px-4 py-1 rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">library_books</span>
+</div>
+<span class="font-label-sm text-label-sm">Library</span>
+</a>
+<!-- Inactive: Profile -->
+<a class="flex flex-col items-center justify-center gap-1 min-w-[64px] text-on-surface-variant active:scale-95 transition-all hover:text-on-surface" href="#">
+<div class="flex items-center justify-center px-4 py-1 rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">person</span>
+</div>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+</body></html>

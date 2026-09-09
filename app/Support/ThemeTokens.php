@@ -43,6 +43,7 @@ final class ThemeTokens
                 'success' => '#10b981',
                 'warning' => '#f59e0b',
                 'danger' => '#ef4444',
+                'info' => '#3b82f6',
                 'shadow' => '0 4px 20px rgba(0, 0, 0, 0.05)',
                 'shadowLift' => '0 6px 24px rgba(0, 0, 0, 0.08)',
             ],
@@ -72,6 +73,7 @@ final class ThemeTokens
                 'success' => '#10b981',
                 'warning' => '#f59e0b',
                 'danger' => '#ef4444',
+                'info' => '#60a5fa',
                 'shadow' => '0 4px 20px rgba(0, 0, 0, 0.3)',
                 'shadowLift' => '0 6px 24px rgba(0, 0, 0, 0.38)',
             ],
@@ -112,6 +114,7 @@ final class ThemeTokens
             'success' => '--color-success',
             'warning' => '--color-warning',
             'danger' => '--color-danger',
+            'info' => '--color-info',
             'shadow' => '--shadow-soft',
             'shadowLift' => '--shadow-lift',
         ];

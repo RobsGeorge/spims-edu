@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Controls - Spims Design System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#785a02",
+                    "surface-container": "#e5eeff",
+                    "on-primary-fixed-variant": "#812340",
+                    "on-secondary-fixed-variant": "#5b4300",
+                    "danger": "#EF4444",
+                    "outline": "#887175",
+                    "outline-variant": "#dbc0c4",
+                    "inverse-surface": "#213145",
+                    "warning": "#F59E0B",
+                    "primary-fixed": "#ffd9df",
+                    "surface-tint": "#a03b57",
+                    "tertiary-container": "#003323",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "background": "#f8f9ff",
+                    "surface-container-low": "#eff4ff",
+                    "surface-bright": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#251a00",
+                    "on-secondary-container": "#795a03",
+                    "error": "#ba1a1a",
+                    "tertiary": "#001c12",
+                    "surface": "#f8f9ff",
+                    "secondary-fixed-dim": "#eac166",
+                    "on-background": "#0b1c30",
+                    "success": "#10B981",
+                    "primary": "#380014",
+                    "on-tertiary-container": "#6f9d87",
+                    "on-surface-variant": "#554245",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-primary-fixed": "#3f0017",
+                    "on-tertiary-fixed": "#002115",
+                    "surface-bg": "#f8f9ff",
+                    "surface-dim": "#cbdbf5",
+                    "tertiary-fixed-dim": "#a1d1b9",
+                    "secondary-fixed": "#ffdf9c",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#ffb1c1",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed-variant": "#224f3d",
+                    "secondary-container": "#ffd578",
+                    "primary-fixed-dim": "#ffb1c1",
+                    "primary-container": "#5d0326",
+                    "on-primary-container": "#e26f8b",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-surface": "#0b1c30",
+                    "tertiary-fixed": "#bdedd5",
+                    "surface-variant": "#d3e4fe",
+                    "surface-container-high": "#dce9ff",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "2xl": "3rem",
+                    "xs": "0.25rem",
+                    "md": "1rem",
+                    "gutter": "24px",
+                    "xl": "2rem",
+                    "sm": "0.5rem",
+                    "container-max": "1440px",
+                    "lg": "1.5rem",
+                    "sidebar-width": "280px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "arabic": ["IBM Plex Sans Arabic"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            },
+            boxShadow: {
+              'soft': '0 4px 24px -4px rgba(0, 0, 0, 0.05)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .rtl { direction: rtl; font-family: 'IBM Plex Sans Arabic', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col h-full border-r border-outline-variant/30 p-md bg-surface-container-low dark:bg-surface-container-lowest text-primary dark:text-primary-fixed-dim font-label-md text-label-md docked left-0 w-sidebar-width shrink-0 z-40">
+<div class="mb-xl flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary-container text-on-primary-container flex items-center justify-center font-bold">S</div>
+<div>
+<div class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed-dim">Spims Design System</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant opacity-70">v2.4.0 (Stable)</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-sm overflow-y-auto pr-sm">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">smart_button</span>
+<span>Buttons</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">toggle_on</span>
+<span>Controls</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">menu</span>
+<span>Navigation</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span>Feedback</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+<span>Layout</span>
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-outline-variant/30 flex flex-col gap-sm">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span>Support</span>
+</a>
+</div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0 relative h-full">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full lg:w-[calc(100%-280px)] z-30 flex justify-between items-center px-gutter py-md bg-surface-container-lowest dark:bg-surface-container-low text-primary dark:text-primary-fixed-dim font-body-md text-body-md shadow-soft dark:shadow-none transition-all duration-200 lg:left-[280px]">
+<div class="flex items-center gap-xl">
+<div class="lg:hidden font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Spims</div>
+<nav class="hidden md:flex gap-md">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Reference</a>
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Components</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Patterns</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Guidelines</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-full p-2 transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary/90 active:scale-95 transition-transform duration-200">
+                    Download SDK
+                </button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto pt-[88px] px-gutter pb-2xl lg:ml-0 bg-background">
+<div class="max-w-container-max mx-auto space-y-2xl">
+<div class="max-w-3xl">
+<h1 class="font-display-lg text-display-lg text-primary mb-sm">Controls</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Interactive elements for data entry and configuration. Designed with high-contrast states and clear visual feedback for academic and institutional applications.</p>
+</div>
+<!-- Input Fields Section -->
+<section class="space-y-xl">
+<h2 class="font-headline-lg text-headline-lg text-primary border-b border-outline-variant/30 pb-sm">Text Inputs</h2>
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-xl">
+<!-- LTR Light -->
+<div class="bg-surface-container-lowest p-xl rounded-xl shadow-soft border border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-secondary mb-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">light_mode</span> LTR - Light
+                            </h3>
+<div class="space-y-md">
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface">Default State</label>
+<input class="w-full h-12 px-md rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Enter academic record ID" type="text"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-primary">Focused State</label>
+<input class="w-full h-12 px-md rounded-xl border-2 border-primary bg-surface-container-lowest text-on-surface focus:outline-none ring-2 ring-primary/20 transition-all" type="text" value="GHR-2024"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-error">Error State</label>
+<div class="relative">
+<input class="w-full h-12 px-md pr-12 rounded-xl border border-error bg-error-container/10 text-error focus:outline-none focus:ring-2 focus:ring-error transition-all" type="text" value="Invalid Format"/>
+<span class="material-symbols-outlined absolute right-4 top-3 text-error">error</span>
+</div>
+<span class="font-label-sm text-label-sm text-error mt-1">Please enter a valid record ID.</span>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface-variant opacity-50">Disabled State</label>
+<input class="w-full h-12 px-md rounded-xl border border-outline-variant/30 bg-surface-container text-on-surface-variant/50 cursor-not-allowed" disabled="" type="text" value="System Generated"/>
+</div>
+</div>
+</div>
+<!-- RTL Arabic Light -->
+<div class="bg-surface-container-lowest p-xl rounded-xl shadow-soft border border-outline-variant/30 rtl font-arabic">
+<h3 class="text-[20px] font-semibold text-secondary mb-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] ml-2">translate</span> RTL - عربي (Light)
+                            </h3>
+<div class="space-y-md">
+<div class="flex flex-col gap-1">
+<label class="text-[14px] font-semibold text-on-surface">الحالة الافتراضية</label>
+<input class="w-full h-12 px-md rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="أدخل معرف السجل الأكاديمي" type="text"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-[14px] font-semibold text-primary">حالة التركيز</label>
+<input class="w-full h-12 px-md rounded-xl border-2 border-primary bg-surface-container-lowest text-on-surface focus:outline-none ring-2 ring-primary/20 transition-all text-left" dir="ltr" type="text" value="GHR-2024"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-[14px] font-semibold text-error">حالة الخطأ</label>
+<div class="relative">
+<input class="w-full h-12 px-md pl-12 rounded-xl border border-error bg-error-container/10 text-error focus:outline-none focus:ring-2 focus:ring-error transition-all" type="text" value="تنسيق غير صالح"/>
+<span class="material-symbols-outlined absolute left-4 top-3 text-error">error</span>
+</div>
+<span class="text-[12px] text-error mt-1">الرجاء إدخال معرف سجل صالح.</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Selection Controls Section -->
+<section class="space-y-xl">
+<h2 class="font-headline-lg text-headline-lg text-primary border-b border-outline-variant/30 pb-sm">Selection Controls</h2>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-xl">
+<!-- Checkboxes -->
+<div class="bg-surface-container-lowest p-xl rounded-xl shadow-soft border border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-secondary mb-lg flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+<span class="material-symbols-outlined text-[20px]">check_box</span> Checkboxes
+                            </h3>
+<div class="space-y-4">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center justify-center">
+<input class="peer appearance-none w-5 h-5 border-2 border-outline rounded bg-surface-container-lowest checked:bg-primary checked:border-primary transition-all" type="checkbox"/>
+<span class="material-symbols-outlined absolute text-[16px] text-on-primary opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Unchecked Default</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center justify-center">
+<input checked="" class="peer appearance-none w-5 h-5 border-2 border-outline rounded bg-surface-container-lowest checked:bg-primary checked:border-primary transition-all" type="checkbox"/>
+<span class="material-symbols-outlined absolute text-[16px] text-on-primary opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Checked Default</span>
+</label>
+<label class="flex items-center gap-3 cursor-not-allowed opacity-50">
+<div class="relative flex items-center justify-center">
+<input class="peer appearance-none w-5 h-5 border-2 border-outline-variant rounded bg-surface-container transition-all" disabled="" type="checkbox"/>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">Disabled Unchecked</span>
+</label>
+</div>
+</div>
+<!-- Radio Buttons -->
+<div class="bg-surface-container-lowest p-xl rounded-xl shadow-soft border border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-secondary mb-lg flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+<span class="material-symbols-outlined text-[20px]">radio_button_checked</span> Radio Buttons
+                            </h3>
+<div class="space-y-4">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center justify-center">
+<input class="peer appearance-none w-5 h-5 border-2 border-outline rounded-full bg-surface-container-lowest checked:border-primary transition-all" name="radio_demo" type="radio"/>
+<div class="absolute w-2.5 h-2.5 rounded-full bg-primary opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</div>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Option 1</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative flex items-center justify-center">
+<input checked="" class="peer appearance-none w-5 h-5 border-2 border-outline rounded-full bg-surface-container-lowest checked:border-primary transition-all" name="radio_demo" type="radio"/>
+<div class="absolute w-2.5 h-2.5 rounded-full bg-primary opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+</div>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Option 2 (Selected)</span>
+</label>
+<label class="flex items-center gap-3 cursor-not-allowed opacity-50">
+<div class="relative flex items-center justify-center">
+<input class="peer appearance-none w-5 h-5 border-2 border-outline-variant rounded-full bg-surface-container transition-all" disabled="" type="radio"/>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">Disabled Option</span>
+</label>
+</div>
+</div>
+<!-- Switches -->
+<div class="bg-surface-container-lowest p-xl rounded-xl shadow-soft border border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-secondary mb-lg flex items-center gap-2 border-b border-outline-variant/30 pb-2">
+<span class="material-symbols-outlined text-[20px]">toggle_on</span> Switches
+                            </h3>
+<div class="space-y-6">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Notifications</span>
+<div class="relative">
+<input class="peer sr-only" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-outline after:border-outline after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:after:bg-on-primary"></div>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Auto-Save</span>
+<div class="relative">
+<input checked="" class="peer sr-only" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-outline after:border-outline after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:after:bg-on-primary"></div>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-not-allowed opacity-50">
+<span class="font-body-md text-body-md text-on-surface-variant">Analytics Tracking</span>
+<div class="relative">
+<input class="peer sr-only" disabled="" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container peer-focus:outline-none rounded-full peer after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-outline-variant after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5"></div>
+</div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Dropdowns Section -->
+<section class="space-y-xl pb-2xl">
+<h2 class="font-headline-lg text-headline-lg text-primary border-b border-outline-variant/30 pb-sm">Dropdowns &amp; Selects</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="bg-surface-container-lowest p-xl rounded-xl shadow-soft border border-outline-variant/30">
+<div class="space-y-md">
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-on-surface">Standard Select</label>
+<div class="relative">
+<select class="w-full h-12 px-md appearance-none rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+<option>Department of Sciences</option>
+<option>Department of Arts</option>
+<option>School of Engineering</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-3 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-xl rounded-xl shadow-soft border border-outline-variant/30 rtl font-arabic">
+<div class="space-y-md">
+<div class="flex flex-col gap-1">
+<label class="text-[14px] font-semibold text-on-surface">قائمة منسدلة (RTL)</label>
+<div class="relative">
+<select class="w-full h-12 px-md appearance-none rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all pr-md pl-12">
+<option>قسم العلوم</option>
+<option>قسم الفنون</option>
+<option>كلية الهندسة</option>
+</select>
+<span class="material-symbols-outlined absolute left-4 top-3 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

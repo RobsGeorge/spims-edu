@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims - Empty &amp; Loading States</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config injected from system prompt -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container": "#e6eeff",
+                      "error": "#ba1a1a",
+                      "surface-container-highest": "#d3e3ff",
+                      "on-secondary-container": "#795a03",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-fixed-dim": "#eac166",
+                      "surface-container-high": "#dde9ff",
+                      "outline": "#887175",
+                      "on-secondary-fixed": "#251a00",
+                      "on-tertiary-fixed": "#00210b",
+                      "on-background": "#0b1c30",
+                      "surface": "#f8f9ff",
+                      "tertiary-container": "#003415",
+                      "on-error": "#ffffff",
+                      "outline-variant": "#dbc0c4",
+                      "tertiary": "#001d09",
+                      "secondary": "#785a02",
+                      "on-primary-container": "#e26f8b",
+                      "on-tertiary-container": "#6d9f76",
+                      "secondary-container": "#ffd578",
+                      "on-primary": "#ffffff",
+                      "primary-fixed-dim": "#d4af37",
+                      "on-surface-variant": "#554245",
+                      "background": "#f8f9ff",
+                      "on-error-container": "#93000a",
+                      "inverse-primary": "#ffb1c1",
+                      "primary": "#380014",
+                      "inverse-surface": "#213146",
+                      "surface-bright": "#f8f9ff",
+                      "surface-container-low": "#eff4ff",
+                      "tertiary-fixed-dim": "#9fd3a6",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed": "#bbefc1",
+                      "surface-dim": "#cbdbf6",
+                      "primary-fixed": "#ffd9df",
+                      "error-container": "#ffdad6",
+                      "on-surface": "#0b1c30",
+                      "on-secondary-fixed-variant": "#5b4300",
+                      "primary-container": "#5d0326",
+                      "on-secondary": "#ffffff",
+                      "surface-variant": "#d3e3ff",
+                      "on-primary-fixed": "#3f0017",
+                      "on-tertiary-fixed-variant": "#21502e",
+                      "inverse-on-surface": "#ebf1ff",
+                      "surface-tint": "#a03b57",
+                      "secondary-fixed": "#ffdf9c",
+                      "on-primary-fixed-variant": "#812340"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "0.25rem",
+                      "lg": "1.5rem",
+                      "sm": "0.5rem",
+                      "sidebar-width": "280px",
+                      "md": "1rem",
+                      "gutter": "24px",
+                      "2xl": "3rem",
+                      "container-max": "1440px",
+                      "xl": "2rem"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom Shimmer Animation for Loaders */
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+        .animate-shimmer {
+            animation: shimmer 2s infinite linear;
+            background: linear-gradient(to right, #eff4ff 4%, #d3e3ff 25%, #eff4ff 36%);
+            background-size: 1000px 100%;
+        }
+        .dark .animate-shimmer {
+             background: linear-gradient(to right, #213146 4%, #380014 25%, #213146 36%);
+             background-size: 1000px 100%;
+        }
+        
+        /* Layout overrides to show multiple variants on one screen for demonstration */
+        .variant-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+            padding: 2rem;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+        
+        .demo-window {
+            border: 1px solid rgba(136, 113, 117, 0.3); /* outline-variant */
+            border-radius: 1rem;
+            overflow: hidden;
+            position: relative;
+            background-color: var(--color-background);
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.05); /* shadow-soft */
+        }
+        
+        .demo-window.dark {
+            background-color: #0b1c30; /* Fake dark mode root bg for demo */
+            color: #f8f9ff;
+        }
+        
+        .demo-window-header {
+            background-color: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid rgba(136, 113, 117, 0.3);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .demo-window.dark .demo-window-header {
+             background-color: #1e293b;
+             color: #cbd5e1;
+             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Mock specific dark mode colors just for the demo window context if needed to override Tailwind class limitations within a light mode document root */
+        .demo-window.dark .bg-surface-container-low { background-color: #1a2a40; }
+        .demo-window.dark .bg-surface-container-lowest { background-color: #0b1c30; }
+        .demo-window.dark .text-primary { color: #ffd9df; }
+        .demo-window.dark .text-on-surface-variant { color: #d3e3ff; }
+        .demo-window.dark .bg-primary { background-color: #ffd9df; }
+        .demo-window.dark .text-on-primary { color: #3f0017; }
+        .demo-window.dark .border-outline-variant\/30 { border-color: rgba(255,255,255,0.1); }
+        .demo-window.dark .text-on-surface { color: #f8f9ff; }
+        .demo-window.dark .bg-surface-container-highest { background-color: #213146; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen">
+<div class="variant-container">
+<!-- LIGHT MODE VARIANT -->
+<div class="demo-window">
+<div class="demo-window-header">
+<span>Light Mode (English/LTR)</span>
+</div>
+<div class="relative min-h-[800px] flex bg-background">
+<!-- SideNavBar -->
+<nav class="fixed right-0 top-[64px] h-[calc(100vh-64px)] w-sidebar-width flex flex-col p-md overflow-y-auto bg-surface-container-low border-r border-outline-variant/30 static absolute left-0 top-0 h-full">
+<div class="mb-lg">
+<h2 class="font-headline-md text-headline-md text-primary mb-xs">Documentation</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">v1.0.4</p>
+</div>
+<ul class="flex flex-col gap-sm flex-1">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-md text-label-md">Introduction</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+<span class="font-label-md text-label-md">Foundations</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="extension">extension</span>
+<span class="font-label-md text-label-md">Components</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-md text-primary font-bold bg-surface-container-highest rounded-md" href="#">
+<span class="material-symbols-outlined filled" data-icon="schema">schema</span>
+<span class="font-label-md text-label-md">Patterns</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="rule">rule</span>
+<span class="font-label-md text-label-md">Guidelines</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto pt-lg border-t border-outline-variant/30">
+<ul class="flex flex-col gap-sm mb-lg">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-label-md text-label-md">Feedback</span>
+</a>
+</li>
+</ul>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-sm px-md rounded-full hover:scale-[0.98] active:scale-95 transition-transform flex items-center justify-center gap-sm">
+                        Download Assets
+                    </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-[280px] flex flex-col">
+<!-- TopNavBar -->
+<header class="flex flex-row-reverse justify-between items-center px-lg py-sm w-full sticky top-0 z-50 bg-surface-container-lowest shadow-sm border-b border-outline-variant/30 h-[64px]">
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-xs rounded-full hover:bg-surface-container-low scale-95 active:transition-transform">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-xs rounded-full hover:bg-surface-container-low scale-95 active:transition-transform">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<button class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors ml-sm">
+                            Sign In
+                        </button>
+</div>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Docs</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Components</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">Resources</a>
+</nav>
+<div class="flex items-center">
+<span class="font-headline-md text-headline-md font-bold text-primary">Spims</span>
+</div>
+</header>
+<div class="p-xl overflow-y-auto">
+<div class="max-w-4xl mx-auto">
+<h1 class="font-display-lg text-display-lg text-primary mb-sm">Empty &amp; Loading States</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-xl">Patterns for handling content loading and missing data across the Spims platform.</p>
+<!-- Skeletons Section -->
+<section class="mb-2xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-lg">Loading States</h2>
+<div class="grid grid-cols-1 gap-xl">
+<!-- Card Grid Skeleton -->
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant/30 shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md border-b border-outline-variant/30 pb-sm">Card Grid Skeleton</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+<!-- Card 1 -->
+<div class="border border-outline-variant/30 rounded-lg p-md">
+<div class="w-full h-32 rounded-md animate-shimmer mb-sm"></div>
+<div class="h-4 w-3/4 rounded animate-shimmer mb-xs"></div>
+<div class="h-4 w-1/2 rounded animate-shimmer"></div>
+</div>
+<!-- Card 2 -->
+<div class="border border-outline-variant/30 rounded-lg p-md">
+<div class="w-full h-32 rounded-md animate-shimmer mb-sm"></div>
+<div class="h-4 w-3/4 rounded animate-shimmer mb-xs"></div>
+<div class="h-4 w-1/2 rounded animate-shimmer"></div>
+</div>
+<!-- Card 3 -->
+<div class="border border-outline-variant/30 rounded-lg p-md">
+<div class="w-full h-32 rounded-md animate-shimmer mb-sm"></div>
+<div class="h-4 w-3/4 rounded animate-shimmer mb-xs"></div>
+<div class="h-4 w-1/2 rounded animate-shimmer"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Empty States Section -->
+<section>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-lg">Empty States</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- No Courses -->
+<div class="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant/30 shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center text-center min-h-[300px]">
+<div class="w-24 h-24 rounded-full bg-surface-container-low flex items-center justify-center mb-md text-primary">
+<span class="material-symbols-outlined text-[48px]" data-icon="school">school</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">No courses enrolled yet</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">You haven't registered for any academic courses this semester.</p>
+<button class="bg-primary text-on-primary font-label-md text-label-md py-sm px-lg rounded-full hover:scale-[0.98] active:scale-95 transition-transform shadow-sm">
+                                        Browse Catalog
+                                    </button>
+</div>
+<!-- No Results -->
+<div class="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant/30 shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center text-center min-h-[300px]">
+<div class="w-24 h-24 rounded-full bg-surface-container-low flex items-center justify-center mb-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[48px]" data-icon="search_off">search_off</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">No results found</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">We couldn't find anything matching your search criteria.</p>
+<button class="border border-outline-variant text-primary font-label-md text-label-md py-sm px-lg rounded-full hover:bg-surface-container-low hover:scale-[0.98] active:scale-95 transition-all">
+                                        Clear Filters
+                                    </button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</div>
+</div>
+</body></html>

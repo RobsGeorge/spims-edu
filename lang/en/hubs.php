@@ -94,4 +94,6 @@ return [
     'reports_desc' => 'Headcount, attendance, grades, finance aging, and standing.',
     'advising' => 'Advising',
     'advising_desc' => 'Advisor assignments, advisee roster, and registration holds.',
+    'help_center' => 'Help center',
+    'help_center_desc' => 'Manage help articles, categories, and locales.',
 ];

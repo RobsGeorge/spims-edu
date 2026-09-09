@@ -129,6 +129,9 @@ jobs:
       - name: Integrations pipeline
         run: php artisan test --testsuite=Integrations --compact
 
+      - name: Help tests
+        run: php artisan test --testsuite=Help --compact
+
   pgsql-migrate-fresh:
     name: PostgreSQL migrate:fresh --seed
     runs-on: ubuntu-latest
@@ -336,3 +339,6 @@ jobs:
 
       - name: Integrations pipeline
         run: php artisan test --testsuite=Integrations --compact
+
+      - name: Help tests
+        run: php artisan test --testsuite=Help --compact

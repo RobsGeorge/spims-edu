@@ -111,4 +111,7 @@ return [
     'file_drop_size_error' => 'File exceeds the maximum size of :max',
     'file_drop_type_error' => 'File type not accepted. Allowed: :accept',
     'file_drop_browse' => 'Browse files',
+    'token_surface' => 'Surface',
+    'token_muted_fg' => 'Muted text',
+    'theme_tokens_hint' => 'Primary, accent, background, surface, and muted text for light and dark modes. Other tokens stay on the Sacred Academic defaults.',
 ];

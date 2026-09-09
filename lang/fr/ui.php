@@ -111,4 +111,7 @@ return [
     'file_drop_size_error' => 'Le fichier dépasse la taille maximale de :max',
     'file_drop_type_error' => 'Type de fichier non accepté. Autorisé : :accept',
     'file_drop_browse' => 'Parcourir les fichiers',
+    'token_surface' => 'Surface',
+    'token_muted_fg' => 'Texte atténué',
+    'theme_tokens_hint' => 'Primaire, accent, fond, surface et texte atténué pour les modes clair et sombre. Les autres jetons restent sur les valeurs Sacred Academic par défaut.',
 ];

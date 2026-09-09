@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims - Sign In</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&amp;family=Inter:wght@400;500&amp;family=Source+Serif+4:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline-variant": "#554245",
+                        "tertiary-container": "#3c4349",
+                        "surface": "#0d1322",
+                        "on-secondary-container": "#e9c16d",
+                        "on-primary-fixed-variant": "#81233f",
+                        "on-primary": "#63082a",
+                        "primary-fixed-dim": "#ffb1c0",
+                        "surface-bright": "#33394a",
+                        "on-tertiary-fixed": "#161c22",
+                        "background": "#0d1322",
+                        "inverse-on-surface": "#2a3040",
+                        "surface-dim": "#0d1322",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "secondary-container": "#6a4e00",
+                        "primary": "#ffb1c0",
+                        "on-tertiary-fixed-variant": "#41474e",
+                        "surface-container-low": "#151b2b",
+                        "surface-container-lowest": "#080e1d",
+                        "on-secondary": "#402d00",
+                        "on-primary-container": "#ff8ca6",
+                        "secondary-fixed-dim": "#e9c16d",
+                        "surface-tint": "#ffb1c0",
+                        "tertiary-fixed": "#dde3eb",
+                        "error-container": "#93000a",
+                        "secondary": "#e9c16d",
+                        "on-secondary-fixed": "#261a00",
+                        "on-error-container": "#ffdad6",
+                        "on-background": "#dde2f8",
+                        "tertiary-fixed-dim": "#c1c7cf",
+                        "on-error": "#690005",
+                        "primary-fixed": "#ffd9df",
+                        "on-tertiary-container": "#a9afb7",
+                        "on-primary-fixed": "#3f0017",
+                        "outline": "#a38b8e",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#2f3445",
+                        "surface-container-high": "#242a3a",
+                        "primary-container": "#7b1e3b",
+                        "secondary-fixed": "#ffdea0",
+                        "surface-container": "#191f2f",
+                        "on-surface-variant": "#dbc0c4",
+                        "on-tertiary": "#2b3137",
+                        "surface-container-highest": "#2f3445",
+                        "on-surface": "#dde2f8",
+                        "tertiary": "#c1c7cf",
+                        "inverse-surface": "#dde2f8",
+                        "inverse-primary": "#a03b57"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "container-padding": "24px",
+                        "base": "8px",
+                        "margin-desktop": "64px",
+                        "gutter": "16px",
+                        "margin-mobile": "16px"
+                    },
+                    fontFamily: {
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "title-md": ["\"Source Serif 4\""],
+                        "display-lg": ["EB Garamond"],
+                        "body-lg": ["\"Source Serif 4\""],
+                        "body-md": ["\"Source Serif 4\""],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["EB Garamond"]
+                    },
+                    fontSize: {
+                        "headline-lg-mobile": ["28px", { lineHeight: "36px", fontWeight: "500" }],
+                        "title-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "display-lg": ["56px", { lineHeight: "64px", letterSpacing: "-0.02em", fontWeight: "600" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom styles for the geometric motif and inputs */
+        .geometric-bg {
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(233, 193, 109, 0.05) 0%, transparent 60%),
+                linear-gradient(rgba(51, 65, 85, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(51, 65, 85, 0.1) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            background-position: center center;
+        }
+        
+        .astrolabe-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(233, 193, 109, 0.15);
+            border-radius: 50%;
+        }
+
+        .academic-input:-webkit-autofill,
+        .academic-input:-webkit-autofill:hover, 
+        .academic-input:-webkit-autofill:focus, 
+        .academic-input:-webkit-autofill:active{
+            -webkit-box-shadow: 0 0 0 30px #0d1322 inset !important;
+            -webkit-text-fill-color: #dde2f8 !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex selection:bg-secondary selection:text-on-secondary">
+<!-- Left Brand Panel -->
+<div class="hidden md:flex md:w-1/2 relative bg-surface-container-lowest overflow-hidden flex-col items-center justify-center border-r border-outline-variant/30">
+<!-- Abstract Atmospheric Image overlaying background -->
+<div class="absolute inset-0 opacity-20 mix-blend-overlay" data-alt="A moody, atmospheric macro shot of an ancient library bookshelf in deep shadow. High contrast lighting illuminates the gold foil lettering on the leather spines of antique tomes. The color palette is dominated by dark, velvety navy blues and deep blacks, with sharp, focused glints of warm golden light catching the dust motes in the air. The aesthetic is scholarly, timeless, and deeply intellectual, evoking a sense of quiet reverence and historical prestige." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBMDbF7azve0tUS3EcjgsJicFSZHe0F2RVu3Rb3vkwJhMamBfqZC-KRIp6tm4M3SAuL6AeqkXg7PHrnUqImbN5WpStLTVjea7RSOihz5AlIdJmffX5GHiR0tiIumBaIWLd-D5IdRJs77Y7uldCpE_6aVQt7j7N17bjcL4PJVzExSpiKn13AeQcL7WG28lp6u66sfu5o_VgqnztmG77fIxaGWMjBUKsa-iPl0vno7bmnEGzwEtS3kcaMkg_Lp5N6jzw2S1XqTEl9cbji'); background-size: cover; background-position: center;">
+</div>
+<!-- Geometric Motif -->
+<div class="absolute inset-0 geometric-bg"></div>
+<div class="astrolabe-ring w-[300px] h-[300px]"></div>
+<div class="astrolabe-ring w-[500px] h-[500px] opacity-50"></div>
+<div class="astrolabe-ring w-[700px] h-[700px] opacity-20"></div>
+<!-- Logo Container -->
+<div class="relative z-10 flex flex-col items-center gap-4">
+<div class="w-16 h-16 rounded-lg bg-surface border border-secondary flex items-center justify-center shadow-[0_0_30px_rgba(233,193,109,0.1)]">
+<span class="material-symbols-outlined text-secondary" style="font-size: 32px; font-variation-settings: 'FILL' 1;">
+                    menu_book
+                </span>
+</div>
+<h1 class="font-display-lg text-display-lg text-secondary tracking-tight">Spims</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-sm text-center mt-4">
+                Enter the archives. Secure access to the digital repository.
+            </p>
+</div>
+</div>
+<!-- Right Sign In Panel -->
+<div class="w-full md:w-1/2 flex relative items-center justify-center p-6 sm:p-12 bg-background">
+<!-- Top Navigation Area (Contextual Actions Only) -->
+<div class="absolute top-6 right-6 sm:top-8 sm:right-8 flex items-center gap-4 z-20">
+<button aria-label="Language" class="p-2 text-on-surface-variant hover:text-secondary transition-colors group flex items-center justify-center rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button aria-label="Toggle Theme" class="p-2 text-on-surface-variant hover:text-secondary transition-colors group flex items-center justify-center rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+</div>
+<!-- Sign In Card -->
+<div class="w-full max-w-[440px] bg-surface-container-low border border-surface-container-high rounded-xl p-8 sm:p-10 shadow-2xl shadow-black/50 relative z-10 before:absolute before:top-0 before:inset-x-0 before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-secondary/50 before:to-transparent">
+<div class="mb-10 text-center sm:text-left">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Sign In</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Continue to your academic workspace.</p>
+</div>
+<form class="space-y-6" onsubmit="event.preventDefault();">
+<!-- Email Field -->
+<div class="flex flex-col gap-1 relative group">
+<label class="font-label-md text-label-md text-on-surface-variant group-focus-within:text-secondary transition-colors" for="email">
+                        Institutional Email
+                    </label>
+<div class="relative">
+<input class="academic-input w-full bg-surface text-on-surface border-0 border-b border-outline-variant focus:ring-0 focus:border-secondary px-0 py-3 font-body-md text-body-md transition-colors placeholder:text-surface-variant" id="email" name="email" placeholder="scholar@spims.edu" required="" type="email"/>
+<span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-secondary transition-colors pointer-events-none">
+                            mail
+                        </span>
+</div>
+</div>
+<!-- Password Field -->
+<div class="flex flex-col gap-1 relative group">
+<label class="font-label-md text-label-md text-on-surface-variant group-focus-within:text-secondary transition-colors" for="password">
+                        Passphrase
+                    </label>
+<div class="relative">
+<input class="academic-input w-full bg-surface text-on-surface border-0 border-b border-outline-variant focus:ring-0 focus:border-secondary px-0 py-3 font-body-md text-body-md transition-colors placeholder:text-surface-variant" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-secondary transition-colors pointer-events-none">
+                            key
+                        </span>
+</div>
+</div>
+<!-- Options Row -->
+<div class="flex items-center justify-between pt-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<div class="relative flex items-center justify-center">
+<input class="peer appearance-none w-4 h-4 border border-outline-variant rounded-sm bg-surface checked:bg-secondary checked:border-secondary focus:ring-1 focus:ring-secondary focus:ring-offset-1 focus:ring-offset-background transition-all" type="checkbox"/>
+<span class="material-symbols-outlined absolute text-on-secondary text-[14px] opacity-0 peer-checked:opacity-100 pointer-events-none" style="font-variation-settings: 'FILL' 1;">
+                                check
+                            </span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface transition-colors">
+                            Remember Me
+                        </span>
+</label>
+<a class="font-label-md text-label-md text-secondary hover:text-on-secondary-container transition-colors focus:outline-none focus:underline underline-offset-4" href="#">
+                        Forgot Password?
+                    </a>
+</div>
+<!-- Submit Action -->
+<div class="pt-6">
+<button class="w-full flex items-center justify-center gap-2 bg-secondary text-on-secondary py-3 px-6 rounded-lg font-label-md text-label-md hover:bg-secondary-fixed active:scale-[0.98] transition-all shadow-[0_4px_14px_rgba(233,193,109,0.1)] hover:shadow-[0_6px_20px_rgba(233,193,109,0.15)]" type="submit">
+<span>Sign In</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</form>
+<div class="mt-8 text-center border-t border-outline-variant/30 pt-6">
+<p class="font-label-md text-label-md text-on-surface-variant">
+                    New to the archives? 
+                    <a class="text-secondary hover:text-on-secondary-container transition-colors ml-1" href="#">Request Access</a>
+</p>
+</div>
+</div>
+</div>
+</body></html>

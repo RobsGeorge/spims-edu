@@ -41,9 +41,13 @@ class ThemeEditorController extends Controller
             'tokens.light.primary' => 'nullable|string|max:32',
             'tokens.light.bg1' => 'nullable|string|max:32',
             'tokens.light.accent' => 'nullable|string|max:32',
+            'tokens.light.surface' => 'nullable|string|max:32',
+            'tokens.light.textMuted' => 'nullable|string|max:32',
             'tokens.dark.primary' => 'nullable|string|max:32',
             'tokens.dark.bg1' => 'nullable|string|max:32',
             'tokens.dark.accent' => 'nullable|string|max:32',
+            'tokens.dark.surface' => 'nullable|string|max:32',
+            'tokens.dark.textMuted' => 'nullable|string|max:32',
         ]);
 
         if (isset($data['tokens']) && is_array($data['tokens'])) {

@@ -32,6 +32,17 @@ return [
     'theme.manage' => [
         'ADMINISTRATIVE_ADMIN' => 'F',
     ],
+    'help.manage' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'help.view' => [
+        'ADMINISTRATIVE_ADMIN' => 'R',
+        'ACADEMIC_ADMIN' => 'R',
+        'FINANCIAL_ADMIN' => 'R',
+        'INSTRUCTOR' => 'R',
+        'TA' => 'R',
+        'STUDENT' => 'R',
+    ],
     'foundation.demo' => [
         'ACADEMIC_ADMIN' => 'F',
     ],

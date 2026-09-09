@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims - تعيين كلمة المرور</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#003415",
+                        "surface-tint": "#a03b57",
+                        "background": "#f8f9ff",
+                        "primary-fixed": "#ffd9df",
+                        "outline": "#887175",
+                        "secondary": "#785a02",
+                        "on-secondary-container": "#795a03",
+                        "on-tertiary-container": "#6d9f76",
+                        "secondary-fixed": "#ffdf9c",
+                        "primary-fixed-dim": "#d4af37",
+                        "surface-container-highest": "#d3e3ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#3f0017",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#001d09",
+                        "surface-dim": "#cbdbf6",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "on-primary-fixed-variant": "#812340",
+                        "primary": "#380014",
+                        "surface-container-low": "#eff4ff",
+                        "outline-variant": "#dbc0c4",
+                        "on-tertiary-fixed": "#00210b",
+                        "inverse-on-surface": "#ebf1ff",
+                        "inverse-surface": "#213146",
+                        "on-primary-container": "#e26f8b",
+                        "error": "#ba1a1a",
+                        "on-background": "#0b1c30",
+                        "inverse-primary": "#ffb1c1",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "on-secondary-fixed": "#251a00",
+                        "surface-container": "#e6eeff",
+                        "secondary-fixed-dim": "#eac166",
+                        "secondary-container": "#ffd578",
+                        "tertiary-fixed": "#bbefc1",
+                        "surface-bright": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "on-surface": "#0b1c30",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#554245",
+                        "surface-variant": "#d3e3ff",
+                        "surface": "#f8f9ff",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#dde9ff",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#5d0326"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sidebar-width": "280px",
+                        "container-max": "1440px",
+                        "md": "1rem",
+                        "lg": "1.5rem",
+                        "xl": "2rem",
+                        "xs": "0.25rem",
+                        "gutter": "24px",
+                        "sm": "0.5rem",
+                        "2xl": "3rem"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Cairo", "sans-serif"],
+                        "label-md": ["Cairo", "sans-serif"],
+                        "headline-lg": ["Cairo", "sans-serif"],
+                        "headline-md": ["Cairo", "sans-serif"],
+                        "body-lg": ["Cairo", "sans-serif"],
+                        "label-sm": ["Cairo", "sans-serif"],
+                        "display-lg": ["Cairo", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen font-body-md text-on-background flex flex-col antialiased">
+<!-- Top Navigation (Reduced for Transactional Screen) -->
+<nav class="bg-transparent flex justify-between items-center px-lg py-md w-full absolute top-0 z-50">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Spims</div>
+<div class="flex items-center gap-sm">
+<button aria-label="Help" class="p-2 rounded-full hover:bg-surface-container-low transition-colors scale-95 active:duration-100 text-primary dark:text-inverse-primary">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button aria-label="Language" class="p-2 rounded-full hover:bg-surface-container-low transition-colors scale-95 active:duration-100 text-primary dark:text-inverse-primary">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+</div>
+</nav>
+<main class="flex-grow flex flex-col md:flex-row min-h-screen">
+<!-- Left Side: Interactive Content Canvas -->
+<section class="flex-1 flex flex-col justify-center items-center p-md md:p-xl bg-background mt-[72px] md:mt-0 relative z-10 w-full md:w-1/2">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-xl shadow-soft border border-outline-variant/30 p-lg md:p-xl flex flex-col gap-xl">
+<header class="flex flex-col gap-sm text-center">
+<h1 class="font-headline-lg text-headline-lg text-primary">إعداد كلمة المرور</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">الرجاء إدخال كلمة مرور قوية لتأمين حسابك الأكاديمي.</p>
+</header>
+<form class="flex flex-col gap-lg">
+<!-- Password Input -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="new-password">كلمة المرور الجديدة</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded p-md pr-[48px] focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors rtl:pl-[48px] rtl:pr-md" id="new-password" placeholder="••••••••" type="password"/>
+<button aria-label="Toggle password visibility" class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors focus:outline-none" type="button">
+<span class="material-symbols-outlined" data-icon="visibility_off">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Password Strength Meter (Static for UI layout) -->
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant">قوة كلمة المرور</span>
+<span class="font-label-sm text-label-sm text-on-tertiary-container">متوسطة</span>
+</div>
+<div class="flex gap-xs w-full h-2">
+<div class="flex-1 bg-tertiary-container rounded-full"></div>
+<div class="flex-1 bg-secondary-container rounded-full"></div>
+<div class="flex-1 bg-surface-variant rounded-full"></div>
+</div>
+</div>
+<!-- Confirm Password Input -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="confirm-password">تأكيد كلمة المرور</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded p-md pr-[48px] focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors rtl:pl-[48px] rtl:pr-md" id="confirm-password" placeholder="••••••••" type="password"/>
+<button aria-label="Toggle password visibility" class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors focus:outline-none" type="button">
+<span class="material-symbols-outlined" data-icon="visibility_off">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Rules Checklist -->
+<ul class="flex flex-col gap-xs">
+<li class="flex items-center gap-sm font-label-sm text-label-sm text-on-tertiary-container">
+<span class="material-symbols-outlined text-[16px]" data-icon="check_circle" data-weight="fill">check_circle</span>
+                            8 أحرف على الأقل
+                        </li>
+<li class="flex items-center gap-sm font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+                            حرف كبير واحد على الأقل
+                        </li>
+<li class="flex items-center gap-sm font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+                            رقم واحد على الأقل
+                        </li>
+<li class="flex items-center gap-sm font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+                            رمز خاص واحد على الأقل (!@#$%)
+                        </li>
+</ul>
+<!-- Submit Button -->
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-md rounded-full shadow-soft hover:-translate-y-[1px] hover:shadow-lg transition-all active:scale-95 mt-sm" type="submit">
+                        تعيين كلمة المرور
+                    </button>
+</form>
+</div>
+</section>
+<!-- Right Side: Brand Panel (Hidden on mobile) -->
+<aside class="hidden md:flex flex-col justify-between items-center w-1/2 bg-primary relative overflow-hidden">
+<!-- Background Image with Overlay -->
+<div class="absolute inset-0 z-0">
+<img alt="صورة خلفية معمارية أكاديمية" class="w-full h-full object-cover mix-blend-overlay opacity-30" data-alt="A striking architectural detail of a prestigious academic building, showcasing classic arches and intricate stonework bathed in warm, dappled sunlight. The scene is imbued with a sense of tradition and academic excellence, filtered through a sophisticated burgundy and deep red color palette indicative of a refined institutional brand identity. High-contrast lighting highlights the textures of the stone, creating a majestic and authoritative atmosphere suitable for a premium educational platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6Uk2Jb6gDLy7gDW8PSmRa5JrNWIFm6eZ2VAxCv70NIunXsD-QhDsbSAlWiNK0XqE9-zxTUpThG9tgy3uzZThIqQGJgEQmrd7AYSK9OxV83nxBjnMdH1HXdUib-04K4AMBZdXW2gB_Q5RZOu-PZY_9Dfxc77FVTfUVbjFUl8ia0h1n0oJ-saFBHfskilXaj4Ke-jgkiqowQAe6U6ILkhKwkQPomfgJJaKZDs4R1DHVuOTLH54BshN-5qQnGRXG0FwqY4FAhJ0EDV17"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-transparent"></div>
+</div>
+<!-- Content overlay -->
+<div class="relative z-10 flex flex-col justify-center items-center h-full p-xl text-center text-on-primary max-w-lg">
+<!-- Coptic Motif Placeholder (SVG or graphic element) -->
+<div class="w-32 h-32 mb-xl opacity-80 rounded-full border-4 border-primary-fixed-dim flex items-center justify-center">
+<span class="material-symbols-outlined text-[64px] text-primary-fixed-dim" data-icon="school">school</span>
+</div>
+<h2 class="font-display-lg text-display-lg font-bold mb-md">بوابة المعرفة</h2>
+<p class="font-body-lg text-body-lg opacity-90 leading-relaxed">
+                    نظام إدارة المعلومات الأكاديمية المقدسة. منصتك الموثوقة للتميز الأكاديمي والبحث العلمي المستدام.
+                </p>
+</div>
+<div class="relative z-10 pb-xl opacity-70 font-label-sm text-label-sm text-on-primary">
+                © 2024 Spims Academic. All rights reserved.
+            </div>
+</aside>
+</main>
+<script>
+        // Simple client-side interaction script (optional enhancement)
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleButtons = document.querySelectorAll('button[aria-label="Toggle password visibility"]');
+            
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const input = this.previousElementSibling;
+                    const icon = this.querySelector('.material-symbols-outlined');
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.textContent = 'visibility';
+                        icon.setAttribute('data-icon', 'visibility');
+                    } else {
+                        input.type = 'password';
+                        icon.textContent = 'visibility_off';
+                        icon.setAttribute('data-icon', 'visibility_off');
+                    }
+                });
+            });
+        });
+    </script>
+</body></html>

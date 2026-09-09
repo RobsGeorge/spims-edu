@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html class="light" dir="ltr" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Course Catalog - Sacred Academic</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#dbc0c4",
+                        "background": "#f8f9ff",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "on-tertiary-fixed": "#00210b",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "on-surface-variant": "#554245",
+                        "surface-tint": "#a03b57",
+                        "on-background": "#0b1c30",
+                        "on-surface": "#0b1c30",
+                        "surface-dim": "#cbdbf6",
+                        "primary-fixed": "#ffd9df",
+                        "on-secondary-fixed": "#251a00",
+                        "on-secondary-container": "#795a03",
+                        "primary-container": "#5d0326",
+                        "inverse-surface": "#213146",
+                        "inverse-on-surface": "#ebf1ff",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#3f0017",
+                        "surface-container-high": "#dde9ff",
+                        "tertiary-container": "#003415",
+                        "surface-container-highest": "#d3e3ff",
+                        "primary-fixed-dim": "#ffb1c1",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e6eeff",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#ffb1c1",
+                        "surface": "#f8f9ff",
+                        "outline": "#887175",
+                        "secondary-fixed-dim": "#eac166",
+                        "secondary-fixed": "#ffdf9c",
+                        "secondary-container": "#ffd578",
+                        "primary": "#380014",
+                        "on-primary-fixed-variant": "#812340",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#001d09",
+                        "tertiary-fixed": "#bbefc1",
+                        "on-tertiary-container": "#6d9f76",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "on-primary-container": "#e26f8b",
+                        "error-container": "#ffdad6",
+                        "secondary": "#785a02",
+                        "surface-bright": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#d3e3ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1440px",
+                        "2xl": "3rem",
+                        "lg": "1.5rem",
+                        "gutter": "24px",
+                        "sm": "0.5rem",
+                        "sidebar-width": "280px",
+                        "xs": "0.25rem",
+                        "xl": "2rem",
+                        "md": "1rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pulse-bg {
+            background: linear-gradient(90deg, var(--tw-colors-surface-container) 25%, var(--tw-colors-surface-container-high) 50%, var(--tw-colors-surface-container) 75%);
+            background-size: 200% 100%;
+            animation: pulse-shimmer 1.5s infinite linear;
+        }
+        @keyframes pulse-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-low dark:bg-surface-container-low font-label-md text-label-md h-screen w-sidebar-width sticky top-0 rtl:right-0 ltr:left-0 border-r border-outline-variant/30 rtl:border-l rtl:border-r-0 flex flex-col h-full py-lg hidden md:flex z-40">
+<div class="px-gutter mb-xl flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold">
+<span class="material-symbols-outlined" data-icon="school" data-weight="fill" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-black text-primary">Sacred Academic</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Portal v2.0</p>
+</div>
+</div>
+<ul class="flex flex-col gap-sm flex-1 overflow-y-auto px-sm">
+<li>
+<a class="flex items-center gap-md py-md px-md text-on-surface-variant hover:bg-surface-container-high mx-2 rounded-lg hover:bg-surface-container-highest transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Dashboard
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md py-md px-md text-on-surface-variant hover:bg-surface-container-high mx-2 rounded-lg hover:bg-surface-container-highest transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+                    My Courses
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md py-md px-md bg-primary text-on-primary rounded-lg mx-2 hover:bg-surface-container-highest transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="import_contacts">import_contacts</span>
+                    Catalog
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md py-md px-md text-on-surface-variant hover:bg-surface-container-high mx-2 rounded-lg hover:bg-surface-container-highest transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+                    Schedule
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md py-md px-md text-on-surface-variant hover:bg-surface-container-high mx-2 rounded-lg hover:bg-surface-container-highest transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    Settings
+                </a>
+</li>
+</ul>
+<div class="px-sm mt-auto">
+<button class="w-[calc(100%-1rem)] mx-2 py-md px-md rounded-lg border border-outline-variant text-primary font-label-md flex items-center justify-center gap-sm hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                Support Center
+            </button>
+<a class="flex items-center gap-md py-md px-md mt-sm text-on-surface-variant hover:bg-surface-container-high mx-2 rounded-lg hover:bg-surface-container-highest transition-all active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-lowest font-body-md text-body-md w-full sticky top-0 z-50 border-b border-outline-variant/30 shadow-soft flex items-center justify-between px-gutter py-md w-full md:hidden">
+<div class="flex items-center gap-sm">
+<h2 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Sacred Academic</h2>
+</div>
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<img alt="User profile avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant/30" data-alt="A close-up portrait of a professional individual in a brightly lit, modern environment, symbolizing a user profile avatar in a clean, sophisticated digital interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjTt08vPKHH36-s8XU4C7HOKHoso8KWLE1M4K84Uv4o5yCq-IvyVXaG9p_5SN_67g7VCx4z26p0j9VHfgHX974vCz1D0QEIWwcviDyYZv5ezM9PE-zeecr8BVPvQ7b46BFIQS8Av21jY5PJ_GBAl0Gev4ywpZ7PnDgIo3ckbMhiJ0-2m_i-HcH__TEb4z_UC3kp2DEy435A9TsORmR4weC0f21nWpXgDqjMWmkicYpl1JnbSCUqi5dPHuPc5caIpBtdvmylxs34W77"/>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto bg-surface">
+<div class="max-w-[container-max] mx-auto w-full px-gutter py-xl">
+<div class="mb-xl">
+<h1 class="font-headline-lg text-headline-lg text-on-background mb-sm">Course Catalog</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Explore our comprehensive academic offerings.</p>
+</div>
+<!-- Filters Simulation (Static) -->
+<div class="bg-surface-container-lowest rounded-DEFAULT border border-outline-variant/30 shadow-soft p-lg mb-xl flex flex-wrap gap-md items-center">
+<div class="relative flex-1 min-w-[250px]">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full pl-xl pr-md py-md rounded-DEFAULT border border-outline-variant bg-surface text-on-surface focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all font-body-md disabled:opacity-50" disabled="" placeholder="Search courses..." type="text" value="Advanced Coptic Studies"/>
+</div>
+<div class="flex gap-sm">
+<select class="py-md px-md rounded-DEFAULT border border-outline-variant bg-surface text-on-surface font-body-md focus:ring-1 focus:ring-primary focus:border-primary outline-none disabled:opacity-50" disabled="">
+<option>Department: Theology</option>
+</select>
+<select class="py-md px-md rounded-DEFAULT border border-outline-variant bg-surface text-on-surface font-body-md focus:ring-1 focus:ring-primary focus:border-primary outline-none disabled:opacity-50" disabled="">
+<option>Level: Graduate</option>
+</select>
+<button class="bg-primary text-on-primary font-label-md py-md px-lg rounded-full hover:shadow-soft active:scale-95 transition-all flex items-center gap-sm disabled:opacity-50">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+                            Filter
+                        </button>
+</div>
+</div>
+<!-- Split View Container -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-2xl">
+<!-- View 1: Loading Skeleton -->
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Loading State</h2>
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm px-sm py-xs rounded-full">Simulating network</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-lg">
+<!-- Skeleton Card 1 -->
+<div class="bg-surface-container-lowest rounded-DEFAULT border border-outline-variant/30 shadow-soft overflow-hidden flex flex-col h-full">
+<div class="h-40 w-full pulse-bg"></div>
+<div class="p-lg flex flex-col flex-1 gap-md">
+<div class="h-6 w-3/4 rounded-full pulse-bg"></div>
+<div class="h-4 w-1/4 rounded-full pulse-bg mb-sm"></div>
+<div class="space-y-2 mt-auto">
+<div class="h-4 w-full rounded-full pulse-bg"></div>
+<div class="h-4 w-5/6 rounded-full pulse-bg"></div>
+<div class="h-4 w-4/6 rounded-full pulse-bg"></div>
+</div>
+<div class="flex gap-sm mt-md">
+<div class="h-10 w-24 rounded-full pulse-bg"></div>
+<div class="h-10 w-10 rounded-full pulse-bg"></div>
+</div>
+</div>
+</div>
+<!-- Skeleton Card 2 -->
+<div class="bg-surface-container-lowest rounded-DEFAULT border border-outline-variant/30 shadow-soft overflow-hidden flex flex-col h-full">
+<div class="h-40 w-full pulse-bg"></div>
+<div class="p-lg flex flex-col flex-1 gap-md">
+<div class="h-6 w-2/3 rounded-full pulse-bg"></div>
+<div class="h-4 w-1/3 rounded-full pulse-bg mb-sm"></div>
+<div class="space-y-2 mt-auto">
+<div class="h-4 w-full rounded-full pulse-bg"></div>
+<div class="h-4 w-4/5 rounded-full pulse-bg"></div>
+<div class="h-4 w-1/2 rounded-full pulse-bg"></div>
+</div>
+<div class="flex gap-sm mt-md">
+<div class="h-10 w-24 rounded-full pulse-bg"></div>
+<div class="h-10 w-10 rounded-full pulse-bg"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- View 2: Empty State -->
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Empty State</h2>
+<span class="bg-error-container text-on-error-container font-label-sm px-sm py-xs rounded-full border border-outline-variant/30">0 Results</span>
+</div>
+<div class="bg-surface-container-lowest rounded-DEFAULT border border-outline-variant/30 shadow-soft flex-1 flex items-center justify-center p-2xl text-center min-h-[400px]">
+<div class="flex flex-col items-center max-w-sm">
+<!-- Abstract Academic/Coptic inspired icon representation -->
+<div class="w-32 h-32 mb-xl relative flex items-center justify-center opacity-80">
+<div class="absolute inset-0 bg-primary-container rounded-full opacity-10"></div>
+<div class="absolute w-24 h-24 border-2 border-primary/20 rounded-full"></div>
+<div class="absolute w-16 h-16 border-2 border-primary/40 rotate-45"></div>
+<span class="material-symbols-outlined text-6xl text-primary" data-icon="search_off" style="font-variation-settings: 'wght' 300;">search_off</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-background mb-sm">No courses found</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl">
+                                    We couldn't find any courses matching "Advanced Coptic Studies" in the Theology department. Try adjusting your filters or search terms.
+                                </p>
+<button class="bg-primary text-on-primary font-label-md py-md px-xl rounded-full hover:shadow-soft active:scale-95 transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined" data-icon="restart_alt">restart_alt</span>
+                                    Reset Filters
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest font-label-sm text-label-sm w-full py-xl border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center px-gutter gap-md mt-auto">
+<div class="font-label-md text-label-md font-bold text-on-surface-variant">
+                    © 2024 Sacred Academic. All rights reserved.
+                </div>
+<ul class="flex flex-wrap gap-md items-center">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Accessibility</a></li>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Support</a></li>
+</ul>
+</footer>
+</main>
+</div>
+</body></html>

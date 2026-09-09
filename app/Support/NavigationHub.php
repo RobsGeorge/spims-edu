@@ -118,7 +118,7 @@ class NavigationHub
                 'label' => __('hubs.nav_admin'),
                 'route' => 'hubs.admin',
                 'icon' => 'bi-gear',
-                'active' => request()->routeIs('hubs.admin') || request()->routeIs('admin.users.*') || request()->routeIs('admin.applications.*') || request()->routeIs('admin.enrollments.*'),
+                'active' => request()->routeIs('hubs.admin') || request()->routeIs('admin.users.*') || request()->routeIs('admin.applications.*') || request()->routeIs('admin.enrollments.*') || request()->routeIs('admin.help.*'),
             ];
         }
 
@@ -139,6 +139,13 @@ class NavigationHub
             ];
         }
 
+
+        $items[] = [
+            'label' => __('help.nav'),
+            'route' => 'help.index',
+            'icon' => 'bi-question-circle',
+            'active' => request()->routeIs('help.*'),
+        ];
         return array_values(array_filter($items, fn (array $item): bool => Route::has($item['route'])));
     }
 
@@ -200,6 +207,7 @@ class NavigationHub
             self::link('notifications.index', 'hubs.notifications', 'bi-bell', 'hubs.notifications_desc'),
             self::link('announcements.index', 'hubs.announcements', 'bi-megaphone', 'hubs.announcements_desc'),
             self::link('settings.notifications.edit', 'hubs.notification_settings', 'bi-sliders', 'hubs.notification_settings_desc'),
+            self::link('help.index', 'help.support_tile', 'bi-question-circle', 'help.support_tile_desc'),
         ]));
     }
 
@@ -228,6 +236,7 @@ class NavigationHub
             self::link('admin.certificate-templates.index', 'hubs.certificate_templates', 'bi-award', 'hubs.certificate_templates_desc'),
             self::link('admin.surveys.index', 'staff.surveys.hub', 'bi-clipboard-data', 'staff.surveys.hub_desc'),
             self::link('admin.reports.index', 'hubs.reports', 'bi-file-earmark-bar-graph', 'hubs.reports_desc'),
+            self::link('help.index', 'help.support_tile', 'bi-question-circle', 'help.support_tile_desc'),
         ]));
     }
 
@@ -247,9 +256,11 @@ class NavigationHub
             self::link('admin.theme.edit', 'hubs.theme', 'bi-palette', 'hubs.theme_desc'),
             self::link('admin.application-forms.index', 'hubs.app_forms', 'bi-ui-checks', 'hubs.app_forms_desc'),
             self::link('admin.applications.index', 'hubs.applications', 'bi-inbox', 'hubs.applications_desc'),
+            self::link('admin.help.index', 'hubs.help_center', 'bi-journal-richtext', 'hubs.help_center_desc'),
             self::link('admin.communications.report', 'hubs.communications', 'bi-envelope-paper', 'hubs.communications_desc'),
             self::link('admin.events.index', 'staff.events.hub', 'bi-calendar-event', 'staff.events.hub_desc'),
             self::link('admin.reports.index', 'hubs.reports', 'bi-file-earmark-bar-graph', 'hubs.reports_desc'),
+            self::link('help.index', 'help.support_tile', 'bi-question-circle', 'help.support_tile_desc'),
         ]));
     }
 
@@ -268,6 +279,8 @@ class NavigationHub
             $links[] = self::link('admin.finance.reports', 'hubs.finance_reports', 'bi-graph-up', 'hubs.finance_reports_desc');
             $links[] = self::link('admin.reports.index', 'hubs.reports', 'bi-file-earmark-bar-graph', 'hubs.reports_desc');
         }
+
+        $links[] = self::link('help.index', 'help.support_tile', 'bi-question-circle', 'help.support_tile_desc');
 
         return array_values(array_filter($links));
     }

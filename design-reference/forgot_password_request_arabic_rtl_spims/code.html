@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims - استعادة الوصول</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts for Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#dbc0c4",
+                        "on-primary-fixed": "#3f0017",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#a03b57",
+                        "on-surface-variant": "#554245",
+                        "on-secondary-fixed": "#251a00",
+                        "inverse-surface": "#213146",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#eac166",
+                        "surface-bright": "#f8f9ff",
+                        "background": "#f8f9ff",
+                        "surface-dim": "#cbdbf6",
+                        "on-error": "#ffffff",
+                        "primary": "#380014",
+                        "on-tertiary-container": "#6d9f76",
+                        "primary-fixed": "#ffd9df",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "on-primary-container": "#e26f8b",
+                        "surface-container-high": "#dde9ff",
+                        "tertiary-fixed": "#bbefc1",
+                        "tertiary-container": "#003415",
+                        "on-background": "#0b1c30",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "secondary-container": "#ffd578",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffdf9c",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#d3e3ff",
+                        "surface-container-low": "#eff4ff",
+                        "primary-fixed-dim": "#ffb1c1",
+                        "on-surface": "#0b1c30",
+                        "inverse-on-surface": "#ebf1ff",
+                        "primary-container": "#5d0326",
+                        "surface": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#e6eeff",
+                        "on-secondary-container": "#795a03",
+                        "on-primary-fixed-variant": "#812340",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#d3e3ff",
+                        "outline": "#887175",
+                        "on-tertiary-fixed": "#00210b",
+                        "tertiary": "#001d09",
+                        "inverse-primary": "#ffb1c1",
+                        "secondary": "#785a02",
+                        "tertiary-fixed-dim": "#9fd3a6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "0.25rem",
+                        "gutter": "24px",
+                        "md": "1rem",
+                        "2xl": "3rem",
+                        "sidebar-width": "280px",
+                        "xl": "2rem",
+                        "lg": "1.5rem",
+                        "container-max": "1440px",
+                        "sm": "0.5rem"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .shadow-soft {
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        /* Ensure Material Symbols render correctly */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col md:flex-row antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Brand Panel (Renders on Right in RTL due to DOM order + flex-row) -->
+<aside class="hidden md:flex md:w-5/12 lg:w-1/2 relative bg-primary-container overflow-hidden items-center justify-center p-xl">
+<!-- Background Image with Overlay -->
+<div class="absolute inset-0 z-0">
+<img alt="Brand background" class="w-full h-full object-cover opacity-30 mix-blend-multiply" data-alt="A striking architectural perspective of a modern, prestigious university campus library bathed in soft, high-key morning light. The composition emphasizes clean, minimalist lines, geometric structural elements, and a sense of institutional authority and academic excellence. The color palette is composed of deep blacks, pristine whites, and subtle, sophisticated tonal shifts, creating a calm, authoritative, yet accessible atmosphere reflecting a premium digital experience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtIPacBHDG6zuwh9bFExijUxnhhix6b4bU4UNoF9ZU676abZkL2qa161A7MMgtdm1Yoe-uXwiNOAqG32A_PIHnytuxBXySX9qJTHk6b6X1MGd8rxDwT_hctFf3ticTFOpQj5-XGmjVf9MlAinOKEwMhDgN4q0753Wn6s_DWlE0u6FFy2SUuuvLpMzmx7Tg7vpNqGkAXXC4Xl5bizx0WhRv_Zab2CPTNq4zImBX5A7pauTFDqg1K3yZdZ_ZOQ04_LqG8Ees5-4pxB00"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-primary/40"></div>
+</div>
+<!-- Brand Content -->
+<div class="relative z-10 text-center flex flex-col items-center gap-md">
+<div class="w-20 h-20 bg-surface-container-lowest rounded-DEFAULT shadow-soft flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">
+                    school
+                </span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-primary font-bold tracking-tight">
+                Spims
+            </h1>
+<div class="h-px w-16 bg-on-primary/30 my-sm"></div>
+<h2 class="font-headline-md text-headline-md text-primary-fixed-dim">
+                استعادة الوصول
+            </h2>
+</div>
+</aside>
+<!-- Content Panel (Renders on Left in RTL) -->
+<main class="flex-1 flex flex-col justify-center items-center p-md md:p-xl relative z-10">
+<!-- Mobile Logo (Visible only on small screens) -->
+<div class="md:hidden flex flex-col items-center gap-sm mb-xl">
+<div class="w-16 h-16 bg-surface-container-lowest rounded-DEFAULT shadow-soft flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl text-primary" style="font-variation-settings: 'FILL' 1;">
+                    school
+                </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary font-bold">
+                Spims
+            </h1>
+<h2 class="font-label-md text-label-md text-on-surface-variant">
+                استعادة الوصول
+            </h2>
+</div>
+<!-- Request Form Card -->
+<div class="w-full max-w-[440px] bg-surface-container-lowest rounded-lg p-lg md:p-xl shadow-soft border border-outline-variant/30 relative overflow-hidden">
+<!-- Subtle decorative top accent -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-primary"></div>
+<div class="mb-xl">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">
+                    نسيت كلمة المرور؟
+                </h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    لا تقلق، أدخل عنوان بريدك الإلكتروني المرتبط بحسابك وسنرسل لك رابطاً لإعادة تعيين كلمة المرور بشكل آمن.
+                </p>
+</div>
+<form action="#" class="flex flex-col gap-lg" method="POST">
+<!-- Email Input -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="email">
+                        البريد الإلكتروني
+                    </label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute right-4 text-on-surface-variant pointer-events-none">
+                            mail
+                        </span>
+<input class="w-full bg-surface-container-low border border-outline-variant text-on-surface font-body-md text-body-md rounded-DEFAULT py-3 pr-12 pl-4 focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-outline outline-none" dir="ltr" id="email" name="email" placeholder="name@example.com" required="" style="text-align: right;" type="email"/>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex flex-col gap-md mt-sm">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-3 px-xl rounded-full hover:bg-primary-container hover:text-on-primary-container active:scale-95 transition-all duration-100 flex items-center justify-center gap-2 shadow-sm" type="submit">
+                        إرسال رابط إعادة التعيين
+                        <span class="material-symbols-outlined text-[18px]">
+                            send
+                        </span>
+</button>
+<a class="w-full flex items-center justify-center gap-2 py-3 font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform rtl:group-hover:translate-x-1">
+                            arrow_forward
+                        </span>
+                        العودة لتسجيل الدخول
+                    </a>
+</div>
+</form>
+</div>
+<!-- Subtle Footer for form area -->
+<div class="mt-xl text-center">
+<p class="font-label-sm text-label-sm text-outline">
+                بطلبك لإعادة تعيين كلمة المرور، أنت توافق على سياسات الأمان الخاصة بـ Spims.
+            </p>
+</div>
+</main>
+</body></html>

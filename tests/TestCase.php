@@ -6,11 +6,21 @@ use App\Enums\OfferingStaffRole;
 use App\Models\CourseOffering;
 use App\Models\OfferingStaff;
 use App\Models\User;
+use App\Support\AuthorizeService;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // role_permissions matrix is cached statically; RefreshDatabase can leave a
+        // stale grant set from a prior test (e.g. RolesHub stripping STUDENT keys).
+        app(AuthorizeService::class)->forgetMatrixCache();
+    }
 
     /**
      * Staff a user on an offering.

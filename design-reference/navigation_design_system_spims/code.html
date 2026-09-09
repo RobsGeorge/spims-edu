@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="light" dir="ltr" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Navigation Architecture - Spims Design System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#785a02",
+                        "surface-container": "#e5eeff",
+                        "on-primary-fixed-variant": "#812340",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "danger": "#EF4444",
+                        "outline": "#887175",
+                        "outline-variant": "#dbc0c4",
+                        "inverse-surface": "#213145",
+                        "warning": "#F59E0B",
+                        "primary-fixed": "#ffd9df",
+                        "surface-tint": "#a03b57",
+                        "tertiary-container": "#003323",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "background": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#251a00",
+                        "on-secondary-container": "#795a03",
+                        "error": "#ba1a1a",
+                        "tertiary": "#001c12",
+                        "surface": "#f8f9ff",
+                        "secondary-fixed-dim": "#eac166",
+                        "on-background": "#0b1c30",
+                        "success": "#10B981",
+                        "primary": "#380014",
+                        "on-tertiary-container": "#6f9d87",
+                        "on-surface-variant": "#554245",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-primary-fixed": "#3f0017",
+                        "on-tertiary-fixed": "#002115",
+                        "surface-bg": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "tertiary-fixed-dim": "#a1d1b9",
+                        "secondary-fixed": "#ffdf9c",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#ffb1c1",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#224f3d",
+                        "secondary-container": "#ffd578",
+                        "primary-fixed-dim": "#ffb1c1",
+                        "primary-container": "#5d0326",
+                        "on-primary-container": "#e26f8b",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-surface": "#0b1c30",
+                        "tertiary-fixed": "#bdedd5",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container-high": "#dce9ff",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "2xl": "3rem",
+                        "xs": "0.25rem",
+                        "md": "1rem",
+                        "gutter": "24px",
+                        "xl": "2rem",
+                        "sm": "0.5rem",
+                        "container-max": "1440px",
+                        "lg": "1.5rem",
+                        "sidebar-width": "280px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .shadow-soft {
+            box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex font-body-md text-body-md">
+<!-- SideNavBar -->
+<nav class="hidden lg:flex flex-col h-full border-r border-outline-variant/30 p-md bg-surface-container-low dark:bg-surface-container-lowest docked fixed left-0 w-sidebar-width z-40">
+<div class="flex items-center gap-sm mb-xl px-sm pt-sm">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-body-md">menu_book</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed-dim">Spims Design System</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">v2.4.0 (Stable)</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-xs">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container transition-all active:scale-95 duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="smart_button">smart_button</span>
+                        Buttons
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container transition-all active:scale-95 duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="toggle_on">toggle_on</span>
+                        Controls
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-lg transition-all active:scale-95 duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="menu" data-weight="fill" style="font-variation-settings: 'FILL' 1;">menu</span>
+                        Navigation
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container transition-all active:scale-95 duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+                        Feedback
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container transition-all active:scale-95 duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+                        Layout
+                    </a>
+</li>
+</ul>
+</div>
+<div class="mt-auto pt-xl border-t border-outline-variant/30">
+<ul class="space-y-xs">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container transition-all active:scale-95 duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                        Settings
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-outline hover:bg-surface-container-high dark:hover:bg-surface-container transition-all active:scale-95 duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                        Support
+                    </a>
+</li>
+</ul>
+<div class="mt-md px-sm">
+<button class="w-full py-sm px-md rounded bg-primary text-on-primary font-label-md text-label-md hover:bg-primary/90 transition-colors duration-200 active:scale-95">
+                    View Documentation
+                </button>
+</div>
+<div class="mt-md flex items-center gap-sm px-sm">
+<img alt="System Operator" class="w-8 h-8 rounded-full border border-outline-variant/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWNCsqiEEXDlLSlYpC2lG-9_eQVHWFUNtKEU13jaWozI1MFdJeVaBwtmkY8XCWYNV9SjzJ6qp4YI4xxXeXooRuDtRbbmn_-4RygVPxRiGDSR0DMSSXzzZ4TMBVO_ZoPoHs13MhPhVIQc7FYg2TaEOXpN5kWZpA5C-8Ctfy9YUH6GFRBveT_DLkrB1u5pw1ATKZ9HbwPGV3FDnyvEOJFE4yb_HlkHIq9_a7X-ugeSgzw7irKFMCb8oIVeln9eN0uqlTJbDB-R-Ynx4s"/>
+<span class="font-label-sm text-label-sm text-on-surface">System Operator</span>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-[280px] min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-low docked full-width top-0 shadow-soft sticky z-30">
+<div class="w-full flex justify-between items-center px-gutter py-md max-w-container-max mx-auto">
+<div class="flex items-center gap-xl">
+<a class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim lg:hidden" href="#">
+                        Spims
+                    </a>
+<nav class="hidden md:flex gap-xl">
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 active:scale-95" href="#">Reference</a>
+<a class="font-body-md text-body-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 active:scale-95 transition-transform duration-200" href="#">Components</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 active:scale-95" href="#">Patterns</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 active:scale-95" href="#">Guidelines</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-body-md">search</span>
+<input class="pl-xl pr-md py-sm rounded-xl border border-outline-variant/50 bg-surface focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none font-body-sm text-body-sm w-64 transition-all duration-200" placeholder="Search documentation..." type="text"/>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hidden sm:block px-md py-sm rounded border border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-colors duration-200 active:scale-95">
+                        Download SDK
+                    </button>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 p-gutter max-w-container-max mx-auto w-full">
+<div class="mb-2xl pt-xl">
+<nav aria-label="Breadcrumb" class="flex text-on-surface-variant font-label-sm text-label-sm mb-sm">
+<ol class="inline-flex items-center space-x-1 md:space-x-3">
+<li class="inline-flex items-center">
+<a class="hover:text-primary transition-colors" href="#">Components</a>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-body-sm mx-xs">chevron_right</span>
+<span class="text-on-surface font-label-md text-label-md">Navigation</span>
+</div>
+</li>
+</ol>
+</nav>
+<h1 class="font-display-lg text-display-lg text-primary mb-sm">Navigation Architecture</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">
+                    The structural backbone of the Spims interface. Navigation components are designed to provide clear, hierarchical wayfinding while maintaining the 'Sacred Academic' minimal aesthetic.
+                </p>
+</div>
+<!-- Bento Grid Layout for Examples -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-2xl">
+<!-- Breadcrumbs Card -->
+<div class="lg:col-span-12 bg-surface-container-lowest rounded-xl shadow-soft border border-outline-variant/30 p-xl">
+<h2 class="font-headline-md text-headline-md text-primary mb-md">Breadcrumbs Wayfinding</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-xl">Used to indicate current page location within a navigational hierarchy. Arrows separate levels.</p>
+<div class="p-xl bg-background rounded border border-outline-variant/20 flex flex-col gap-xl">
+<nav aria-label="Breadcrumb" class="font-body-sm text-body-sm">
+<ol class="flex items-center gap-sm">
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Faculty Directory</a></li>
+<span class="material-symbols-outlined text-outline-variant text-[16px]">arrow_forward_ios</span>
+<li><a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Department of History</a></li>
+<span class="material-symbols-outlined text-outline-variant text-[16px]">arrow_forward_ios</span>
+<li aria-current="page" class="text-primary font-medium">Prof. Alistair Vance</li>
+</ol>
+</nav>
+</div>
+</div>
+<!-- Tabs Card -->
+<div class="lg:col-span-12 bg-surface-container-lowest rounded-xl shadow-soft border border-outline-variant/30 p-xl">
+<h2 class="font-headline-md text-headline-md text-primary mb-md">Tab Structures</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-xl">Organize content across different views within the same context.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="p-xl bg-background rounded border border-outline-variant/20">
+<h3 class="font-label-md text-label-md text-on-surface mb-md">Underline Style (Canvas Level)</h3>
+<div class="flex border-b border-outline-variant/30">
+<button class="px-md py-sm font-label-md text-label-md text-primary border-b-2 border-primary -mb-[1px]">Overview</button>
+<button class="px-md py-sm font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Publications</button>
+<button class="px-md py-sm font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Courses</button>
+</div>
+</div>
+<div class="p-xl bg-background rounded border border-outline-variant/20">
+<h3 class="font-label-md text-label-md text-on-surface mb-md">Pill Style (Card/Section Level)</h3>
+<div class="inline-flex bg-surface-container-low rounded-lg p-xs border border-outline-variant/20">
+<button class="px-md py-sm rounded font-label-md text-label-md bg-surface-container-lowest text-primary shadow-sm">Grid View</button>
+<button class="px-md py-sm rounded font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">List View</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

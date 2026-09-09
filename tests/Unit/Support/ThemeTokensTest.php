@@ -17,8 +17,10 @@ class ThemeTokensTest extends TestCase
         $this->assertSame('#5d0326', $defaults['light']['primary']);
         $this->assertSame('#eac167', $defaults['light']['accent']);
         $this->assertSame('#ffffff', $defaults['light']['primaryText']);
+        $this->assertSame('#3b82f6', $defaults['light']['info']);
         $this->assertSame('#0d1322', $defaults['dark']['bg1']);
         $this->assertSame('#ffb1c0', $defaults['dark']['primary']);
+        $this->assertSame('#60a5fa', $defaults['dark']['info']);
 
         // Reject parchment-era values.
         $this->assertNotSame('#faf6ee', $defaults['light']['bg1']);
@@ -122,5 +124,13 @@ class ThemeTokensTest extends TestCase
                 $label.' ('.$foreground.' on '.$background.')'
             );
         }
+    }
+
+    #[Test]
+    public function to_css_variables_maps_info_color(): void
+    {
+        $vars = ThemeTokens::toCssVariables(ThemeTokens::defaults()['light']);
+
+        $this->assertSame('#3b82f6', $vars['--color-info']);
     }
 }

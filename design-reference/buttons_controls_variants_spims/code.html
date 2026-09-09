@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Buttons &amp; Controls Reference - Spims Design System</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts for Typography Hierarchy -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS Config -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#ffdf9c",
+                        "on-surface-variant": "#554245",
+                        "primary-fixed-dim": "#ffb1c1",
+                        "warning": "#F59E0B",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "surface-container": "#e5eeff",
+                        "surface-container-low": "#eff4ff",
+                        "on-primary-fixed-variant": "#812340",
+                        "on-primary-fixed": "#3f0017",
+                        "background": "#f8f9ff",
+                        "outline-variant": "#dbc0c4",
+                        "outline": "#887175",
+                        "secondary-fixed-dim": "#eac166",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#bdedd5",
+                        "primary-fixed": "#ffd9df",
+                        "surface-tint": "#a03b57",
+                        "on-background": "#0b1c30",
+                        "on-tertiary-fixed": "#002115",
+                        "surface": "#f8f9ff",
+                        "tertiary": "#001c12",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary-fixed-dim": "#a1d1b9",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#dce9ff",
+                        "primary": "#380014",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#224f3d",
+                        "inverse-surface": "#213145",
+                        "tertiary-container": "#003323",
+                        "success": "#10B981",
+                        "on-tertiary-container": "#6f9d87",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary-container": "#5d0326",
+                        "surface-variant": "#d3e4fe",
+                        "surface-dim": "#cbdbf5",
+                        "secondary": "#785a02",
+                        "inverse-primary": "#ffb1c1",
+                        "surface-bg": "#f8f9ff",
+                        "on-secondary-fixed": "#251a00",
+                        "on-surface": "#0b1c30",
+                        "secondary-container": "#ffd578",
+                        "on-secondary-container": "#795a03",
+                        "on-primary-container": "#e26f8b",
+                        "danger": "#EF4444"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "1rem",
+                        "gutter": "24px",
+                        "xl": "2rem",
+                        "xs": "0.25rem",
+                        "sidebar-width": "280px",
+                        "container-max": "1440px",
+                        "2xl": "3rem",
+                        "sm": "0.5rem",
+                        "lg": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "arabic": ["IBM Plex Sans Arabic", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0 4px 20px -2px rgba(0, 0, 0, 0.05)",
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Arabic RTL Specific Overrides */
+        [dir="rtl"] {
+            font-family: "IBM Plex Sans Arabic", sans-serif;
+        }
+        [dir="rtl"] .flip-rtl {
+            transform: scaleX(-1);
+        }
+        
+        /* Custom Button Component Styles (Translating Sacred Academic design) */
+        .btn {
+            @apply inline-flex items-center justify-center gap-sm font-label-md text-label-md rounded-lg transition-all duration-200;
+        }
+        .btn-primary {
+            @apply bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+        }
+        .btn-secondary {
+            @apply bg-secondary text-on-secondary hover:bg-secondary-container hover:text-on-secondary-container focus:ring-2 focus:ring-secondary focus:ring-offset-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+        }
+        .btn-outline {
+            @apply border border-outline text-primary hover:bg-surface-container hover:text-primary-container focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+        }
+        .btn-ghost {
+            @apply text-primary hover:bg-surface-container hover:text-primary-container focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+        }
+        .btn-destructive {
+            @apply bg-error text-on-error hover:bg-error-container hover:text-on-error-container focus:ring-2 focus:ring-error focus:ring-offset-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+        }
+        .btn-sm { @apply px-3 py-1.5 text-label-sm; }
+        .btn-md { @apply px-4 py-2; }
+        .btn-lg { @apply px-6 py-3 text-body-lg; }
+        .btn-icon { @apply p-2 rounded-full; }
+        
+        /* Loading Spinner */
+        .spinner {
+            @apply animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col md:flex-row">
+<!-- JSON Injected SideNavBar -->
+<nav class="hidden lg:flex flex-col h-full border-r border-outline-variant/30 p-md bg-surface-container-low left-0 w-sidebar-width fixed top-0 bottom-0 z-40">
+<div class="mb-xl">
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary flex items-center gap-sm">
+<span class="material-symbols-outlined fill">school</span>
+                Spims Design System
+            </h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">v2.4.0 (Stable)</p>
+</div>
+<ul class="flex flex-col gap-sm flex-grow">
+<!-- Active State -->
+<li>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md active:scale-95 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined fill">smart_button</span>
+                    Buttons
+                </a>
+</li>
+<!-- Inactive States -->
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg font-label-md text-label-md hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">toggle_on</span>
+                    Controls
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg font-label-md text-label-md hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">menu</span>
+                    Navigation
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg font-label-md text-label-md hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">notifications</span>
+                    Feedback
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg font-label-md text-label-md hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+                    Layout
+                </a>
+</li>
+</ul>
+<div class="mt-auto flex flex-col gap-sm">
+<button class="btn btn-outline btn-md w-full mb-md">View Documentation</button>
+<ul class="flex flex-col gap-sm border-t border-outline-variant/30 pt-md">
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg font-label-md text-label-md hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+                        Settings
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg font-label-md text-label-md hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+                        Support
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow lg:ml-[280px] p-gutter lg:p-2xl max-w-container-max mx-auto w-full">
+<header class="mb-2xl border-b border-outline-variant/30 pb-xl">
+<h1 class="font-display-lg text-display-lg text-primary mb-sm">Buttons &amp; Controls</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">
+                The definitive reference for interactive elements within the Spims Academic Suite. 
+                These components are designed with the 'Sacred Academic' aesthetic, prioritizing clarity, 
+                high contrast, and a sense of institutional authority.
+            </p>
+</header>
+<!-- The 3-Column Layout -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-xl">
+<!-- COLUMN 1: Light Mode (LTR) -->
+<section class="bg-surface-container-lowest rounded-xl shadow-soft border border-outline-variant/30 p-xl">
+<div class="flex items-center justify-between mb-lg border-b border-outline-variant/30 pb-md">
+<h2 class="font-headline-md text-headline-md text-primary">Light Mode <span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-1 rounded ml-2">LTR</span></h2>
+<span class="material-symbols-outlined text-outline">light_mode</span>
+</div>
+<!-- Button Matrix -->
+<div class="space-y-xl mb-2xl">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md">Button Matrix</h3>
+<div class="overflow-x-auto pb-4">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant/30">
+<th class="py-2 pr-4 font-medium">Variant</th>
+<th class="py-2 px-2 font-medium">Default</th>
+<th class="py-2 px-2 font-medium">Hover</th>
+<th class="py-2 px-2 font-medium">Disabled</th>
+<th class="py-2 pl-2 font-medium">Loading</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm">
+<!-- Primary -->
+<tr class="border-b border-outline-variant/10">
+<td class="py-4 pr-4 text-on-surface-variant">Primary</td>
+<td class="py-4 px-2"><button class="btn btn-primary btn-md">Submit</button></td>
+<td class="py-4 px-2"><button class="btn btn-primary btn-md bg-primary-container text-on-primary-container">Submit</button></td>
+<td class="py-4 px-2"><button class="btn btn-primary btn-md" disabled="">Submit</button></td>
+<td class="py-4 pl-2"><button class="btn btn-primary btn-md"><span class="spinner"></span>Submit</button></td>
+</tr>
+<!-- Secondary -->
+<tr class="border-b border-outline-variant/10">
+<td class="py-4 pr-4 text-on-surface-variant">Secondary</td>
+<td class="py-4 px-2"><button class="btn btn-secondary btn-md">Save Draft</button></td>
+<td class="py-4 px-2"><button class="btn btn-secondary btn-md bg-secondary-container text-on-secondary-container">Save Draft</button></td>
+<td class="py-4 px-2"><button class="btn btn-secondary btn-md" disabled="">Save Draft</button></td>
+<td class="py-4 pl-2"><button class="btn btn-secondary btn-md"><span class="spinner"></span>Saving</button></td>
+</tr>
+<!-- Outline -->
+<tr>
+<td class="py-4 pr-4 text-on-surface-variant">Outline</td>
+<td class="py-4 px-2"><button class="btn btn-outline btn-md">Cancel</button></td>
+<td class="py-4 px-2"><button class="btn btn-outline btn-md bg-surface-container text-primary-container">Cancel</button></td>
+<td class="py-4 px-2"><button class="btn btn-outline btn-md" disabled="">Cancel</button></td>
+<td class="py-4 pl-2"><button class="btn btn-outline btn-md"><span class="spinner"></span>Cancel</button></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Interactive Controls -->
+<div class="space-y-xl">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md border-b border-outline-variant/30 pb-md">Interactive Controls</h3>
+<!-- Segmented Control -->
+<div class="bg-surface-container-low p-1 rounded-lg inline-flex w-full">
+<button class="flex-1 py-1.5 px-3 font-label-md text-label-md text-on-primary bg-primary shadow-soft rounded-md transition-all">Daily</button>
+<button class="flex-1 py-1.5 px-3 font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all rounded-md">Weekly</button>
+<button class="flex-1 py-1.5 px-3 font-label-md text-label-md text-on-surface-variant hover:text-primary transition-all rounded-md">Term</button>
+</div>
+<!-- Toggles & Checks -->
+<div class="flex flex-col gap-md">
+<label class="flex items-center gap-md cursor-pointer">
+<div class="relative">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+<span class="font-body-md text-body-md text-on-surface">Enable Notifications</span>
+</label>
+<label class="flex items-center gap-md cursor-pointer">
+<input checked="" class="w-5 h-5 text-primary bg-surface border-outline rounded focus:ring-primary focus:ring-2" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Accept terms</span>
+</label>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

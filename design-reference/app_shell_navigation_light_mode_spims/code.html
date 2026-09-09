@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sacred Academic - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#bbefc1",
+                      "tertiary-container": "#003415",
+                      "surface-variant": "#d3e3ff",
+                      "primary-fixed-dim": "#d4af37",
+                      "secondary-container": "#ffd578",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-container": "#6d9f76",
+                      "inverse-on-surface": "#ebf1ff",
+                      "secondary-fixed": "#ffdf9c",
+                      "on-primary-container": "#e26f8b",
+                      "on-tertiary-fixed": "#00210b",
+                      "primary-container": "#5d0326",
+                      "on-secondary-fixed-variant": "#5b4300",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#3f0017",
+                      "on-surface-variant": "#554245",
+                      "surface-container-highest": "#d3e3ff",
+                      "primary": "#380014",
+                      "on-error-container": "#93000a",
+                      "background": "#f8f9ff",
+                      "surface-container-low": "#eff4ff",
+                      "secondary": "#785a02",
+                      "surface-bright": "#f8f9ff",
+                      "outline": "#887175",
+                      "surface-container-high": "#dde9ff",
+                      "surface-container": "#e6eeff",
+                      "on-error": "#ffffff",
+                      "on-tertiary-fixed-variant": "#21502e",
+                      "error": "#ba1a1a",
+                      "tertiary": "#001d09",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#ffd9df",
+                      "on-primary": "#ffffff",
+                      "inverse-primary": "#ffb1c1",
+                      "on-secondary-fixed": "#251a00",
+                      "inverse-surface": "#213146",
+                      "tertiary-fixed-dim": "#9fd3a6",
+                      "on-background": "#0b1c30",
+                      "outline-variant": "#dbc0c4",
+                      "on-surface": "#0b1c30",
+                      "on-primary-fixed-variant": "#812340",
+                      "on-secondary": "#ffffff",
+                      "surface-tint": "#a03b57",
+                      "surface-dim": "#cbdbf6",
+                      "secondary-fixed-dim": "#eac166",
+                      "surface": "#f8f9ff",
+                      "on-secondary-container": "#795a03"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "2rem",
+                      "sm": "0.5rem",
+                      "md": "1rem",
+                      "xs": "0.25rem",
+                      "container-max": "1440px",
+                      "gutter": "24px",
+                      "sidebar-width": "280px",
+                      "lg": "1.5rem",
+                      "2xl": "3rem"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              },
+              "boxShadow": {
+                "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+              }
+            },
+          }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col p-md gap-sm bg-surface-container-low text-primary h-screen w-sidebar-width fixed left-0 top-0 rtl:right-0 rtl:left-auto">
+<!-- Header -->
+<div class="flex items-center gap-sm px-4 py-6 mb-4">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-headline-md text-headline-md">
+                SA
+            </div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary">Sacred Academic</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Coptic Orthodox LMS</p>
+</div>
+</div>
+<!-- Links -->
+<div class="flex flex-col gap-2 flex-grow">
+<!-- Active: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary text-on-primary rounded-2xl active:scale-[0.98] transition-transform duration-200 group" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<!-- Inactive: Courses -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-2xl transition-all active:scale-[0.98] duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">school</span>
+<span class="font-label-md text-label-md group-hover:text-primary transition-colors">Courses</span>
+</a>
+<!-- Inactive: Calendar -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-2xl transition-all active:scale-[0.98] duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">calendar_month</span>
+<span class="font-label-md text-label-md group-hover:text-primary transition-colors">Calendar</span>
+</a>
+<!-- Inactive: Grades -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-2xl transition-all active:scale-[0.98] duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">grade</span>
+<span class="font-label-md text-label-md group-hover:text-primary transition-colors">Grades</span>
+</a>
+<!-- Inactive: Library -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-2xl transition-all active:scale-[0.98] duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">local_library</span>
+<span class="font-label-md text-label-md group-hover:text-primary transition-colors">Library</span>
+</a>
+<div class="mt-auto mb-4">
+<!-- Inactive: Settings -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-2xl transition-all active:scale-[0.98] duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+<span class="font-label-md text-label-md group-hover:text-primary transition-colors">Settings</span>
+</a>
+</div>
+</div>
+<!-- CTA -->
+<button class="mt-auto w-full py-3 bg-secondary-container text-on-secondary-container rounded-full font-label-md text-label-md shadow-soft hover:bg-secondary-fixed-dim transition-colors">
+            Support Portal
+        </button>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 md:ml-[280px] flex flex-col w-full min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-lg py-sm w-full sticky top-0 z-40 bg-surface shadow-soft">
+<!-- Left: Brand (Mobile only, hidden on desktop as Sidebar has it) -->
+<div class="md:hidden font-display-lg text-display-lg text-primary">
+                Spims
+            </div>
+<!-- Left: Search (Desktop) -->
+<div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-2 w-96 border border-outline-variant/30 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none outline-none w-full font-body-md text-body-md text-on-surface placeholder-on-surface-variant/50 focus:ring-0" placeholder="Search courses, students, files..." type="text"/>
+</div>
+<!-- Right: Actions -->
+<div class="flex items-center gap-4">
+<!-- Translate -->
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors scale-95 active:transition-transform">
+<span class="material-symbols-outlined">translate</span>
+</button>
+<!-- Dark Mode -->
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors scale-95 active:transition-transform">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<!-- Notifications -->
+<button class="relative w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors scale-95 active:transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<!-- Profile -->
+<div class="relative cursor-pointer ml-2">
+<img alt="User profile" class="w-10 h-10 rounded-full object-cover border-2 border-surface shadow-soft" data-alt="A professional headshot of a young male student in a bright, modern academic setting. The lighting is soft and natural, emphasizing a clear, approachable expression. The style is modern, high-key light mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6HZ-Bcrak4bEGW8qXArJnLvtGNGvPtob6JgWmYNpiygXlyxLra8Wf8TH9WQDy8_u1psBtCAjmDRyIw6lWQuwN-0pHShc6uuZCAnzPvRaRzxeBkPkpUwm6jEQCGWEHYkGKQRLBBY92p_jfaySovsmSbHh7oV_PCjnveWXD4-a7D020ud8O6V7p0W3h5WJE7Qr0vNXGQvoxKyNpoC_546jiTe1Rb-2Tx6JDIjmFX85h_yt-h8UCLjFbE7hc2_5biN4ktPwYeRSp3j0s"/>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 p-md md:p-xl overflow-y-auto">
+<div class="max-w-container-max mx-auto">
+<div class="mb-8">
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-2">Welcome back, Student</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Here's an overview of your academic progress today.</p>
+</div>
+<!-- Bento Grid Placeholder -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<div class="col-span-1 md:col-span-2 bg-surface-container-lowest rounded-DEFAULT p-lg shadow-soft border border-outline-variant/30 flex flex-col">
+<h3 class="font-headline-md text-headline-md text-on-background mb-4">Upcoming Assignments</h3>
+<div class="flex-1 flex items-center justify-center border-2 border-dashed border-outline-variant/50 rounded-DEFAULT p-8">
+<p class="font-body-md text-body-md text-on-surface-variant text-center">Your active assignments will appear here.</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="col-span-1 bg-surface-container-lowest rounded-DEFAULT p-lg shadow-soft border border-outline-variant/30 flex flex-col">
+<h3 class="font-headline-md text-headline-md text-on-background mb-4">Recent Grades</h3>
+<div class="flex-1 flex items-center justify-center border-2 border-dashed border-outline-variant/50 rounded-DEFAULT p-8">
+<p class="font-body-md text-body-md text-on-surface-variant text-center">No recent grades to display.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface border-t border-outline-variant/30 shadow-soft z-50 rounded-t-lg">
+<!-- Active: Home (Maps to Dashboard intent) -->
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 scale-95 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<!-- Inactive: Courses -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant scale-95 transition-all p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">book</span>
+<span class="font-label-sm text-label-sm mt-1">Courses</span>
+</a>
+<!-- Inactive: Calendar -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant scale-95 transition-all p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">event</span>
+<span class="font-label-sm text-label-sm mt-1">Calendar</span>
+</a>
+<!-- Inactive: Library -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant scale-95 transition-all p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">library_books</span>
+<span class="font-label-sm text-label-sm mt-1">Library</span>
+</a>
+<!-- Inactive: Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant scale-95 transition-all p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

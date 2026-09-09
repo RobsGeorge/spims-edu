@@ -15,6 +15,7 @@ class ObjectStorageService
         'logos',
         'uploads',
         'receipts',
+        'help-media',
         'credentials',
         'project-deliverables',
         'discussion-attachments',

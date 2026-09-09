@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="light" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spims - Coptic Orthodox Online School</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#380014",
+                        "surface-container-low": "#eff4ff",
+                        "inverse-primary": "#ffb1c1",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#e6eeff",
+                        "surface-tint": "#a03b57",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#6d9f76",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#554245",
+                        "on-tertiary-fixed-variant": "#21502e",
+                        "surface-variant": "#d3e3ff",
+                        "on-primary-fixed-variant": "#812340",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#ffb1c1",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#ebf1ff",
+                        "outline-variant": "#dbc0c4",
+                        "secondary-fixed-dim": "#eac166",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-highest": "#d3e3ff",
+                        "on-secondary-container": "#795a03",
+                        "on-secondary": "#ffffff",
+                        "background": "#f8f9ff",
+                        "secondary": "#785a02",
+                        "tertiary-fixed": "#bbefc1",
+                        "outline": "#887175",
+                        "secondary-container": "#ffd578",
+                        "on-primary-fixed": "#3f0017",
+                        "surface-dim": "#cbdbf6",
+                        "on-tertiary-fixed": "#00210b",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#213146",
+                        "surface": "#f8f9ff",
+                        "primary-container": "#5d0326",
+                        "on-background": "#0b1c30",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "primary-fixed": "#ffd9df",
+                        "error": "#ba1a1a",
+                        "tertiary": "#001d09",
+                        "on-secondary-fixed": "#251a00",
+                        "tertiary-container": "#003415",
+                        "surface-container-high": "#dde9ff",
+                        "secondary-fixed": "#ffdf9c",
+                        "on-primary-container": "#e26f8b",
+                        "on-surface": "#0b1c30"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "2rem",
+                        "gutter": "24px",
+                        "sm": "0.5rem",
+                        "2xl": "3rem",
+                        "sidebar-width": "280px",
+                        "xs": "0.25rem",
+                        "md": "1rem",
+                        "lg": "1.5rem",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Tajawal", "sans-serif"],
+                        "headline-md": ["Tajawal", "sans-serif"],
+                        "body-lg": ["Tajawal", "sans-serif"],
+                        "label-sm": ["Tajawal", "sans-serif"],
+                        "body-md": ["Tajawal", "sans-serif"],
+                        "label-md": ["Tajawal", "sans-serif"],
+                        "headline-lg": ["Tajawal", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Tajawal', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen antialiased flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface-container-lowest shadow-soft fixed top-0 left-0 right-0 w-full z-50 flex justify-between items-center px-gutter py-md max-w-container-max mx-auto">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">Spims</span>
+</div>
+<div class="hidden md:flex gap-lg">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">البرامج</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">القبول</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">الأكاديميون</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">الحياة الروحية</a>
+</div>
+<div class="flex items-center gap-sm">
+<button class="font-label-md text-label-md text-primary bg-surface-container-lowest border border-outline-variant rounded-full px-4 py-2 hover:bg-surface-container-low transition-colors duration-200 active:scale-95">تصفح الدورات</button>
+<button class="font-label-md text-label-md bg-primary text-on-primary rounded-full px-4 py-2 hover:bg-primary-container transition-colors duration-200 active:scale-95">قدم الآن</button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[88px] flex flex-col items-center">
+<!-- Hero Section -->
+<section class="w-full max-w-container-max mx-auto px-gutter py-2xl flex flex-col md:flex-row items-center gap-xl">
+<div class="w-full md:w-1/2 flex flex-col items-start gap-lg text-right">
+<h1 class="font-display-lg text-display-lg text-primary">تعميق المنح الدراسية القبطية الأرثوذكسية في العصر الحديث</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                    مؤسسة أكاديمية رائدة مكرسة للحفاظ على وتطوير التراث الغني للتقاليد القبطية الأرثوذكسية من خلال منصة تعليمية رقمية حديثة وصارمة.
+                </p>
+<div class="flex gap-md mt-sm">
+<button class="font-label-md text-label-md bg-primary text-on-primary rounded-full px-6 py-3 hover:bg-primary-container transition-colors duration-200 active:scale-95 shadow-soft">قدم الآن</button>
+<button class="font-label-md text-label-md text-primary bg-surface-container-lowest border border-outline-variant rounded-full px-6 py-3 hover:bg-surface-container-low transition-colors duration-200 active:scale-95">تصفح الدورات</button>
+</div>
+</div>
+<div class="w-full md:w-1/2 rounded-DEFAULT overflow-hidden shadow-soft border border-outline-variant/30 h-[400px] relative bg-surface-container-low">
+<img alt="صورة تعبيرية للحرم الجامعي" class="w-full h-full object-cover" data-alt="A brightly lit, modern academic library with tall arched windows allowing natural sunlight to pour onto long wooden study tables. Students are engaged in quiet study. The aesthetic is clean, scholarly, and serene, utilizing a color palette of warm woods, pristine white walls, and subtle burgundy accents. The mood is focused and prestigious." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxM09-YZHSWwjo6BtqG8EugLriGbbcsz7ZoGzDaiFqkxlcr5xE2gcN5zNMdA_jD1_ncGShdfhB9sc9SJGRad_iq0mxuKORJwhX3JYLV2T14KQhgBaET2FixDZMCXOBPsG8UF0TOvEG1uv9AmvPxncfcqG2vmPPSzkY8oaBCoZK9nDfPBI-uuylUcdqA06SNFIVt0a0xLX0mbInbqba2wFlcUEF5DxGvgE9hiltSDOgld_ap5E7scsvdYsCoLBn9TIBKdUqg0q46_8i"/>
+</div>
+</section>
+<!-- Stats Section -->
+<section class="w-full bg-surface-container-low py-xl">
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-2 md:grid-cols-4 gap-lg text-center">
+<div class="p-md">
+<h3 class="font-display-lg text-display-lg text-primary">١٠+</h3>
+<p class="font-label-md text-label-md text-on-surface-variant mt-sm">برامج أكاديمية</p>
+</div>
+<div class="p-md border-r border-outline-variant/30">
+<h3 class="font-display-lg text-display-lg text-primary">٥٠٠+</h3>
+<p class="font-label-md text-label-md text-on-surface-variant mt-sm">طلاب نشطون</p>
+</div>
+<div class="p-md border-r border-outline-variant/30">
+<h3 class="font-display-lg text-display-lg text-primary">٥٠+</h3>
+<p class="font-label-md text-label-md text-on-surface-variant mt-sm">أعضاء هيئة التدريس</p>
+</div>
+<div class="p-md border-r border-outline-variant/30">
+<h3 class="font-display-lg text-display-lg text-primary">١٠٠٪</h3>
+<p class="font-label-md text-label-md text-on-surface-variant mt-sm">متاح عبر الإنترنت</p>
+</div>
+</div>
+</section>
+<!-- Programs Section -->
+<section class="w-full max-w-container-max mx-auto px-gutter py-2xl">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-xl text-center">البرامج المميزة</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-DEFAULT p-lg shadow-soft border border-outline-variant/30 flex flex-col gap-md hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">book</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">دراسات الكتاب المقدس</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">استكشاف متعمق للنصوص المقدسة وتفسيرها في التقاليد القبطية.</p>
+<a class="font-label-md text-label-md text-primary mt-auto flex items-center gap-xs" href="#">
+                        اقرأ المزيد
+                        <span class="material-symbols-outlined text-sm">arrow_back</span>
+</a>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-DEFAULT p-lg shadow-soft border border-outline-variant/30 flex flex-col gap-md hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">history_edu</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">تاريخ الكنيسة</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">دراسة شاملة لتاريخ وتطور الكنيسة القبطية الأرثوذكسية.</p>
+<a class="font-label-md text-label-md text-primary mt-auto flex items-center gap-xs" href="#">
+                        اقرأ المزيد
+                        <span class="material-symbols-outlined text-sm">arrow_back</span>
+</a>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-DEFAULT p-lg shadow-soft border border-outline-variant/30 flex flex-col gap-md hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">language</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">اللغة القبطية</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">تعلم لغة الكنيسة القديمة لقراءة النصوص الأصلية.</p>
+<a class="font-label-md text-label-md text-primary mt-auto flex items-center gap-xs" href="#">
+                        اقرأ المزيد
+                        <span class="material-symbols-outlined text-sm">arrow_back</span>
+</a>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-primary text-on-primary px-gutter py-2xl flex flex-col md:flex-row justify-between items-center gap-md mt-auto">
+<div class="font-headline-sm text-headline-sm font-bold text-on-primary">Spims</div>
+<div class="flex flex-wrap justify-center gap-md font-body-md text-body-md">
+<a class="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-opacity" href="#">About Us</a>
+<a class="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-opacity" href="#">Contact</a>
+<a class="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-opacity" href="#">Privacy Policy</a>
+<a class="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-opacity" href="#">Terms of Service</a>
+<a class="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-opacity" href="#">Give</a>
+</div>
+<div class="font-body-md text-body-md opacity-80 text-center md:text-left">
+            © 2024 Spims Coptic Orthodox Online School. All rights reserved.
+        </div>
+</footer>
+</body></html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Alerts, Toasts &amp; Banners - Spims Docs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Tajawal:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#a03b57",
+                        "outline-variant": "#dbc0c4",
+                        "inverse-surface": "#213146",
+                        "primary-fixed": "#ffd9df",
+                        "on-secondary-fixed-variant": "#5b4300",
+                        "outline": "#887175",
+                        "secondary": "#785a02",
+                        "on-primary-fixed-variant": "#812340",
+                        "surface-container": "#e6eeff",
+                        "tertiary": "#001d09",
+                        "on-secondary-container": "#795a03",
+                        "error": "#ba1a1a",
+                        "surface": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#251a00",
+                        "background": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-bright": "#f8f9ff",
+                        "tertiary-container": "#003415",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#ffdf9c",
+                        "tertiary-fixed-dim": "#9fd3a6",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#554245",
+                        "inverse-primary": "#ffb1c1",
+                        "on-tertiary-fixed": "#00210b",
+                        "surface-dim": "#cbdbf6",
+                        "surface-container-highest": "#d3e3ff",
+                        "on-tertiary-container": "#6d9f76",
+                        "on-primary-fixed": "#3f0017",
+                        "on-background": "#0b1c30",
+                        "secondary-fixed-dim": "#eac166",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#380014",
+                        "primary-fixed-dim": "#ffb1c1",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#dde9ff",
+                        "tertiary-fixed": "#bbefc1",
+                        "surface-variant": "#d3e3ff",
+                        "primary-container": "#5d0326",
+                        "on-primary-container": "#e26f8b",
+                        "secondary-container": "#ffd578",
+                        "on-surface": "#0b1c30",
+                        "inverse-on-surface": "#ebf1ff",
+                        "on-tertiary-fixed-variant": "#21502e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sidebar-width": "280px",
+                        "container-max": "1440px",
+                        "lg": "1.5rem",
+                        "sm": "0.5rem",
+                        "xl": "2rem",
+                        "xs": "0.25rem",
+                        "md": "1rem",
+                        "gutter": "24px",
+                        "2xl": "3rem"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0px 4px 20px rgba(0,0,0,0.05)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .font-arabic { font-family: 'Tajawal', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex fixed left-0 top-0 h-screen w-sidebar-width border-r border-outline-variant/30 flex-col p-md overflow-y-auto bg-surface-container-low dark:bg-inverse-surface">
+<div class="mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Spims Docs</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-sm">v2.4.0 Academic</p>
+</div>
+<ul class="space-y-sm flex-1">
+<li>
+<a class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+                    Introduction
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+                    Layout
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="text_fields">text_fields</span>
+                    Typography
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+                    Colors
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-sm rounded-lg bg-primary-container text-on-primary-container font-bold font-label-md text-label-md Active: translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="notification_important">notification_important</span>
+                    Feedback Components
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="input">input</span>
+                    Forms
+                </a>
+</li>
+</ul>
+<ul class="space-y-sm mt-auto pt-lg border-t border-outline-variant/30">
+<li>
+<a class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    Settings
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:bg-surface-container-highest transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                    Support
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-sidebar-width flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-gutter h-16 sticky top-0 z-50 bg-surface dark:bg-inverse-surface shadow-soft border-b border-outline-variant/30">
+<div class="flex items-center gap-lg">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary md:hidden">Spims</span>
+<nav class="hidden md:flex gap-lg font-label-md text-label-md">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">Docs</a>
+<a class="text-primary dark:text-inverse-primary border-b-2 border-primary font-bold pb-1 Active: scale-95 transition-transform" href="#">Components</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">Themes</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">RTL</a>
+</nav>
+</div>
+<div class="flex items-center gap-sm text-primary dark:text-inverse-primary">
+<button aria-label="Toggle Dark Mode" class="p-sm rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+<button aria-label="Language" class="p-sm rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<button aria-label="Account" class="p-sm rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 p-gutter max-w-container-max mx-auto w-full">
+<div class="mb-xl">
+<h2 class="font-display-lg text-display-lg text-primary mb-sm">Alerts, Toasts &amp; Banners</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">
+                    Feedback components communicate important system state changes, errors, and informational messages to the user in a non-disruptive yet noticeable manner.
+                </p>
+</div>
+<div class="space-y-2xl">
+<!-- Section 1: Toasts -->
+<section class="bg-surface-container-lowest rounded-xl p-lg shadow-soft border border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-lg pb-sm border-b border-outline-variant/30">1. Toasts (Transient Feedback)</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<!-- Preview -->
+<div class="relative bg-surface-container h-96 rounded-lg overflow-hidden flex flex-col justify-end p-md gap-sm">
+<!-- Success Toast -->
+<div class="bg-surface-container-lowest rounded-lg shadow-soft border border-tertiary-fixed-dim p-sm flex items-start gap-md animate-[slideUp_0.3s_ease-out]">
+<span class="material-symbols-outlined text-tertiary-fixed-dim mt-xs" data-icon="check_circle" data-weight="fill">check_circle</span>
+<div class="flex-1">
+<h4 class="font-label-md text-label-md text-on-surface">Course Published</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Students can now access the materials.</p>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-sm" data-icon="close">close</span></button>
+</div>
+<!-- Error Toast -->
+<div class="bg-surface-container-lowest rounded-lg shadow-soft border border-error p-sm flex items-start gap-md opacity-90 scale-95 origin-bottom">
+<span class="material-symbols-outlined text-error mt-xs" data-icon="error" data-weight="fill">error</span>
+<div class="flex-1">
+<h4 class="font-label-md text-label-md text-on-surface">Upload Failed</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">File size exceeds the 50MB limit.</p>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-sm" data-icon="close">close</span></button>
+</div>
+<!-- Warning Toast -->
+<div class="bg-surface-container-lowest rounded-lg shadow-soft border border-secondary p-sm flex items-start gap-md opacity-70 scale-90 origin-bottom">
+<span class="material-symbols-outlined text-secondary mt-xs" data-icon="warning" data-weight="fill">warning</span>
+<div class="flex-1">
+<h4 class="font-label-md text-label-md text-on-surface">Session Expiring</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">Please save your work soon.</p>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-sm" data-icon="close">close</span></button>
+</div>
+</div>
+<!-- Code/Details -->
+<div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">
+                                Toasts appear temporarily at the bottom edge of the screen to provide concise feedback about an operation. They should stack if multiple arrive simultaneously.
+                            </p>
+<ul class="list-disc pl-md font-body-md text-body-md text-on-surface-variant space-y-sm">
+<li><strong>Success:</strong> Green accents (`tertiary-fixed-dim`)</li>
+<li><strong>Error:</strong> Red accents (`error`)</li>
+<li><strong>Warning:</strong> Gold/Amber accents (`secondary`)</li>
+<li><strong>Info:</strong> Primary brand accents (`primary`)</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Section 2: Inline Alerts -->
+<section class="bg-surface-container-lowest rounded-xl p-lg shadow-soft border border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-lg pb-sm border-b border-outline-variant/30">2. Inline Contextual Alerts</h3>
+<div class="max-w-md mx-auto space-y-md">
+<!-- Form Field with Alert -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs">New Password</label>
+<input class="w-full rounded-DEFAULT border-error focus:ring-1 focus:ring-error focus:border-error bg-surface-container-low px-md py-sm font-body-md text-body-md text-on-surface outline-none transition-all" type="password" value="short"/>
+<div class="mt-xs flex items-center gap-xs text-error">
+<span class="material-symbols-outlined text-sm" data-icon="info">info</span>
+<span class="font-label-sm text-label-sm">Password must be at least 8 characters long.</span>
+</div>
+</div>
+<!-- Info Banner in content -->
+<div class="bg-surface-container-highest border-l-4 border-primary p-md rounded-r-lg flex gap-md items-start mt-lg">
+<span class="material-symbols-outlined text-primary" data-icon="lightbulb">lightbulb</span>
+<div>
+<h4 class="font-label-md text-label-md text-primary">Pro Tip</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Use a mix of alphanumeric characters and symbols for stronger security.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>
