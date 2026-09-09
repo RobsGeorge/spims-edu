@@ -13,13 +13,12 @@
             <a href="{{ route('superadmin.index') }}" class="text-decoration-none spims-text-dim">
                 @include('partials.superadmin-entry-tag', ['class' => 'me-1']) {{ __('people.dossier_crumb_console') }}
             </a>
-            <span class="spims-text-dim mx-1">·</span>
+            <span class="spims-text-dim mx-1">Â·</span>
         @endif
         <span class="spims-text-dim">{{ __('people.directory_title') }}</span>
     </nav>
 
-    <h1 class="page-title mb-2">{{ __('people.directory_title') }}</h1>
-    <p class="spims-text-dim mb-2">{{ __('people.directory_lead') }}</p>
+    <x-page-header :title="__('people.directory_title')" :subtitle="__('people.directory_lead')" />
     <p class="small spims-text-dim mb-3">{{ __('people.directory_help') }}</p>
 
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_users')])
@@ -28,7 +27,7 @@
     <x-card variant="panel" class="mb-4">
         <h2 class="h6 page-title">{{ __('people.create_title') }}</h2>
         <p class="small spims-text-dim">{{ __('people.create_help') }}</p>
-        <form method="POST" action="{{ route('admin.users.store') }}" class="row g-3">
+        <form method="POST" action="{{ route('admin.users.store') }}" class="row g-3 academic-form">
             @csrf
             <div class="col-md-3">
                 <label class="form-label" for="create-first">{{ __('ui.first_name') }}</label>
@@ -55,7 +54,7 @@
             <div class="col-md-3">
                 <label class="form-label" for="create-locale">{{ __('people.locale') }}</label>
                 <select id="create-locale" name="preferred_locale" class="form-select">
-                    @foreach(['ar' => 'العربية', 'en' => 'English', 'fr' => 'Français'] as $code => $label)
+                    @foreach(['ar' => 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©', 'en' => 'English', 'fr' => 'FranÃ§ais'] as $code => $label)
                         <option value="{{ $code }}" @selected($code === 'en')>{{ $label }}</option>
                     @endforeach
                 </select>

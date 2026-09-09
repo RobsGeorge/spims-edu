@@ -4,7 +4,7 @@
     'icon' => 'bi-inbox',
 ])
 
-<div {{ $attributes->merge(['class' => 'spims-empty-state text-center py-5 px-3']) }}>
+<div {{ $attributes->merge(['class' => 'spims-empty-state academic-empty text-center py-5 px-3']) }}>
     <div class="spims-empty-icon mb-3" aria-hidden="true">
         <i class="bi {{ $icon }}"></i>
     </div>

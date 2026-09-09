@@ -7,7 +7,7 @@
             <div class="card-body p-4 p-md-5">
                 <h1 class="h3 spims-title mb-2">{{ __('ui.register') }}</h1>
                 <p class="spims-text-dim auth-help mb-4">{{ __('ui.auth_help_register') }}</p>
-                <form method="POST" action="{{ route('auth.register') }}">
+                <form method="POST" action="{{ route('auth.register') }}" class="academic-form">
                     @csrf
                     <div class="row g-3">
                         <div class="col-md-6">

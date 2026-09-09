@@ -8,24 +8,26 @@
 @endphp
 
 <div class="animate-in portal-dashboard">
-    <div class="mb-4">
-        <h1 class="display-6 page-title mb-1">
-            {{ __('dashboard.hello', ['name' => $user->first_name ?: __('dashboard.user_fallback')]) }}
-        </h1>
-        <p class="spims-text-dim mb-0">{{ __('ui.dashboard_subheading') }}</p>
-    </div>
+    <x-page-header
+        :title="__('dashboard.hello', ['name' => $user->first_name ?: __('dashboard.user_fallback')])"
+        :subtitle="__('ui.dashboard_subheading')"
+    />
 
     <div class="bento-grid mb-4">
-        <section class="bento-courses app-card p-3">
+        <section class="bento-courses app-card academic-card p-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h5 spims-title mb-0">{{ __('learning.my_courses') }}</h2>
                 <a href="{{ route('catalog.index') }}" class="small">{{ __('learning.browse_catalog') }}</a>
             </div>
             @if($enrollments->isEmpty())
-                <div class="spims-empty py-4 text-center">
-                    <p class="spims-text-dim mb-3">{{ __('learning.my_courses_empty') }}</p>
-                    <a href="{{ route('catalog.index') }}" class="btn btn-primary">{{ __('learning.browse_catalog') }}</a>
-                </div>
+                <x-empty-state
+                    :title="__('learning.my_courses_empty')"
+                    icon="bi-journal-bookmark"
+                >
+                    <x-slot:actions>
+                        <a href="{{ route('catalog.index') }}" class="btn btn-primary">{{ __('learning.browse_catalog') }}</a>
+                    </x-slot:actions>
+                </x-empty-state>
             @else
                 <ul class="list-unstyled mb-0">
                     @foreach($enrollments as $enrollment)
@@ -54,7 +56,7 @@
             @endif
         </section>
 
-        <section class="bento-due app-card p-3">
+        <section class="bento-due app-card academic-card p-3">
             <h2 class="h5 spims-title mb-3">{{ __('learning.due_soon') }}</h2>
             @forelse($due_assessments as $assessment)
                 <div class="d-flex justify-content-between gap-2 py-2 border-bottom border-opacity-25">
@@ -77,7 +79,7 @@
             @endforelse
         </section>
 
-        <section class="bento-wallet app-card p-3">
+        <section class="bento-wallet app-card academic-card p-3">
             <h2 class="h5 spims-title mb-3">{{ __('learning.wallet') }}</h2>
             <div class="row g-2 small">
                 <div class="col-6"><div class="wallet-chip">{{ __('learning.egp_money') }}<strong>{{ $wallet['egp_money'] }}</strong></div></div>
@@ -88,7 +90,7 @@
             <a href="{{ route('finance.index') }}" class="btn btn-sm btn-outline-secondary mt-3">{{ __('dashboard.finance_hub') }}</a>
         </section>
 
-        <section class="bento-notes app-card p-3">
+        <section class="bento-notes app-card academic-card p-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h5 spims-title mb-0">{{ __('learning.notifications') }}</h2>
                 @if(($unread_notifications ?? 0) > 0)

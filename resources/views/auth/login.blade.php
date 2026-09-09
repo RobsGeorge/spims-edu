@@ -14,18 +14,18 @@
                 <p class="spims-text-dim auth-help mb-4">{{ __('ui.auth_help_login') }}</p>
 
                 @if(session('status'))
-                    <div class="alert alert-success" role="status">{{ session('status') }}</div>
+                    <div class="alert alert-success academic-alert" role="status">{{ session('status') }}</div>
                 @endif
 
                 @if($isSuspended)
-                    <div class="alert alert-danger" role="alert">{{ __('auth.suspended') }}</div>
+                    <div class="alert alert-danger academic-alert" role="alert">{{ __('auth.suspended') }}</div>
                 @elseif($isFailed)
-                    <div class="alert alert-danger" role="alert">{{ __('auth.failed') }}</div>
+                    <div class="alert alert-danger academic-alert" role="alert">{{ __('auth.failed') }}</div>
                 @elseif($emailError)
-                    <div class="alert alert-danger" role="alert">{{ $emailError }}</div>
+                    <div class="alert alert-danger academic-alert" role="alert">{{ $emailError }}</div>
                 @endif
 
-                <form method="POST" action="{{ route('auth.login') }}" novalidate>
+                <form method="POST" action="{{ route('auth.login') }}" class="academic-form" novalidate>
                     @csrf
                     <div class="mb-3">
                         <label class="form-label" for="login-email">{{ __('ui.email') }}</label>

@@ -1,39 +1,41 @@
 @extends('layouts.app')
 @section('title', __('teach.title'))
 @section('content')
-<x-page-header :title="__('teach.title')" :subtitle="__('teach.subtitle')">
-    <x-slot:actions>
-        <a class="btn btn-outline-primary" href="{{ route('advising.index') }}">{{ __('teach.advising') }}</a>
-    </x-slot:actions>
-</x-page-header>
+<div class="teach-hub animate-in">
+    <x-page-header :title="__('teach.title')" :subtitle="__('teach.subtitle')">
+        <x-slot:actions>
+            <a class="btn btn-outline-primary" href="{{ route('advising.index') }}">{{ __('teach.advising') }}</a>
+        </x-slot:actions>
+    </x-page-header>
 
-@if($offerings->isEmpty())
-    <x-empty-state
-        :title="__('teach.empty_title')"
-        :message="__('teach.empty_message')"
-        icon="bi-easel2"
-    />
-@else
-    <div class="row g-3">
-        @foreach($offerings as $offering)
-            <div class="col-md-6 col-xl-4">
-                <a href="{{ route('teach.show', $offering) }}" class="teach-offering-card d-block h-100 text-decoration-none">
-                    <div class="p-3">
-                        <div class="d-flex justify-content-between gap-2 mb-2">
-                            <span class="fw-semibold text-body">{{ $offering->course->code }}</span>
-                            <x-status-badge :status="$offering->status->value" :label="$offering->status->value" />
+    @if($offerings->isEmpty())
+        <x-empty-state
+            :title="__('teach.empty_title')"
+            :message="__('teach.empty_message')"
+            icon="bi-easel2"
+        />
+    @else
+        <div class="row g-3">
+            @foreach($offerings as $offering)
+                <div class="col-md-6 col-xl-4">
+                    <a href="{{ route('teach.show', $offering) }}" class="teach-offering-card academic-card d-block h-100 text-decoration-none">
+                        <div class="p-3">
+                            <div class="d-flex justify-content-between gap-2 mb-2">
+                                <span class="fw-semibold text-body">{{ $offering->course->code }}</span>
+                                <x-status-badge :status="$offering->status->value" :label="$offering->status->value" />
+                            </div>
+                            <h2 class="h6 spims-title mb-1">{{ $offering->course->title }}</h2>
+                            <p class="small spims-text-dim mb-0">
+                                <x-badge :value="$offering->mode" />
+                                @if($offering->semester)
+                                    · {{ $offering->semester->name }}
+                                @endif
+                            </p>
                         </div>
-                        <h2 class="h6 spims-title mb-1">{{ $offering->course->title }}</h2>
-                        <p class="small spims-text-dim mb-0">
-                            <x-badge :value="$offering->mode" />
-                            @if($offering->semester)
-                                · {{ $offering->semester->name }}
-                            @endif
-                        </p>
-                    </div>
-                </a>
-            </div>
-        @endforeach
-    </div>
-@endif
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    @endif
+</div>
 @endsection

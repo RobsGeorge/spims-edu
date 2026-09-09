@@ -2184,3 +2184,157 @@ progress.spims-progress--danger::-moz-progress-bar  { background: var(--color-da
     font-size: var(--text-sm);
     word-break: break-word;
 }
+
+/* ══════════════════════════════════════
+   Phase B — Sacred Academic surface recipes
+   Thin aliases so Blade can use DESIGN.md names without
+   fighting Phase A token/scale work. Prefer tokens only.
+   ══════════════════════════════════════ */
+
+.academic-card,
+.app-card.academic-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+}
+
+.academic-form .form-label,
+.academic-form .spims-field-label {
+    font-weight: 600;
+    color: var(--color-title);
+}
+
+.academic-form .form-control,
+.academic-form .form-select {
+    min-height: 44px;
+}
+
+.academic-alert.alert,
+.alert.academic-alert {
+    border-radius: var(--radius-md);
+    border-width: 1px;
+    box-shadow: var(--shadow-soft);
+}
+
+.academic-modal .modal-content,
+.academic-modal.spims-modal-content {
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-floating);
+}
+
+.academic-empty,
+.spims-empty-state.academic-empty {
+    background: var(--color-surface);
+    border: 1px dashed var(--color-surface-border);
+    border-radius: var(--radius-md);
+}
+
+.spims-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3, 0.75rem);
+    align-items: end;
+    padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+    background: var(--color-surface-low);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+}
+
+.spims-filter-bar .form-control,
+.spims-filter-bar .form-select,
+.spims-filter-bar .btn {
+    min-height: 44px;
+}
+
+.spims-data-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+}
+
+.spims-data-panel > .spims-table-wrap,
+.spims-data-panel > .table-responsive {
+    margin: 0;
+}
+
+@media (max-width: 767.98px) {
+    .spims-table-wrap--cards table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .spims-table-wrap--cards table,
+    .spims-table-wrap--cards tbody,
+    .spims-table-wrap--cards tr,
+    .spims-table-wrap--cards td {
+        display: block;
+        width: 100%;
+    }
+
+    .spims-table-wrap--cards tr {
+        margin-block-end: var(--space-3, 0.75rem);
+        padding: var(--space-3, 0.75rem);
+        background: var(--color-surface);
+        border: 1px solid var(--color-surface-border);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .spims-table-wrap--cards td {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-2, 0.5rem);
+        padding: var(--space-2, 0.5rem) 0;
+        border-bottom: 1px solid var(--color-hairline);
+        text-align: end;
+    }
+
+    .spims-table-wrap--cards td:last-child {
+        border-bottom: 0;
+    }
+
+    .spims-table-wrap--cards td::before {
+        content: attr(data-label);
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 600;
+        color: var(--color-text-muted);
+        text-align: start;
+        flex: 0 0 auto;
+        max-width: 45%;
+    }
+}
+
+.learn-shell .player-item,
+.learn-shell .list-group-item {
+    border-color: var(--color-surface-border);
+}
+
+.teach-hub .teach-offering-card.academic-card {
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.admin-console .spims-page-actions .btn,
+.sa-hub .spims-page-actions .btn {
+    min-height: 44px;
+}
+
+.portal-dashboard .bento-grid .app-card,
+.portal-dashboard .bento-grid .academic-card {
+    height: 100%;
+}
+
+.settings-page .academic-card {
+    padding: var(--space-4, 1rem);
+}

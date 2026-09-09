@@ -12,6 +12,9 @@ if (! in_array($variant, $allowed, true)) {
 }
 
 $classes = "spims-card spims-card-{$variant}";
+if ($variant !== 'bare') {
+    $classes .= ' academic-card';
+}
 @endphp
 
 <{{ $tag }} {{ $attributes->merge(['class' => $classes]) }}>

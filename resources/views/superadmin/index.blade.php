@@ -3,16 +3,15 @@
 @section('title', __('superadmin.title'))
 
 @section('content')
-<div class="sa-console animate-in">
-    <header class="sa-console-hero app-card mb-4">
+<div class="sa-hub sa-console animate-in">
+    <header class="sa-console-hero app-card academic-card mb-4">
         <div class="d-flex flex-wrap align-items-start gap-3">
             <span class="badge bg-danger fs-6 px-3 py-2">
                 <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
                 {{ __('superadmin.role') }}
             </span>
             <div class="min-w-0 flex-grow-1">
-                <h1 class="page-title mb-2">{{ __('superadmin.title') }}</h1>
-                <p class="spims-text-dim mb-0">{{ __('superadmin.hub_desc') }}</p>
+                <x-page-header class="mb-0" :title="__('superadmin.title')" :subtitle="__('superadmin.hub_desc')" />
             </div>
         </div>
         <div class="sa-callout sa-callout-danger mt-3" role="note">
@@ -44,7 +43,7 @@
         </section>
     @endforeach
 
-    <aside class="sa-roadmap app-card mt-4" aria-label="{{ __('superadmin.roadmap_title') }}">
+    <aside class="sa-roadmap app-card academic-card mt-4" aria-label="{{ __('superadmin.roadmap_title') }}">
         <h2 class="h6 page-title mb-2">{{ __('superadmin.roadmap_title') }}</h2>
         <p class="spims-text-dim small mb-3">{{ __('superadmin.roadmap_desc') }}</p>
         <ul class="sa-roadmap-list mb-0">
