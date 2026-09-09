@@ -158,7 +158,18 @@ class DemoResetCommand extends Command
         // ── Phase 9: Demo users ───────────────────────────────────────────────────
         // Cascade: wallet_accounts → wallet_transactions, user_roles, OTP codes,
         //   advising assignments, notification preferences, personal access tokens.
+        // Explicit wallet wipe first: deleting many users in one statement can leave
+        // wallet_transactions orphaned under PostgreSQL when created_by_id also points
+        // at demo users in the same DELETE set (FK violation on wallet_id).
         if ($demoUserIds->isNotEmpty()) {
+            $walletIds = DB::table('wallet_accounts')
+                ->whereIn('user_id', $demoUserIds)
+                ->pluck('id');
+            if ($walletIds->isNotEmpty()) {
+                DB::table('wallet_transactions')->whereIn('wallet_id', $walletIds)->delete();
+                DB::table('wallet_accounts')->whereIn('id', $walletIds)->delete();
+            }
+            DB::table('notifications')->whereIn('user_id', $demoUserIds)->delete();
             DB::table('users')->whereIn('id', $demoUserIds)->delete();
         }
     }
