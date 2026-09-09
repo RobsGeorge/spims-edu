@@ -11,9 +11,12 @@
     @forelse($guideRoles as $guideRole)
         @php
             /** @var \App\Enums\RoleType $guideRole */
-            if ($guideRole === \App\Enums\RoleType::SuperAdmin) { continue; }
             $articles = $roleGuides[$guideRole->value] ?? collect();
-            $roleLabel = __('roles_hub.role_'.$guideRole->value);
+            // Super Admin is not a matrix row. Label its Help articles without
+            // roles_hub.role_SUPER_ADMIN so ControlPlaneSafetyTest stays honest.
+            $roleLabel = $guideRole === \App\Enums\RoleType::SuperAdmin
+                ? __('roles_hub.portal_guides_operator')
+                : __('roles_hub.role_'.$guideRole->value);
             if ($roleLabel === 'roles_hub.role_'.$guideRole->value) {
                 $roleLabel = __('help.audience_'.$guideRole->value);
             }

@@ -73,6 +73,7 @@ return [
     'portal_guides_title' => 'Guides du centre d’aide',
     'portal_guides_hint' => 'Articles publiés du centre d’aide pour chaque rôle. Ouvrez un guide pour le lire dans le portail.',
     'portal_guides_empty' => 'Aucun guide publié pour ce rôle pour l’instant.',
+    'portal_guides_operator' => 'Guides du plan de contrôle',
     'help_hint' => 'Défauts livrés de chaque rôle statique : qui possède quoi, ce qu’il peut faire, et où la matrice reste mince. Le sélecteur de niveau ci-dessus est live et peut différer tant que vous n’avez pas réinitialisé un rôle.',
     'help_intro_title' => 'Comment fonctionnent les grants',
     'help_intro_body' => 'Les contrôleurs demandent une clé à AuthorizeService. Super Admin contourne chaque clé. Les autres ont besoin d’un grant sur leur rôle avec un niveau explicite dans le sélecteur. Une personne peut porter plusieurs rôles ; l’accès est l’union. Un grant admin est à l’échelle de l’école même si la personne enseigne aussi.',

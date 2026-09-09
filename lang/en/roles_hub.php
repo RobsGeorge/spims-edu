@@ -73,6 +73,7 @@ return [
     'portal_guides_title' => 'Portal Help guides',
     'portal_guides_hint' => 'Published Help Center articles for each role. Open a guide to read it in the portal.',
     'portal_guides_empty' => 'No published portal guides for this role yet.',
+    'portal_guides_operator' => 'Control plane guides',
     'help_hint' => 'Shipped defaults for each static role: who owns what, what they can do, and where the matrix is still thin. The level picker above is live and may differ until you reset a role.',
     'help_intro_title' => 'How grants work',
     'help_intro_body' => 'Controllers ask AuthorizeService for a permission key. Super Admin bypasses every key. Everyone else needs a grant on their role with an explicit level on the picker. A person may hold several roles; access is the union. An admin grant is school-wide even if that person also teaches.',
