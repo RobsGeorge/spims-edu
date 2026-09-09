@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStatus;
 use App\Enums\ProgramType;
+use App\Enums\SemesterStatus;
 use App\Enums\RequirementType;
 use App\Models\AcademicYear;
 use App\Models\Course;
@@ -84,7 +85,7 @@ class SampleDataSeeder extends Seeder
                 'add_drop_end_week' => 2,
                 'last_withdrawal_week' => 8,
                 'withdrawal_refund_percent' => 50,
-                'status' => OfferingStatus::Open,
+                'status' => SemesterStatus::Open,
             ]
         );
 
