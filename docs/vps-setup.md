@@ -140,8 +140,11 @@ In repo Settings → Secrets:
 | A `spims-edu.com` | VPS IP |
 | A `www` | VPS IP |
 | A `staging` | VPS IP |
+| A `demo` | VPS IP |
 
-No hidden subdomains in v1 — only production and staging hostnames above.
+- Production: `/var/www/spims` → `spims-edu.com`
+- Staging: `/var/www/spims-staging` → `staging.spims-edu.com` (CI deploys)
+- Demo: `/var/www/spims-demo` → `demo.spims-edu.com` (client show; `SEED_DEMO_DATA=true`)
 
 ## 11. Production `.env` hardening
 
