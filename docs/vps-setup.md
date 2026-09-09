@@ -171,6 +171,8 @@ sudo chmod 600 /home/deploy/.ssh/authorized_keys
 sudo chown -R deploy:deploy /home/deploy/.ssh
 ```
 
+`deploy` has **no password**. `ssh deploy@YOUR_VPS_IP` will always fail with `deploy@…'s password:` / `Permission denied` until a public key is in `authorized_keys` and you connect with the matching private key (`ssh -i …`). Do not run `passwd deploy` for GitHub Actions — key-only is what the pipeline uses. Stay logged in as `root` (or your sudo user) to install the key below.
+
 Give `deploy` passwordless sudo **only** for the commands the deploy workflow runs (`chown`, `chmod`, `systemctl`):
 
 ```bash
@@ -222,7 +224,7 @@ Test from your laptop before adding GitHub secrets:
 ssh -i ./spims-deploy-actions deploy@YOUR_VPS_IP 'whoami && hostname'
 ```
 
-It must print `deploy` with no password prompt.
+It must print `deploy` with no password prompt. If you see `deploy@…'s password:`, key auth did not run — see the troubleshooting entry below.
 
 ---
 
@@ -694,6 +696,7 @@ Staging uses the **same** four SSH secrets. Push to branch `staging` to trigger 
 
 | Symptom | What to check |
 |---------|----------------|
+| `deploy@IP's password:` then `Permission denied` | Expected: `deploy` has no password. Log in as **root**, install a public key, then `ssh -i ./spims-deploy-actions deploy@IP`. Do not guess a password. Repair steps in the next subsection. |
 | Actions: `Permission denied (publickey)` | Public key not in `/home/deploy/.ssh/authorized_keys`; secret `SSH_PRIVATE_KEY` is the wrong key or malformed; `SSH_USER` is not `deploy` |
 | Actions: `sudo: a password is required` | `/etc/sudoers.d/spims-deploy` missing or wrong paths |
 | Actions: `git fetch` auth failure | Private repo without a VPS deploy key; or HTTPS clone with no credentials |
@@ -703,6 +706,45 @@ Staging uses the **same** four SSH secrets. Push to branch `staging` to trigger 
 | Certbot NXDOMAIN | DNS A records not pointing at this VPS yet |
 | Queue jobs stuck | `systemctl status spims-queue`; `QUEUE_CONNECTION=redis`; Redis `PONG` |
 | Super Admin cannot log in | Password is `SUPERADMIN_PASSWORD` **at seed time**. Changing `.env` later does not update the hash — reset in tinker or re-seed on a fresh DB only |
+
+### Repair: `deploy@…'s password:` / `Permission denied`
+
+`adduser --disabled-password` means there is no password to type. A password prompt means SSH did not accept a key and fell back to password auth, which then fails.
+
+On your **laptop**, if you do not already have the Actions key pair:
+
+```bash
+ssh-keygen -t ed25519 -C "spims-github-actions" -f ./spims-deploy-actions -N ""
+cat ./spims-deploy-actions.pub
+```
+
+On the VPS, as **root** (or a sudo user that can already log in):
+
+```bash
+ssh root@YOUR_VPS_IP
+```
+
+```bash
+sudo mkdir -p /home/deploy/.ssh
+sudo chmod 700 /home/deploy/.ssh
+# Paste the one line from spims-deploy-actions.pub (starts with ssh-ed25519)
+echo 'ssh-ed25519 AAAA... spims-github-actions' | sudo tee -a /home/deploy/.ssh/authorized_keys
+sudo chmod 600 /home/deploy/.ssh/authorized_keys
+sudo chown -R deploy:deploy /home/deploy/.ssh
+sudo -u deploy cat /home/deploy/.ssh/authorized_keys
+```
+
+`authorized_keys` must contain the **public** line (`ssh-ed25519 AAAA…`), never the private key (`-----BEGIN … PRIVATE KEY-----`).
+
+Back on the laptop:
+
+```bash
+ssh -i ./spims-deploy-actions -o IdentitiesOnly=yes deploy@YOUR_VPS_IP 'whoami'
+```
+
+`-o IdentitiesOnly=yes` stops SSH from trying other keys first. Success prints `deploy` and does not ask for a password.
+
+For GitHub Actions, paste the **private** file `spims-deploy-actions` into secret `SSH_PRIVATE_KEY` (including the `BEGIN`/`END` lines). The public half stays only on the VPS.
 
 Rollback: [release-runbook.md](release-runbook.md).
 
