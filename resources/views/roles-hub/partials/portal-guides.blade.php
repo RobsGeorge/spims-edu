@@ -11,6 +11,7 @@
     @forelse($guideRoles as $guideRole)
         @php
             /** @var \App\Enums\RoleType $guideRole */
+            if ($guideRole === \App\Enums\RoleType::SuperAdmin) { continue; }
             $articles = $roleGuides[$guideRole->value] ?? collect();
             $roleLabel = __('roles_hub.role_'.$guideRole->value);
             if ($roleLabel === 'roles_hub.role_'.$guideRole->value) {
