@@ -15,6 +15,7 @@ use App\Enums\FormFieldType;
 use App\Enums\GradeStatus;
 use App\Enums\GradeType;
 use App\Enums\LedgerReason;
+use App\Enums\LiveQuizSessionState;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStaffRole;
 use App\Enums\OfferingStatus;
@@ -35,12 +36,14 @@ use App\Models\ApplicationFieldValue;
 use App\Models\ApplicationForm;
 use App\Models\ApplicationFormField;
 use App\Models\Assessment;
+use App\Models\AssessmentTemplate;
 use App\Models\ClassSession;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Credential;
 use App\Models\DiscussionPost;
+use App\Models\EmailTemplate;
 use App\Models\Enrollment;
 use App\Models\Event;
 use App\Models\FeedbackSurvey;
@@ -48,6 +51,7 @@ use App\Models\GradebookComponent;
 use App\Models\GradingScheme;
 use App\Models\Invoice;
 use App\Models\LiveQuiz;
+use App\Models\LiveQuizSession;
 use App\Models\LiveSession;
 use App\Models\OfferingStaff;
 use App\Models\Program;
@@ -60,9 +64,11 @@ use App\Models\StudentProgram;
 use App\Models\User;
 use App\Models\UserRole;
 use App\Models\Week;
+use App\Services\Academics\AssessmentTemplateService;
 use App\Services\Assessment\AssessmentService;
 use App\Services\Assessment\QuestionBankService;
 use App\Services\Communications\AnnouncementService;
+use App\Services\Communications\EmailTemplateService;
 use App\Services\Credentials\CredentialService;
 use App\Services\Discussions\DiscussionService;
 use App\Services\Enrollment\EnrollmentService;
@@ -699,6 +705,8 @@ class DemoDataSeeder extends Seeder
 
         $th101 = $this->offeringByCourseCode($offerings, 'TH101', OfferingMode::Cohort);
         $bi101 = $this->offeringByCourseCode($offerings, 'BI101', OfferingMode::Cohort);
+        $bi102 = $this->offeringByCourseCode($offerings, 'BI102', OfferingMode::Cohort);
+        $li101 = $this->offeringByCourseCode($offerings, 'LI101', OfferingMode::Cohort);
         $free1 = $this->offeringByCourseCode($offerings, 'FREE1', OfferingMode::Cohort);
         $et101SelfPaced = $this->offeringByCourseCode($offerings, 'ET101', OfferingMode::SelfPaced);
 
@@ -712,6 +720,14 @@ class DemoDataSeeder extends Seeder
             [ContentItemType::Text->value, 'Welcome to Old Testament Survey', 'Week 1 introduces the survey map for this course.'],
             [ContentItemType::Reading->value, 'Week 1 reading — survey map', 'Read the unit map and list the books covered in the first half of the term.'],
             [ContentItemType::Text->value, 'Study notes for Week 1', 'Bring one question from the reading to the live session.'],
+        ]);
+        $this->seedWeekOneContent($offeringsService, $ins1, $bi102, [
+            [ContentItemType::Text->value, 'Welcome to New Testament Survey', 'Week 1 orients students to the Gospels and Acts as the narrative backbone of the New Testament.'],
+            [ContentItemType::Reading->value, 'Week 1 reading — NT survey map', 'Skim the unit map and note which books fall in the first half of the term.'],
+        ]);
+        $this->seedWeekOneContent($offeringsService, $ins2, $li101, [
+            [ContentItemType::Text->value, 'Welcome to Coptic Liturgy Basics', 'Week 1 introduces the shape of the Divine Liturgy and how this course approaches it.'],
+            [ContentItemType::Reading->value, 'Week 1 reading — liturgy outline', 'Read the short outline of the Alexandrian liturgy and mark questions for the live session.'],
         ]);
 
         // Seed additional content item types (VIDEO, FILE) in TH101 Week 2
@@ -733,6 +749,10 @@ class DemoDataSeeder extends Seeder
         $this->seedSurvey($ins1, $th101);
         $this->seedLiveQuiz($ins1, $th101);
         $this->seedTeamProject($aca, $student1, $th101);
+
+        // Phase D polish
+        $this->seedEmailTemplate($aca);
+        $this->seedAssessmentTemplate($aca);
     }
 
     /**
@@ -1222,37 +1242,95 @@ class DemoDataSeeder extends Seeder
     }
 
     /**
-     * Create a live quiz for TH101 (Ready status, not yet started).
-     * student1 can join when an instructor starts a session from it.
+     * Create a Ready live quiz for TH101 and open a Lobby session so hosts and
+     * students can join without waiting for a timed question launch.
      */
     private function seedLiveQuiz(User $ins1, CourseOffering $th101): void
     {
-        if (LiveQuiz::query()->where('offering_id', $th101->id)->where('title', 'TH101 Live Check Quiz')->exists()) {
+        $host = app(LiveQuizHostService::class);
+
+        $quiz = LiveQuiz::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Live Check Quiz')
+            ->first();
+
+        if ($quiz === null) {
+            $quiz = $host->createQuiz($ins1, $th101, 'TH101 Live Check Quiz', [
+                [
+                    'prompt' => 'What does the course code "TH" stand for in TH101?',
+                    'time_limit_seconds' => 30,
+                    'points' => 1000,
+                    'options' => [
+                        ['label' => 'Theology', 'is_correct' => true],
+                        ['label' => 'Theory', 'is_correct' => false],
+                        ['label' => 'Thinking', 'is_correct' => false],
+                        ['label' => 'Tradition', 'is_correct' => false],
+                    ],
+                ],
+                [
+                    'prompt' => 'How many credit hours does TH101 carry?',
+                    'time_limit_seconds' => 20,
+                    'points' => 500,
+                    'options' => [
+                        ['label' => '2', 'is_correct' => false],
+                        ['label' => '3', 'is_correct' => true],
+                        ['label' => '4', 'is_correct' => false],
+                        ['label' => '1', 'is_correct' => false],
+                    ],
+                ],
+            ]);
+        }
+
+        $active = LiveQuizSession::query()
+            ->where('quiz_id', $quiz->id)
+            ->where('state', '!=', LiveQuizSessionState::Ended->value)
+            ->first();
+
+        if ($active === null) {
+            $host->startSession($ins1, $quiz);
+        }
+    }
+
+    /**
+     * Global email template so /admin/email-templates is non-empty for the walkthrough.
+     */
+    private function seedEmailTemplate(User $aca): void
+    {
+        $exists = EmailTemplate::query()
+            ->where('key', 'announcement.published')
+            ->where('locale', 'en')
+            ->whereNull('scope_type')
+            ->whereNull('scope_id')
+            ->exists();
+
+        if ($exists) {
             return;
         }
 
-        app(LiveQuizHostService::class)->createQuiz($ins1, $th101, 'TH101 Live Check Quiz', [
-            [
-                'prompt' => 'What does the course code "TH" stand for in TH101?',
-                'time_limit_seconds' => 30,
-                'points' => 1000,
-                'options' => [
-                    ['label' => 'Theology', 'is_correct' => true],
-                    ['label' => 'Theory', 'is_correct' => false],
-                    ['label' => 'Thinking', 'is_correct' => false],
-                    ['label' => 'Tradition', 'is_correct' => false],
-                ],
-            ],
-            [
-                'prompt' => 'How many credit hours does TH101 carry?',
-                'time_limit_seconds' => 20,
-                'points' => 500,
-                'options' => [
-                    ['label' => '2', 'is_correct' => false],
-                    ['label' => '3', 'is_correct' => true],
-                    ['label' => '4', 'is_correct' => false],
-                    ['label' => '1', 'is_correct' => false],
-                ],
+        app(EmailTemplateService::class)->upsert($aca, [
+            'key' => 'announcement.published',
+            'locale' => 'en',
+            'subject' => 'SPIMS demo: {{title}}',
+            'body' => "Hello {{name}},\n\n{{body}}\n\nCourse: {{course}}\n\n— SPIMS demo template",
+        ]);
+    }
+
+    /**
+     * Assessment template so /admin/assessment-templates shows a usable rollup.
+     */
+    private function seedAssessmentTemplate(User $aca): void
+    {
+        if (AssessmentTemplate::query()->where('name', 'Demo Standard Rollup')->exists()) {
+            return;
+        }
+
+        app(AssessmentTemplateService::class)->create($aca, [
+            'name' => 'Demo Standard Rollup',
+            'is_default' => ! AssessmentTemplate::query()->where('is_default', true)->exists(),
+            'components' => [
+                ['name' => 'Exam', 'weight_percent' => 50, 'kind' => ComponentKind::Exam->value],
+                ['name' => 'Assignments', 'weight_percent' => 30, 'kind' => ComponentKind::Assignment->value],
+                ['name' => 'Attendance', 'weight_percent' => 20, 'kind' => ComponentKind::Attendance->value],
             ],
         ]);
     }
