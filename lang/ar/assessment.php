@@ -147,4 +147,23 @@ return [
     'attach' => 'إرفاق',
     'questions' => 'الأسئلة',
     'minutes_meta' => ':count د',
+
+    // Step 14 — gradebook cell entry
+    'cell_score_saved' => 'تم حفظ الدرجة.',
+    'cell_score_error' => 'تعذّر حفظ الدرجة. يُرجى المحاولة مجدداً.',
+    'cell_score_range' => 'يجب أن تكون الدرجة بين 0 و100.',
+    'cell_score_input' => 'أدخل الدرجة (0–100)',
+    'cell_edit_aria' => 'تعديل درجة :component — :student',
+    'gradebook_locked_banner_title' => 'دفتر الدرجات مقفل',
+    'gradebook_locked_banner_body' => 'تم قفل دفتر الدرجات في :date. تواصل مع المسؤول الأكاديمي لإعادة فتحه.',
+
+    // Step 14 — proctor review
+    'proctor_events' => 'أحداث المراقبة',
+    'proctor_event_type' => 'نوع الحدث',
+    'proctor_event_at' => 'الوقت',
+    'proctor_event_number' => '#',
+    'proctor_focus_loss_count' => 'عدد مرات فقدان التركيز',
+    'proctor_event_type_FOCUS_LOSS' => 'فقدان التركيز',
+    'proctor_event_type_TAB_SWITCH' => 'تبديل التبويب',
+    'proctor_event_type_unknown' => 'حدث غير معروف',
 ];

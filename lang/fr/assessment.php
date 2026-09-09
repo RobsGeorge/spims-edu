@@ -147,4 +147,23 @@ return [
     'attach' => 'Attacher',
     'questions' => 'Questions',
     'minutes_meta' => ':count min',
+
+    // Step 14 — gradebook cell entry
+    'cell_score_saved' => 'Note enregistrée.',
+    'cell_score_error' => 'Impossible d'enregistrer la note. Veuillez réessayer.',
+    'cell_score_range' => 'La note doit être comprise entre 0 et 100.',
+    'cell_score_input' => 'Entrer la note (0–100)',
+    'cell_edit_aria' => 'Modifier la note pour :component — :student',
+    'gradebook_locked_banner_title' => 'Le carnet de notes est verrouillé',
+    'gradebook_locked_banner_body' => 'Ce carnet de notes a été verrouillé le :date. Contactez un administrateur académique pour le rouvrir.',
+
+    // Step 14 — proctor review
+    'proctor_events' => 'Événements de surveillance',
+    'proctor_event_type' => 'Type d'événement',
+    'proctor_event_at' => 'Heure',
+    'proctor_event_number' => '#',
+    'proctor_focus_loss_count' => 'Nombre de pertes de focus',
+    'proctor_event_type_FOCUS_LOSS' => 'Perte de focus',
+    'proctor_event_type_TAB_SWITCH' => 'Changement d'onglet',
+    'proctor_event_type_unknown' => 'Événement inconnu',
 ];
