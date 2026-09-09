@@ -72,10 +72,15 @@ class ProgramCatalogTest extends TestCase
     public function program_catalog_hides_programs_with_no_courses(): void
     {
         $emptyProgram = Program::query()->create([
-            'code'   => 'EMPTY-PROG',
-            'name'   => 'Empty Program',
-            'type'   => ProgramType::Diploma,
-            'active' => true,
+            'code'                      => 'EMPTY-PROG',
+            'name'                      => 'Empty Program',
+            'type'                      => ProgramType::Diploma,
+            'passing_threshold'         => 60.0,
+            'max_credits_per_semester'  => 18,
+            'max_courses_per_semester'  => 6,
+            'max_semesters_to_graduate' => 4,
+            'elective_credits_required' => 0,
+            'active'                    => true,
         ]);
 
         $response = $this->get(route('programs.catalog.index'));
@@ -130,10 +135,15 @@ class ProgramCatalogTest extends TestCase
     public function inactive_program_is_not_accessible(): void
     {
         $inactive = Program::query()->create([
-            'code'   => 'INACTIVE',
-            'name'   => 'Inactive Program',
-            'type'   => ProgramType::Diploma,
-            'active' => false,
+            'code'                      => 'INACTIVE',
+            'name'                      => 'Inactive Program',
+            'type'                      => ProgramType::Diploma,
+            'passing_threshold'         => 60.0,
+            'max_credits_per_semester'  => 18,
+            'max_courses_per_semester'  => 6,
+            'max_semesters_to_graduate' => 4,
+            'elective_credits_required' => 0,
+            'active'                    => false,
         ]);
 
         $response = $this->get(route('programs.catalog.show', $inactive->code));
