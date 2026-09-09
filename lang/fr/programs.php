@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'catalog_title'       => 'Catalogue des programmes',
+    'catalog_subtitle'    => 'Parcourez nos programmes académiques et trouvez celui qui vous convient.',
+    'no_programs'         => 'Aucun programme disponible',
+    'no_programs_hint'    => 'Revenez bientôt — les programmes apparaîtront ici une fois publiés.',
+    'credits'             => 'crédits',
+    'courses'             => 'cours',
+    'semesters'           => 'semestres',
+    'apply_now'           => 'Postuler maintenant',
+    'learn_more'          => 'En savoir plus',
+    'all_programs'        => 'Tous les programmes',
+    'brochure'            => 'Brochure du programme',
+    'total_credits'       => 'Total crédits',
+    'elective_credits'    => 'Crédits électifs',
+    'max_semesters'       => 'Semestres max',
+    'passing_threshold'   => 'Seuil de réussite',
+    'course_sequence'     => 'Séquence des cours',
+    'year_label'          => 'Année :year',
+    'cr'                  => 'cr',
+    'ready_to_apply'      => 'Prêt à postuler ?',
+    'apply_hint'          => "Soumettez votre candidature aujourd'hui ou contactez notre équipe des admissions.",
+    'contact_admissions'  => 'Contacter les admissions',
+];

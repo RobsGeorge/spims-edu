@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'catalog_title'       => 'Program Catalog',
+    'catalog_subtitle'    => 'Browse our academic programs and find the one that suits you.',
+    'no_programs'         => 'No programs available',
+    'no_programs_hint'    => 'Check back soon — programs will appear here once published.',
+    'credits'             => 'credits',
+    'courses'             => 'courses',
+    'semesters'           => 'semesters',
+    'apply_now'           => 'Apply now',
+    'learn_more'          => 'Learn more',
+    'all_programs'        => 'All programs',
+    'brochure'            => 'Program brochure',
+    'total_credits'       => 'Total credits',
+    'elective_credits'    => 'Elective credits',
+    'max_semesters'       => 'Max semesters',
+    'passing_threshold'   => 'Passing threshold',
+    'course_sequence'     => 'Course sequence',
+    'year_label'          => 'Year :year',
+    'cr'                  => 'cr',
+    'ready_to_apply'      => 'Ready to apply?',
+    'apply_hint'          => 'Submit your application today or reach out to our admissions team.',
+    'contact_admissions'  => 'Contact admissions',
+];

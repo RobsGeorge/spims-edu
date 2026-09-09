@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'catalog_title'       => 'كتالوج البرامج',
+    'catalog_subtitle'    => 'تصفح برامجنا الأكاديمية واختر ما يناسبك.',
+    'no_programs'         => 'لا توجد برامج متاحة',
+    'no_programs_hint'    => 'عودة قريباً — ستظهر البرامج هنا عند نشرها.',
+    'credits'             => 'ساعات',
+    'courses'             => 'مقررات',
+    'semesters'           => 'فصول',
+    'apply_now'           => 'تقدم الآن',
+    'learn_more'          => 'اعرف أكثر',
+    'all_programs'        => 'كل البرامج',
+    'brochure'            => 'نشرة البرنامج',
+    'total_credits'       => 'إجمالي الساعات',
+    'elective_credits'    => 'ساعات اختيارية',
+    'max_semesters'       => 'أقصى فصول',
+    'passing_threshold'   => 'حد النجاح',
+    'course_sequence'     => 'تسلسل المقررات',
+    'year_label'          => 'السنة :year',
+    'cr'                  => 'س',
+    'ready_to_apply'      => 'مستعد للتقديم؟',
+    'apply_hint'          => 'قدم طلبك اليوم أو تواصل مع فريق القبول.',
+    'contact_admissions'  => 'تواصل مع القبول',
+];

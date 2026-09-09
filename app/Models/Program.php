@@ -27,6 +27,8 @@ class Program extends Model
         'signatory_title',
         'grading_scheme_id',
         'active',
+        'description',
+        'marketing_summary',
         'standing_good_min',
         'standing_suspension_below',
         'enforce_year_sequence',
