@@ -2,10 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Enums\AdvisingHoldKind;
 use App\Enums\ApplicationStatus;
 use App\Enums\AssessmentMode;
+use App\Enums\AttemptStatus;
 use App\Enums\AttendanceStatus;
 use App\Enums\ClassSessionMode;
+use App\Enums\CommunicationChannel;
+use App\Enums\CompletionCriterionKind;
 use App\Enums\ComponentKind;
 use App\Enums\ContentItemType;
 use App\Enums\Currency;
@@ -22,16 +26,18 @@ use App\Enums\OfferingStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\ProjectDeliverableKind;
 use App\Enums\ProjectGradingMode;
+use App\Enums\ProjectReviewStatus;
 use App\Enums\ProgramType;
 use App\Enums\QuestionType;
 use App\Enums\RequirementType;
 use App\Enums\RoleType;
 use App\Enums\StudentProgramStatus;
+use App\Enums\SubmissionType;
 use App\Enums\UserStatus;
 use App\Enums\WalletKind;
 use App\Models\AcademicYear;
-use App\Enums\AttemptStatus;
-use App\Enums\SubmissionType;
+use App\Models\AdvisingHold;
+use App\Models\AdvisorAssignment;
 use App\Models\Announcement;
 use App\Models\Application;
 use App\Models\ApplicationFieldValue;
@@ -41,7 +47,10 @@ use App\Models\Assessment;
 use App\Models\AssessmentAttempt;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
+use App\Models\CertificateTemplate;
 use App\Models\ClassSession;
+use App\Models\CommunicationLog;
+use App\Models\CompletionCriterion;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
@@ -65,6 +74,7 @@ use App\Models\PaymentPlan;
 use App\Models\Program;
 use App\Models\ProgramCourse;
 use App\Models\ProjectAssessment;
+use App\Models\ProjectDeliverableSubmission;
 use App\Models\ProjectMembership;
 use App\Models\Question;
 use App\Models\QuestionBank;
@@ -80,8 +90,12 @@ use App\Services\Assessment\AssignmentService;
 use App\Services\Assessment\AttemptService;
 use App\Services\Assessment\QuestionBankService;
 use App\Services\Communications\AnnouncementService;
+use App\Services\Communications\ChannelDispatcher;
+use App\Services\Completion\CompletionService;
+use App\Services\Credentials\CertificateTemplateService;
 use App\Services\Credentials\CredentialService;
 use App\Services\Discussions\DiscussionService;
+use App\Services\Enrollment\AdvisingService;
 use App\Services\Enrollment\EnrollmentService;
 use App\Services\Events\EventCheckInService;
 use App\Services\Events\EventService;
@@ -99,8 +113,10 @@ use App\Services\LiveQuiz\LiveQuizHostService;
 use App\Services\Notifications\NotificationService;
 use App\Services\Offerings\OfferingService;
 use App\Services\Projects\ProjectAssessmentService;
+use App\Services\Projects\ProjectDeliverableService;
 use App\Services\Projects\ProjectTeamService;
 use Illuminate\Database\Seeder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 
 class DemoDataSeeder extends Seeder
@@ -765,6 +781,13 @@ class DemoDataSeeder extends Seeder
         $this->seedWalletPoints($fin, $student1);
         $this->seedTranslations($aca, $courses, $programs);
         $this->seedStudentNotifications($student1);
+
+        // Phase C — admin depth fixtures
+        $this->seedAdvising($aca, $ins1, $student1, $student6, $programs);
+        $this->seedCertificateTemplate($aca, $th101);
+        $this->seedCommunicationLogs($student1);
+        $this->seedCompletionCriteriaAndEvaluate($aca, $th101);
+        $this->seedProjectDeliverableSubmission($aca, $student1, $th101);
     }
 
     /**
@@ -829,6 +852,7 @@ class DemoDataSeeder extends Seeder
     /**
      * Seed VIDEO and FILE content item types in TH101 Week 2 so every major
      * content-item type is represented in the demo walkthrough offering.
+     * FILE items store a real PDF so learn download works.
      */
     private function seedWeekTwoContent(OfferingService $offeringsService, User $ins1, CourseOffering $th101): void
     {
@@ -841,20 +865,25 @@ class DemoDataSeeder extends Seeder
             return;
         }
 
+        $fileTitle = 'TH101 Week 2 reference sheet (PDF)';
         $items = [
-            [ContentItemType::Video->value, 'TH101 Week 2 intro video', 'Watch this short clip before the live session. Key themes: the nature of divine revelation.'],
-            [ContentItemType::File->value, 'TH101 Week 2 reference sheet (PDF)', 'A downloadable reference sheet covering the key terms from Week 2.'],
-            [ContentItemType::Reading->value, 'TH101 Week 2 assigned reading', 'Complete the assigned pages before the Week 2 live session.'],
-            [ContentItemType::Text->value, 'TH101 Week 2 study notes', 'Notes to supplement the assigned reading. Review before the quiz.'],
+            [ContentItemType::Video->value, 'TH101 Week 2 intro video', 'Watch this short clip before the live session. Key themes: the nature of divine revelation.', null],
+            [ContentItemType::File->value, $fileTitle, 'A downloadable reference sheet covering the key terms from Week 2.', $this->demoPdfUpload('th101-week2-reference.pdf')],
+            [ContentItemType::Reading->value, 'TH101 Week 2 assigned reading', 'Complete the assigned pages before the Week 2 live session.', null],
+            [ContentItemType::Text->value, 'TH101 Week 2 study notes', 'Notes to supplement the assigned reading. Review before the quiz.', null],
         ];
 
-        foreach ($items as $i => [$type, $title, $body]) {
+        foreach ($items as $i => [$type, $title, $body, $upload]) {
             $existing = ContentItem::query()
                 ->where('week_id', $week2->id)
                 ->where('title', $title)
                 ->first();
 
             if ($existing !== null) {
+                if ($type === ContentItemType::File->value && ! $existing->isStoredFile() && $upload !== null) {
+                    $offeringsService->updateContentItem($ins1, $existing, [], $upload);
+                    $existing = $existing->fresh();
+                }
                 if (! $existing->isPublished()) {
                     $offeringsService->publishContentItem($ins1, $existing);
                 }
@@ -867,8 +896,20 @@ class DemoDataSeeder extends Seeder
                 'body' => $body,
                 'order' => $i + 1,
                 'published' => true,
-            ]);
+            ], $upload);
         }
+    }
+
+    /**
+     * Minimal valid PDF for demo FILE content uploads (magic-byte checked).
+     */
+    private function demoPdfUpload(string $originalName): UploadedFile
+    {
+        $contents = "%PDF-1.4\n1 0 obj<< /Type /Catalog >>endobj\ntrailer<< /Root 1 0 R >>\n%%EOF\n";
+        $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'spims-demo-'.md5($originalName).'.pdf';
+        file_put_contents($path, $contents);
+
+        return new UploadedFile($path, $originalName, 'application/pdf', null, true);
     }
 
     private function seedTh101AssessmentAndGradebook(User $ins1, CourseOffering $th101, ?ContentItem $hostItem): void
@@ -1705,6 +1746,201 @@ class DemoDataSeeder extends Seeder
                 $invoice !== null ? ['invoice_id' => $invoice->id] : null,
                 alsoEmail: false,
             );
+        }
+    }
+
+    // ─── Phase C — admin depth ────────────────────────────────────────────────
+
+    /**
+     * Advisor assignment for student1; active hold on student6; released hold
+     * history on student1 (so the student1 walkthrough is not enrollment-blocked).
+     *
+     * @param  array<string, Program>  $programs
+     */
+    private function seedAdvising(User $aca, User $ins1, User $student1, User $student6, array $programs): void
+    {
+        $advising = app(AdvisingService::class);
+        $programId = $programs['DIP-THEO']->id ?? null;
+
+        if (! AdvisorAssignment::query()
+            ->where('student_id', $student1->id)
+            ->where('advisor_id', $ins1->id)
+            ->exists()) {
+            $advising->assignAdvisor($aca, $student1, $ins1, $programId);
+        }
+
+        if (! AdvisingHold::query()
+            ->where('student_id', $student6->id)
+            ->whereNull('released_at')
+            ->exists()) {
+            $advising->placeHold(
+                $aca,
+                $student6,
+                AdvisingHoldKind::Advising,
+                'Demo advising hold — parish recommendation pending.'
+            );
+        }
+
+        if (! AdvisingHold::query()
+            ->where('student_id', $student1->id)
+            ->whereNotNull('released_at')
+            ->exists()) {
+            $hold = $advising->placeHold(
+                $aca,
+                $student1,
+                AdvisingHoldKind::Discipline,
+                'Demo released hold — resolved before term start.'
+            );
+            $advising->releaseHold($aca, $hold);
+        }
+    }
+
+    /**
+     * Global + TH101-scoped certificate templates for /admin/certificate-templates.
+     * Credential PDF issuance stays best-effort in seedCredential().
+     */
+    private function seedCertificateTemplate(User $aca, CourseOffering $th101): void
+    {
+        $templates = app(CertificateTemplateService::class);
+        $th101->loadMissing('course');
+
+        if (CertificateTemplate::query()->whereNull('course_id')->where('locale', 'en')->doesntExist()) {
+            $templates->upsert($aca, [
+                'course_id' => null,
+                'locale' => 'en',
+                'title' => 'Certificate of Completion',
+                'body' => 'This certifies that {{student_name}} has completed {{course_title}} on {{issued_at}}. Serial: {{serial}}.',
+            ]);
+        }
+
+        if (CertificateTemplate::query()
+            ->where('course_id', $th101->course_id)
+            ->where('locale', 'en')
+            ->doesntExist()) {
+            $templates->upsert($aca, [
+                'course_id' => $th101->course_id,
+                'locale' => 'en',
+                'title' => 'TH101 Certificate of Completion',
+                'body' => 'SPIMS certifies that {{student_name}} completed {{course_title}} ({{issued_at}}). Credential {{serial}}.',
+            ]);
+        }
+    }
+
+    /**
+     * Ensure /admin/communications has rows. Announcement publish usually writes
+     * them; fall back to ChannelDispatcher if the cohort had no deliveries yet.
+     */
+    private function seedCommunicationLogs(User $student1): void
+    {
+        if (CommunicationLog::query()->where('recipient_id', $student1->id)->exists()) {
+            return;
+        }
+
+        $dispatcher = app(ChannelDispatcher::class);
+        $dispatcher->dispatch(
+            CommunicationChannel::InApp,
+            $student1,
+            'announcement.published',
+            'Demo in-app notice',
+            'Week 1 materials are ready.',
+        );
+        $dispatcher->dispatch(
+            CommunicationChannel::Mail,
+            $student1,
+            'announcement.published',
+            'Demo mail notice',
+            'Week 1 materials are ready.',
+        );
+    }
+
+    /**
+     * Offering-scoped completion criteria + evaluate for the closing UI.
+     * Does not lock grading / announce / close — lockGrades marks enrollments
+     * Completed and empties the student attendance walkthrough history.
+     */
+    private function seedCompletionCriteriaAndEvaluate(User $aca, CourseOffering $th101): void
+    {
+        $completion = app(CompletionService::class);
+        $th101->loadMissing('course');
+
+        $hasCriteria = CompletionCriterion::query()
+            ->where(function ($q) use ($th101) {
+                $q->where('offering_id', $th101->id)
+                    ->orWhere('course_id', $th101->course_id);
+            })
+            ->exists();
+
+        if (! $hasCriteria) {
+            $completion->addCriterion($aca, $th101->course, [
+                'kind' => CompletionCriterionKind::MinAttendance->value,
+                'threshold' => 50,
+                'is_required' => true,
+                'offering_id' => $th101->id,
+            ]);
+            $completion->addCriterion($aca, $th101->course, [
+                'kind' => CompletionCriterionKind::MinGrade->value,
+                'threshold' => 50,
+                'is_required' => false,
+                'offering_id' => $th101->id,
+            ]);
+        }
+
+        $completion->evaluate($aca, $th101);
+    }
+
+    /**
+     * Upload student1's FILE deliverable and accept it for the TH101 team project.
+     */
+    private function seedProjectDeliverableSubmission(User $aca, User $student1, CourseOffering $th101): void
+    {
+        $assessment = ProjectAssessment::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Group Research Project')
+            ->first();
+
+        if ($assessment === null) {
+            return;
+        }
+
+        $membership = ProjectMembership::query()
+            ->whereHas('project', fn ($q) => $q->where('project_assessment_id', $assessment->id))
+            ->where('student_id', $student1->id)
+            ->whereNull('left_at')
+            ->with('project')
+            ->first();
+
+        if ($membership?->project === null) {
+            return;
+        }
+
+        $project = $membership->project;
+        $deliverable = $assessment->phases()
+            ->with('deliverables')
+            ->get()
+            ->flatMap(fn ($phase) => $phase->deliverables)
+            ->first();
+
+        if ($deliverable === null) {
+            return;
+        }
+
+        if (ProjectDeliverableSubmission::query()
+            ->where('project_id', $project->id)
+            ->where('deliverable_id', $deliverable->id)
+            ->exists()) {
+            return;
+        }
+
+        try {
+            $deliverables = app(ProjectDeliverableService::class);
+            $submission = $deliverables->submit($student1, $project, $deliverable, [], [
+                UploadedFile::fake()->create('research-paper.pdf', 40),
+            ]);
+            $deliverables->review($aca, $submission, [
+                'review_status' => ProjectReviewStatus::Accepted->value,
+            ]);
+        } catch (\Throwable) {
+            // Deliverable upload/review is best-effort for demo data.
         }
     }
 }
