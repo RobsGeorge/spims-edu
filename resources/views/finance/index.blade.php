@@ -47,17 +47,32 @@
     <div class="col-12">
         <x-card variant="panel">
             <h2 class="h6">{{ __('finance.transactions') }}</h2>
-            <ul class="small mb-0">
-                @forelse($transactions as $tx)
-                    <li class="d-flex flex-wrap align-items-center gap-1 py-1">
-                        <x-badge :value="$tx->direction" />
-                        <x-money :minor="(int) $tx->amount_minor" :currency="$tx->currency" />
-                        <span class="spims-text-dim">(</span><x-badge :value="$tx->kind" /><span class="spims-text-dim"> / </span><x-badge :value="$tx->reason" /><span class="spims-text-dim">)</span>
-                    </li>
-                @empty
-                    <li>{{ __('ui.empty') }}</li>
-                @endforelse
-            </ul>
+            <div class="spims-table-wrap">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>{{ __('finance.tx_date') }}</th>
+                        <th>{{ __('finance.tx_direction') }}</th>
+                        <th class="text-end">{{ __('finance.tx_amount') }}</th>
+                        <th>{{ __('finance.tx_kind') }}</th>
+                        <th>{{ __('finance.tx_reason') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($transactions as $tx)
+                        <tr>
+                            <td class="text-nowrap spims-text-dim small">{{ $tx->created_at->format('Y-m-d') }}</td>
+                            <td><x-badge :value="$tx->direction" /></td>
+                            <td class="text-end tabular-nums"><x-money :minor="(int) $tx->amount_minor" :currency="$tx->currency" /></td>
+                            <td><x-badge :value="$tx->kind" /></td>
+                            <td><x-badge :value="$tx->reason" /></td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5" class="spims-text-dim py-3 text-center">{{ __('ui.empty') }}</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+            </div>
             @if($transactions->hasPages())
                 <div class="mt-3">{{ $transactions->links() }}</div>
             @endif
@@ -68,14 +83,21 @@
 <h2 class="h5">{{ __('finance.invoices') }}</h2>
 <div class="spims-table-wrap">
 <table class="table">
-    <thead><tr><th>ID</th><th>{{ __('finance.total') }}</th><th>{{ __('ui.status') }}</th><th>{{ __('finance.due') }}</th><th></th></tr></thead>
+    <thead><tr><th>{{ __('finance.invoice_date') }}</th><th>{{ __('finance.total') }}</th><th>{{ __('ui.status') }}</th><th>{{ __('finance.due') }}</th><th></th></tr></thead>
     <tbody>
     @foreach($invoices as $invoice)
+        @php $overdue = $invoice->due_date && $invoice->due_date->isPast() && $invoice->amountDue() > 0; @endphp
         <tr>
-            <td>{{ \Illuminate\Support\Str::limit($invoice->id, 8, '') }}</td>
+            <td class="text-nowrap small spims-text-dim">{{ $invoice->created_at->format('Y-m-d') }}</td>
             <td><x-money :minor="(int) $invoice->total_minor" :currency="$invoice->currency" /></td>
             <td><x-badge :value="$invoice->status" /></td>
-            <td>{{ $invoice->amountDue() }}</td>
+            <td class="tabular-nums">
+                @if($overdue)
+                    <span class="text-danger fw-semibold"><x-money :minor="(int) $invoice->amountDue()" :currency="$invoice->currency" /></span>
+                @else
+                    <x-money :minor="(int) $invoice->amountDue()" :currency="$invoice->currency" />
+                @endif
+            </td>
             <td>
                 <a href="{{ route('finance.invoices.show', $invoice) }}">{{ __('finance.pay') }}</a>
                 @if($invoice->openPaymentPlan())

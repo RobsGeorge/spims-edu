@@ -89,4 +89,10 @@ return [
     'plan_sum_mismatch' => 'Installments must sum to the invoice total.',
     'dunning_subject' => 'Overdue installment reminder',
     'dunning_body' => 'An installment of :amount :currency was due on :due_on. Please pay it from your finance page.',
+    'tx_date' => 'Date',
+    'tx_direction' => 'Dir.',
+    'tx_amount' => 'Amount',
+    'tx_kind' => 'Kind',
+    'tx_reason' => 'Reason',
+    'invoice_date' => 'Date',
 ];
