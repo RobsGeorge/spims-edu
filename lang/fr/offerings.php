@@ -86,4 +86,10 @@ return [
     'preview_banner' => 'Affichage en étudiant. Les verrous et l’ordre des semaines correspondent à un étudiant inscrit. Les brouillons restent masqués.',
     'preview_exit' => 'Quitter l’aperçu',
     'preview_read_only' => 'L’aperçu étudiant est en lecture seule.',
+    'usd_minor' => 'USD (unités mineures)',
+    'egp_minor' => 'EGP (unités mineures)',
+    'minor_units_hint' => 'Saisissez les montants en unités mineures (cents/piastres). Ex. : 2500 = 25,00.',
+    'pdf_url' => 'URL PDF',
+    'week_label' => 'Semaine :number',
+    'week_number' => 'N° semaine',
 ];

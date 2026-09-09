@@ -65,4 +65,8 @@ return [
     'day_4' => 'Jeudi',
     'day_5' => 'Vendredi',
     'day_6' => 'Samedi',
+    'student_ulid' => 'ULID étudiant',
+    'student_ulid_hint' => 'Collez l’ID étudiant depuis Utilisateurs.',
+    'present' => 'Présent',
+    'absent' => 'Absent',
 ];

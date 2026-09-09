@@ -61,8 +61,9 @@
             <p class="small spims-text-dim">{{ __('offerings.resolved') }}: USD {{ $offering->resolvedPriceUsd() }} / EGP {{ $offering->resolvedPriceEgp() }}</p>
             <form method="POST" action="{{ route('admin.offerings.pricing', $offering) }}" class="row g-2">
                 @csrf
-                <div class="col-6"><input type="number" name="price_usd_override" class="form-control" placeholder="USD minor" value="{{ $offering->price_usd_override }}"></div>
-                <div class="col-6"><input type="number" name="price_egp_override" class="form-control" placeholder="EGP minor" value="{{ $offering->price_egp_override }}"></div>
+                <div class="col-6"><input type="number" name="price_usd_override" class="form-control" placeholder="{{ __('offerings.usd_minor') }}" value="{{ $offering->price_usd_override }}" aria-label="{{ __('offerings.usd_minor') }}"></div>
+                <div class="col-6"><input type="number" name="price_egp_override" class="form-control" placeholder="{{ __('offerings.egp_minor') }}" value="{{ $offering->price_egp_override }}" aria-label="{{ __('offerings.egp_minor') }}"></div>
+                <div class="col-12"><p class="form-text mb-0">{{ __('offerings.minor_units_hint') }}</p></div>
                 <div class="col-12"><button class="btn btn-outline-primary btn-sm">{{ __('offerings.save_pricing') }}</button></div>
             </form>
         </x-card>

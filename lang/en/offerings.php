@@ -86,4 +86,10 @@ return [
     'preview_banner' => 'Viewing as a student. Locks and week order match a typical enrolled student. Drafts stay hidden.',
     'preview_exit' => 'Exit preview',
     'preview_read_only' => 'Student preview is read-only.',
+    'usd_minor' => 'USD (minor units)',
+    'egp_minor' => 'EGP (minor units)',
+    'minor_units_hint' => 'Enter amounts in minor units (cents/piastres). Example: 2500 = 25.00.',
+    'pdf_url' => 'PDF URL',
+    'week_label' => 'Week :number',
+    'week_number' => 'Week #',
 ];

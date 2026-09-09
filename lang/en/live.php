@@ -65,4 +65,8 @@ return [
     'day_4' => 'Thursday',
     'day_5' => 'Friday',
     'day_6' => 'Saturday',
+    'student_ulid' => 'Student ULID',
+    'student_ulid_hint' => 'Paste the student ID from Users.',
+    'present' => 'Present',
+    'absent' => 'Absent',
 ];
