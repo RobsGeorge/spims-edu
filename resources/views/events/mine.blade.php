@@ -13,36 +13,56 @@
 
 @forelse($reservations as $reservation)
     @php $event = $reservation->event; @endphp
-    <article class="border rounded-3 p-3 mb-3">
-        <div class="d-flex flex-wrap justify-content-between gap-2 align-items-start">
-            <div>
-                <h2 class="h6 mb-1">{{ $event?->title ?? __('events.not_found') }}</h2>
-                <div class="small text-muted-theme mb-2">
+    <x-card variant="quiet" tag="article" class="mb-3">
+        <div class="d-flex flex-wrap justify-content-between gap-3 align-items-start mb-3">
+            <div class="min-width-0">
+                <p class="fw-semibold mb-1 spims-title">{{ $event?->title ?? __('events.not_found') }}</p>
+                <p class="small spims-text-dim mb-2">
                     @if($event)
                         {{ $event->starts_at?->timezone(config('app.timezone'))->format('M j, H:i') }}
                         @if($event->venue)
-                            · {{ $event->venue }}
+                            &middot; {{ $event->venue }}
                         @endif
                     @endif
-                </div>
+                </p>
                 <x-status-badge :status="$reservation->status->value" :label="__('events.status_'.$reservation->status->value)" />
             </div>
             <div class="d-flex flex-wrap gap-2">
                 @if($event)
                     <a class="btn btn-sm btn-outline-primary" href="{{ route('events.show', $event) }}">{{ __('events.view') }}</a>
                     @if($reservation->isOpen())
-                        <form method="POST" action="{{ route('events.cancel', $event) }}">
-                            @csrf
-                            <button class="btn btn-sm btn-outline-danger">{{ __('events.cancel_reservation') }}</button>
-                        </form>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#cancel-confirm-{{ $reservation->id }}">
+                            {{ __('events.cancel_reservation') }}
+                        </button>
                     @endif
                 @endif
             </div>
         </div>
+
         @if(!empty($qrById[$reservation->id]))
             @include('events.partials.check-in-ticket', ['payload' => $qrById[$reservation->id]])
         @endif
-    </article>
+    </x-card>
+
+    {{-- Cancel confirmation dialog --}}
+    @if($event && $reservation->isOpen())
+        <x-confirm-dialog
+            id="cancel-confirm-{{ $reservation->id }}"
+            :title="__('events.confirm_cancel_title')"
+            :message="__('events.confirm_cancel_message')"
+            tone="danger"
+        >
+            <x-slot:confirm>
+                <form method="POST" action="{{ route('events.cancel', $event) }}">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">{{ __('events.cancel_reservation') }}</button>
+                </form>
+            </x-slot:confirm>
+        </x-confirm-dialog>
+    @endif
 @empty
     <x-empty-state :title="__('events.mine_empty')" icon="bi-calendar-check" />
 @endforelse

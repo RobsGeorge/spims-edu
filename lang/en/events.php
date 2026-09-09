@@ -41,4 +41,10 @@ return [
     'status_RESERVED' => 'Reserved',
     'status_WAITLISTED' => 'Waitlisted',
     'status_CANCELLED' => 'Cancelled',
+    'you_are_registered' => 'You are registered',
+    'seats_full' => 'Full — no seats available',
+    'waitlist_available' => 'Waitlist available',
+    'confirm_cancel_title' => 'Cancel your reservation?',
+    'confirm_cancel_message' => 'This will release your seat. You may re-register if seats are still open.',
+    'capacity_meter' => 'Seat availability',
 ];
