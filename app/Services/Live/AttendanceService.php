@@ -613,7 +613,7 @@ class AttendanceService
 
         $offeringIds = Enrollment::query()
             ->where('student_id', $student->id)
-            ->where('status', EnrollmentStatus::Enrolled)
+            ->whereIn('status', [EnrollmentStatus::Enrolled, EnrollmentStatus::Completed])
             ->pluck('offering_id');
 
         $sessionQuery = ClassSession::query()->whereIn('offering_id', $offeringIds);
