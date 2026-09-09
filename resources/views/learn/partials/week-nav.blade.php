@@ -25,12 +25,15 @@
                             ->isWeekUnlocked($offering, $week, enrolled: true, completedWeekNumbers: $completedWeekNumbers ?? []);
                     $done = $enrollment ? $progress->isWeekComplete($enrollment, $week) : false;
                     $active = $activeWeek && $activeWeek->id === $week->id;
+                    $weekItemIds = $week->items->pluck('id')->toArray();
+                    $weekTotal = count($weekItemIds);
+                    $weekCompleted = count(array_intersect($weekItemIds, $completedItemIds ?? []));
                 @endphp
                 <a href="{{ $unlocked ? route('learn.week', [$offering, $week]) : '#' }}"
                    class="list-group-item list-group-item-action px-0 {{ $active ? 'fw-semibold' : '' }} {{ ! $unlocked ? 'disabled spims-text-dim' : '' }}"
                    @if(! $unlocked) aria-disabled="true" tabindex="-1" @endif>
                     <div class="d-flex justify-content-between gap-2">
-                        <span>{{ __('learn.week', ['number' => $week->number]) }}: {{ $week->title }}</span>
+                        <span>{{ __('learn.week', ['number' => $week->number]) }}: {{ $week->title }}<span class="badge text-bg-info ms-1">{{ $weekCompleted }} / {{ $weekTotal }}</span></span>
                         @if($done)
                             <span class="badge text-bg-success">{{ __('learn.completed') }}</span>
                         @elseif(! $unlocked)

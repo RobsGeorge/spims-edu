@@ -5,7 +5,12 @@
     <div>
         <h1 class="spims-title mb-1">{{ $offering->course->code }} — {{ $offering->course->title }}</h1>
         @php $offeringModeVal = $offering->mode->value; @endphp
-        <p class="spims-text-dim mb-0">{{ __('offerings.mode') }}: {{ $offeringModeVal }} · {{ __('learn.progress') }}: {{ number_format($enrollment->progress_percent ?? 0, 0) }}%</p>
+        <p class="spims-text-dim mb-1">{{ __('offerings.mode') }}: {{ $offeringModeVal }}</p>
+        <div class="progress mb-2" style="height:6px" role="progressbar"
+             aria-valuenow="{{ (int)($enrollment->progress_percent ?? 0) }}" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar bg-primary" style="width:{{ (int)($enrollment->progress_percent ?? 0) }}%"></div>
+        </div>
+        <p class="small spims-text-dim mb-0">{{ (int)($enrollment->progress_percent ?? 0) }}% {{ __('learn.complete') }}</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
         @if(!empty($hasPublishedProjects))

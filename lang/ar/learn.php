@@ -32,4 +32,7 @@ return [
     'reading_link_only' => 'يفتح هذا الملف خارج سبيمز.',
     'back_to_course' => 'العودة إلى المقرر',
     'completion' => 'الإكمال',
+    'complete' => 'مكتمل',
+    'prev_item' => '→ السابق',
+    'next_item' => 'التالي ←',
 ];

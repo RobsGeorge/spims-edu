@@ -27,6 +27,25 @@
                 </form>
             @endif
         @endif
+
+        @php
+            $sortedItems = $activeWeek->items->sortBy('order')->values();
+            $idx = $sortedItems->search(fn($i) => $i->id === $item->id);
+            $prevItem = $idx > 0 ? $sortedItems[$idx - 1] : null;
+            $nextItem = $idx < $sortedItems->count() - 1 ? $sortedItems[$idx + 1] : null;
+        @endphp
+        <div class="d-flex justify-content-between mt-3 gap-2 flex-wrap">
+            @if($prevItem)
+                <a href="{{ route('learn.item', [$offering, $prevItem]) }}" class="btn btn-outline-secondary btn-sm">{{ __('learn.prev_item') }}</a>
+            @else
+                <span class="btn btn-outline-secondary btn-sm disabled" aria-disabled="true">{{ __('learn.prev_item') }}</span>
+            @endif
+            @if($nextItem)
+                <a href="{{ route('learn.item', [$offering, $nextItem]) }}" class="btn btn-outline-secondary btn-sm">{{ __('learn.next_item') }}</a>
+            @else
+                <span class="btn btn-outline-secondary btn-sm disabled" aria-disabled="true">{{ __('learn.next_item') }}</span>
+            @endif
+        </div>
     </div>
 </div>
 @endsection
