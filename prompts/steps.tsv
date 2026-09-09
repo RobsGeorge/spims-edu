@@ -21,7 +21,10 @@ A2-f	Offerings|Assessment|Attendance	resources/views/admin/offerings,resources/v
 A2-g	Academics|Admin	resources/views/admin/programs,resources/views/admin/courses,resources/views/admin/semesters,resources/views/admin/academic-years,resources/views/admin/grading-schemes,resources/views/admin/users,resources/views/admin/translations,resources/views/admin/theme
 A2-h	Admissions|Communications|Events	resources/views/admin/applications,resources/views/admin/application-forms,resources/views/admin/enrollments,resources/views/admin/communications,resources/views/admin/credentials,resources/views/admin/certificate-templates,resources/views/admin/events,resources/views/staff
 A2-i	Admin|SuperAdmin	resources/views/admin/reports,resources/views/admin/finance,resources/views/admin/live,resources/views/superadmin
-# W3
+# W3 — student experience polish
+W3-a	Portal|Smoke	resources/views/learn
+W3-b	Finance|Portal	resources/views/grades
+W3-c	Finance|Portal	resources/views/finance
 1	Portal|Smoke	resources/views/programs,routes/web.php,database/migrations
 5	Offerings|Academics	resources/views/admin/semesters,app/Services
 9	Events	resources/views/events,app/Http/Controllers
