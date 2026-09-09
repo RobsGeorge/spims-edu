@@ -22,6 +22,7 @@ A2-g	Academics|Admin	resources/views/admin/programs,resources/views/admin/course
 A2-h	Admissions|Communications|Events	resources/views/admin/applications,resources/views/admin/application-forms,resources/views/admin/enrollments,resources/views/admin/communications,resources/views/admin/credentials,resources/views/admin/certificate-templates,resources/views/admin/events,resources/views/staff
 A2-i	Admin|SuperAdmin	resources/views/admin/reports,resources/views/admin/finance,resources/views/admin/live,resources/views/superadmin
 # W3
+W3-c	Finance|LocaleParityTest	resources/views/finance,lang
 1	Portal|Smoke	resources/views/programs,routes/web.php,database/migrations
 5	Offerings|Academics	resources/views/admin/semesters,app/Services
 9	Events	resources/views/events,app/Http/Controllers
