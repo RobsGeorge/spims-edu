@@ -27,9 +27,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('layouts.app', function ($view): void {
-            $cookieTheme = request()->cookie('theme', 'system');
+            $cookieTheme = request()->cookie('theme', 'light');
             if (! in_array($cookieTheme, ['light', 'dark', 'system'], true)) {
-                $cookieTheme = 'system';
+                $cookieTheme = 'light';
             }
 
             $activeTheme = Theme::query()->where('is_active', true)->first();

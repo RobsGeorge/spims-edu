@@ -46,6 +46,10 @@ final class ThemeTokens
                 'info' => '#3b82f6',
                 'shadow' => '0 4px 20px rgba(0, 0, 0, 0.05)',
                 'shadowLift' => '0 6px 24px rgba(0, 0, 0, 0.08)',
+                // Marketing spine stays burgundy in both modes (never dark pink/gold fills).
+                'spine' => '#5d0326',
+                'spineDeep' => '#380014',
+                'spineText' => '#f8f9ff',
             ],
             'dark' => [
                 'bg1' => '#0d1322',
@@ -76,6 +80,9 @@ final class ThemeTokens
                 'info' => '#60a5fa',
                 'shadow' => '0 4px 20px rgba(0, 0, 0, 0.3)',
                 'shadowLift' => '0 6px 24px rgba(0, 0, 0, 0.38)',
+                'spine' => '#5d0326',
+                'spineDeep' => '#380014',
+                'spineText' => '#f8f9ff',
             ],
         ];
     }
@@ -117,6 +124,9 @@ final class ThemeTokens
             'info' => '--color-info',
             'shadow' => '--shadow-soft',
             'shadowLift' => '--shadow-lift',
+            'spine' => '--color-spine',
+            'spineDeep' => '--color-spine-deep',
+            'spineText' => '--color-spine-text',
         ];
 
         $vars = [];
@@ -135,6 +145,11 @@ final class ThemeTokens
             );
         }
 
+        $rgb = self::hexToRgbTriplet($tokens['primary'] ?? '');
+        if ($rgb !== null) {
+            $vars['--bs-primary-rgb'] = $rgb;
+        }
+
         return $vars;
     }
 
@@ -145,11 +160,71 @@ final class ThemeTokens
     public static function resolve(?array $stored): array
     {
         $defaults = self::defaults();
+        $lightExplicit = is_array($stored['light'] ?? null) ? $stored['light'] : [];
+        $darkExplicit = is_array($stored['dark'] ?? null) ? $stored['dark'] : [];
 
         return [
-            'light' => array_merge($defaults['light'], is_array($stored['light'] ?? null) ? $stored['light'] : []),
-            'dark' => array_merge($defaults['dark'], is_array($stored['dark'] ?? null) ? $stored['dark'] : []),
+            'light' => self::syncDerived(array_merge($defaults['light'], $lightExplicit), $lightExplicit),
+            'dark' => self::syncDerived(array_merge($defaults['dark'], $darkExplicit), $darkExplicit),
         ];
+    }
+
+    /**
+     * When Theme Editor overrides primary, keep chrome tokens aligned unless set explicitly.
+     *
+     * @param  array<string, string>  $merged
+     * @param  array<string, mixed>  $explicit
+     * @return array<string, string>
+     */
+    public static function syncDerived(array $merged, array $explicit): array
+    {
+        if (isset($explicit['primary']) && is_string($explicit['primary']) && $explicit['primary'] !== '') {
+            if (! isset($explicit['title'])) {
+                $merged['title'] = $explicit['primary'];
+            }
+            if (! isset($explicit['link'])) {
+                $merged['link'] = $explicit['primary'];
+            }
+            if (! isset($explicit['navActive'])) {
+                $merged['navActive'] = $explicit['primary'];
+            }
+            if (! isset($explicit['primaryHover']) && isset($merged['titleAccent'])) {
+                $merged['primaryHover'] = $merged['titleAccent'];
+            }
+        }
+
+        $merged['spine'] = is_string($explicit['spine'] ?? null) && $explicit['spine'] !== ''
+            ? $explicit['spine']
+            : ($merged['spine'] ?? '#5d0326');
+        $merged['spineDeep'] = is_string($explicit['spineDeep'] ?? null) && $explicit['spineDeep'] !== ''
+            ? $explicit['spineDeep']
+            : ($merged['spineDeep'] ?? '#380014');
+        $merged['spineText'] = is_string($explicit['spineText'] ?? null) && $explicit['spineText'] !== ''
+            ? $explicit['spineText']
+            : ($merged['spineText'] ?? '#f8f9ff');
+
+        return $merged;
+    }
+
+    /**
+     * @return non-empty-string|null
+     */
+    public static function hexToRgbTriplet(string $hex): ?string
+    {
+        $hex = ltrim(trim($hex), '#');
+        if (strlen($hex) === 3 && ctype_xdigit($hex)) {
+            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+        }
+        if (strlen($hex) !== 6 || ! ctype_xdigit($hex)) {
+            return null;
+        }
+
+        return sprintf(
+            '%d, %d, %d',
+            hexdec(substr($hex, 0, 2)),
+            hexdec(substr($hex, 2, 2)),
+            hexdec(substr($hex, 4, 2))
+        );
     }
 
     /**

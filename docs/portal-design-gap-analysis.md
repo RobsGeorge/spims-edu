@@ -41,6 +41,11 @@ backgrounds remain banned. Named type roles (`--text-display` … `--text-label-
 (`--space-xs` … `--space-2xl`), and recipe classes (`.academic-card`, `.academic-form`,
 `.academic-alert`, `.academic-modal`) are available alongside Bootstrap theming.
 
+**Public chrome unification:** `spims-public.css` uses token vars / `color-mix`. Marketing fills
+(CTA band, auth brand, footer, `.feature-panel`) lock to `--color-spine` burgundy in light **and**
+dark (never pink/gold title fills under light text). Portal chrome has a Light/Dark toggle; Settings
+keeps System. Default cookie is `light`.
+
 Remaining gaps are mostly **surface / IA fidelity**, not the core palette:
 
 | Spec (DESIGN.md / PRODUCT.md) | Current Laravel UI | Gap |

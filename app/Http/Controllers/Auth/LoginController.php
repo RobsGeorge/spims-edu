@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\ThemePreference;
 use App\Http\Controllers\Controller;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\RedirectResponse;
@@ -22,9 +23,20 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        $auth->login($credentials['email'], $credentials['password']);
+        $user = $auth->login($credentials['email'], $credentials['password']);
 
-        return redirect()->intended(route('dashboard'));
+        $redirect = redirect()->intended(route('dashboard'));
+
+        if (! $request->hasCookie('theme')) {
+            $cookieTheme = match ($user->theme_preference) {
+                ThemePreference::Dark => 'dark',
+                ThemePreference::Light => 'light',
+                default => 'light',
+            };
+            $redirect->withCookie(cookie('theme', $cookieTheme, 60 * 24 * 365));
+        }
+
+        return $redirect;
     }
 
     public function destroy(AuthService $auth): RedirectResponse

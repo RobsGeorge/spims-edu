@@ -103,7 +103,12 @@ body.spims-public-catalog .spims-public-nav {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(248, 249, 255, 0.58), rgba(248, 249, 255, 0.78));
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-bg-1) 58%, var(--color-spine-deep) 12%) 0%,
+        color-mix(in srgb, var(--color-bg-1) 82%, transparent) 55%,
+        color-mix(in srgb, var(--color-bg-1) 92%, var(--color-spine) 8%) 100%
+    );
     pointer-events: none;
 }
 
@@ -117,7 +122,12 @@ body.theme-dark .spims-landing-atmosphere--photo {
 }
 
 body.theme-dark .spims-landing-hero::after {
-    background: linear-gradient(180deg, rgba(13, 19, 34, 0.55), rgba(13, 19, 34, 0.78));
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-bg-1) 55%, var(--color-spine-deep) 30%) 0%,
+        color-mix(in srgb, var(--color-bg-1) 78%, transparent) 50%,
+        color-mix(in srgb, var(--color-bg-1) 88%, var(--color-spine) 12%) 100%
+    );
 }
 
 .spims-landing-hero-inner {
@@ -293,13 +303,13 @@ html[dir='rtl'] .spims-landing-featured-title {
 .spims-landing-program-media {
     height: 10rem;
     background:
-        linear-gradient(160deg, rgba(93, 3, 38, 0.28), rgba(248, 249, 255, 0.35)),
+        linear-gradient(160deg, color-mix(in srgb, var(--color-spine) 45%, transparent), color-mix(in srgb, var(--color-bg-1) 55%, transparent)),
         url('../img/landing-featured-1.jpg') center / cover;
 }
 
 .spims-landing-program-media--2 {
     background:
-        linear-gradient(200deg, rgba(56, 0, 20, 0.28), rgba(239, 244, 255, 0.35)),
+        linear-gradient(200deg, color-mix(in srgb, var(--color-spine-deep) 45%, transparent), color-mix(in srgb, var(--color-bg-2) 50%, transparent)),
         url('../img/landing-featured-2.jpg') center / cover;
 }
 
@@ -337,8 +347,8 @@ html[dir='rtl'] .spims-landing-program-title {
 }
 
 .spims-landing-program--feature {
-    background: #380014;
-    color: #f8f9ff;
+    background: linear-gradient(160deg, var(--color-spine) 0%, var(--color-spine-deep) 100%);
+    color: var(--color-spine-text);
     border-color: transparent;
     padding: 2rem 1.5rem;
     justify-content: space-between;
@@ -347,12 +357,12 @@ html[dir='rtl'] .spims-landing-program-title {
 .spims-landing-program--feature .spims-landing-program-title,
 .spims-landing-program--feature .spims-landing-program-blurb,
 .spims-landing-program--feature .spims-landing-program-meta {
-    color: #f8f9ff;
-    border-color: rgba(248, 249, 255, 0.2);
+    color: var(--color-spine-text);
+    border-color: color-mix(in srgb, var(--color-spine-text) 20%, transparent);
 }
 
 body.theme-dark .spims-landing-program--feature {
-    background: #5d0326;
+    background: linear-gradient(160deg, var(--color-spine) 0%, var(--color-spine-deep) 100%);
 }
 
 .spims-landing-band {
@@ -443,8 +453,8 @@ html[dir='rtl'] .spims-landing-beat-num {
 }
 
 .spims-landing-footer {
-    background: #380014;
-    color: #f8f9ff;
+    background: var(--color-spine-deep);
+    color: var(--color-spine-text);
     padding: 2rem 1.5rem;
     display: flex;
     flex-wrap: wrap;
@@ -456,7 +466,7 @@ html[dir='rtl'] .spims-landing-beat-num {
 }
 
 .spims-landing-footer a {
-    color: #f8f9ff;
+    color: var(--color-spine-text);
     opacity: 0.85;
 }
 
@@ -498,8 +508,8 @@ html[dir='rtl'] .spims-landing-footer-brand {
 .spims-auth-brand {
     display: none;
     position: relative;
-    background: #380014;
-    color: #f8f9ff;
+    background: linear-gradient(160deg, var(--color-spine) 0%, var(--color-spine-deep) 100%);
+    color: var(--color-spine-text);
     padding: 2.5rem;
     flex: 0 0 42%;
     flex-direction: column;
@@ -518,8 +528,8 @@ html[dir='rtl'] .spims-landing-footer-brand {
     position: absolute;
     inset: 0;
     background-image:
-        radial-gradient(circle at 10% 20%, rgba(248, 249, 255, 0.18) 1px, transparent 1px),
-        radial-gradient(circle at 90% 80%, rgba(248, 249, 255, 0.18) 1px, transparent 1px);
+        radial-gradient(circle at 10% 20%, color-mix(in srgb, var(--color-spine-text) 18%, transparent) 1px, transparent 1px),
+        radial-gradient(circle at 90% 80%, color-mix(in srgb, var(--color-spine-text) 18%, transparent) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
 }
@@ -676,7 +686,7 @@ html[dir='rtl'] .catalog-featured-title {
     min-height: 10rem;
     border-radius: var(--radius-md);
     background:
-        linear-gradient(160deg, rgba(93, 3, 38, 0.28), rgba(248, 249, 255, 0.28)),
+        linear-gradient(160deg, color-mix(in srgb, var(--color-spine) 50%, transparent), color-mix(in srgb, var(--color-bg-1) 40%, transparent)),
         url('../img/landing-featured-1.jpg') center / cover;
 }
 
@@ -691,18 +701,16 @@ html[dir='rtl'] .catalog-featured-title {
     overflow: hidden;
 }
 
+/* Catalog cards: thin token stripe (matches catalog page recipe; no light wash on photos) */
 .catalog-card-media {
-    height: 8.5rem;
-    margin: -1rem -1rem 1rem;
-    background:
-        linear-gradient(165deg, rgba(93, 3, 38, 0.22), rgba(230, 238, 255, 0.45)),
-        url('../img/landing-featured-1.jpg') center / cover;
+    height: 4px;
+    margin: 0 0 var(--space-3);
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg, var(--color-spine) 0%, var(--color-accent) 100%);
 }
 
 .catalog-card-media--alt {
-    background:
-        linear-gradient(200deg, rgba(56, 0, 20, 0.24), rgba(239, 244, 255, 0.4)),
-        url('../img/landing-featured-2.jpg') 70% 30% / cover;
+    background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-spine) 100%);
 }
 
 .catalog-results[aria-busy='true'] {
@@ -1031,7 +1039,7 @@ html[dir='rtl'] .spims-landing-verifier-title {
 .spims-landing-verifier-result--revoked {
     background: color-mix(in srgb, var(--color-warning) 12%, var(--color-surface));
     border: 1px solid color-mix(in srgb, var(--color-warning) 28%, transparent);
-    color: #92400e;
+    color: color-mix(in srgb, var(--color-warning) 75%, var(--color-text));
 }
 
 .spims-landing-verifier-result--not-found {
@@ -1043,8 +1051,8 @@ html[dir='rtl'] .spims-landing-verifier-title {
 /* —— Step 2: footer CTA band —— */
 
 .spims-landing-cta-band {
-    background: linear-gradient(160deg, var(--color-title-accent) 0%, var(--color-title) 100%);
-    color: #f8f9ff;
+    background: linear-gradient(160deg, var(--color-spine) 0%, var(--color-spine-deep) 100%);
+    color: var(--color-spine-text);
     border-radius: var(--radius-lg);
     padding: var(--space-12) var(--space-8);
     text-align: center;
@@ -1064,7 +1072,7 @@ html[dir='rtl'] .spims-landing-verifier-title {
     font-family: var(--font-display);
     font-size: var(--text-3xl);
     font-weight: 700;
-    color: #f8f9ff;
+    color: var(--color-spine-text);
     line-height: var(--leading-3xl);
     margin: 0;
 }
@@ -1085,6 +1093,30 @@ html[dir='rtl'] .spims-landing-cta-title {
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--space-3);
+}
+
+.spims-theme-toggle {
+    min-height: 44px;
+    gap: 0.35rem;
+}
+
+.spims-landing-cta-band .btn-outline-primary,
+.spims-landing-cta-band .btn-outline-secondary {
+    color: var(--color-spine-text) !important;
+    border-color: color-mix(in srgb, var(--color-spine-text) 55%, transparent) !important;
+}
+
+.spims-landing-cta-band .btn-outline-primary:hover,
+.spims-landing-cta-band .btn-outline-secondary:hover {
+    background: color-mix(in srgb, var(--color-spine-text) 12%, transparent) !important;
+    color: var(--color-spine-text) !important;
+}
+
+.spims-landing-cta-band .btn-primary,
+.spims-landing-cta-band .btn-accent {
+    background: var(--color-accent) !important;
+    border-color: var(--color-accent) !important;
+    color: var(--color-accent-text) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

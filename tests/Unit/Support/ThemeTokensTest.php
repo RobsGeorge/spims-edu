@@ -133,4 +133,41 @@ class ThemeTokensTest extends TestCase
 
         $this->assertSame('#3b82f6', $vars['--color-info']);
     }
+
+    #[Test]
+    public function to_css_variables_emits_bs_primary_rgb_and_spine(): void
+    {
+        $vars = ThemeTokens::toCssVariables(ThemeTokens::defaults()['light']);
+
+        $this->assertSame('93, 3, 38', $vars['--bs-primary-rgb']);
+        $this->assertSame('#5d0326', $vars['--color-spine']);
+        $this->assertSame('#380014', $vars['--color-spine-deep']);
+        $this->assertSame('#f8f9ff', $vars['--color-spine-text']);
+    }
+
+    #[Test]
+    public function resolve_derives_title_and_link_from_overridden_primary(): void
+    {
+        $resolved = ThemeTokens::resolve([
+            'light' => ['primary' => '#4a021e'],
+        ]);
+
+        $this->assertSame('#4a021e', $resolved['light']['primary']);
+        $this->assertSame('#4a021e', $resolved['light']['title']);
+        $this->assertSame('#4a021e', $resolved['light']['link']);
+        $this->assertSame('#4a021e', $resolved['light']['navActive']);
+        $this->assertSame('#380014', $resolved['light']['primaryHover']);
+        $this->assertSame('#5d0326', $resolved['light']['spine']);
+    }
+
+    #[Test]
+    public function dark_spine_stays_burgundy_not_pink_or_gold(): void
+    {
+        $dark = ThemeTokens::defaults()['dark'];
+
+        $this->assertSame('#5d0326', $dark['spine']);
+        $this->assertSame('#380014', $dark['spineDeep']);
+        $this->assertNotSame($dark['title'], $dark['spine']);
+        $this->assertNotSame($dark['accent'], $dark['spine']);
+    }
 }

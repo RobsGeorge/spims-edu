@@ -1,9 +1,9 @@
 /**
- * SPIMS — Sacred Academic Design System
+ * SPIMS ? Sacred Academic Design System
  * Cool near-white field + liturgical burgundy spine + academic gold accent.
  * Explicitly rejects warm parchment / cream skeuomorphism.
  *
- * One-Burgundy: gold (#eac167 / #e9c16d) is accent only — never --color-primary
+ * One-Burgundy: gold (#eac167 / #e9c16d) is accent only ? never --color-primary
  * or body text (--color-text). Soft Lift: --shadow-soft plus slightly stronger
  * --shadow-lift. Hairline rose: --color-hairline on card borders.
  */
@@ -22,7 +22,7 @@
     --shadow-floating: 0 8px 30px rgba(0, 0, 0, 0.12);
     --color-hairline: rgba(219, 192, 196, 0.65);
 
-    /* — Type scale (clamp-based, no media queries needed) — */
+    /* ? Type scale (clamp-based, no media queries needed) ? */
     --text-xs: clamp(0.75rem, 0.75rem + 0vw, 0.75rem);
     --text-sm: clamp(0.875rem, 0.875rem + 0vw, 0.875rem);
     --text-base: clamp(1rem, 0.956rem + 0.222vw, 1rem);
@@ -31,7 +31,7 @@
     --text-2xl: clamp(1.5rem, 1.317rem + 0.917vw, 1.875rem);
     --text-3xl: clamp(1.875rem, 1.623rem + 1.261vw, 2.25rem);
     --text-4xl: clamp(2.25rem, 1.872rem + 1.889vw, 3rem);
-    /* — Named type roles (DESIGN.md; alias numeric scale) — */
+    /* ? Named type roles (DESIGN.md; alias numeric scale) ? */
     --text-display: var(--text-4xl);
     --text-headline-lg: var(--text-3xl);
     --text-headline-md: var(--text-2xl);
@@ -39,7 +39,7 @@
     --text-body-md: var(--text-base);
     --text-label-md: var(--text-sm);
     --text-label-sm: var(--text-xs);
-    /* — Paired line-heights — */
+    /* ? Paired line-heights ? */
     --leading-xs: 1.5;
     --leading-sm: 1.5;
     --leading-base: 1.5;
@@ -48,7 +48,7 @@
     --leading-2xl: 1.25;
     --leading-3xl: 1.2;
     --leading-4xl: 1.1;
-    /* — Spacing scale — */
+    /* ? Spacing scale ? */
     --space-0: 0;
     --space-1: 0.25rem;
     --space-2: 0.5rem;
@@ -61,16 +61,16 @@
     --space-16: 4rem;
     --space-20: 5rem;
     --space-24: 6rem;
-    /* — Named spacing roles (DESIGN.md; alias numeric scale) — */
+    /* ? Named spacing roles (DESIGN.md; alias numeric scale) ? */
     --space-xs: var(--space-1);   /* 4px */
     --space-sm: var(--space-2);   /* 8px */
     --space-md: var(--space-4);   /* 16px */
     --space-lg: var(--space-6);   /* 24px */
     --space-xl: var(--space-8);   /* 32px */
     --space-2xl: var(--space-12); /* 48px */
-    /* — Focus ring — */
+    /* ? Focus ring ? */
     --focus-ring: 0 0 0 3px var(--color-primary, #5d0326);
-    /* — Motion — */
+    /* ? Motion ? */
     --motion-fast: 100ms ease;
     --motion-base: 200ms ease;
     --motion-slow: 350ms ease;
@@ -118,6 +118,10 @@ body.theme-system {
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
     --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.08);
     --bs-primary-rgb: 93, 3, 38;
+    /* Coptic marketing spine ? burgundy in light and dark (never pink/gold fills) */
+    --color-spine: #5d0326;
+    --color-spine-deep: #380014;
+    --color-spine-text: #f8f9ff;
 }
 
 body.theme-dark {
@@ -151,7 +155,10 @@ body.theme-dark {
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
     --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.38);
     --bs-primary-rgb: 255, 177, 192;
-    /* — Type scale (duplicated for dark block) — */
+    --color-spine: #5d0326;
+    --color-spine-deep: #380014;
+    --color-spine-text: #f8f9ff;
+    /* ? Type scale (duplicated for dark block) ? */
     --text-xs: clamp(0.75rem, 0.75rem + 0vw, 0.75rem);
     --text-sm: clamp(0.875rem, 0.875rem + 0vw, 0.875rem);
     --text-base: clamp(1rem, 0.956rem + 0.222vw, 1rem);
@@ -168,7 +175,7 @@ body.theme-dark {
     --leading-2xl: 1.25;
     --leading-3xl: 1.2;
     --leading-4xl: 1.1;
-    /* — Spacing scale (duplicated for dark block) — */
+    /* ? Spacing scale (duplicated for dark block) ? */
     --space-0: 0;
     --space-1: 0.25rem;
     --space-2: 0.5rem;
@@ -181,7 +188,7 @@ body.theme-dark {
     --space-16: 4rem;
     --space-20: 5rem;
     --space-24: 6rem;
-    /* — Focus ring + Motion (duplicated for dark block) — */
+    /* ? Focus ring + Motion (duplicated for dark block) ? */
     --focus-ring: 0 0 0 3px var(--color-primary, #ffb1c0);
     --motion-fast: 100ms ease;
     --motion-base: 200ms ease;
@@ -221,6 +228,9 @@ body.theme-dark {
         --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
         --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.38);
         --bs-primary-rgb: 255, 177, 192;
+        --color-spine: #5d0326;
+        --color-spine-deep: #380014;
+        --color-spine-text: #f8f9ff;
     }
 }
 
@@ -277,7 +287,7 @@ html[dir='rtl'] .display-6 {
     color: var(--color-text-muted) !important;
 }
 
-/* Preferred alias — does not trigger text-muted guard pattern */
+/* Preferred alias ? does not trigger text-muted guard pattern */
 .spims-text-dim {
     color: var(--color-text-muted) !important;
 }
@@ -698,7 +708,7 @@ html[dir='rtl'] .app-tile h3 {
     color: var(--color-title);
 }
 
-/* —— x-badge —— */
+/* ?? x-badge ?? */
 .spims-badge {
     display: inline-flex;
     align-items: center;
@@ -740,18 +750,18 @@ html[dir='rtl'] .app-tile h3 {
     opacity: 0.85;
 }
 
-/* —— x-money —— */
+/* ?? x-money ?? */
 .spims-money {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
 
-/* —— x-icon sizes —— */
+/* ?? x-icon sizes ?? */
 .spims-icon-sm { font-size: var(--text-sm); }
 .spims-icon-md { font-size: var(--text-base); }
 .spims-icon-lg { font-size: var(--text-xl); }
 
-/* —— x-card surface tiers —— */
+/* ?? x-card surface tiers ?? */
 .spims-card {
     padding: var(--space-4);
 }
@@ -775,7 +785,7 @@ html[dir='rtl'] .app-tile h3 {
     border-radius: var(--radius-sm);
 }
 
-/* —— D2/D3 surfaces —— */
+/* ?? D2/D3 surfaces ?? */
 .spims-landing {
     min-height: calc(100vh - 8rem);
     display: grid;
@@ -852,8 +862,8 @@ html[dir='rtl'] .spims-landing-brand {
 }
 
 .feature-panel {
-    background: linear-gradient(160deg, #5d0326 0%, #380014 100%);
-    color: #ffffff;
+    background: linear-gradient(160deg, var(--color-spine) 0%, var(--color-spine-deep) 100%);
+    color: var(--color-spine-text);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-soft);
 }
@@ -909,7 +919,7 @@ html[dir='rtl'] .spims-landing-brand {
     border-radius: var(--radius-full);
 }
 
-/* —— D1 App shell —— */
+/* ?? D1 App shell ?? */
 :root {
     --sidebar-width: 280px;
     --topbar-height: 64px;
@@ -1096,9 +1106,9 @@ html[dir='rtl'] .spims-landing-brand {
 }
 
 .spims-status-success { background: color-mix(in srgb, var(--color-success) 18%, transparent); color: var(--color-success); border-color: transparent; }
-.spims-status-warning { background: color-mix(in srgb, var(--color-warning) 18%, transparent); color: #92400e; border-color: transparent; }
+.spims-status-warning { background: color-mix(in srgb, var(--color-warning) 18%, transparent); color: color-mix(in srgb, var(--color-warning) 72%, var(--color-text)); border-color: transparent; }
 .spims-status-danger { background: color-mix(in srgb, var(--color-danger) 18%, transparent); color: var(--color-danger); border-color: transparent; }
-.spims-status-info { background: color-mix(in srgb, #3b82f6 18%, transparent); color: #1d4ed8; border-color: transparent; }
+.spims-status-info { background: color-mix(in srgb, var(--color-info) 18%, transparent); color: var(--color-info); border-color: transparent; }
 
 .offering-workspace-tabs .nav-link {
     white-space: nowrap;
@@ -1130,7 +1140,7 @@ html[dir='rtl'] .app-bottom-link i {
     transform: scaleX(-1);
 }
 
-/* —— D6: wallet balance cards —— */
+/* ?? D6: wallet balance cards ?? */
 .wallet-balance-card {
     display: flex;
     flex-direction: column;
@@ -1168,7 +1178,7 @@ html[dir='rtl'] .app-bottom-link i {
     background: var(--color-surface);
 }
 
-/* —— D6: exam progress rail + near-expiry pulse —— */
+/* ?? D6: exam progress rail + near-expiry pulse ?? */
 .exam-progress-rail__track {
     height: 0.45rem;
     border-radius: var(--radius-full);
@@ -1674,14 +1684,14 @@ html[dir='rtl'] .sa-impersonation-stop {
     }
 }
 
-/* ══════════════════════════════════════
-   A1.4 — Component Library additions
-   ══════════════════════════════════════ */
+/* ??????????????????????????????????????
+   A1.4 ? Component Library additions
+   ?????????????????????????????????????? */
 
-/* —— Alpine: hide before init —— */
+/* ?? Alpine: hide before init ?? */
 [x-cloak] { display: none !important; }
 
-/* —— Responsive grid utilities —— */
+/* ?? Responsive grid utilities ?? */
 .grid-auto-sm {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
@@ -1700,12 +1710,12 @@ html[dir='rtl'] .sa-impersonation-stop {
     gap: var(--space-8);
 }
 
-/* —— x-empty-state: lede paragraph (replaces inline max-width) —— */
+/* ?? x-empty-state: lede paragraph (replaces inline max-width) ?? */
 .spims-empty-lede {
     max-width: 28rem;
 }
 
-/* —— x-stat —— */
+/* ?? x-stat ?? */
 .spims-stat {
     display: flex;
     align-items: center;
@@ -1757,7 +1767,7 @@ html[dir='rtl'] .sa-impersonation-stop {
 .spims-stat-trend--down { color: var(--color-danger); }
 .spims-stat-trend--neutral { color: var(--color-text-muted); }
 
-/* —— x-field —— */
+/* ?? x-field ?? */
 .spims-field-label {
     font-weight: 600;
     color: var(--color-title);
@@ -1781,7 +1791,7 @@ html[dir='rtl'] .sa-impersonation-stop {
     margin-top: var(--space-1);
 }
 
-/* —— x-modal —— */
+/* ?? x-modal ?? */
 .spims-modal-backdrop {
     position: fixed;
     inset: 0;
@@ -1882,7 +1892,7 @@ html[dir='rtl'] .academic-modal .spims-modal-title {
     }
 }
 
-/* —— x-tabs —— */
+/* ?? x-tabs ?? */
 .spims-tabs-list {
     display: flex;
     flex-wrap: nowrap;
@@ -1922,7 +1932,7 @@ html[dir='rtl'] .academic-modal .spims-modal-title {
     border-bottom-color: var(--color-primary);
 }
 
-/* —— x-toolbar —— */
+/* ?? x-toolbar ?? */
 .spims-toolbar {
     display: flex;
     flex-wrap: wrap;
@@ -1947,7 +1957,7 @@ html[dir='rtl'] .academic-modal .spims-modal-title {
     flex-shrink: 0;
 }
 
-/* —— x-avatar —— */
+/* ?? x-avatar ?? */
 .spims-avatar {
     display: inline-flex;
     align-items: center;
@@ -1971,7 +1981,7 @@ html[dir='rtl'] .academic-modal .spims-modal-title {
 .spims-avatar-md { width: 2.5rem; height: 2.5rem; font-size: var(--text-sm); }
 .spims-avatar-lg { width: 3.5rem; height: 3.5rem; font-size: var(--text-lg); }
 
-/* —— x-progress —— */
+/* ?? x-progress ?? */
 .spims-progress-wrap {
     display: flex;
     flex-direction: column;
@@ -2020,7 +2030,7 @@ progress.spims-progress--success::-moz-progress-bar { background: var(--color-su
 progress.spims-progress--warning::-moz-progress-bar { background: var(--color-warning); }
 progress.spims-progress--danger::-moz-progress-bar  { background: var(--color-danger); }
 
-/* —— x-timeline —— */
+/* ?? x-timeline ?? */
 .spims-timeline {
     list-style: none;
     padding: 0;
@@ -2066,7 +2076,7 @@ progress.spims-progress--danger::-moz-progress-bar  { background: var(--color-da
     color: var(--color-text-muted);
 }
 
-/* —— x-file-drop —— */
+/* ?? x-file-drop ?? */
 .spims-file-drop {
     display: flex;
     flex-direction: column;
@@ -2104,7 +2114,7 @@ progress.spims-progress--danger::-moz-progress-bar  { background: var(--color-da
     margin-top: var(--space-1);
 }
 
-/* —— x-data-table —— */
+/* ?? x-data-table ?? */
 .spims-dt-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -2185,11 +2195,11 @@ progress.spims-progress--danger::-moz-progress-bar  { background: var(--color-da
     word-break: break-word;
 }
 
-/* ══════════════════════════════════════
-   Phase B — Sacred Academic surface recipes
+/* ??????????????????????????????????????
+   Phase B ? Sacred Academic surface recipes
    Thin aliases so Blade can use DESIGN.md names without
    fighting Phase A token/scale work. Prefer tokens only.
-   ══════════════════════════════════════ */
+   ?????????????????????????????????????? */
 
 .academic-card,
 .app-card.academic-card {
