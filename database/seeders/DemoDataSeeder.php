@@ -10,6 +10,7 @@ use App\Enums\ComponentKind;
 use App\Enums\ContentItemType;
 use App\Enums\Currency;
 use App\Enums\EnrollmentStatus;
+use App\Enums\EventReservationStatus;
 use App\Enums\FeedbackQuestionKind;
 use App\Enums\FormFieldType;
 use App\Enums\GradeStatus;
@@ -48,13 +49,19 @@ use App\Models\Credential;
 use App\Models\DiscussionPost;
 use App\Models\Enrollment;
 use App\Models\Event;
+use App\Models\EventReservation;
+use App\Models\FeedbackIdentityRevealRequest;
+use App\Models\FeedbackSubmission;
+use App\Models\FeedbackSubmissionIdentity;
 use App\Models\FeedbackSurvey;
 use App\Models\GradebookComponent;
 use App\Models\GradingScheme;
 use App\Models\Invoice;
 use App\Models\LiveQuiz;
 use App\Models\LiveSession;
+use App\Models\Notification;
 use App\Models\OfferingStaff;
+use App\Models\PaymentPlan;
 use App\Models\Program;
 use App\Models\ProgramCourse;
 use App\Models\ProjectAssessment;
@@ -65,7 +72,9 @@ use App\Models\Semester;
 use App\Models\StudentProgram;
 use App\Models\User;
 use App\Models\UserRole;
+use App\Models\WalletTransaction;
 use App\Models\Week;
+use App\Services\Academics\TranslationService;
 use App\Services\Assessment\AssessmentService;
 use App\Services\Assessment\AssignmentService;
 use App\Services\Assessment\AttemptService;
@@ -74,15 +83,20 @@ use App\Services\Communications\AnnouncementService;
 use App\Services\Credentials\CredentialService;
 use App\Services\Discussions\DiscussionService;
 use App\Services\Enrollment\EnrollmentService;
+use App\Services\Events\EventCheckInService;
 use App\Services\Events\EventService;
+use App\Services\Feedback\FeedbackIdentityRevealService;
+use App\Services\Feedback\FeedbackSubmissionService;
 use App\Services\Feedback\FeedbackSurveyService;
 use App\Services\Finance\InvoiceService;
+use App\Services\Finance\PaymentPlanService;
 use App\Services\Finance\PaymentService;
 use App\Services\Finance\WalletService;
 use App\Services\Gradebook\GradebookService;
 use App\Services\Live\AttendanceService;
 use App\Services\Live\LiveSessionService;
 use App\Services\LiveQuiz\LiveQuizHostService;
+use App\Services\Notifications\NotificationService;
 use App\Services\Offerings\OfferingService;
 use App\Services\Projects\ProjectAssessmentService;
 use App\Services\Projects\ProjectTeamService;
@@ -743,6 +757,14 @@ class DemoDataSeeder extends Seeder
         $this->seedSurvey($ins1, $th101);
         $this->seedLiveQuiz($ins1, $th101);
         $this->seedTeamProject($aca, $student1, $th101);
+
+        // Phase B fixtures (responses / reservations / finance locale / notifications)
+        $this->seedSurveySubmission($ins1, $student1, $th101);
+        $this->seedEventReservation($adm, $student1);
+        $this->seedPaymentPlan($student1);
+        $this->seedWalletPoints($fin, $student1);
+        $this->seedTranslations($aca, $courses, $programs);
+        $this->seedStudentNotifications($student1);
     }
 
     /**
@@ -1468,6 +1490,221 @@ class DemoDataSeeder extends Seeder
             }
         } catch (\Throwable) {
             // Team join is best-effort for demo data.
+        }
+    }
+
+    // ─── Phase B fixtures ────────────────────────────────────────────────────
+
+    /**
+     * student1 submits the TH101 Week 1 feedback survey; instructor requests identity reveal.
+     */
+    private function seedSurveySubmission(User $ins1, User $student1, CourseOffering $th101): void
+    {
+        $survey = FeedbackSurvey::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Week 1 Feedback')
+            ->with('questions')
+            ->first();
+
+        if ($survey === null) {
+            return;
+        }
+
+        $already = FeedbackSubmissionIdentity::query()
+            ->where('student_id', $student1->id)
+            ->whereHas('submission', fn ($q) => $q->where('survey_id', $survey->id))
+            ->exists();
+
+        if (! $already) {
+            $answers = [];
+            foreach ($survey->questions as $question) {
+                $kind = $question->kind instanceof FeedbackQuestionKind
+                    ? $question->kind
+                    : FeedbackQuestionKind::from((string) $question->kind);
+
+                $answers[$question->id] = match ($kind) {
+                    FeedbackQuestionKind::Scale => 5,
+                    FeedbackQuestionKind::Text => 'The reading overview and live session were most valuable.',
+                    FeedbackQuestionKind::Single => 'Theology basics',
+                    FeedbackQuestionKind::Multi => ['Assigned reading', 'Live session'],
+                };
+            }
+
+            app(FeedbackSubmissionService::class)->submit($student1, $survey, $answers);
+        }
+
+        $submission = FeedbackSubmission::query()
+            ->where('survey_id', $survey->id)
+            ->whereHas('identity', fn ($q) => $q->where('student_id', $student1->id))
+            ->first();
+
+        if ($submission === null) {
+            return;
+        }
+
+        $revealExists = FeedbackIdentityRevealRequest::query()
+            ->where('submission_id', $submission->id)
+            ->exists();
+
+        if (! $revealExists) {
+            try {
+                app(FeedbackIdentityRevealService::class)->request(
+                    $ins1,
+                    $submission,
+                    'Demo walkthrough — review Week 1 feedback authenticity'
+                );
+            } catch (\Throwable) {
+                // Identity reveal is optional for the demo walkthrough.
+            }
+        }
+    }
+
+    /**
+     * student1 reserves a seat on Theology Orientation Day and is checked in.
+     */
+    private function seedEventReservation(User $adm, User $student1): void
+    {
+        $event = Event::query()->where('title', 'Theology Orientation Day')->first();
+        if ($event === null) {
+            return;
+        }
+
+        $events = app(EventService::class);
+        $reservation = EventReservation::query()
+            ->where('event_id', $event->id)
+            ->where('student_id', $student1->id)
+            ->whereIn('status', [
+                EventReservationStatus::Reserved->value,
+                EventReservationStatus::Waitlisted->value,
+            ])
+            ->first();
+
+        if ($reservation === null) {
+            $reservation = $events->reserve($student1, $event);
+        }
+
+        if ($reservation->checkIn()->exists()) {
+            return;
+        }
+
+        if ($reservation->status !== EventReservationStatus::Reserved) {
+            return;
+        }
+
+        $checkIns = app(EventCheckInService::class);
+        $payload = $checkIns->issueQr($reservation);
+        $checkIns->verify($adm, $payload);
+    }
+
+    /**
+     * Open a 3-installment payment plan on one of student1's unpaid invoices.
+     * start_on in the past so the first installment is Due.
+     */
+    private function seedPaymentPlan(User $student1): void
+    {
+        if (PaymentPlan::query()->whereHas('invoice', fn ($q) => $q->where('student_id', $student1->id))->exists()) {
+            return;
+        }
+
+        $invoice = Invoice::query()
+            ->where('student_id', $student1->id)
+            ->where('total_minor', '>', 0)
+            ->orderBy('created_at')
+            ->get()
+            ->first(fn (Invoice $row) => $row->amountDue() > 0 && $row->amountPaid() === 0 && $row->openPaymentPlan() === null);
+
+        if ($invoice === null) {
+            return;
+        }
+
+        app(PaymentPlanService::class)->create($student1, $invoice, 3, now()->subDays(2));
+    }
+
+    /**
+     * Credit points wallet for student1 (distinct from money balance).
+     */
+    private function seedWalletPoints(User $fin, User $student1): void
+    {
+        $wallets = app(WalletService::class);
+        $wallet = $wallets->ensureWallet($student1);
+
+        if ($wallet->balance(Currency::Egp, WalletKind::Points) > 0) {
+            return;
+        }
+
+        if (WalletTransaction::query()
+            ->where('wallet_id', $wallet->id)
+            ->where('kind', WalletKind::Points)
+            ->exists()) {
+            return;
+        }
+
+        $wallets->grantPoints($fin, $student1, Currency::Egp, 2500, 'Demo EGP points grant');
+    }
+
+    /**
+     * Human translations for one course title and one program name (ar + fr).
+     *
+     * @param  array<string, Course>  $courses
+     * @param  array<string, Program>  $programs
+     */
+    private function seedTranslations(User $aca, array $courses, array $programs): void
+    {
+        $translations = app(TranslationService::class);
+        $th101 = $courses['TH101'] ?? null;
+        $diploma = $programs['DIP-THEO'] ?? null;
+
+        if ($th101 !== null) {
+            $translations->upsert($aca, 'Course', (string) $th101->id, 'title', 'ar', 'مقدمة في اللاهوت', true);
+            $translations->upsert($aca, 'Course', (string) $th101->id, 'title', 'fr', 'Introduction à la théologie', true);
+        }
+
+        if ($diploma !== null) {
+            $translations->upsert($aca, 'Program', (string) $diploma->id, 'name', 'ar', 'دبلوم في اللاهوت', true);
+            $translations->upsert($aca, 'Program', (string) $diploma->id, 'name', 'fr', 'Diplôme en théologie', true);
+        }
+    }
+
+    /**
+     * In-app notifications for student1 covering announcement and invoice types.
+     */
+    private function seedStudentNotifications(User $student1): void
+    {
+        $notifications = app(NotificationService::class);
+
+        if (! Notification::query()
+            ->where('user_id', $student1->id)
+            ->where('type', 'announcement.published')
+            ->exists()) {
+            $announcement = Announcement::query()->where('title', 'Week 1 is open')->first();
+            $notifications->notify(
+                $student1,
+                'announcement.published',
+                'Week 1 is open',
+                'Please complete the Week 1 reading and join the live session this week.',
+                $announcement !== null ? ['announcement_id' => $announcement->id] : null,
+                alsoEmail: false,
+            );
+        }
+
+        if (! Notification::query()
+            ->where('user_id', $student1->id)
+            ->where('type', 'finance.invoice_issued')
+            ->exists()) {
+            $invoice = Invoice::query()
+                ->where('student_id', $student1->id)
+                ->where('total_minor', '>', 0)
+                ->orderBy('created_at')
+                ->first();
+
+            $notifications->notify(
+                $student1,
+                'finance.invoice_issued',
+                'Tuition invoice ready',
+                'You have an open tuition invoice ready for payment or installment plan.',
+                $invoice !== null ? ['invoice_id' => $invoice->id] : null,
+                alsoEmail: false,
+            );
         }
     }
 }
