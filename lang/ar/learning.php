@@ -71,4 +71,10 @@ return [
     'starts_at' => 'يبدأ :when',
     'closes_at' => 'يغلق :when',
     'no_due_date' => 'نافذة مفتوحة',
+    'grade_status_not_started' => 'لم يبدأ',
+    'grade_status_submitted' => 'مُرسَل',
+    'grade_status_passed' => 'ناجح',
+    'grade_status_failed' => 'راسب',
+    'grade_status_graded' => 'مُقيَّم',
+    'grade_status_pending' => 'قيد الانتظار',
 ];
