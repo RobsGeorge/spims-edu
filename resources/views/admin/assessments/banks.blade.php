@@ -1,7 +1,10 @@
 @extends('layouts.app')
 @section('title', __('assessment.banks'))
 @section('content')
-<h1 class="spims-title mb-3">{{ __('assessment.banks') }} — {{ $course->code }}</h1>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h1 class="spims-title mb-0">{{ __('assessment.banks') }} — {{ $course->code }}</h1>
+    <a class="small" href="{{ route('help.show', 'banks-assessments') }}">{{ __('help.learn_more') }}</a>
+</div>
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 <form method="POST" action="{{ route('admin.banks.store', $course) }}" class="row g-2 mb-4">@csrf
     <div class="col-auto"><input name="name" class="form-control" placeholder="{{ __('assessment.bank_name') }}" required aria-label="{{ __('assessment.bank_name') }}"></div>

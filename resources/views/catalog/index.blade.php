@@ -57,7 +57,7 @@
               class="catalog-filters academic-form spims-filter-bar mb-4"
               aria-controls="catalog-results-courses catalog-results-standalone">
 
-            <x-card variant="quiet" class="p-3">
+            <x-card variant="quiet" class="p-3 w-100">
                 {{-- Hidden tab field — kept in sync by Alpine --}}
                 <input type="hidden" name="tab" x-bind:value="tab">
 
@@ -174,7 +174,11 @@
                     :title="__('catalog.no_programs')"
                     :message="__('catalog.no_programs_hint')"
                     icon="bi-journal-text"
-                />
+                >
+                    <x-slot:actions>
+                        <a href="{{ route('help.show', 'browse-catalog-enroll') }}" class="btn btn-outline-secondary btn-sm">{{ __('help.catalog_enroll_cta') }}</a>
+                    </x-slot:actions>
+                </x-empty-state>
             @else
                 <div class="grid-auto-md">
                     @foreach($programs as $program)
@@ -241,7 +245,11 @@
                     :title="__('catalog.no_standalone')"
                     :message="__('catalog.no_standalone_hint')"
                     icon="bi-journal-text"
-                />
+                >
+                    <x-slot:actions>
+                        <a href="{{ route('help.show', 'browse-catalog-enroll') }}" class="btn btn-outline-secondary btn-sm">{{ __('help.catalog_enroll_cta') }}</a>
+                    </x-slot:actions>
+                </x-empty-state>
             @else
                 <div class="row g-3">
                     @foreach($standaloneCourses as $index => $course)

@@ -18,7 +18,11 @@
         <span class="spims-text-dim">{{ __('people.directory_title') }}</span>
     </nav>
 
-    <x-page-header :title="__('people.directory_title')" :subtitle="__('people.directory_lead')" />
+    <x-page-header :title="__('people.directory_title')" :subtitle="__('people.directory_lead')">
+        <x-slot:actions>
+            <a class="small align-self-center" href="{{ route('help.show', 'users-roles') }}">{{ __('help.learn_more') }}</a>
+        </x-slot:actions>
+    </x-page-header>
     <p class="small spims-text-dim mb-3">{{ __('people.directory_help') }}</p>
 
     @include('partials.superadmin-entrance-banner', ['caption' => __('superadmin.entrance_from_users')])

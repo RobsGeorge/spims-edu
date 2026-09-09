@@ -35,6 +35,9 @@ class RolesHubTest extends TestCase
 
         $help = $this->actingAs($sa)->get(route('roles.hub', ['section' => 'help']))
             ->assertOk()
+            ->assertSee(__('roles_hub.portal_guides_title'))
+            ->assertSee(route('help.show', 'getting-started'), false)
+            ->assertSee(route('help.show', 'roles-hub-permissions'), false)
             ->getContent();
 
         foreach ([
