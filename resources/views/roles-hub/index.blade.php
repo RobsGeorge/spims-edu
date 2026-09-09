@@ -54,6 +54,7 @@
             </h2>
             <div id="helpSection" class="accordion-collapse collapse{{ $helpOpen ? ' show' : '' }}" data-bs-parent="#rolesHubAccordion">
                 <div class="accordion-body">
+                    @include('roles-hub.partials.portal-guides')
                     @include('roles-hub.help')
                 </div>
             </div>

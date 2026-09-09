@@ -5,7 +5,7 @@
 Open **Help Center** at [`/help`](https://spims-edu.com/help) (or `/help` on your local/staging host). Articles are localized in Arabic, English, and French via the portal locale switcher and follow Sacred Academic light/dark chrome.
 
 - Role-filtered lists: `/help/role/{ROLE}` (e.g. `STUDENT`, `INSTRUCTOR`)
-- Single article: `/help/{slug}` (e.g. `/help/minor-units`)
+- Single article: `/help/{slug}` (e.g. `/help/minor-units-explained`)
 - Category browse: `/help/c/{category}`
 
 **Editors:** Administrative Admin and Super Admin manage content at **`/admin/help`** (`help.manage`). Draft, publish, archive, locales (en/ar/fr), audiences, and media — no deploy required.

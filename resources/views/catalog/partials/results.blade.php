@@ -3,7 +3,11 @@
         :title="$emptyTitle ?? __('catalog.empty')"
         :message="$emptyHint ?? __('catalog.empty_hint')"
         icon="bi-inbox"
-    />
+    >
+        <x-slot:actions>
+            <a href="{{ route('help.show', 'browse-catalog-enroll') }}" class="btn btn-outline-secondary btn-sm">{{ __('help.catalog_enroll_cta') }}</a>
+        </x-slot:actions>
+    </x-empty-state>
 @else
     <div class="row g-3">
         @foreach($courses as $index => $course)

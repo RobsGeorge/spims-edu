@@ -18,7 +18,10 @@
         <span class="spims-text-dim">{{ __('people.directory_title') }}</span>
     </nav>
 
-    <h1 class="page-title mb-2">{{ __('people.directory_title') }}</h1>
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-2">
+        <h1 class="page-title mb-0">{{ __('people.directory_title') }}</h1>
+        <a class="small align-self-center" href="{{ route('help.show', 'users-roles') }}">{{ __('help.learn_more') }}</a>
+    </div>
     <p class="spims-text-dim mb-2">{{ __('people.directory_lead') }}</p>
     <p class="small spims-text-dim mb-3">{{ __('people.directory_help') }}</p>
 
