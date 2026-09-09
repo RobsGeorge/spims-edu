@@ -10,6 +10,7 @@ use App\Enums\ComponentKind;
 use App\Enums\ContentItemType;
 use App\Enums\Currency;
 use App\Enums\EnrollmentStatus;
+use App\Enums\FeedbackQuestionKind;
 use App\Enums\FormFieldType;
 use App\Enums\GradeStatus;
 use App\Enums\GradeType;
@@ -18,6 +19,8 @@ use App\Enums\OfferingMode;
 use App\Enums\OfferingStaffRole;
 use App\Enums\OfferingStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\ProjectDeliverableKind;
+use App\Enums\ProjectGradingMode;
 use App\Enums\ProgramType;
 use App\Enums\QuestionType;
 use App\Enums\RequirementType;
@@ -36,15 +39,21 @@ use App\Models\ClassSession;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
+use App\Models\Credential;
 use App\Models\DiscussionPost;
 use App\Models\Enrollment;
+use App\Models\Event;
+use App\Models\FeedbackSurvey;
 use App\Models\GradebookComponent;
 use App\Models\GradingScheme;
 use App\Models\Invoice;
+use App\Models\LiveQuiz;
 use App\Models\LiveSession;
 use App\Models\OfferingStaff;
 use App\Models\Program;
 use App\Models\ProgramCourse;
+use App\Models\ProjectAssessment;
+use App\Models\ProjectMembership;
 use App\Models\QuestionBank;
 use App\Models\Semester;
 use App\Models\StudentProgram;
@@ -54,21 +63,39 @@ use App\Models\Week;
 use App\Services\Assessment\AssessmentService;
 use App\Services\Assessment\QuestionBankService;
 use App\Services\Communications\AnnouncementService;
+use App\Services\Credentials\CredentialService;
 use App\Services\Discussions\DiscussionService;
 use App\Services\Enrollment\EnrollmentService;
+use App\Services\Events\EventService;
+use App\Services\Feedback\FeedbackSurveyService;
 use App\Services\Finance\InvoiceService;
 use App\Services\Finance\PaymentService;
 use App\Services\Finance\WalletService;
 use App\Services\Gradebook\GradebookService;
 use App\Services\Live\AttendanceService;
 use App\Services\Live\LiveSessionService;
+use App\Services\LiveQuiz\LiveQuizHostService;
 use App\Services\Offerings\OfferingService;
+use App\Services\Projects\ProjectAssessmentService;
+use App\Services\Projects\ProjectTeamService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class DemoDataSeeder extends Seeder
 {
     public const PASSWORD = 'Spims@Test2026!';
+
+    /** Email suffix that identifies all demo accounts. */
+    public const DEMO_EMAIL_SUFFIX = '@spims.test';
+
+    /** Demo program codes — used by DemoResetCommand to scope the wipe. */
+    public const DEMO_PROGRAM_CODES = ['DIP-THEO', 'CERT-LIT', 'DEG-BTH', 'CERT-BIB', 'DEG-DIAC'];
+
+    /** Demo course codes — used by DemoResetCommand to scope the wipe. */
+    public const DEMO_COURSE_CODES = ['TH101', 'TH201', 'TH301', 'BI101', 'BI102', 'BI201', 'LI101', 'LI201', 'CH101', 'CH201', 'ET101', 'FREE1'];
+
+    /** Demo academic year names — used by DemoResetCommand to scope the wipe. */
+    public const DEMO_YEAR_NAMES = ['2025/2026', '2026/2027'];
 
     public function run(): void
     {
@@ -87,7 +114,7 @@ class DemoDataSeeder extends Seeder
         $offerings = $this->seedOfferings($courses, $fall, $spring, $users);
         $forms = $this->seedApplicationForms($programs);
         $this->seedApplicationsAndEnrollments($users, $programs, $forms, $offerings);
-        $this->seedClassroomAndMoney($users, $offerings);
+        $this->seedClassroomAndMoney($users, $offerings, $programs, $courses);
 
         $this->command?->info('Demo accounts password: '.self::PASSWORD);
         $this->command?->info('See docs/demo-accounts.md for the full account list.');
@@ -167,29 +194,79 @@ class DemoDataSeeder extends Seeder
     private function seedPrograms(?GradingScheme $scheme): array
     {
         $defs = [
-            'DIP-THEO' => ['Diploma in Theology', ProgramType::Diploma, 60, 15, 5, 8, 3],
-            'CERT-LIT' => ['Certificate in Liturgics', ProgramType::Certificate, 70, 12, 4, 4, 0],
-            'DEG-BTH' => ['Bachelor of Theology', ProgramType::Degree, 60, 18, 6, 12, 6],
-            'CERT-BIB' => ['Certificate in Biblical Studies', ProgramType::Certificate, 65, 9, 3, 3, 0],
+            'DIP-THEO' => [
+                'name' => 'Diploma in Theology',
+                'type' => ProgramType::Diploma,
+                'passing_threshold' => 60,
+                'max_credits_per_semester' => 15,
+                'max_courses_per_semester' => 5,
+                'max_semesters_to_graduate' => 8,
+                'elective_credits_required' => 3,
+                'description' => 'A comprehensive diploma that introduces students to foundational theological disciplines including biblical studies, church history, and systematic theology.',
+                'marketing_summary' => 'Begin your theological journey with our structured Diploma in Theology — ideal for those entering ministry or lay service.',
+                'enforce_year_sequence' => false,
+            ],
+            'CERT-LIT' => [
+                'name' => 'Certificate in Liturgics',
+                'type' => ProgramType::Certificate,
+                'passing_threshold' => 70,
+                'max_credits_per_semester' => 12,
+                'max_courses_per_semester' => 4,
+                'max_semesters_to_graduate' => 4,
+                'elective_credits_required' => 0,
+                'description' => 'A focused certificate program covering Coptic liturgical tradition, including the Divine Liturgy, hymns, and liturgical calendar.',
+                'marketing_summary' => 'Deepen your understanding of Coptic worship with our Certificate in Liturgics.',
+                'enforce_year_sequence' => false,
+            ],
+            'DEG-BTH' => [
+                'name' => 'Bachelor of Theology',
+                'type' => ProgramType::Degree,
+                'passing_threshold' => 60,
+                'max_credits_per_semester' => 18,
+                'max_courses_per_semester' => 6,
+                'max_semesters_to_graduate' => 12,
+                'elective_credits_required' => 6,
+                'description' => 'A full degree program spanning systematic theology, biblical studies, church history, and practical ministry. Requires year-sequence completion for core courses.',
+                'marketing_summary' => 'Earn a recognized Bachelor of Theology through our rigorous, parish-rooted academic program.',
+                'enforce_year_sequence' => false,
+            ],
+            'CERT-BIB' => [
+                'name' => 'Certificate in Biblical Studies',
+                'type' => ProgramType::Certificate,
+                'passing_threshold' => 65,
+                'max_credits_per_semester' => 9,
+                'max_courses_per_semester' => 3,
+                'max_semesters_to_graduate' => 3,
+                'elective_credits_required' => 0,
+                'description' => 'An introductory certificate covering the Old Testament Survey, New Testament Survey, and Pauline Epistles.',
+                'marketing_summary' => 'Study Scripture systematically with our Certificate in Biblical Studies.',
+                'enforce_year_sequence' => false,
+            ],
+            // enforce_year_sequence = true program — demonstrates both branches of year-sequence rule (Step 6c)
+            'DEG-DIAC' => [
+                'name' => 'Diaconal Studies (Year-Sequenced)',
+                'type' => ProgramType::Degree,
+                'passing_threshold' => 65,
+                'max_credits_per_semester' => 12,
+                'max_courses_per_semester' => 4,
+                'max_semesters_to_graduate' => 8,
+                'elective_credits_required' => 0,
+                'description' => 'A structured degree in diaconal ministry requiring students to complete Year 1 courses before advancing to Year 2. Year-sequencing is strictly enforced.',
+                'marketing_summary' => 'A year-sequenced pathway preparing deacons for ordained service.',
+                'enforce_year_sequence' => true,
+            ],
         ];
 
         $programs = [];
-        foreach ($defs as $code => [$name, $type, $pass, $maxCredits, $maxCourses, $maxSem, $electives]) {
+        foreach ($defs as $code => $attrs) {
             $programs[$code] = Program::query()->updateOrCreate(
                 ['code' => $code],
-                [
-                    'name' => $name,
-                    'type' => $type,
-                    'passing_threshold' => $pass,
-                    'max_credits_per_semester' => $maxCredits,
-                    'max_courses_per_semester' => $maxCourses,
-                    'max_semesters_to_graduate' => $maxSem,
-                    'elective_credits_required' => $electives,
+                array_merge($attrs, [
                     'signatory_name' => 'Dean of Studies',
                     'signatory_title' => 'Academic Dean',
                     'grading_scheme_id' => $scheme?->id,
                     'active' => true,
-                ]
+                ])
             );
         }
 
@@ -202,22 +279,22 @@ class DemoDataSeeder extends Seeder
     private function seedCourses(): array
     {
         $defs = [
-            ['TH101', 'Introduction to Theology', 3, 15000, 75000, false],
-            ['TH201', 'Patristics I', 3, 18000, 90000, false],
-            ['TH301', 'Systematic Theology', 4, 20000, 100000, false],
-            ['BI101', 'Old Testament Survey', 3, 15000, 75000, false],
-            ['BI102', 'New Testament Survey', 3, 15000, 75000, false],
-            ['BI201', 'Pauline Epistles', 3, 17000, 85000, false],
-            ['LI101', 'Coptic Liturgy Basics', 2, 10000, 50000, false],
-            ['LI201', 'Divine Liturgy Practicum', 2, 12000, 60000, false],
-            ['CH101', 'Church History I', 3, 14000, 70000, false],
-            ['CH201', 'Church History II', 3, 14000, 70000, false],
-            ['ET101', 'Christian Ethics', 2, 11000, 55000, true],
-            ['FREE1', 'Open Orientation (Free)', 1, 0, 0, true],
+            ['TH101', 'Introduction to Theology', 3, 15000, 75000, false, 'An entry-level survey of theological method, the nature of doctrine, and the major categories of systematic theology.'],
+            ['TH201', 'Patristics I', 3, 18000, 90000, false, 'A study of the early Church Fathers and their contribution to Christian doctrine and spiritual formation.'],
+            ['TH301', 'Systematic Theology', 4, 20000, 100000, false, 'A comprehensive examination of the major loci of Christian systematic theology including Christology, pneumatology, and eschatology.'],
+            ['BI101', 'Old Testament Survey', 3, 15000, 75000, false, 'An overview of the Hebrew Bible covering its historical, literary, and theological dimensions.'],
+            ['BI102', 'New Testament Survey', 3, 15000, 75000, false, 'A survey of the New Testament from the Gospels through Revelation with attention to authorship, date, and message.'],
+            ['BI201', 'Pauline Epistles', 3, 17000, 85000, false, 'An in-depth reading of Paul\'s letters with emphasis on Romans, Galatians, and the Corinthian correspondence.'],
+            ['LI101', 'Coptic Liturgy Basics', 2, 10000, 50000, false, 'Introduction to the structure and theology of the Coptic Divine Liturgy, with attention to its Alexandrian roots.'],
+            ['LI201', 'Divine Liturgy Practicum', 2, 12000, 60000, false, 'A practicum course in Coptic liturgical chant, rites, and deaconate duties within the Divine Liturgy.'],
+            ['CH101', 'Church History I', 3, 14000, 70000, false, 'The history of Christianity from apostolic times through the Council of Chalcedon, with focus on the Coptic tradition.'],
+            ['CH201', 'Church History II', 3, 14000, 70000, false, 'Continuation of Church History from the post-Chalcedonian era through the modern Coptic revival.'],
+            ['ET101', 'Christian Ethics', 2, 11000, 55000, true, 'An introduction to Christian moral reasoning and its application to contemporary ethical questions.'],
+            ['FREE1', 'Open Orientation (Free)', 1, 0, 0, true, 'A free orientation course welcoming new students to the SPIMS learning environment.'],
         ];
 
         $courses = [];
-        foreach ($defs as [$code, $title, $credits, $usd, $egp, $free]) {
+        foreach ($defs as [$code, $title, $credits, $usd, $egp, $free, $description]) {
             $courses[$code] = Course::query()->updateOrCreate(
                 ['code' => $code],
                 [
@@ -229,6 +306,7 @@ class DemoDataSeeder extends Seeder
                     'is_standalone' => in_array($code, ['ET101', 'FREE1'], true),
                     'passing_threshold' => 60,
                     'active' => true,
+                    'description' => $description,
                 ]
             );
         }
@@ -272,6 +350,13 @@ class DemoDataSeeder extends Seeder
                 ['BI101', RequirementType::Required, 1],
                 ['BI102', RequirementType::Required, 1],
                 ['BI201', RequirementType::Required, 1],
+            ],
+            // DEG-DIAC has courses at Year 1 and Year 2 — both branches of enforce_year_sequence are testable
+            'DEG-DIAC' => [
+                ['TH101', RequirementType::Required, 1],
+                ['CH101', RequirementType::Required, 1],
+                ['TH201', RequirementType::Required, 2],
+                ['CH201', RequirementType::Required, 2],
             ],
         ];
 
@@ -329,6 +414,22 @@ class DemoDataSeeder extends Seeder
             ]
         );
 
+        // IN_PROGRESS semester — demonstrates the lifecycle state
+        Semester::query()->updateOrCreate(
+            ['academic_year_id' => $year->id, 'name' => 'Summer'],
+            [
+                'start_date' => '2027-06-15',
+                'end_date' => '2027-08-30',
+                'registration_start' => now()->subWeeks(2),
+                'registration_end' => now()->addWeeks(3),
+                'add_drop_end_week' => 1,
+                'last_withdrawal_week' => 4,
+                'withdrawal_refund_percent' => 25,
+                'status' => OfferingStatus::InProgress,
+            ]
+        );
+
+        // CLOSED semester — the prior year fall is Completed
         $prior = AcademicYear::query()->updateOrCreate(
             ['name' => '2025/2026'],
             ['start_date' => '2025-09-01', 'end_date' => '2026-06-30']
@@ -492,16 +593,16 @@ class DemoDataSeeder extends Seeder
         }
 
         $statuses = [
-            ApplicationStatus::Accepted,
-            ApplicationStatus::Submitted,
-            ApplicationStatus::UnderReview,
-            ApplicationStatus::Waitlisted,
-            ApplicationStatus::Rejected,
-            ApplicationStatus::Accepted,
-            ApplicationStatus::Accepted,
-            ApplicationStatus::Draft,
-            ApplicationStatus::Accepted,
-            ApplicationStatus::Submitted,
+            ApplicationStatus::Accepted,    // student1
+            ApplicationStatus::Submitted,   // student2
+            ApplicationStatus::UnderReview, // student3
+            ApplicationStatus::Waitlisted,  // student4
+            ApplicationStatus::Rejected,    // student5
+            ApplicationStatus::Accepted,    // student6
+            ApplicationStatus::Accepted,    // student7
+            ApplicationStatus::Draft,       // student8
+            ApplicationStatus::Accepted,    // student9
+            ApplicationStatus::Submitted,   // student10
         ];
 
         foreach ($students as $i => $student) {
@@ -553,6 +654,21 @@ class DemoDataSeeder extends Seeder
                 }
             }
         }
+
+        // Withdrawn application — demonstrates EVERY application status
+        $student1 = $users['student1@spims.test'];
+        $certBibForm = $forms['CERT-BIB'];
+        Application::query()->updateOrCreate(
+            ['applicant_id' => $student1->id, 'program_id' => $programs['CERT-BIB']->id],
+            [
+                'form_id' => $certBibForm->id,
+                'status' => ApplicationStatus::Withdrawn,
+                'reviewer_id' => null,
+                'decision_note' => null,
+                'submitted_at' => now()->subDays(20),
+                'decided_at' => null,
+            ]
+        );
     }
 
     /**
@@ -560,8 +676,10 @@ class DemoDataSeeder extends Seeder
      *
      * @param  array<string, User>  $users
      * @param  list<CourseOffering>  $offerings
+     * @param  array<string, Program>  $programs
+     * @param  array<string, Course>  $courses
      */
-    private function seedClassroomAndMoney(array $users, array $offerings): void
+    private function seedClassroomAndMoney(array $users, array $offerings, array $programs, array $courses): void
     {
         foreach ($offerings as $offering) {
             $offering->loadMissing(['course', 'weeks']);
@@ -571,6 +689,7 @@ class DemoDataSeeder extends Seeder
         $ins2 = $users['ins2@spims.test'];
         $fin = $users['fin@spims.test'];
         $aca = $users['aca@spims.test'];
+        $adm = $users['adm@spims.test'];
         $student1 = $users['student1@spims.test'];
         $student3 = $users['student3@spims.test'];
         $student6 = $users['student6@spims.test'];
@@ -595,6 +714,9 @@ class DemoDataSeeder extends Seeder
             [ContentItemType::Text->value, 'Study notes for Week 1', 'Bring one question from the reading to the live session.'],
         ]);
 
+        // Seed additional content item types (VIDEO, FILE) in TH101 Week 2
+        $this->seedWeekTwoContent($offeringsService, $ins1, $th101);
+
         $this->seedTh101AssessmentAndGradebook($ins1, $th101, $th101Items[0] ?? null);
         $this->seedInvoicesPaymentsAndWallet($fin, $student1, $student9);
         $this->seedTh101Attendance($ins1, $th101, $student1, $student6, $student7);
@@ -603,6 +725,14 @@ class DemoDataSeeder extends Seeder
         $this->seedTh101Discussion($ins1, $student1, $th101);
         $this->seedApplicationAnswers($student1, $student3);
         $this->seedDualRoleAccess($aca, $dual, $free1, $et101SelfPaced);
+
+        // 8A additions
+        $this->seedReleasedGrades($ins1, $th101);
+        $this->seedCredential($aca, $student1);
+        $this->seedEvent($adm);
+        $this->seedSurvey($ins1, $th101);
+        $this->seedLiveQuiz($ins1, $th101);
+        $this->seedTeamProject($aca, $student1, $th101);
     }
 
     /**
@@ -662,6 +792,51 @@ class DemoDataSeeder extends Seeder
         }
 
         return $created;
+    }
+
+    /**
+     * Seed VIDEO and FILE content item types in TH101 Week 2 so every major
+     * content-item type is represented in the demo walkthrough offering.
+     */
+    private function seedWeekTwoContent(OfferingService $offeringsService, User $ins1, CourseOffering $th101): void
+    {
+        $week2 = Week::query()
+            ->where('offering_id', $th101->id)
+            ->where('number', 2)
+            ->first();
+
+        if ($week2 === null) {
+            return;
+        }
+
+        $items = [
+            [ContentItemType::Video->value, 'TH101 Week 2 intro video', 'Watch this short clip before the live session. Key themes: the nature of divine revelation.'],
+            [ContentItemType::File->value, 'TH101 Week 2 reference sheet (PDF)', 'A downloadable reference sheet covering the key terms from Week 2.'],
+            [ContentItemType::Reading->value, 'TH101 Week 2 assigned reading', 'Complete the assigned pages before the Week 2 live session.'],
+            [ContentItemType::Text->value, 'TH101 Week 2 study notes', 'Notes to supplement the assigned reading. Review before the quiz.'],
+        ];
+
+        foreach ($items as $i => [$type, $title, $body]) {
+            $existing = ContentItem::query()
+                ->where('week_id', $week2->id)
+                ->where('title', $title)
+                ->first();
+
+            if ($existing !== null) {
+                if (! $existing->isPublished()) {
+                    $offeringsService->publishContentItem($ins1, $existing);
+                }
+                continue;
+            }
+
+            $offeringsService->addContentItem($ins1, $week2, [
+                'type' => $type,
+                'title' => $title,
+                'body' => $body,
+                'order' => $i + 1,
+                'published' => true,
+            ]);
+        }
     }
 
     private function seedTh101AssessmentAndGradebook(User $ins1, CourseOffering $th101, ?ContentItem $hostItem): void
@@ -942,5 +1117,203 @@ class DemoDataSeeder extends Seeder
         }
 
         app(EnrollmentService::class)->register($dual, $et101SelfPaced);
+    }
+
+    // ─── 8A additions ────────────────────────────────────────────────────────
+
+    /**
+     * Submit grades for TH101 so the walkthrough shows "released" (Submitted) grades.
+     */
+    private function seedReleasedGrades(User $ins1, CourseOffering $th101): void
+    {
+        // submitGrades is idempotent: it skips Locked enrollments and sets the rest to Submitted.
+        try {
+            app(GradebookService::class)->submitGrades($ins1, $th101);
+        } catch (\Throwable) {
+            // Grade submission is best-effort for demo data.
+        }
+    }
+
+    /**
+     * Issue a transcript credential for student1. The qr_token can be used with
+     * the /verify/{token} endpoint to demonstrate the verifier widget.
+     */
+    private function seedCredential(User $aca, User $student1): void
+    {
+        if (Credential::query()->where('student_id', $student1->id)->whereNull('revoked_at')->exists()) {
+            return;
+        }
+
+        try {
+            app(CredentialService::class)->issueTranscript($aca, $student1, 'en');
+        } catch (\Throwable) {
+            // Credential issuance is best-effort for demo data (PDF rendering may be unavailable).
+        }
+    }
+
+    /**
+     * Publish an event with open seats so student1 can reserve a spot.
+     */
+    private function seedEvent(User $adm): void
+    {
+        if (Event::query()->where('title', 'Theology Orientation Day')->exists()) {
+            return;
+        }
+
+        $eventService = app(EventService::class);
+        $event = $eventService->create($adm, [
+            'title' => 'Theology Orientation Day',
+            'description' => 'A welcome day for all theology students with talks, Q&A, and fellowship.',
+            'starts_at' => now()->addDays(14)->setTime(10, 0)->toDateTimeString(),
+            'ends_at' => now()->addDays(14)->setTime(17, 0)->toDateTimeString(),
+            'venue' => 'St. Mark Cathedral Hall',
+            'capacity' => 50,
+            'waitlist_enabled' => true,
+        ]);
+        $eventService->publish($adm, $event);
+    }
+
+    /**
+     * Create and publish an open survey for TH101 with one question of each
+     * FeedbackQuestionKind: TEXT, SINGLE, MULTI, SCALE.
+     */
+    private function seedSurvey(User $ins1, CourseOffering $th101): void
+    {
+        if (FeedbackSurvey::query()->where('offering_id', $th101->id)->where('title', 'TH101 Week 1 Feedback')->exists()) {
+            return;
+        }
+
+        $surveyService = app(FeedbackSurveyService::class);
+        $survey = $surveyService->create($ins1, [
+            'title' => 'TH101 Week 1 Feedback',
+            'anonymous_default' => true,
+            'opens_at' => now()->subHour()->toDateTimeString(),
+            'closes_at' => now()->addMonths(1)->toDateTimeString(),
+        ], $th101);
+
+        $surveyService->addQuestion($ins1, $survey, [
+            'prompt' => 'How would you rate this week overall? (1 = poor, 5 = excellent)',
+            'kind' => FeedbackQuestionKind::Scale->value,
+            'position' => 1,
+            'required' => true,
+        ]);
+        $surveyService->addQuestion($ins1, $survey, [
+            'prompt' => 'What did you find most valuable in Week 1?',
+            'kind' => FeedbackQuestionKind::Text->value,
+            'position' => 2,
+            'required' => false,
+        ]);
+        $surveyService->addQuestion($ins1, $survey, [
+            'prompt' => 'Which topic interested you most in Week 1?',
+            'kind' => FeedbackQuestionKind::Single->value,
+            'position' => 3,
+            'required' => true,
+            'options' => ['Theology basics', 'Church history', 'Patristics', 'Liturgics'],
+        ]);
+        $surveyService->addQuestion($ins1, $survey, [
+            'prompt' => 'Which of the following resources did you use this week?',
+            'kind' => FeedbackQuestionKind::Multi->value,
+            'position' => 4,
+            'required' => false,
+            'options' => ['Assigned reading', 'Live session', 'Study notes', 'Discussion board'],
+        ]);
+
+        $surveyService->publish($ins1, $survey);
+    }
+
+    /**
+     * Create a live quiz for TH101 (Ready status, not yet started).
+     * student1 can join when an instructor starts a session from it.
+     */
+    private function seedLiveQuiz(User $ins1, CourseOffering $th101): void
+    {
+        if (LiveQuiz::query()->where('offering_id', $th101->id)->where('title', 'TH101 Live Check Quiz')->exists()) {
+            return;
+        }
+
+        app(LiveQuizHostService::class)->createQuiz($ins1, $th101, 'TH101 Live Check Quiz', [
+            [
+                'prompt' => 'What does the course code "TH" stand for in TH101?',
+                'time_limit_seconds' => 30,
+                'points' => 1000,
+                'options' => [
+                    ['label' => 'Theology', 'is_correct' => true],
+                    ['label' => 'Theory', 'is_correct' => false],
+                    ['label' => 'Thinking', 'is_correct' => false],
+                    ['label' => 'Tradition', 'is_correct' => false],
+                ],
+            ],
+            [
+                'prompt' => 'How many credit hours does TH101 carry?',
+                'time_limit_seconds' => 20,
+                'points' => 500,
+                'options' => [
+                    ['label' => '2', 'is_correct' => false],
+                    ['label' => '3', 'is_correct' => true],
+                    ['label' => '4', 'is_correct' => false],
+                    ['label' => '1', 'is_correct' => false],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Create a team project assessment for TH101 with student1 as a member.
+     * The deliverable slot is open (due in the future).
+     */
+    private function seedTeamProject(User $aca, User $student1, CourseOffering $th101): void
+    {
+        if (ProjectAssessment::query()->where('offering_id', $th101->id)->where('title', 'TH101 Group Research Project')->exists()) {
+            return;
+        }
+
+        $assessmentService = app(ProjectAssessmentService::class);
+        $teamService = app(ProjectTeamService::class);
+
+        // Deliverables grading mode: one deliverable worth 100 pts
+        $assessment = $assessmentService->create($aca, $th101, [
+            'title' => 'TH101 Group Research Project',
+            'team_size_min' => 1,
+            'team_size_max' => 4,
+            'join_opens_at' => now()->subDay()->toDateTimeString(),
+            'join_closes_at' => now()->addMonths(2)->toDateTimeString(),
+            'allow_leave_once' => true,
+            'grading_mode' => ProjectGradingMode::Deliverables->value,
+            'max_points' => 100,
+        ]);
+
+        $phase = $assessmentService->addPhase($aca, $assessment, [
+            'name' => 'Final Submission',
+            'position' => 1,
+            'due_at' => now()->addMonths(2)->toDateTimeString(),
+        ]);
+
+        $assessmentService->addDeliverable($aca, $phase, [
+            'kind' => ProjectDeliverableKind::File->value,
+            'title' => 'Research Paper',
+            'max_files' => 1,
+            'max_file_mb' => 10,
+            'due_at' => now()->addMonths(2)->toDateTimeString(),
+            'points' => 100,
+        ]);
+
+        $assessment = $assessment->fresh();
+        $assessmentService->publish($aca, $assessment);
+        $assessment = $assessment->fresh();
+
+        // Enroll student1 in a team
+        try {
+            $existing = ProjectMembership::query()
+                ->whereHas('project', fn ($q) => $q->where('project_assessment_id', $assessment->id))
+                ->where('student_id', $student1->id)
+                ->whereNull('left_at')
+                ->exists();
+
+            if (! $existing) {
+                $teamService->join($student1, $assessment);
+            }
+        } catch (\Throwable) {
+            // Team join is best-effort for demo data.
+        }
     }
 }
