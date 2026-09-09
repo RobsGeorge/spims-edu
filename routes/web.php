@@ -746,6 +746,9 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/semesters/{semester}', [SemesterController::class, 'updateSemester'])
             ->middleware('permission:semesters.manage')
             ->name('semesters.update');
+        Route::post('/semesters/{semester}/transition', [SemesterController::class, 'transition'])
+            ->middleware('permission:semesters.manage')
+            ->name('semesters.transition');
 
         Route::get('/offerings', [OfferingController::class, 'index'])
             ->middleware('permission:offerings.view')
@@ -1138,3 +1141,10 @@ Route::get('/programs/{code}', [ProgramCatalogController::class, 'show'])
 // Credential serial verify API (used by homepage widget)
 Route::get('/api/verify-serial', CredentialVerifySerialController::class)
     ->name('api.verify-serial');
+
+// --- TRACK: step-8B — demo mode ---
+Route::get('/demo/guide', [App\Http\Controllers\DemoController::class, 'guide'])
+    ->name('demo.guide');
+Route::post('/demo/login', [App\Http\Controllers\DemoController::class, 'login'])
+    ->name('demo.login')
+    ->middleware('throttle:10,1');
