@@ -3,12 +3,21 @@
 namespace Tests\Feature\Database;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\ContentItemType;
 use App\Enums\FeedbackQuestionKind;
+use App\Enums\OfferingClosingStatus;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStatus;
+use App\Enums\ProjectReviewStatus;
+use App\Models\AdvisingHold;
+use App\Models\AdvisorAssignment;
 use App\Models\Announcement;
 use App\Models\Application;
+use App\Models\CertificateTemplate;
 use App\Models\ClassSession;
+use App\Models\CommunicationLog;
+use App\Models\CompletionCriterion;
+use App\Models\CompletionResult;
 use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
@@ -21,9 +30,11 @@ use App\Models\LiveQuiz;
 use App\Models\OfferingStaff;
 use App\Models\Program;
 use App\Models\ProjectAssessment;
+use App\Models\ProjectDeliverableSubmission;
 use App\Models\ProjectMembership;
 use App\Models\Semester;
 use App\Models\User;
+use App\Services\Completion\OfferingClosingService;
 use Database\Seeders\DemoDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -314,6 +325,162 @@ class DemoDataSeederTest extends TestCase
 
         $this->assertContains(ApplicationStatus::Withdrawn->value, $statuses,
             'student1 should have a Withdrawn application');
+    }
+
+    // ─── Phase C gate tests ───────────────────────────────────────────────────
+
+    #[Test]
+    public function seeded_advising_has_assignment_active_hold_and_released_hold(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+        $student6 = User::query()->where('email', 'student6@spims.test')->firstOrFail();
+        $ins1 = User::query()->where('email', 'ins1@spims.test')->firstOrFail();
+
+        $this->assertTrue(
+            AdvisorAssignment::query()
+                ->where('student_id', $student1->id)
+                ->where('advisor_id', $ins1->id)
+                ->exists(),
+            'student1 should be assigned to ins1 as advisor'
+        );
+
+        $this->assertTrue(
+            AdvisingHold::query()
+                ->where('student_id', $student6->id)
+                ->whereNull('released_at')
+                ->exists(),
+            'student6 should have an active advising hold'
+        );
+
+        $this->assertTrue(
+            AdvisingHold::query()
+                ->where('student_id', $student1->id)
+                ->whereNotNull('released_at')
+                ->exists(),
+            'student1 should have a released hold variant'
+        );
+        $this->assertFalse(
+            AdvisingHold::query()
+                ->where('student_id', $student1->id)
+                ->whereNull('released_at')
+                ->exists(),
+            'student1 must not remain on an active hold after seed'
+        );
+    }
+
+    #[Test]
+    public function seeded_certificate_templates_exist_for_admin_fixture(): void
+    {
+        $this->seed();
+
+        $this->assertTrue(
+            CertificateTemplate::query()->whereNull('course_id')->where('locale', 'en')->exists(),
+            'Expected a global EN certificate template'
+        );
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+        $this->assertTrue(
+            CertificateTemplate::query()
+                ->where('course_id', $th101->course_id)
+                ->where('locale', 'en')
+                ->exists(),
+            'Expected a TH101-scoped EN certificate template'
+        );
+    }
+
+    #[Test]
+    public function seeded_communication_logs_exist_for_admin_report(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $this->assertGreaterThanOrEqual(
+            1,
+            CommunicationLog::query()->where('recipient_id', $student1->id)->count(),
+            'Expected communication log rows for student1 (announcement or fallback dispatch)'
+        );
+        $this->assertTrue(
+            CommunicationLog::query()->where('type', 'announcement.published')->exists()
+        );
+    }
+
+    #[Test]
+    public function seeded_completion_criteria_are_evaluated(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+
+        $this->assertGreaterThanOrEqual(
+            1,
+            CompletionCriterion::query()
+                ->where(function ($q) use ($th101) {
+                    $q->where('offering_id', $th101->id)
+                        ->orWhere('course_id', $th101->course_id);
+                })
+                ->count()
+        );
+        $this->assertGreaterThanOrEqual(
+            1,
+            CompletionResult::query()->where('offering_id', $th101->id)->count()
+        );
+        // Closing stays OPEN: lockGrades would mark enrollments Completed and
+        // break the student attendance walkthrough history.
+        $this->assertSame(
+            OfferingClosingStatus::Open,
+            app(OfferingClosingService::class)->statusFor($th101)
+        );
+    }
+
+    #[Test]
+    public function seeded_file_content_item_has_stored_path(): void
+    {
+        $this->seed();
+
+        $item = ContentItem::query()
+            ->where('title', 'TH101 Week 2 reference sheet (PDF)')
+            ->first();
+
+        $this->assertNotNull($item);
+        $this->assertSame(ContentItemType::File, $item->type);
+        $this->assertTrue($item->isStoredFile(), 'FILE demo item should store a real path for download');
+        $this->assertTrue($item->isStoredPdf());
+    }
+
+    #[Test]
+    public function seeded_project_deliverable_is_submitted_and_accepted(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $assessment = ProjectAssessment::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Group Research Project')
+            ->first();
+        $this->assertNotNull($assessment);
+
+        $membership = ProjectMembership::query()
+            ->whereHas('project', fn ($q) => $q->where('project_assessment_id', $assessment->id))
+            ->where('student_id', $student1->id)
+            ->whereNull('left_at')
+            ->first();
+        $this->assertNotNull($membership);
+
+        $submission = ProjectDeliverableSubmission::query()
+            ->where('project_id', $membership->project_id)
+            ->first();
+
+        $this->assertNotNull($submission, 'student1 should have a deliverable submission');
+        $this->assertSame(ProjectReviewStatus::Accepted, $submission->review_status);
+        $this->assertGreaterThanOrEqual(1, $submission->files()->count());
     }
 
     #[Test]
