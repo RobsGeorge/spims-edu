@@ -9,6 +9,7 @@ use App\Enums\Currency;
 use App\Enums\EventReservationStatus;
 use App\Enums\FeedbackQuestionKind;
 use App\Enums\GradeStatus;
+use App\Enums\LiveQuizSessionState;
 use App\Enums\OfferingClosingStatus;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStatus;
@@ -21,6 +22,7 @@ use App\Models\Announcement;
 use App\Models\Application;
 use App\Models\Assessment;
 use App\Models\AssessmentAttempt;
+use App\Models\AssessmentTemplate;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\CertificateTemplate;
@@ -32,6 +34,7 @@ use App\Models\ContentItem;
 use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Credential;
+use App\Models\EmailTemplate;
 use App\Models\Enrollment;
 use App\Models\Event;
 use App\Models\EventCheckIn;
@@ -41,6 +44,7 @@ use App\Models\FeedbackSubmissionIdentity;
 use App\Models\FeedbackSurvey;
 use App\Models\Invoice;
 use App\Models\LiveQuiz;
+use App\Models\LiveQuizSession;
 use App\Models\Notification;
 use App\Models\OfferingStaff;
 use App\Models\PaymentPlan;
@@ -296,7 +300,7 @@ class DemoDataSeederTest extends TestCase
     }
 
     #[Test]
-    public function seeded_live_quiz_is_in_ready_status(): void
+    public function seeded_live_quiz_has_lobby_session(): void
     {
         $this->seed();
 
@@ -311,8 +315,63 @@ class DemoDataSeederTest extends TestCase
         $this->assertNotNull($quiz);
         $this->assertGreaterThanOrEqual(1, $quiz->questions()->count());
 
-        // No active session started (not yet started).
-        $this->assertNull($quiz->sessions()->where('ended_at', null)->where('started_at', '!=', null)->first());
+        $session = LiveQuizSession::query()
+            ->where('quiz_id', $quiz->id)
+            ->where('state', '!=', LiveQuizSessionState::Ended->value)
+            ->first();
+
+        $this->assertNotNull($session);
+        $this->assertSame(LiveQuizSessionState::Lobby, $session->state);
+        $this->assertNotEmpty($session->join_code);
+    }
+
+    #[Test]
+    public function seeded_email_and_assessment_templates_exist(): void
+    {
+        $this->seed();
+
+        $email = EmailTemplate::query()
+            ->where('key', 'announcement.published')
+            ->where('locale', 'en')
+            ->whereNull('scope_type')
+            ->whereNull('scope_id')
+            ->first();
+
+        $this->assertNotNull($email);
+        $this->assertStringContainsString('SPIMS demo', $email->subject);
+
+        $template = AssessmentTemplate::query()
+            ->where('name', 'Demo Standard Rollup')
+            ->first();
+
+        $this->assertNotNull($template);
+        $this->assertCount(3, $template->components);
+        $this->assertEquals(100, $template->components->sum('weight_percent'));
+    }
+
+    #[Test]
+    public function secondary_offerings_have_week_one_content(): void
+    {
+        $this->seed();
+
+        foreach (['BI102' => 'Welcome to New Testament Survey', 'LI101' => 'Welcome to Coptic Liturgy Basics'] as $code => $title) {
+            $offering = $this->cohortOffering($code);
+            $this->assertNotNull($offering, "Expected cohort offering {$code}");
+
+            $item = ContentItem::query()
+                ->where('title', $title)
+                ->whereHas('week', fn ($q) => $q->where('offering_id', $offering->id)->where('number', 1))
+                ->first();
+
+            $this->assertNotNull($item, "Expected Week 1 content on {$code}");
+            $this->assertTrue($item->isPublished());
+
+            $readingCount = ContentItem::query()
+                ->whereHas('week', fn ($q) => $q->where('offering_id', $offering->id)->where('number', 1))
+                ->count();
+
+            $this->assertGreaterThanOrEqual(2, $readingCount, "{$code} Week 1 should have TEXT + READING");
+        }
     }
 
     #[Test]
