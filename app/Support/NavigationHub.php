@@ -146,6 +146,14 @@ class NavigationHub
             'icon' => 'bi-question-circle',
             'active' => request()->routeIs('help.*'),
         ];
+
+        $items[] = [
+            'label' => __('system_docs.nav'),
+            'route' => 'system-docs.index',
+            'icon' => 'bi-journal-text',
+            'active' => request()->routeIs('system-docs.*'),
+        ];
+
         return array_values(array_filter($items, fn (array $item): bool => Route::has($item['route'])));
     }
 
@@ -208,6 +216,7 @@ class NavigationHub
             self::link('announcements.index', 'hubs.announcements', 'bi-megaphone', 'hubs.announcements_desc'),
             self::link('settings.notifications.edit', 'hubs.notification_settings', 'bi-sliders', 'hubs.notification_settings_desc'),
             self::link('help.index', 'help.support_tile', 'bi-question-circle', 'help.support_tile_desc'),
+            self::link('system-docs.index', 'system_docs.tile', 'bi-journal-text', 'system_docs.tile_desc'),
         ]));
     }
 
@@ -350,6 +359,7 @@ class NavigationHub
                     self::superadminTile('superadmin.scheduled-tasks.index', 'superadmin.tile_scheduled', 'bi-clock-history', 'superadmin.tile_scheduled_desc', 'superadmin.tile_scheduled_hint'),
                     self::superadminTile('superadmin.system-tests.index', 'superadmin.tile_system_tests', 'bi-clipboard2-check', 'superadmin.tile_system_tests_desc', 'superadmin.tile_system_tests_hint'),
                     self::superadminTile('superadmin.feedback-reveals.index', 'superadmin.tile_reveals', 'bi-eye-slash', 'superadmin.tile_reveals_desc', 'superadmin.tile_reveals_hint'),
+                    self::superadminTile('superadmin.system-docs.publish', 'system_docs.superadmin_tile', 'bi-journal-text', 'system_docs.superadmin_tile_desc', 'system_docs.superadmin_tile_hint'),
                 ])),
             ],
         ];

@@ -1,0 +1,126 @@
+<?php
+
+namespace Tests\Feature\SystemDocs;
+
+use App\Enums\RoleType;
+use App\Models\AuditLog;
+use App\Models\Setting;
+use App\Models\User;
+use App\Services\SystemDocs\SystemDocsCatalog;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
+
+class SystemDocsPortalTest extends TestCase
+{
+    use RefreshDatabase;
+
+    #[Test]
+    public function guest_cannot_browse_when_unpublished(): void
+    {
+        $this->get(route('system-docs.index'))->assertNotFound();
+        $this->get(route('system-docs.show', 'overview'))->assertNotFound();
+    }
+
+    #[Test]
+    public function signed_in_user_can_read_client_and_technical_docs(): void
+    {
+        $student = User::factory()->withRole(RoleType::Student)->create();
+
+        $this->actingAs($student)->get(route('system-docs.index'))
+            ->assertOk()
+            ->assertSee(__('system_docs.title'))
+            ->assertSee(__('system_docs.pages.overview.title'))
+            ->assertSee(__('system_docs.pages.architecture.title'));
+
+        $this->actingAs($student)->get(route('system-docs.show', 'overview'))
+            ->assertOk()
+            ->assertSee(__('system_docs.pages.overview.title'));
+
+        $this->actingAs($student)->get(route('system-docs.show', 'architecture'))
+            ->assertOk()
+            ->assertSee(__('system_docs.pages.architecture.title'));
+    }
+
+    #[Test]
+    public function super_admin_can_publish_client_docs_to_guests(): void
+    {
+        $sa = User::factory()->withRole(RoleType::SuperAdmin)->create();
+
+        $this->actingAs($sa)->get(route('superadmin.system-docs.publish'))
+            ->assertOk()
+            ->assertSee(__('system_docs.publish_title'));
+
+        $this->actingAs($sa)
+            ->put(route('superadmin.system-docs.publish.update'), ['guest_published' => '1'])
+            ->assertRedirect();
+
+        $this->assertTrue(app(SystemDocsCatalog::class)->isGuestPublished());
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'system_docs.guest_publish',
+        ]);
+
+        auth()->logout();
+
+        $this->get(route('system-docs.index'))
+            ->assertOk()
+            ->assertSee(__('system_docs.pages.overview.title'), false)
+            ->assertDontSee(__('system_docs.pages.architecture.title'), false);
+
+        $this->get(route('system-docs.show', 'overview'))->assertOk();
+        $this->get(route('system-docs.show', 'architecture'))->assertNotFound();
+    }
+
+    #[Test]
+    public function super_admin_can_unpublish_guest_docs(): void
+    {
+        $sa = User::factory()->withRole(RoleType::SuperAdmin)->create();
+        Setting::query()->create([
+            'key' => 'system_docs.guest_published',
+            'value' => ['enabled' => true],
+        ]);
+
+        $this->actingAs($sa)
+            ->put(route('superadmin.system-docs.publish.update'), ['guest_published' => '0'])
+            ->assertRedirect();
+
+        $this->assertFalse(app(SystemDocsCatalog::class)->isGuestPublished());
+        $this->assertTrue(
+            AuditLog::query()->where('action', 'system_docs.guest_unpublish')->exists()
+        );
+
+        auth()->logout();
+
+        $this->get(route('system-docs.index'))->assertNotFound();
+    }
+
+    #[Test]
+    public function non_super_admin_cannot_open_publish_panel(): void
+    {
+        $admin = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+
+        $this->actingAs($admin)->get(route('superadmin.system-docs.publish'))->assertForbidden();
+        $this->actingAs($admin)
+            ->put(route('superadmin.system-docs.publish.update'), ['guest_published' => '1'])
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function unknown_slug_returns_404_for_signed_in_user(): void
+    {
+        $student = User::factory()->withRole(RoleType::Student)->create();
+
+        $this->actingAs($student)->get(route('system-docs.show', 'not-a-real-guide'))
+            ->assertNotFound();
+    }
+
+    #[Test]
+    public function superadmin_hub_lists_system_docs_tile(): void
+    {
+        $sa = User::factory()->withRole(RoleType::SuperAdmin)->create();
+
+        $this->actingAs($sa)->get(route('superadmin.index'))
+            ->assertOk()
+            ->assertSee(__('system_docs.superadmin_tile'));
+    }
+}
