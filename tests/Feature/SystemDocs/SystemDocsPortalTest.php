@@ -30,6 +30,7 @@ class SystemDocsPortalTest extends TestCase
         $this->actingAs($student)->get(route('system-docs.index'))
             ->assertOk()
             ->assertSee(__('system_docs.title'))
+            ->assertSee(__('system_docs.open_guide'))
             ->assertSee(__('system_docs.pages.overview.title'))
             ->assertSee(__('system_docs.pages.architecture.title'));
 
@@ -40,6 +41,22 @@ class SystemDocsPortalTest extends TestCase
         $this->actingAs($student)->get(route('system-docs.show', 'architecture'))
             ->assertOk()
             ->assertSee(__('system_docs.pages.architecture.title'));
+    }
+
+    #[Test]
+    public function doc_pages_render_markdown_tables_as_html_not_pipes(): void
+    {
+        $student = User::factory()->withRole(RoleType::Student)->create();
+
+        $roles = $this->actingAs($student)->get(route('system-docs.show', 'roles-guide'));
+        $roles->assertOk();
+        $roles->assertSee('<table class="help-article-table"', false);
+        $roles->assertSee('<th>', false);
+        $roles->assertSee('spims-table-wrap', false);
+        $roles->assertSee('spims-table-wrap--cards', false);
+        $roles->assertSee('data-label=', false);
+        $roles->assertDontSee('|---|', false);
+        $roles->assertSee('Super Admin', false);
     }
 
     #[Test]
