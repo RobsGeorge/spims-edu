@@ -13,7 +13,6 @@ use App\Enums\LiveQuizSessionState;
 use App\Enums\OfferingClosingStatus;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStatus;
-use App\Enums\SemesterStatus;
 use App\Enums\PaymentPlanInstallmentStatus;
 use App\Enums\SemesterStatus;
 use App\Enums\ProjectReviewStatus;
