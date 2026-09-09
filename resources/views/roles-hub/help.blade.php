@@ -112,7 +112,6 @@
     $gaps = [
         __('roles_hub.help_gap_holds'),
         __('roles_hub.help_gap_advising_holds'),
-        __('roles_hub.help_gap_hub_nav'),
         __('roles_hub.help_gap_parent'),
     ];
 @endphp
@@ -174,6 +173,7 @@
             <li>{{ __('roles_hub.help_assign_none') }}</li>
         </ul>
         <p class="mt-3 mb-2"><strong>{{ __('roles_hub.help_scoped_title') }}</strong> {{ __('roles_hub.help_scoped_body') }}</p>
+        <p class="mt-3 mb-2"><strong>{{ __('roles_hub.help_nav_title') }}</strong> {{ __('roles_hub.help_nav_body') }}</p>
         <p class="mb-0"><strong>{{ __('roles_hub.help_multi_title') }}</strong> {{ __('roles_hub.help_multi_body') }}</p>
     </x-card>
 

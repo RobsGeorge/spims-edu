@@ -169,4 +169,6 @@ return [
     'help_gap_advising_holds' => 'L’admin administratif consulte l’orientation mais ne pose pas de blocage d’orientation. L’enseignant consulte et bloque uniquement ses étudiants assignés.',
     'help_gap_hub_nav' => 'La navigation des hubs utilise encore des contrôles de nom de rôle (hasRole). Passer ces liens aux clés de permission est un suivi, pas un changement de matrice.',
     'help_gap_parent' => 'Parent / tuteur n’est pas un rôle. Ce travail reste en parking.',
+    'help_nav_title' => 'Navigation des hubs',
+    'help_nav_body' => 'Les liens Académique, Administration et Finance admin suivent des clés de permission (programs.manage, users.manage, offerings.pricing). Teach reste TeachAccessService. La console Super Admin reste Super Admin seulement.',
 ];
