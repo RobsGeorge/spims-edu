@@ -64,6 +64,7 @@ use App\Http\Controllers\GradesController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SystemDocsController;
 use App\Http\Controllers\HubController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\LiveQuizController;
@@ -82,6 +83,7 @@ use App\Http\Controllers\SuperAdmin\AuditExplorerController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\SuperAdmin\SystemDocsPublishController;
 use App\Http\Controllers\Teach\AssessmentController as TeachAssessmentController;
 use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController;
 use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController;
@@ -122,6 +124,9 @@ Route::get('/help', [HelpController::class, 'index'])->name('help.index');
 Route::get('/help/c/{category}', [HelpController::class, 'category'])->name('help.category');
 Route::get('/help/role/{role}', [HelpController::class, 'byRole'])->name('help.role');
 Route::get('/help/{slug}', [HelpController::class, 'show'])->name('help.show');
+
+Route::get('/system-docs', [SystemDocsController::class, 'index'])->name('system-docs.index');
+Route::get('/system-docs/{slug}', [SystemDocsController::class, 'show'])->name('system-docs.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('auth.register');
@@ -342,6 +347,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/system-tests', [SuperAdminController::class, 'systemTests'])->name('system-tests.index');
         Route::get('/feedback-reveals', [FeedbackRevealController::class, 'index'])->name('feedback-reveals.index');
         Route::post('/feedback-reveals/{reveal}/decide', [FeedbackRevealController::class, 'decide'])->name('feedback-reveals.decide');
+        Route::get('/system-docs', [SystemDocsPublishController::class, 'edit'])->name('system-docs.publish');
+        Route::put('/system-docs', [SystemDocsPublishController::class, 'update'])->name('system-docs.publish.update');
         Route::post('/people/{user}/impersonate', [ImpersonationController::class, 'start'])
             ->middleware('permission:users.impersonate')
             ->name('people.impersonate');
