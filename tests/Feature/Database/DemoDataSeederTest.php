@@ -3,11 +3,18 @@
 namespace Tests\Feature\Database;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\AttemptStatus;
+use App\Enums\ContentItemType;
 use App\Enums\FeedbackQuestionKind;
+use App\Enums\GradeStatus;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStatus;
 use App\Models\Announcement;
 use App\Models\Application;
+use App\Models\Assessment;
+use App\Models\AssessmentAttempt;
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
 use App\Models\ClassSession;
 use App\Models\ContentItem;
 use App\Models\Course;
@@ -62,6 +69,72 @@ class DemoDataSeederTest extends TestCase
         );
         $this->assertTrue(
             Enrollment::query()->where('student_id', $dual->id)->exists()
+        );
+    }
+
+    #[Test]
+    public function phase_a_seeds_assignment_quiz_attempt_and_locked_th101_grades(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $assignmentItem = ContentItem::query()
+            ->where('title', 'TH101 Week 1 reflection')
+            ->where('type', ContentItemType::Assignment)
+            ->first();
+        $this->assertNotNull($assignmentItem);
+        $this->assertTrue($assignmentItem->isPublished());
+
+        $assignment = Assignment::query()->where('content_item_id', $assignmentItem->id)->first();
+        $this->assertNotNull($assignment);
+
+        $this->assertGreaterThanOrEqual(
+            1,
+            AssignmentSubmission::query()->where('assignment_id', $assignment->id)->count()
+        );
+        $this->assertTrue(
+            AssignmentSubmission::query()
+                ->where('assignment_id', $assignment->id)
+                ->where('student_id', $student1->id)
+                ->whereNotNull('final_score')
+                ->exists(),
+            'student1 should have a graded assignment submission'
+        );
+        $this->assertTrue(
+            AssignmentSubmission::query()
+                ->where('assignment_id', $assignment->id)
+                ->whereNull('final_score')
+                ->exists(),
+            'at least one assignment submission should still be pending review'
+        );
+
+        $assessment = Assessment::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Week 1 check')
+            ->first();
+        $this->assertNotNull($assessment);
+
+        $attempt = AssessmentAttempt::query()
+            ->where('assessment_id', $assessment->id)
+            ->where('student_id', $student1->id)
+            ->whereIn('status', [
+                AttemptStatus::Submitted,
+                AttemptStatus::AutoSubmitted,
+                AttemptStatus::Graded,
+            ])
+            ->first();
+        $this->assertNotNull($attempt, 'student1 should have a submitted/graded quiz attempt on TH101');
+
+        $this->assertTrue(
+            Enrollment::query()
+                ->where('offering_id', $th101->id)
+                ->where('grade_status', GradeStatus::Locked)
+                ->exists(),
+            'TH101 enrollments should be grade-locked after Phase A seed'
         );
     }
 

@@ -29,12 +29,17 @@ use App\Enums\StudentProgramStatus;
 use App\Enums\UserStatus;
 use App\Enums\WalletKind;
 use App\Models\AcademicYear;
+use App\Enums\AttemptStatus;
+use App\Enums\SubmissionType;
 use App\Models\Announcement;
 use App\Models\Application;
 use App\Models\ApplicationFieldValue;
 use App\Models\ApplicationForm;
 use App\Models\ApplicationFormField;
 use App\Models\Assessment;
+use App\Models\AssessmentAttempt;
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
 use App\Models\ClassSession;
 use App\Models\ContentItem;
 use App\Models\Course;
@@ -54,6 +59,7 @@ use App\Models\Program;
 use App\Models\ProgramCourse;
 use App\Models\ProjectAssessment;
 use App\Models\ProjectMembership;
+use App\Models\Question;
 use App\Models\QuestionBank;
 use App\Models\Semester;
 use App\Models\StudentProgram;
@@ -61,6 +67,8 @@ use App\Models\User;
 use App\Models\UserRole;
 use App\Models\Week;
 use App\Services\Assessment\AssessmentService;
+use App\Services\Assessment\AssignmentService;
+use App\Services\Assessment\AttemptService;
 use App\Services\Assessment\QuestionBankService;
 use App\Services\Communications\AnnouncementService;
 use App\Services\Credentials\CredentialService;
@@ -718,6 +726,8 @@ class DemoDataSeeder extends Seeder
         $this->seedWeekTwoContent($offeringsService, $ins1, $th101);
 
         $this->seedTh101AssessmentAndGradebook($ins1, $th101, $th101Items[0] ?? null);
+        $this->seedTh101AssignmentAndSubmissions($ins1, $th101, $student1, $student6);
+        $this->seedTh101QuizAttempt($student1, $th101);
         $this->seedInvoicesPaymentsAndWallet($fin, $student1, $student9);
         $this->seedTh101Attendance($ins1, $th101, $student1, $student6, $student7);
         $this->seedTh101Announcement($ins1, $th101);
@@ -1119,19 +1129,163 @@ class DemoDataSeeder extends Seeder
         app(EnrollmentService::class)->register($dual, $et101SelfPaced);
     }
 
+    /**
+     * ASSIGNMENT content item on TH101 Week 1 with two submissions:
+     * student1 graded, student6 pending review.
+     */
+    private function seedTh101AssignmentAndSubmissions(
+        User $ins1,
+        CourseOffering $th101,
+        User $student1,
+        User $student6,
+    ): void {
+        $week = Week::query()
+            ->where('offering_id', $th101->id)
+            ->where('number', 1)
+            ->first();
+
+        if ($week === null) {
+            throw new \RuntimeException('TH101 Week 1 is missing; cannot seed assignment.');
+        }
+
+        $title = 'TH101 Week 1 reflection';
+        $item = ContentItem::query()
+            ->where('week_id', $week->id)
+            ->where('title', $title)
+            ->first();
+
+        $offerings = app(OfferingService::class);
+        if ($item === null) {
+            $item = $offerings->addContentItem($ins1, $week, [
+                'type' => ContentItemType::Assignment->value,
+                'title' => $title,
+                'body' => 'Write a short reflection on the Week 1 reading.',
+                'order' => ($week->items()->max('order') ?? 0) + 1,
+                'published' => true,
+            ]);
+        } elseif (! $item->isPublished()) {
+            $offerings->publishContentItem($ins1, $item);
+            $item = $item->fresh();
+        }
+
+        $assignments = app(AssignmentService::class);
+        $assignment = Assignment::query()->where('content_item_id', $item->id)->first();
+        if ($assignment === null) {
+            $examComponent = GradebookComponent::query()
+                ->where('offering_id', $th101->id)
+                ->where('kind', ComponentKind::Exam)
+                ->first();
+
+            $assignment = $assignments->create($ins1, $item, [
+                'instructions' => 'In 150–250 words, summarize one idea from the Week 1 reading and why it matters for theology students.',
+                'submission_type' => SubmissionType::Text->value,
+                'max_points' => 100,
+                'released' => true,
+                'due_date' => now()->addWeeks(1),
+                'component_id' => $examComponent?->id,
+            ]);
+        }
+
+        if (AssignmentSubmission::query()
+            ->where('assignment_id', $assignment->id)
+            ->where('student_id', $student1->id)
+            ->doesntExist()) {
+            $graded = $assignments->submit(
+                $student1,
+                $assignment,
+                'The Week 1 reading frames theology as disciplined reflection on revelation. That framing helps students separate devotion from study without opposing them.'
+            );
+            $assignments->grade(
+                $ins1,
+                $graded,
+                88.0,
+                'Clear summary with a useful takeaway. Expand the parish application next time.'
+            );
+        }
+
+        if (AssignmentSubmission::query()
+            ->where('assignment_id', $assignment->id)
+            ->where('student_id', $student6->id)
+            ->doesntExist()) {
+            $assignments->submit(
+                $student6,
+                $assignment,
+                'ملخص قصير لقراءة الأسبوع الأول — بانتظار المراجعة.'
+            );
+        }
+    }
+
+    /**
+     * Submitted + auto-graded quiz attempt for student1 on TH101 Week 1 check.
+     */
+    private function seedTh101QuizAttempt(User $student1, CourseOffering $th101): void
+    {
+        $assessment = Assessment::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Week 1 check')
+            ->first();
+
+        if ($assessment === null) {
+            throw new \RuntimeException('TH101 Week 1 check assessment is missing; cannot seed quiz attempt.');
+        }
+
+        if (AssessmentAttempt::query()
+            ->where('assessment_id', $assessment->id)
+            ->where('student_id', $student1->id)
+            ->whereIn('status', [
+                AttemptStatus::Submitted,
+                AttemptStatus::AutoSubmitted,
+                AttemptStatus::Graded,
+            ])
+            ->exists()) {
+            return;
+        }
+
+        $attempts = app(AttemptService::class);
+        $attempt = $attempts->start($student1, $assessment);
+        $questions = Question::query()
+            ->with('options')
+            ->whereIn('id', $attempt->question_ids ?? [])
+            ->get()
+            ->keyBy('id');
+
+        $answers = [];
+        foreach ($attempt->question_ids ?? [] as $qid) {
+            $question = $questions->get($qid);
+            if ($question === null) {
+                continue;
+            }
+
+            $answers[$qid] = match ($question->type) {
+                QuestionType::McqSingle, QuestionType::TrueFalse => [
+                    'option_id' => $question->options->firstWhere('is_correct', true)?->id,
+                ],
+                QuestionType::ShortAnswer, QuestionType::FillBlank => [
+                    'text' => 'TH101',
+                ],
+                QuestionType::Numeric => [
+                    'value' => 3,
+                ],
+                default => ['text' => ''],
+            };
+        }
+
+        $attempts->autosave($student1, $attempt, $answers);
+        $attempts->submit($student1, $attempt);
+    }
+
     // ─── 8A additions ────────────────────────────────────────────────────────
 
     /**
-     * Submit grades for TH101 so the walkthrough shows "released" (Submitted) grades.
+     * Submit then lock TH101 grades so the walkthrough shows honest Locked records.
      */
     private function seedReleasedGrades(User $ins1, CourseOffering $th101): void
     {
+        $gradebook = app(GradebookService::class);
+
         // submitGrades is idempotent: it skips Locked enrollments and sets the rest to Submitted.
-        try {
-            app(GradebookService::class)->submitGrades($ins1, $th101);
-        } catch (\Throwable) {
-            // Grade submission is best-effort for demo data.
-        }
+        $gradebook->submitGrades($ins1, $th101);
+        $gradebook->lockGrades($ins1, $th101);
     }
 
     /**

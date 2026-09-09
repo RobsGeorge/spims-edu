@@ -58,7 +58,7 @@ Use these in this order. Each row is a **persona**, not just a login.
 | `adm@spims.test` | Admin Office | Administrative Admin | en | Users, admissions queue (10 applications, mixed status), semesters, branding |
 | `aca@spims.test` | Academic Dean | Academic Admin | en | Programs, courses, offerings, gradebook, live admin, translations |
 | `fin@spims.test` | Finance Bursar | Financial Admin | en | Finance hub with invoices; student9 has a verified cash payment |
-| `ins1@spims.test` | Mina Instructor | Instructor | en | Teach TH101 (lessons, quiz, announcement, attendance, live). Also BI102, CH101, FREE1 |
+| `ins1@spims.test` | Mina Instructor | Instructor | en | Teach TH101 (lessons, quiz, assignment grading queue, announcement, attendance, live). Also BI102, CH101, FREE1 |
 | `ins2@spims.test` | Mariana Teacher | Instructor | **ar** | Teach BI101 (Week 1 lessons). Also LI101, ET101 cohort, TH201 |
 | `ta1@spims.test` | Yousef Assistant | TA | en | Staffed on TH101, BI101, BI102. Cannot lock grades |
 | `dual@spims.test` | Dual Role | Instructor + Student | en | Instructor on FREE1; enrolled in ET101 self-paced |
@@ -67,12 +67,12 @@ Use these in this order. Each row is a **persona**, not just a login.
 
 | Email | Name | Locale | Application | Enrollments | Best use |
 |---|---|---|---|---|---|
-| `student1@spims.test` | John Student | en | DIP-THEO **Accepted** (answers filled) | TH101 + BI101 enrolled, BI102 **waitlisted** | Primary student walkthrough: lesson, announcement, invoice, attendance |
+| `student1@spims.test` | John Student | en | DIP-THEO **Accepted** (answers filled) | TH101 + BI101 enrolled (TH101 grades **locked**), BI102 **waitlisted** | Primary student walkthrough: lesson, assignment (graded), quiz attempt, announcement, invoice, attendance |
 | `student2@spims.test` | Sara Habib | **ar** | DIP-THEO Submitted | none | Arabic applicant; admissions still in flight |
 | `student3@spims.test` | Mark Shenouda | en | DIP-THEO Under review (answers filled) | none | Reviewer queue |
 | `student4@spims.test` | Mary Guirguis | **fr** | DIP-THEO Waitlisted | none | French UI + waitlisted application |
 | `student5@spims.test` | David Bishoy | en | DIP-THEO **Rejected** | none | Rejection state |
-| `student6@spims.test` | Hannah Rizk | **ar** | CERT-LIT Accepted | TH101, BI101, BI102 | Arabic enrolled student; marked **Late** on TH101 Week 1 |
+| `student6@spims.test` | Hannah Rizk | **ar** | CERT-LIT Accepted | TH101, BI101, BI102 | Arabic enrolled student; marked **Late** on TH101 Week 1; pending assignment submission on TH101 |
 | `student7@spims.test` | Peter Atallah | en | CERT-LIT Accepted | same three | Marked **Absent** then **excused** on TH101 Week 1 |
 | `student8@spims.test` | Rebecca Fawzy | en | CERT-LIT **Draft** | none | Unfinished application |
 | `student9@spims.test` | Andrew Naguib | en | DEG-BTH Accepted | same three | Degree-program student; first invoice is **paid** (manual cash) |
@@ -93,15 +93,17 @@ After `migrate:fresh --seed` with `SEED_DEMO_DATA=true`:
 | Courses | 13 | 12 demo + `DEMO101` |
 | Offerings | 14 | 8 Fall Open cohort + 1 ET101 self-paced + 4 Spring Draft + 1 sample |
 | Weeks | 18 | 2 per Fall offering, 1 self-paced module |
-| Content items | 6 | TH101 + BI101 Week 1: TEXT + READING (+ a third TEXT on each) |
+| Content items | 11+ | TH101 + BI101 Week 1 TEXT/READING; TH101 Week 2 VIDEO/FILE/READING/TEXT; TH101 Week 1 **ASSIGNMENT** reflection |
 | Question banks / questions | 1 / 4 | TH101 Week 1 bank: MCQ, T/F, short, numeric |
 | Assessments | 1 | Released, in-window quiz on TH101, attached to the welcome item |
+| Assessment attempts | 1+ | student1 submitted + graded on “TH101 Week 1 check” |
+| Assignments / submissions | 1 / 2 | TH101 Week 1 reflection; student1 graded, student6 pending review |
 | Gradebook components | 2 | Exam + Attendance on TH101 |
 | Application forms | 4 | “Why join?” + “Parish name” |
 | Application field values | 4 | student1 and student3 |
 | Applications | 10 | All statuses represented |
 | Student programs | 4 | The four Accepted students |
-| Enrollments | 13 | 12 from accepted students + dual on ET101 self-paced |
+| Enrollments | 13 | 12 from accepted students + dual on ET101 self-paced; TH101 grades **Locked** |
 | Invoices | 12 | 11 non-free enrolled rows + dual’s free ET101 invoice; student9 first invoice is paid |
 | Payments | 1 | Manual cash, verified, on student9 |
 | Wallet accounts | 1 | student1 has EGP 50.00 money (`5000` minor) |
@@ -109,7 +111,7 @@ After `migrate:fresh --seed` with `SEED_DEMO_DATA=true`:
 | Live sessions | 1 | TH101, scheduled in the next 24h (mock Zoom) |
 | Class sessions / attendance | 1 / 3 | student1 Present, student6 Late, student7 Excused |
 | Discussion posts | 2 | Instructor thread + student1 reply on TH101 |
-| Credentials / academic records | 0 | Not seeded — no locked grades or honest certificate |
+| Credentials / academic records | best-effort | TH101 grades are locked (academic records posted). Transcript credential for student1 when PDF rendering is available |
 
 Curriculum (demo programs):
 
@@ -144,19 +146,19 @@ Do this on **staging** after a fresh seed.
 ### 5.1 Fifteen-minute “what is this product?”
 
 1. **Public catalog** (logged out) → `/catalog`.
-2. **Student** `student1@spims.test` → `/learn/{TH101}` (Week 1 lessons), `/announcements`, `/finance` (open invoices + EGP wallet), `/attendance` (Present on Week 1).
+2. **Student** `student1@spims.test` → `/learn/{TH101}` (Week 1 lessons + reflection assignment), `/announcements`, `/finance` (open invoices + EGP wallet), `/attendance` (Present on Week 1). Show the graded quiz attempt and assignment score on the grades surface.
 3. **Admin** `adm@spims.test` → `/admin/applications`. student1/student3 have “Why join?” / “Parish name” answers.
-4. **Academic** `aca@spims.test` → `/admin/programs` → DIP-THEO. `/admin/offerings` → Fall vs Spring Draft.
-5. **Instructor** `ins1@spims.test` → `/teach/{TH101}` (content, roster, announcements). Attendance at `/teach/{TH101}/attendance`.
+4. **Academic** `aca@spims.test` → `/admin/programs` → DIP-THEO. `/admin/offerings` → Fall vs Spring Draft. Gradebook for TH101 shows **locked** grades.
+5. **Instructor** `ins1@spims.test` → `/teach/{TH101}` (content, roster, announcements). Assignment queue has student6 pending; student1 already graded. Attendance at `/teach/{TH101}/attendance`.
 6. **Finance** `fin@spims.test` → `/admin/finance` lists invoices; student9’s first invoice is paid.
 7. **Dual** `dual@spims.test` → teach FREE1 and learn ET101 self-paced.
 
 ### 5.2 What not to promise in that meeting
 
-- “Here is a certificate PDF” — credentials are not seeded (and downloads are HTML today; PDF is S4).
 - Live Zoom — joins a mock URL unless Zoom keys are in `.env`.
 - Card payments — mock auto-complete unless real gateway keys are set.
 - Course titles stay English — there are no `translations` rows.
+- Certificate PDF may be missing in some environments — transcript seeding is best-effort when PDF rendering is unavailable.
 
 ---
 
@@ -168,16 +170,16 @@ The seeder now covers the classroom + money walkthrough. Use the admin/teach scr
 
 ## 7. How dummy data is put into the seeder
 
-`database/seeders/DemoDataSeeder.php` seeds catalog and enrollments, then calls the same services the UI uses for classroom and money rows: `OfferingService`, `QuestionBankService`, `AssessmentService`, `GradebookService`, `InvoiceService`, `PaymentService`, `WalletService`, `AttendanceService`, `AnnouncementService`, `LiveSessionService`, `DiscussionService`, `EnrollmentService`.
+`database/seeders/DemoDataSeeder.php` seeds catalog and enrollments, then calls the same services the UI uses for classroom and money rows: `OfferingService`, `QuestionBankService`, `AssessmentService`, `AssignmentService`, `AttemptService`, `GradebookService`, `InvoiceService`, `PaymentService`, `WalletService`, `AttendanceService`, `AnnouncementService`, `LiveSessionService`, `DiscussionService`, `EnrollmentService`.
 
 Rules for that work (same as the rest of the repo):
 
 - Mutations go through services + `AuditLogWriter::withAudit()`.
 - Money is integer minor units.
 - Instructors are staffed on the offering before they act on it.
-- `tests/Feature/Database/DemoDataSeederTest.php` asserts content, invoice, class session, announcement, and the dual-role account so a future edit cannot silently empty the demo.
+- `tests/Feature/Database/DemoDataSeederTest.php` asserts content, invoice, class session, announcement, dual-role, Phase A assignment/quiz/lock, and the dual-role account so a future edit cannot silently empty the demo.
 
-Locked grades and credentials are **not** seeded. A hollow certificate is worse than none.
+TH101 grades are submitted then locked via `GradebookService`. Transcript credentials remain best-effort when PDF rendering is unavailable.
 
 ---
 
