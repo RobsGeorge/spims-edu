@@ -3,9 +3,13 @@
 namespace Tests\Feature\Database;
 
 use App\Enums\ApplicationStatus;
+use App\Enums\Currency;
+use App\Enums\EventReservationStatus;
 use App\Enums\FeedbackQuestionKind;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStatus;
+use App\Enums\PaymentPlanInstallmentStatus;
+use App\Enums\WalletKind;
 use App\Models\Announcement;
 use App\Models\Application;
 use App\Models\ClassSession;
@@ -15,15 +19,24 @@ use App\Models\CourseOffering;
 use App\Models\Credential;
 use App\Models\Enrollment;
 use App\Models\Event;
+use App\Models\EventCheckIn;
+use App\Models\EventReservation;
+use App\Models\FeedbackIdentityRevealRequest;
+use App\Models\FeedbackSubmissionIdentity;
 use App\Models\FeedbackSurvey;
 use App\Models\Invoice;
 use App\Models\LiveQuiz;
+use App\Models\Notification;
 use App\Models\OfferingStaff;
+use App\Models\PaymentPlan;
 use App\Models\Program;
 use App\Models\ProjectAssessment;
 use App\Models\ProjectMembership;
 use App\Models\Semester;
+use App\Models\Translation;
 use App\Models\User;
+use App\Models\WalletAccount;
+use App\Models\WalletTransaction;
 use Database\Seeders\DemoDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -331,6 +344,150 @@ class DemoDataSeederTest extends TestCase
 
         $this->assertEquals($counts1, $counts2,
             'Running spims:demo-reset twice must produce identical record counts.');
+    }
+
+    // ─── Phase B fixtures ────────────────────────────────────────────────────
+
+    #[Test]
+    public function seeded_survey_has_student1_submission_and_optional_reveal(): void
+    {
+        $this->seed();
+
+        $th101 = $this->cohortOffering('TH101');
+        $this->assertNotNull($th101);
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $survey = FeedbackSurvey::query()
+            ->where('offering_id', $th101->id)
+            ->where('title', 'TH101 Week 1 Feedback')
+            ->first();
+        $this->assertNotNull($survey);
+
+        $identity = FeedbackSubmissionIdentity::query()
+            ->where('student_id', $student1->id)
+            ->whereHas('submission', fn ($q) => $q->where('survey_id', $survey->id))
+            ->first();
+
+        $this->assertNotNull($identity, 'student1 should have submitted the TH101 feedback survey');
+        $this->assertGreaterThanOrEqual(1, $identity->submission->answers()->count());
+
+        // Identity reveal is optional but seeded when the instructor may request it.
+        $this->assertTrue(
+            FeedbackIdentityRevealRequest::query()
+                ->where('submission_id', $identity->submission_id)
+                ->exists()
+        );
+    }
+
+    #[Test]
+    public function seeded_event_has_student1_reservation_and_check_in(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+        $event = Event::query()->where('title', 'Theology Orientation Day')->firstOrFail();
+
+        $reservation = EventReservation::query()
+            ->where('event_id', $event->id)
+            ->where('student_id', $student1->id)
+            ->where('status', EventReservationStatus::Reserved)
+            ->first();
+
+        $this->assertNotNull($reservation);
+        $this->assertTrue(
+            EventCheckIn::query()->where('reservation_id', $reservation->id)->exists()
+        );
+    }
+
+    #[Test]
+    public function seeded_payment_plan_has_installment_states_for_student1(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $plan = PaymentPlan::query()
+            ->whereHas('invoice', fn ($q) => $q->where('student_id', $student1->id))
+            ->with('installments')
+            ->first();
+
+        $this->assertNotNull($plan);
+        $this->assertGreaterThanOrEqual(2, $plan->installments->count());
+        $this->assertTrue(
+            $plan->installments->contains(
+                fn ($row) => $row->status === PaymentPlanInstallmentStatus::Due
+            ),
+            'Expected at least one Due installment'
+        );
+        $this->assertTrue(
+            $plan->installments->contains(
+                fn ($row) => $row->status === PaymentPlanInstallmentStatus::Pending
+            ),
+            'Expected at least one Pending installment'
+        );
+    }
+
+    #[Test]
+    public function seeded_wallet_points_ledger_exists_for_student1(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+        $wallet = WalletAccount::query()->where('user_id', $student1->id)->first();
+
+        $this->assertNotNull($wallet);
+        $this->assertGreaterThan(0, $wallet->balance(Currency::Egp, WalletKind::Points));
+        $this->assertTrue(
+            WalletTransaction::query()
+                ->where('wallet_id', $wallet->id)
+                ->where('kind', WalletKind::Points)
+                ->exists()
+        );
+    }
+
+    #[Test]
+    public function seeded_translations_cover_course_and_program_locales(): void
+    {
+        $this->seed();
+
+        $th101 = Course::query()->where('code', 'TH101')->firstOrFail();
+        $diploma = Program::query()->where('code', 'DIP-THEO')->firstOrFail();
+
+        $courseLocales = Translation::query()
+            ->where('entity_type', 'Course')
+            ->where('entity_id', $th101->id)
+            ->where('field', 'title')
+            ->pluck('locale')
+            ->all();
+
+        $programLocales = Translation::query()
+            ->where('entity_type', 'Program')
+            ->where('entity_id', $diploma->id)
+            ->where('field', 'name')
+            ->pluck('locale')
+            ->all();
+
+        $this->assertContains('ar', $courseLocales);
+        $this->assertContains('fr', $courseLocales);
+        $this->assertContains('ar', $programLocales);
+        $this->assertContains('fr', $programLocales);
+    }
+
+    #[Test]
+    public function seeded_in_app_notifications_exist_for_student1(): void
+    {
+        $this->seed();
+
+        $student1 = User::query()->where('email', 'student1@spims.test')->firstOrFail();
+
+        $types = Notification::query()
+            ->where('user_id', $student1->id)
+            ->pluck('type')
+            ->unique()
+            ->all();
+
+        $this->assertContains('announcement.published', $types);
+        $this->assertContains('finance.invoice_issued', $types);
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────────────
