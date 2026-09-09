@@ -41,4 +41,10 @@ return [
     'status_RESERVED' => 'محجوز',
     'status_WAITLISTED' => 'قائمة انتظار',
     'status_CANCELLED' => 'ملغى',
+    'you_are_registered' => 'أنت مسجل',
+    'seats_full' => 'مكتمل — لا مقاعد متاحة',
+    'waitlist_available' => 'قائمة الانتظار متاحة',
+    'confirm_cancel_title' => 'إلغاء حجزك؟',
+    'confirm_cancel_message' => 'سيؤدي هذا إلى تحرير مقعدك. يمكنك إعادة التسجيل إذا كانت المقاعد لا تزال متاحة.',
+    'capacity_meter' => 'توفر المقاعد',
 ];
