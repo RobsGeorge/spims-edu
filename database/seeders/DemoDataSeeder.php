@@ -25,6 +25,7 @@ use App\Enums\OfferingMode;
 use App\Enums\OfferingStaffRole;
 use App\Enums\OfferingStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\SemesterStatus;
 use App\Enums\ProjectDeliverableKind;
 use App\Enums\ProjectGradingMode;
 use App\Enums\ProjectReviewStatus;
@@ -454,7 +455,7 @@ class DemoDataSeeder extends Seeder
                 'add_drop_end_week' => 2,
                 'last_withdrawal_week' => 8,
                 'withdrawal_refund_percent' => 40,
-                'status' => OfferingStatus::Draft,
+                'status' => SemesterStatus::Draft,
             ]
         );
 
@@ -469,11 +470,11 @@ class DemoDataSeeder extends Seeder
                 'add_drop_end_week' => 1,
                 'last_withdrawal_week' => 4,
                 'withdrawal_refund_percent' => 25,
-                'status' => OfferingStatus::InProgress,
+                'status' => SemesterStatus::InProgress,
             ]
         );
 
-        // CLOSED semester — the prior year fall is Completed
+        // CLOSED semester — the prior year fall is closed
         $prior = AcademicYear::query()->updateOrCreate(
             ['name' => '2025/2026'],
             ['start_date' => '2025-09-01', 'end_date' => '2026-06-30']
@@ -488,7 +489,7 @@ class DemoDataSeeder extends Seeder
                 'add_drop_end_week' => 2,
                 'last_withdrawal_week' => 8,
                 'withdrawal_refund_percent' => 50,
-                'status' => OfferingStatus::Completed,
+                'status' => SemesterStatus::Closed,
             ]
         );
 

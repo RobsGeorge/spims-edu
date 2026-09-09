@@ -14,6 +14,7 @@ use App\Enums\OfferingClosingStatus;
 use App\Enums\OfferingMode;
 use App\Enums\OfferingStatus;
 use App\Enums\PaymentPlanInstallmentStatus;
+use App\Enums\SemesterStatus;
 use App\Enums\ProjectReviewStatus;
 use App\Enums\WalletKind;
 use App\Models\AdvisingHold;
@@ -448,9 +449,9 @@ class DemoDataSeederTest extends TestCase
             ->unique()
             ->toArray();
 
-        $this->assertContains(OfferingStatus::Completed->value, $statuses, 'Expected a CLOSED (Completed) semester');
-        $this->assertContains(OfferingStatus::InProgress->value, $statuses, 'Expected an IN_PROGRESS semester');
-        $this->assertContains(OfferingStatus::Draft->value, $statuses, 'Expected a DRAFT semester');
+        $this->assertContains(SemesterStatus::Closed->value, $statuses, 'Expected a CLOSED semester');
+        $this->assertContains(SemesterStatus::InProgress->value, $statuses, 'Expected an IN_PROGRESS semester');
+        $this->assertContains(SemesterStatus::Draft->value, $statuses, 'Expected a DRAFT semester');
     }
 
     #[Test]
