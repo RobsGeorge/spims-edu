@@ -71,4 +71,10 @@ return [
     'starts_at' => 'Début :when',
     'closes_at' => 'Clôture :when',
     'no_due_date' => 'Fenêtre ouverte',
+    'grade_status_not_started' => 'Non commencé',
+    'grade_status_submitted' => 'Soumis',
+    'grade_status_passed' => 'Réussi',
+    'grade_status_failed' => 'Échoué',
+    'grade_status_graded' => 'Noté',
+    'grade_status_pending' => 'En attente',
 ];

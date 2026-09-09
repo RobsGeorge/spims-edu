@@ -71,4 +71,10 @@ return [
     'starts_at' => 'Starts :when',
     'closes_at' => 'Closes :when',
     'no_due_date' => 'Open window',
+    'grade_status_not_started' => 'Not started',
+    'grade_status_submitted' => 'Submitted',
+    'grade_status_passed' => 'Passed',
+    'grade_status_failed' => 'Failed',
+    'grade_status_graded' => 'Graded',
+    'grade_status_pending' => 'Pending',
 ];
