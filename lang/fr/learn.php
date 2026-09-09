@@ -32,4 +32,7 @@ return [
     'reading_link_only' => 'Ce fichier s’ouvre en dehors de SPIMS.',
     'back_to_course' => 'Retour au cours',
     'completion' => 'Achèvement',
+    'complete' => 'terminé',
+    'prev_item' => '← Précédent',
+    'next_item' => 'Suivant →',
 ];
