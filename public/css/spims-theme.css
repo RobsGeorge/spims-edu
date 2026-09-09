@@ -2378,3 +2378,162 @@ progress.spims-progress--danger::-moz-progress-bar  { background: var(--color-da
     font-weight: 700;
     color: var(--color-warning);
 }
+
+/* ── System docs / help article body ─────────────────────────────────── */
+.system-docs-shell,
+.system-docs-article-shell {
+    max-width: 60rem;
+    margin-inline: auto;
+}
+
+.system-docs-audience-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2, 0.5rem);
+}
+
+.system-docs-related-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3, 0.75rem);
+}
+
+@media (min-width: 768px) {
+    .system-docs-related-list {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.help-article-body {
+    color: var(--color-text);
+    font-size: var(--text-base);
+    line-height: var(--leading-base, 1.6);
+}
+
+.help-article-body > :first-child {
+    margin-block-start: 0;
+}
+
+.help-article-body > :last-child {
+    margin-block-end: 0;
+}
+
+.help-article-body h2,
+.help-article-body h3,
+.help-article-body h4 {
+    color: var(--color-title);
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-align: start;
+    margin-block-start: var(--space-5, 1.5rem);
+    margin-block-end: var(--space-2, 0.5rem);
+}
+
+.help-article-body h2 {
+    font-size: var(--text-xl);
+}
+
+.help-article-body h3 {
+    font-size: var(--text-lg);
+}
+
+.help-article-body h4 {
+    font-size: var(--text-base);
+}
+
+.help-article-body p,
+.help-article-body ul,
+.help-article-body ol {
+    margin-block-end: var(--space-3, 0.75rem);
+}
+
+.help-article-body ul,
+.help-article-body ol {
+    padding-inline-start: 1.25rem;
+}
+
+.help-article-body li + li {
+    margin-block-start: 0.35rem;
+}
+
+.help-article-body a {
+    color: var(--color-link);
+}
+
+.help-article-body code {
+    font-size: var(--text-sm);
+    background: var(--color-surface-low);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm);
+    padding-inline: 0.3rem;
+    padding-block: 0.1rem;
+}
+
+.help-article-body pre {
+    overflow-x: auto;
+    background: var(--color-surface-low);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3, 0.75rem);
+    margin-block-end: var(--space-4, 1rem);
+}
+
+.help-article-body pre code {
+    background: transparent;
+    border: 0;
+    padding: 0;
+}
+
+.help-article-body blockquote {
+    margin-inline: 0;
+    margin-block: var(--space-3, 0.75rem);
+    padding-inline-start: var(--space-3, 0.75rem);
+    border-inline-start: 3px solid var(--color-accent);
+    color: var(--color-text-muted);
+}
+
+.help-article-body .spims-table-wrap {
+    margin-block: var(--space-4, 1rem);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-soft);
+}
+
+.help-article-body .help-article-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.help-article-body .help-article-table th,
+.help-article-body .help-article-table td {
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    text-align: start;
+    vertical-align: top;
+    border-block-end: 1px solid var(--color-hairline);
+}
+
+.help-article-body .help-article-table thead th {
+    background: var(--color-surface-low);
+    color: var(--color-title);
+    font-weight: 700;
+    font-size: var(--text-xs);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.help-article-body .help-article-table tbody tr:last-child th,
+.help-article-body .help-article-table tbody tr:last-child td {
+    border-block-end: 0;
+}
+
+.help-article-body .help-article-table tbody tr:nth-child(even) td {
+    background: var(--color-surface-low);
+}
+
+@media (max-width: 767.98px) {
+    .help-article-body .spims-table-wrap:not(.spims-table-wrap--cards) table {
+        min-width: 28rem;
+    }
+}

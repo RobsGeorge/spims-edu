@@ -3,14 +3,14 @@
 @section('title', __('system_docs.title'))
 
 @section('content')
-<div class="system-docs animate-in" style="max-width:960px;margin-inline:auto;">
+<div class="system-docs-shell animate-in">
     <x-page-header :title="__('system_docs.title')" :subtitle="__('system_docs.subtitle')" />
 
     @if($isGuest)
         <p class="spims-text-dim mb-4" role="status">{{ __('system_docs.guest_banner') }}</p>
     @endif
 
-    <nav class="d-flex flex-wrap gap-2 mb-4" aria-label="{{ __('system_docs.audience_nav') }}">
+    <nav class="system-docs-audience-nav spims-filter-bar mb-4" aria-label="{{ __('system_docs.audience_nav') }}">
         <a href="{{ route('system-docs.index') }}"
            class="btn btn-sm {{ $audienceFilter ? 'btn-outline-secondary' : 'btn-secondary' }}">
             {{ __('system_docs.audience_all') }}
@@ -42,11 +42,12 @@
                             <div class="p-3 d-flex flex-column h-100 gap-2">
                                 <div class="d-flex align-items-start gap-2">
                                     <i class="bi {{ $page['icon'] }} fs-4" aria-hidden="true"></i>
-                                    <div>
+                                    <div class="flex-grow-1">
                                         <a href="{{ route('system-docs.show', $page['slug']) }}" class="stretched-link text-decoration-none">
                                             <span class="fw-semibold">{{ $page['title'] }}</span>
                                         </a>
-                                        <p class="spims-text-dim mb-0 small">{{ $page['summary'] }}</p>
+                                        <p class="spims-text-dim mb-2 small">{{ $page['summary'] }}</p>
+                                        <span class="small">{{ __('system_docs.open_guide') }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -67,11 +68,12 @@
                             <div class="p-3 d-flex flex-column h-100 gap-2">
                                 <div class="d-flex align-items-start gap-2">
                                     <i class="bi {{ $page['icon'] }} fs-4" aria-hidden="true"></i>
-                                    <div>
+                                    <div class="flex-grow-1">
                                         <a href="{{ route('system-docs.show', $page['slug']) }}" class="stretched-link text-decoration-none">
                                             <span class="fw-semibold">{{ $page['title'] }}</span>
                                         </a>
-                                        <p class="spims-text-dim mb-0 small">{{ $page['summary'] }}</p>
+                                        <p class="spims-text-dim mb-2 small">{{ $page['summary'] }}</p>
+                                        <span class="small">{{ __('system_docs.open_guide') }}</span>
                                     </div>
                                 </div>
                             </div>

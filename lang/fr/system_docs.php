@@ -17,6 +17,7 @@ return [
     'empty_title' => 'Aucun guide disponible',
     'empty_desc' => 'Demandez à un Super Admin de publier la vue client pour les invités, ou connectez-vous pour lire l’ensemble complet.',
     'help_crosslink_prefix' => 'Besoin d’aide pratique ? Ouvrez le',
+    'open_guide' => 'Ouvrir le guide',
     'publish_title' => 'Publier la documentation système',
     'publish_desc' => 'Contrôlez si les invités sans compte peuvent lire la vue direction dans le portail.',
     'publish_status_label' => 'Accès invité',
