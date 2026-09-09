@@ -91,6 +91,7 @@ use App\Http\Controllers\Teach\SurveyController as TeachSurveyController;
 use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
+use App\Http\Controllers\ProgramCatalogController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -1093,3 +1094,10 @@ Route::middleware(['auth'])->group(function () {
 // ## track:A2-f — admin offerings / gradebook / assessments / attendance / completion-criteria / offering-closing
 // ## track:A2-g — admin programs / courses / semesters / academic-years / grading-schemes / users / translations / theme
 // ## track:A2-h — admin applications / application-forms / enrollments / communications / credentials / certificate-templates / events / staff
+
+// --- TRACK: public-marketing ---
+// Step 1: public program catalog pages — guest accessible
+Route::get('/programs', [ProgramCatalogController::class, 'index'])
+    ->name('programs.catalog.index');
+Route::get('/programs/{code}', [ProgramCatalogController::class, 'show'])
+    ->name('programs.catalog.show');

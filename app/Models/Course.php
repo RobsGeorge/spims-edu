@@ -25,6 +25,7 @@ class Course extends Model
         'passing_threshold',
         'assessment_template_id',
         'active',
+        'description',
     ];
 
     protected $casts = [
