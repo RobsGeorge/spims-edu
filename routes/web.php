@@ -48,6 +48,7 @@ use App\Http\Controllers\CoursePlayerController;
 use App\Http\Controllers\StudentPreviewController;
 use App\Http\Controllers\CredentialDownloadController;
 use App\Http\Controllers\CredentialVerifyController;
+use App\Http\Controllers\CredentialVerifySerialController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\DonationController;
@@ -1101,3 +1102,8 @@ Route::get('/programs', [ProgramCatalogController::class, 'index'])
     ->name('programs.catalog.index');
 Route::get('/programs/{code}', [ProgramCatalogController::class, 'show'])
     ->name('programs.catalog.show');
+
+// --- TRACK: step-2 — public landing rebuild ---
+// Credential serial verify API (used by homepage widget)
+Route::get('/api/verify-serial', CredentialVerifySerialController::class)
+    ->name('api.verify-serial');
