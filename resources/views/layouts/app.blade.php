@@ -91,6 +91,7 @@
                     @else
                         <a href="{{ route('dashboard') }}" class="btn btn-sm btn-primary">{{ __('ui.home_cta_dashboard') }}</a>
                     @endguest
+                    @include('partials.theme-toggle')
                     <form method="POST" action="{{ route('locale.update') }}" class="d-inline">
                         @csrf
                         <label class="visually-hidden" for="locale-select">{{ __('ui.locale') }}</label>

@@ -150,7 +150,7 @@ return [
 
     // Step 14 — gradebook cell entry
     'cell_score_saved' => 'Note enregistrée.',
-    'cell_score_error' => 'Impossible d'enregistrer la note. Veuillez réessayer.',
+    'cell_score_error' => "Impossible d'enregistrer la note. Veuillez réessayer.",
     'cell_score_range' => 'La note doit être comprise entre 0 et 100.',
     'cell_score_input' => 'Entrer la note (0–100)',
     'cell_edit_aria' => 'Modifier la note pour :component — :student',
