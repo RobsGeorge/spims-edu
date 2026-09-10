@@ -161,4 +161,94 @@ class StudentLiveQuizWebTest extends TestCase
             ->assertSee(__('live.live_quiz'), false)
             ->assertSee(route('live-quiz.join'), false);
     }
+
+    #[Test]
+    public function state_endpoint_returns_json_without_join_code(): void
+    {
+        $offering = $this->offering('WEB-LQ6');
+        $instructor = $this->instructorOn($offering);
+        $student = $this->studentOn($offering);
+        $quiz = $this->readyQuiz($instructor, $offering);
+        $session = $this->startLobby($instructor, $quiz);
+
+        $this->actingAs($student)
+            ->post(route('live-quiz.join.store'), ['code' => $session->join_code]);
+
+        $resp = $this->actingAs($student)
+            ->getJson(route('live-quiz.sessions.state', $session));
+
+        $resp->assertOk()
+            ->assertJsonStructure(['state', 'server_now', 'participant_count', 'quiz', 'you'])
+            ->assertJsonMissing(['join_code' => $session->join_code])
+            ->assertJsonPath('state', 'LOBBY')
+            ->assertJsonPath('participant_count', 1);
+
+        $this->assertArrayNotHasKey('join_code', $resp->json());
+    }
+
+    #[Test]
+    public function state_endpoint_carries_closes_at_when_question_open(): void
+    {
+        $offering = $this->offering('WEB-LQ7');
+        $instructor = $this->instructorOn($offering);
+        $student = $this->studentOn($offering);
+        $quiz = $this->readyQuiz($instructor, $offering);
+        $question = $this->firstQuestion($quiz);
+        $session = $this->startLobby($instructor, $quiz);
+
+        $this->actingAs($student)
+            ->post(route('live-quiz.join.store'), ['code' => $session->join_code]);
+
+        app(LiveQuizHostService::class)->launchQuestion($instructor, $session, $question);
+
+        $resp = $this->actingAs($student)
+            ->getJson(route('live-quiz.sessions.state', $session));
+
+        $resp->assertOk()
+            ->assertJsonPath('state', 'QUESTION_OPEN')
+            ->assertJsonStructure(['current_question' => ['id', 'closes_at', 'time_limit_seconds']]);
+
+        $this->assertNotNull($resp->json('current_question.closes_at'));
+        $this->assertNotNull($resp->json('server_now'));
+        $this->assertArrayNotHasKey('join_code', $resp->json());
+    }
+
+    #[Test]
+    public function state_endpoint_is_forbidden_for_non_participants(): void
+    {
+        $offering = $this->offering('WEB-LQ8');
+        $instructor = $this->instructorOn($offering);
+        $student = $this->studentOn($offering);
+        $quiz = $this->readyQuiz($instructor, $offering);
+        $session = $this->startLobby($instructor, $quiz);
+
+        // student has NOT joined — must be forbidden
+        $this->actingAs($student)
+            ->getJson(route('live-quiz.sessions.state', $session))
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function ended_session_shows_ended_state_not_error(): void
+    {
+        $offering = $this->offering('WEB-LQ9');
+        $instructor = $this->instructorOn($offering);
+        $student = $this->studentOn($offering);
+        $quiz = $this->readyQuiz($instructor, $offering);
+        $question = $this->firstQuestion($quiz);
+        $session = $this->startLobby($instructor, $quiz);
+
+        $this->actingAs($student)
+            ->post(route('live-quiz.join.store'), ['code' => $session->join_code]);
+
+        app(LiveQuizHostService::class)->launchQuestion($instructor, $session, $question);
+        app(LiveQuizHostService::class)->closeQuestion($instructor, $session);
+        app(LiveQuizHostService::class)->endSession($instructor, $session);
+
+        $this->actingAs($student)
+            ->get(route('live-quiz.sessions.show', $session))
+            ->assertOk()
+            ->assertSee(__('live_quiz.ended'), false)
+            ->assertDontSee('JS error', false);
+    }
 }

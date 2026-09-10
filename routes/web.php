@@ -552,6 +552,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/live-quiz/sessions/{session}/questions/{question}/answer', [LiveQuizController::class, 'answer'])
         ->middleware('permission:live_quiz.play')
         ->name('live-quiz.sessions.answer');
+    // Step 11: lightweight JSON state endpoint for Alpine polling
+    Route::get('/live-quiz/sessions/{session}/state', [LiveQuizController::class, 'state'])
+        ->middleware('permission:live_quiz.play')
+        ->name('live-quiz.sessions.state');
 
     Route::get('/events', [StudentEventController::class, 'index'])
         ->middleware('permission:events.view')
