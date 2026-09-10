@@ -67,4 +67,9 @@ class Course extends Model
     {
         return $this->hasMany(ProgramCourse::class);
     }
+
+    public function offerings(): HasMany
+    {
+        return $this->hasMany(CourseOffering::class);
+    }
 }
