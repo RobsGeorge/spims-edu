@@ -98,6 +98,7 @@ use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
 use App\Http\Controllers\ProgramCatalogController;
+use App\Http\Controllers\PublicCourseController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -148,6 +149,13 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('auth.logout');
 Route::post('/theme', [ThemeController::class, 'update'])->name('theme.update');
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
+
+// Step 4: public course detail — guest accessible
+// Course codes are short alphanumeric (e.g. CORE201); ULIDs are 26 chars.
+// The where constraint prevents this from intercepting the player's {offering} ULID binding.
+Route::get('/courses/{code}', [PublicCourseController::class, 'show'])
+    ->name('courses.public.show')
+    ->where('code', '[A-Za-z0-9_\-]{1,24}');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
