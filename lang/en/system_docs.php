@@ -17,6 +17,7 @@ return [
     'empty_title' => 'No guides available',
     'empty_desc' => 'Ask a Super Admin to publish the client overview for guests, or sign in to read the full set.',
     'help_crosslink_prefix' => 'Looking for how-to tips? Open the',
+    'open_guide' => 'Open guide',
     'publish_title' => 'Publish system documentation',
     'publish_desc' => 'Control whether guests without accounts can read the leadership overview inside the portal.',
     'publish_status_label' => 'Guest access',

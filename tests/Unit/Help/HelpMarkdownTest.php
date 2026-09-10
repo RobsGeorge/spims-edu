@@ -42,4 +42,41 @@ class HelpMarkdownTest extends TestCase
         $this->assertStringContainsString('href="https://example.com"', $html);
         $this->assertStringContainsString('<img', $html);
     }
+
+    #[Test]
+    public function pipe_tables_become_wrapped_html_tables(): void
+    {
+        $markdown = <<<'MD'
+| Role | Owns |
+|---|---|
+| **Instructor** | Gradebook lock |
+MD;
+
+        $html = app(HelpMarkdown::class)->toHtml($markdown);
+
+        $this->assertStringContainsString('<table class="help-article-table"', $html);
+        $this->assertStringContainsString('<th>Role</th>', $html);
+        $this->assertStringContainsString('<th>Owns</th>', $html);
+        $this->assertStringContainsString('<strong>Instructor</strong>', $html);
+        $this->assertStringContainsString('Gradebook lock', $html);
+        $this->assertStringContainsString('class="spims-table-wrap"', $html);
+        $this->assertStringNotContainsString('|---|', $html);
+        $this->assertStringNotContainsString('| Role |', $html);
+    }
+
+    #[Test]
+    public function wide_tables_get_card_fallback_labels(): void
+    {
+        $markdown = <<<'MD'
+| A | B | C | D | E |
+|---|---|---|---|---|
+| 1 | 2 | 3 | 4 | 5 |
+MD;
+
+        $html = app(HelpMarkdown::class)->toHtml($markdown);
+
+        $this->assertStringContainsString('spims-table-wrap--cards', $html);
+        $this->assertStringContainsString('data-label="A"', $html);
+        $this->assertStringContainsString('data-label="E"', $html);
+    }
 }
