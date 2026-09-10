@@ -159,11 +159,17 @@ class LiveQuizPlayService
                 ->first();
         }
 
+        $totalScore = null;
+        if ($participant !== null && $includeCorrectness) {
+            $totalScore = (int) $participant->answers()->sum('score');
+        }
+
         return [
             'id' => $session->id,
             'join_code' => $session->join_code,
             'state' => $session->state->value,
             'server_now' => now()->toIso8601String(),
+            'participant_count' => $session->participants()->count(),
             'quiz' => [
                 'id' => $session->quiz_id,
                 'title' => $session->quiz?->title,
@@ -189,13 +195,38 @@ class LiveQuizPlayService
                     return $row;
                 })->values()->all(),
             ],
+            'leaderboard' => $includeCorrectness ? $this->leaderboard($session) : [],
             'you' => $participant === null ? null : [
                 'participant_id' => $participant->id,
                 'display_name' => $participant->display_name,
                 'score' => $yourAnswer?->score,
+                'total_score' => $totalScore,
                 'answered' => $yourAnswer !== null,
             ],
         ];
+    }
+
+    /**
+     * Build a ranked leaderboard for the session.
+     *
+     * @return list<array{rank: int, display_name: string, total_score: int}>
+     */
+    private function leaderboard(LiveQuizSession $session): array
+    {
+        return LiveQuizParticipant::query()
+            ->where('session_id', $session->id)
+            ->withSum('answers', 'score')
+            ->get()
+            ->sortByDesc('answers_sum_score')
+            ->values()
+            ->map(function (LiveQuizParticipant $p, int $i) {
+                return [
+                    'rank' => $i + 1,
+                    'display_name' => $p->display_name,
+                    'total_score' => (int) ($p->answers_sum_score ?? 0),
+                ];
+            })
+            ->all();
     }
 
     private function scoreFor(

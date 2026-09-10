@@ -42,4 +42,9 @@ return [
     'state_QUESTION_CLOSED' => 'السؤال مغلق',
     'state_RESULTS' => 'النتائج',
     'state_ENDED' => 'انتهى',
+    'lobby_count' => 'المشاركون: :count',
+    'time_left' => 'الوقت المتبقي',
+    'leaderboard' => 'لوحة المتصدرين',
+    'rank' => 'الترتيب',
+    'total_score' => 'المجموع',
 ];

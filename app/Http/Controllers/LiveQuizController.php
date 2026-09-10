@@ -8,6 +8,7 @@ use App\Models\LiveQuizQuestion;
 use App\Models\LiveQuizSession;
 use App\Services\LiveQuiz\LiveQuizPlayService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -49,6 +50,18 @@ class LiveQuizController extends Controller
             'snapshot' => $snapshot,
             'autoRefresh' => $snapshot['state'] !== LiveQuizSessionState::Ended->value,
         ]);
+    }
+
+    /**
+     * Lightweight JSON state endpoint — polled by Alpine every ~2 s.
+     * Never includes the join_code so students cannot re-share it.
+     */
+    public function state(Request $request, LiveQuizSession $session, LiveQuizPlayService $play): JsonResponse
+    {
+        $snapshot = $play->poll($request->user(), $session);
+        unset($snapshot['join_code']);
+
+        return response()->json($snapshot);
     }
 
     public function answer(

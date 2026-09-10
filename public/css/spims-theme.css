@@ -2372,6 +2372,160 @@ progress.spims-progress--danger::-moz-progress-bar  { background: var(--color-da
 [x-cloak] {
     display: none !important;
 }
+/* ── Step 11: Live Quiz Player ────────────────────────────────────────── */
+
+/* Phase icons */
+.lq-lobby-icon {
+    font-size: var(--text-4xl);
+    color: var(--color-primary);
+    display: block;
+    margin-block-end: var(--space-3);
+}
+
+.lq-trophy-icon {
+    font-size: var(--text-4xl);
+    color: var(--color-accent);
+    display: block;
+    margin-block-end: var(--space-3);
+}
+
+/* Answer buttons — largest tap targets in the portal (≥48px, required ≥44px) */
+.lq-answer-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 48px;
+    width: 100%;
+    padding-block: var(--space-3);
+    padding-inline: var(--space-4);
+    background: var(--color-surface);
+    border: 2px solid var(--color-surface-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-size: var(--text-base);
+    font-weight: 500;
+    cursor: pointer;
+    text-align: start;
+    transition: border-color var(--motion-base), background var(--motion-base), transform var(--motion-fast);
+    user-select: none;
+}
+
+.lq-answer-btn:hover {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
+    transform: translateX(var(--space-1));
+}
+
+html[dir='rtl'] .lq-answer-btn:hover {
+    transform: translateX(calc(-1 * var(--space-1)));
+}
+
+.lq-answer-btn:has(input:checked),
+.lq-answer-btn.is-selected {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+}
+
+.lq-answer-btn:focus-within {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.lq-answer-btn__text {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Answer result states (RESULTS/ENDED phase) */
+.lq-answer-btn--correct {
+    border-color: var(--color-success);
+    background: color-mix(in srgb, var(--color-success) 12%, var(--color-surface));
+}
+
+.lq-answer-btn--wrong {
+    border-color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 10%, var(--color-surface));
+    opacity: 0.75;
+}
+
+/* Timer display */
+.lq-timer {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-title);
+    min-width: 3ch;
+    text-align: end;
+    transition: color var(--motion-base);
+}
+
+.lq-timer--warn { color: var(--color-warning); }
+.lq-timer--critical {
+    color: var(--color-danger);
+    animation: lq-timer-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes lq-timer-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lq-timer--critical { animation: none !important; }
+    .lq-answer-btn:hover,
+    .lq-answer-btn.is-selected { transform: none !important; }
+}
+
+/* Timer progress bar */
+.lq-timer-bar {
+    height: 0.4rem;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-surface-border) 60%, transparent);
+    overflow: hidden;
+}
+
+.lq-timer-bar__fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-primary);
+    transition: width var(--motion-fast), background var(--motion-base);
+}
+
+.lq-timer-bar__fill--warn { background: var(--color-warning); }
+.lq-timer-bar__fill--critical { background: var(--color-danger); }
+
+@media (prefers-reduced-motion: reduce) {
+    .lq-timer-bar__fill { transition: none !important; }
+}
+
+/* Leaderboard table */
+.lq-leaderboard {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.lq-leaderboard th,
+.lq-leaderboard td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-surface-border);
+    font-size: var(--text-sm);
+}
+
+.lq-leaderboard th {
+    text-align: start;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.lq-leaderboard td:last-child,
+.lq-leaderboard th:last-child {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+}
+
+.lq-leaderboard tr:first-child td { font-weight: 700; color: var(--color-title); }
+.lq-leaderboard .lq-rank-1 { color: var(--color-accent); }
+
 /* ── Step 14: Proctor timeline ─────────────────────────────────────────── */
 .proctor-warning-count {
     font-size: var(--text-lg);

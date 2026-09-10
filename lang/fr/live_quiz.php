@@ -42,4 +42,9 @@ return [
     'state_QUESTION_CLOSED' => 'Question fermée',
     'state_RESULTS' => 'Résultats',
     'state_ENDED' => 'Terminé',
+    'lobby_count' => 'Participants : :count',
+    'time_left' => 'Temps restant',
+    'leaderboard' => 'Classement',
+    'rank' => 'Rang',
+    'total_score' => 'Total',
 ];
