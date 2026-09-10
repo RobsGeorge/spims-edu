@@ -82,11 +82,11 @@ class PortalD2RemainingTest extends TestCase
             ->assertSee('auth-card', false)
             ->assertSee(__('ui.auth_help_set_password'));
 
-        $this->withSession(['reset_email' => $pending->email])
+        $this->withSession(['reset_email' => $pending->email, 'reset_verified' => true])
             ->get(route('auth.password.reset.form'))
             ->assertOk()
             ->assertSee('auth-card', false)
-            ->assertSee(__('ui.auth_help_reset'));
+            ->assertSee(__('ui.auth_help_new_password'));
     }
 
     #[Test]

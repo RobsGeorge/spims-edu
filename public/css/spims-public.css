@@ -498,6 +498,24 @@ html[dir='rtl'] .spims-landing-footer-brand {
     border: 1px solid var(--color-hairline);
 }
 
+@media (max-width: 575px) {
+    .spims-auth-split {
+        width: calc(100% - 1rem);
+        margin: 1rem auto 2rem;
+        border-radius: var(--radius-md);
+    }
+
+    .spims-auth-form-col {
+        padding: 1.25rem 1rem;
+    }
+
+    .auth-card .auth-footer-links {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
 @media (min-width: 768px) {
     .spims-auth-split {
         flex-direction: row;
@@ -623,6 +641,16 @@ html[dir='rtl'] .spims-auth-brand-quote {
 
 html[dir='rtl'] .auth-otp-input {
     letter-spacing: 0.2em;
+}
+
+.spims-link-btn {
+    color: var(--color-link);
+    text-decoration: none;
+    font-size: inherit;
+}
+
+.spims-link-btn:hover {
+    color: var(--color-primary-hover);
 }
 
 /* —— Catalog —— */

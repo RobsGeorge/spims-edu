@@ -8,6 +8,7 @@ return [
     'forbidden' => 'You do not have permission to perform this action.',
     'otp_invalid' => 'The verification code is invalid or expired.',
     'otp_sent_log' => 'A verification code was generated. Check application logs (mail skipped in dev).',
+    'otp_resent' => 'A new code has been sent. Check your email.',
     'email_not_verified' => 'Please verify your email first.',
     'reset_user_not_found' => 'No account found with that email.',
     'password_reset_success' => 'Your password has been reset. You may sign in.',

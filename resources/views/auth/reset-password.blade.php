@@ -1,22 +1,14 @@
 @extends('layouts.app')
 
-@section('title', __('ui.reset_password'))
+@section('title', __('ui.new_password_title'))
 
 @section('content')
         <div class="card border-0 auth-card">
             <div class="card-body p-4 p-md-5">
-                <h1 class="h3 spims-title mb-2">{{ __('ui.reset_password') }}</h1>
-                <p class="spims-text-dim auth-help mb-4">{{ __('ui.auth_help_reset') }}</p>
-                @if(!empty($devOtp))
-                    <div class="alert alert-warning academic-alert">{{ __('ui.dev_otp', ['code' => $devOtp]) }}</div>
-                @endif
+                <h1 class="h3 spims-title mb-2">{{ __('ui.new_password_title') }}</h1>
+                <p class="spims-text-dim auth-help mb-4">{{ __('ui.auth_help_new_password') }}</p>
                 <form method="POST" action="{{ route('auth.password.reset') }}" class="academic-form">
                     @csrf
-                    <div class="mb-3">
-                        <label class="form-label" for="reset-code">{{ __('ui.otp_code') }}</label>
-                        <input id="reset-code" type="text" name="code" maxlength="6" class="form-control auth-otp-input @error('code') is-invalid @enderror" required inputmode="numeric" autocomplete="one-time-code">
-                        @error('code')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    </div>
                     <div class="mb-3">
                         <label class="form-label" for="reset-password">{{ __('ui.password') }}</label>
                         <input id="reset-password" type="password" name="password" class="form-control @error('password') is-invalid @enderror" required autocomplete="new-password">

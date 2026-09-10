@@ -140,10 +140,14 @@ Route::middleware('guest')->group(function () {
     Route::post('/set-password', [SetPasswordController::class, 'store'])->middleware('throttle:auth');
     Route::get('/forgot-password', [PasswordResetController::class, 'requestForm'])->name('auth.password.request');
     Route::post('/forgot-password', [PasswordResetController::class, 'sendOtp'])->middleware('throttle:auth');
+    Route::get('/verify-reset', [PasswordResetController::class, 'verifyOtpForm'])->name('auth.password.verify.form');
+    Route::post('/verify-reset', [PasswordResetController::class, 'verifyOtp'])->middleware('throttle:auth')->name('auth.password.verify');
+    Route::post('/resend-reset-otp', [PasswordResetController::class, 'resendOtp'])->middleware('throttle:auth')->name('auth.password.resend');
     Route::get('/reset-password', [PasswordResetController::class, 'resetForm'])->name('auth.password.reset.form');
     Route::post('/reset-password', [PasswordResetController::class, 'reset'])
         ->middleware('throttle:auth')
         ->name('auth.password.reset');
+    Route::post('/resend-verification', [VerifyEmailController::class, 'resend'])->middleware('throttle:auth')->name('auth.verify.resend');
 });
 
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('auth.logout');

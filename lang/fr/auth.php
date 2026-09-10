@@ -8,6 +8,7 @@ return [
     'forbidden' => 'Vous n’avez pas la permission d’effectuer cette action.',
     'otp_invalid' => 'Le code de vérification est invalide ou expiré.',
     'otp_sent_log' => 'Un code de vérification a été généré. Consultez les journaux (e-mail désactivé en dev).',
+    'otp_resent' => 'Un nouveau code a été envoyé. Consultez votre e-mail.',
     'email_not_verified' => 'Veuillez d’abord vérifier votre e-mail.',
     'reset_user_not_found' => 'Aucun compte trouvé avec cet e-mail.',
     'password_reset_success' => 'Votre mot de passe a été réinitialisé. Vous pouvez vous connecter.',

@@ -31,4 +31,17 @@ class VerifyEmailController extends Controller
 
         return redirect()->route('auth.password.create');
     }
+
+    public function resend(AuthService $auth): RedirectResponse
+    {
+        if (! session('pending_user_id')) {
+            return redirect()->route('auth.register');
+        }
+
+        $user = User::query()->findOrFail(session('pending_user_id'));
+        $otp = $auth->resendEmailVerificationOtp($user);
+        session(['dev_otp' => app()->environment(['local', 'testing']) ? $otp : null]);
+
+        return redirect()->route('auth.verify')->with('status', __('auth.otp_resent'));
+    }
 }

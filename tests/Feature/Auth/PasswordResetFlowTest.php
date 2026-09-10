@@ -21,12 +21,15 @@ class PasswordResetFlowTest extends TestCase
         ]);
 
         $this->post('/forgot-password', ['email' => $user->email])
-            ->assertRedirect(route('auth.password.reset.form'));
+            ->assertRedirect(route('auth.password.verify.form'));
 
         $otp = session('dev_otp');
 
-        $this->post(route('auth.password.reset'), [
+        $this->post(route('auth.password.verify'), [
             'code' => $otp,
+        ])->assertRedirect(route('auth.password.reset.form'));
+
+        $this->post(route('auth.password.reset'), [
             'password' => 'NewPassword2!',
             'password_confirmation' => 'NewPassword2!',
         ])->assertRedirect(route('auth.login'));

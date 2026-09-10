@@ -169,6 +169,22 @@ class AuthService
         return $this->otp->issue($user, OtpPurpose::PasswordReset);
     }
 
+    public function verifyPasswordResetOtp(string $email, string $code): void
+    {
+        $user = User::query()->where('email', strtolower($email))->firstOrFail();
+
+        if (! $this->otp->verify($user, OtpPurpose::PasswordReset, $code)) {
+            throw ValidationException::withMessages(['code' => [__('auth.otp_invalid')]]);
+        }
+    }
+
+    public function resetPasswordAfterVerified(string $email, string $password): void
+    {
+        $user = User::query()->where('email', strtolower($email))->firstOrFail();
+        $user->update(['password_hash' => Hash::make($password)]);
+        $this->audit->write($user, 'auth.password_reset', 'User', $user->id);
+    }
+
     public function resetPassword(string $email, string $code, string $password): void
     {
         $user = User::query()->where('email', strtolower($email))->firstOrFail();
@@ -179,5 +195,10 @@ class AuthService
 
         $user->update(['password_hash' => Hash::make($password)]);
         $this->audit->write($user, 'auth.password_reset', 'User', $user->id);
+    }
+
+    public function resendEmailVerificationOtp(User $user): string
+    {
+        return $this->otp->issue($user, OtpPurpose::EmailVerification);
     }
 }
