@@ -55,6 +55,7 @@
         $logoUrl = $themeClass === 'dark' ? $logoDarkUrl : $logoLightUrl;
     }
     $shellLess = request()->routeIs('home') || request()->routeIs('auth.*') || !auth()->check();
+    $guestCanReadSystemDocs = app(\App\Services\SystemDocs\SystemDocsCatalog::class)->canBrowse($navUser);
     $userInitials = '';
     if ($navUser) {
         $firstInitial = mb_substr(trim((string) $navUser->first_name), 0, 1);
@@ -83,10 +84,16 @@
                         <a href="#admissions">{{ __('home.nav_admissions') }}</a>
                         <a href="#academics">{{ __('home.nav_academics') }}</a>
                         <a href="#spiritual">{{ __('home.nav_spiritual') }}</a>
+                        @if($guestCanReadSystemDocs)
+                            <a href="{{ route('system-docs.index') }}">{{ __('system_docs.nav') }}</a>
+                        @endif
                     </div>
                 @endif
                 <div class="d-flex align-items-center gap-2 ms-auto">
                     <a href="{{ route('catalog.index') }}" class="btn btn-sm btn-outline-primary d-none d-lg-inline-flex">{{ __('ui.home_cta_catalog') }}</a>
+                    @if($guestCanReadSystemDocs)
+                        <a href="{{ route('system-docs.index') }}" class="btn btn-sm btn-outline-primary d-none d-lg-inline-flex">{{ __('system_docs.nav') }}</a>
+                    @endif
                     @guest
                         <a href="{{ route('auth.login') }}" class="btn btn-sm btn-outline-primary">{{ __('ui.login') }}</a>
                         <a href="{{ route('auth.register') }}" class="btn btn-sm btn-primary">{{ __('ui.register') }}</a>

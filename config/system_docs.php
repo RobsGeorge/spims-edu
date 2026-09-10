@@ -6,8 +6,8 @@
  * Bodies live in resources/system-docs/{locale}/{slug}.md
  * Titles/summaries live in lang/{locale}/system_docs.php under pages.*.
  *
- * guest_eligible pages become readable by guests only when Super Admin
- * publishes via settings key system_docs.guest_published.
+ * guest_eligible pages are readable by guests by default. Super Admin can
+ * turn guest access off via settings key system_docs.guest_published.
  */
 return [
     'setting_key' => 'system_docs.guest_published',

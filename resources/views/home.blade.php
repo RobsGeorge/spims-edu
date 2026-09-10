@@ -282,6 +282,9 @@
     <div class="spims-landing-footer-brand">{{ __('ui.home_heading') }}</div>
     <div class="d-flex flex-wrap justify-content-center gap-3">
         <a href="{{ route('catalog.index') }}">{{ __('ui.nav_catalog') }}</a>
+        @if(app(\App\Services\SystemDocs\SystemDocsCatalog::class)->canBrowse(auth()->user()))
+            <a href="{{ route('system-docs.index') }}">{{ __('system_docs.nav') }}</a>
+        @endif
         <a href="{{ route('auth.register') }}">{{ __('ui.register') }}</a>
     </div>
     <div>{{ __('home.footer_copy') }}</div>
