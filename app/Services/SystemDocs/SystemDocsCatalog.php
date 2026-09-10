@@ -25,7 +25,7 @@ class SystemDocsCatalog
     {
         $row = Setting::query()->find($this->settingKey());
 
-        return (bool) ($row?->value['enabled'] ?? false);
+        return (bool) ($row?->value['enabled'] ?? true);
     }
 
     public function setGuestPublished(User $actor, bool $enabled): void

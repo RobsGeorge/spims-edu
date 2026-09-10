@@ -16,10 +16,41 @@ class SystemDocsPortalTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
+    public function guest_can_browse_client_docs_by_default(): void
+    {
+        $this->get(route('system-docs.index'))
+            ->assertOk()
+            ->assertSee(__('system_docs.title'))
+            ->assertSee(__('system_docs.guest_banner'))
+            ->assertSee(__('system_docs.pages.overview.title'), false)
+            ->assertDontSee(__('system_docs.pages.architecture.title'), false);
+
+        $this->get(route('system-docs.show', 'overview'))->assertOk();
+        $this->get(route('system-docs.show', 'architecture'))->assertNotFound();
+    }
+
+    #[Test]
+    public function guest_landing_links_to_system_docs_when_published(): void
+    {
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee(route('system-docs.index'), false)
+            ->assertSee(__('system_docs.nav'));
+    }
+
+    #[Test]
     public function guest_cannot_browse_when_unpublished(): void
     {
+        Setting::query()->updateOrCreate(
+            ['key' => 'system_docs.guest_published'],
+            ['value' => ['enabled' => false]]
+        );
+
         $this->get(route('system-docs.index'))->assertNotFound();
         $this->get(route('system-docs.show', 'overview'))->assertNotFound();
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertDontSee(route('system-docs.index'), false);
     }
 
     #[Test]
@@ -92,10 +123,10 @@ class SystemDocsPortalTest extends TestCase
     public function super_admin_can_unpublish_guest_docs(): void
     {
         $sa = User::factory()->withRole(RoleType::SuperAdmin)->create();
-        Setting::query()->create([
-            'key' => 'system_docs.guest_published',
-            'value' => ['enabled' => true],
-        ]);
+        Setting::query()->updateOrCreate(
+            ['key' => 'system_docs.guest_published'],
+            ['value' => ['enabled' => true]]
+        );
 
         $this->actingAs($sa)
             ->put(route('superadmin.system-docs.publish.update'), ['guest_published' => '0'])

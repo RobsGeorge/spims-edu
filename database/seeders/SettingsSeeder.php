@@ -15,6 +15,7 @@ class SettingsSeeder extends Seeder
             'zoom.concurrent_hosts' => ['value' => 1],
             'academic_standing.thresholds' => ['good_min' => 200, 'suspension_below' => 100],
             'audit.retention_days' => ['value' => 365],
+            'system_docs.guest_published' => ['enabled' => true],
         ];
 
         foreach ($defaults as $key => $value) {
