@@ -13,11 +13,11 @@
         $assessment = $project?->assessment;
         $offering = $assessment?->offering;
     @endphp
-    <div class="app-card p-3 mb-2">
+    <x-card variant="quiet" class="p-3 mb-2">
         <div class="d-flex flex-wrap justify-content-between gap-2 align-items-start">
             <div>
                 <strong>{{ $project?->name }}</strong>
-                <div class="small text-muted-theme">
+                <div class="small spims-text-dim">
                     {{ $offering?->course?->code }} · {{ $assessment?->title }}
                 </div>
             </div>
@@ -30,7 +30,7 @@
                 @endif
             </div>
         </div>
-    </div>
+    </x-card>
 @empty
     <x-empty-state :title="__('projects.mine_empty')" :message="__('projects.mine_desc')" icon="bi-people">
         <x-slot:actions>

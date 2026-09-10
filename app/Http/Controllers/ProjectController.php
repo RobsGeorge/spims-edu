@@ -11,6 +11,7 @@ use App\Models\Project;
 use App\Models\ProjectAssessment;
 use App\Models\ProjectDeliverable;
 use App\Models\ProjectMembership;
+use App\Models\ProjectPeerEvaluation;
 use App\Models\ProjectSubmissionFile;
 use App\Services\Projects\PeerEvaluationService;
 use App\Services\Projects\ProjectDeliverableService;
@@ -135,7 +136,7 @@ class ProjectController extends Controller
         $this->authorize->authorize($request->user(), 'projects.view');
 
         if ($this->teams->activeMembership($request->user(), $project) === null) {
-            throw new NotFoundHttpException;
+            throw new AuthorizationException(__('auth.forbidden'));
         }
 
         $assessment = $project->assessment;
@@ -146,6 +147,12 @@ class ProjectController extends Controller
             $pendingPeers = $this->peers->pending($request->user(), $project);
         }
 
+        $submittedPeerEvals = ProjectPeerEvaluation::query()
+            ->where('project_id', $project->id)
+            ->where('rater_id', $request->user()->id)
+            ->with('ratee')
+            ->get();
+
         return view('projects.show', [
             'offering' => $assessment->offering,
             'assessment' => $assessment,
@@ -153,6 +160,7 @@ class ProjectController extends Controller
             'phases' => $phases,
             'submissions' => $submissions,
             'pendingPeers' => $pendingPeers,
+            'submittedPeerEvals' => $submittedPeerEvals,
             'peerWindowOpen' => $assessment->isPeerWindowOpen(),
             'grade' => $this->grading->announcedPercentForStudent($assessment, $request->user()),
             'fileUrl' => fn (?string $path) => StudentPayload::signedFileUrl($path, $this->storage),
@@ -166,12 +174,13 @@ class ProjectController extends Controller
         $this->assertWriteMember($request, $project);
         $this->assertDeliverableBelongs($project, $deliverable);
 
+        $maxKb = $deliverable->max_file_mb * 1024;
         $request->validate([
             'body' => 'nullable|string',
-            'link' => 'nullable|string',
+            'link' => 'nullable|url',
             'files' => 'nullable|array',
-            'files.*' => 'file',
-            'file' => 'nullable|file',
+            'files.*' => "file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,gif,zip,txt,odt,ods,odp|max:{$maxKb}",
+            'file' => "nullable|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,gif,zip,txt,odt,ods,odp|max:{$maxKb}",
         ]);
 
         $files = [];

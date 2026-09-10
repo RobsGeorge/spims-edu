@@ -72,4 +72,7 @@ return [
     'peer_comment' => 'Comment (optional)',
     'peer_submit' => 'Submit evaluation',
     'peer_saved' => 'Peer evaluation submitted.',
+    'peer_submitted_label' => 'Your submitted evaluations',
+    'link_label' => 'Link URL',
+    'file_type_error' => 'File type not allowed. Accepted: PDF, Word, PowerPoint, Excel, image, ZIP, or text.',
 ];

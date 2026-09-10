@@ -15,11 +15,11 @@
         $assessment = $row['assessment'];
         $membership = $row['membership'];
     @endphp
-    <div class="app-card p-3 mb-3">
+    <x-card variant="panel" class="p-3 mb-3">
         <div class="d-flex flex-wrap justify-content-between gap-2 align-items-start mb-2">
             <div>
                 <h2 class="h5 mb-1">{{ $assessment->title }}</h2>
-                <p class="small text-muted-theme mb-0">
+                <p class="small spims-text-dim mb-0">
                     {{ __('projects.team_size', ['min' => $assessment->team_size_min, 'max' => $assessment->team_size_max]) }}
                     · {{ __('projects.join_window_label') }}:
                     {{ $assessment->join_opens_at?->timezone(config('app.timezone'))->format('Y-m-d H:i') ?? '—' }}
@@ -37,13 +37,13 @@
             @if($row['canLeave'])
                 <form method="POST" action="{{ route('student.projects.leave', [$offering, $assessment]) }}">
                     @csrf
-                    <button class="btn btn-sm btn-outline-danger">{{ __('projects.leave') }}</button>
+                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ __('projects.leave') }}</button>
                 </form>
             @endif
         @elseif($assessment->isJoinWindowOpen())
             <form method="POST" action="{{ route('student.projects.join', [$offering, $assessment]) }}" class="mb-3">
                 @csrf
-                <button class="btn btn-sm btn-primary">{{ __('projects.join_any') }}</button>
+                <button type="submit" class="btn btn-sm btn-primary">{{ __('projects.join_any') }}</button>
             </form>
             @if($row['openTeams']->isNotEmpty())
                 <h3 class="h6">{{ __('projects.open_teams') }}</h3>
@@ -52,25 +52,25 @@
                         <li class="d-flex flex-wrap justify-content-between align-items-center gap-2 py-1">
                             <span>
                                 {{ $teamRow['project']->name }}
-                                <span class="small text-muted-theme">{{ $teamRow['seats'] }}/{{ $teamRow['capacity'] }}</span>
+                                <span class="small spims-text-dim">{{ $teamRow['seats'] }}/{{ $teamRow['capacity'] }}</span>
                             </span>
                             @if($teamRow['seats'] < $teamRow['capacity'])
                                 <form method="POST" action="{{ route('student.projects.join', [$offering, $assessment]) }}">
                                     @csrf
                                     <input type="hidden" name="project_id" value="{{ $teamRow['project']->id }}">
-                                    <button class="btn btn-sm btn-outline-primary">{{ __('projects.join_team') }}</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">{{ __('projects.join_team') }}</button>
                                 </form>
                             @else
-                                <span class="small text-muted-theme">{{ __('projects.at_capacity') }}</span>
+                                <span class="small spims-text-dim">{{ __('projects.at_capacity') }}</span>
                             @endif
                         </li>
                     @endforeach
                 </ul>
             @endif
         @else
-            <p class="text-muted-theme mb-0">{{ __('projects.join_window') }}</p>
+            <p class="spims-text-dim mb-0">{{ __('projects.join_window') }}</p>
         @endif
-    </div>
+    </x-card>
 @empty
     <x-empty-state :title="__('projects.no_assessments')" icon="bi-people" />
 @endforelse

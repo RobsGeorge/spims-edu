@@ -72,4 +72,7 @@ return [
     'peer_comment' => 'Commentaire (facultatif)',
     'peer_submit' => 'Envoyer l’évaluation',
     'peer_saved' => 'Évaluation par les pairs envoyée.',
+    'peer_submitted_label' => 'Vos évaluations soumises',
+    'link_label' => 'URL du lien',
+    'file_type_error' => 'Type de fichier non autorisé. Acceptés : PDF, Word, PowerPoint, Excel, image, ZIP ou texte.',
 ];

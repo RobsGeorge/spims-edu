@@ -72,4 +72,7 @@ return [
     'peer_comment' => 'تعليق (اختياري)',
     'peer_submit' => 'إرسال التقييم',
     'peer_saved' => 'تم إرسال تقييم الأقران.',
+    'peer_submitted_label' => 'تقييماتك المُرسَلة',
+    'link_label' => 'رابط URL',
+    'file_type_error' => 'نوع الملف غير مسموح. المقبول: PDF أو Word أو PowerPoint أو Excel أو صور أو ZIP أو نص.',
 ];

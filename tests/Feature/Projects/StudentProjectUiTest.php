@@ -148,7 +148,7 @@ class StudentProjectUiTest extends TestCase
 
         $this->actingAs($a)
             ->get(route('student.projects.show', $teamB))
-            ->assertNotFound();
+            ->assertForbidden();
 
         $this->actingAs($a)
             ->get(route('student.projects.index', $offering))
@@ -188,6 +188,11 @@ class StudentProjectUiTest extends TestCase
 
         $file = $project->submissions()->firstOrFail()->files()->firstOrFail();
 
+        // Assert the file was stored via StorageService (path in storage/app, not a plain URL)
+        $this->assertNotEmpty($file->path);
+        $this->assertStringStartsWith('project-deliverables/', $file->path);
+        Storage::disk('local')->assertExists($file->path);
+
         $this->actingAs($student)
             ->get(route('student.projects.show', $project))
             ->assertOk()
@@ -199,6 +204,84 @@ class StudentProjectUiTest extends TestCase
             ->assertRedirect(route('student.projects.show', $project));
 
         $this->assertSame(0, $project->fresh()->submissions()->firstOrFail()->files()->count());
+    }
+
+    #[Test]
+    public function non_member_gets_403_on_project_show_submit_and_peer_eval(): void
+    {
+        $offering = $this->offering('WSP5B');
+        $member = $this->studentOn($offering);
+        $nonMember = $this->studentOn($offering);
+        $assessment = $this->publishedAssessment($offering);
+        $project = $this->joinTeam($member, $assessment);
+        $deliverable = $this->fileDeliverable($assessment);
+
+        // Non-member enrolled in the same offering cannot view the project
+        $this->actingAs($nonMember)
+            ->get(route('student.projects.show', $project))
+            ->assertForbidden();
+
+        // Non-member cannot submit a deliverable
+        $this->actingAs($nonMember)
+            ->post(route('student.projects.submit', [$project, $deliverable]), ['body' => 'test'])
+            ->assertForbidden();
+
+        // Non-member cannot submit a peer evaluation
+        $this->actingAs($nonMember)
+            ->post(route('student.projects.peer.store', $project), [
+                'ratee_id' => $member->id,
+                'score' => 80,
+            ])
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function peer_eval_is_shown_read_only_after_submission(): void
+    {
+        $offering = $this->offering('WSP5C');
+        $a = $this->studentOn($offering);
+        $b = $this->studentOn($offering);
+        $assessment = $this->publishedAssessment($offering, ['team_size_max' => 2]);
+        $project = $this->joinTeam($a, $assessment);
+        $this->teams()->join($b, $assessment, $project->id);
+
+        // A submits an evaluation of B
+        $this->actingAs($a)
+            ->from(route('student.projects.show', $project))
+            ->post(route('student.projects.peer.store', $project), [
+                'ratee_id' => $b->id,
+                'score' => 85,
+                'comment' => 'great work',
+            ])
+            ->assertRedirect(route('student.projects.show', $project));
+
+        // Show page: submitted eval visible; form for B is gone (they are no longer pending)
+        $this->actingAs($a)
+            ->get(route('student.projects.show', $project))
+            ->assertOk()
+            ->assertSee(__('projects.peer_submitted_label'))
+            ->assertSee($b->first_name)
+            ->assertSee('85');
+    }
+
+    #[Test]
+    public function oversized_file_is_rejected_with_user_facing_error(): void
+    {
+        Storage::fake('local');
+        $offering = $this->offering('WSP5D');
+        $student = $this->studentOn($offering);
+        $assessment = $this->publishedAssessment($offering);
+        $project = $this->joinTeam($student, $assessment);
+        // max_file_mb = 1 → max 1 MB
+        $deliverable = $this->fileDeliverable($assessment, ['max_file_mb' => 1]);
+
+        // Upload a file that exceeds the size limit (2 MB = 2048 KB)
+        $this->actingAs($student)
+            ->from(route('student.projects.show', $project))
+            ->post(route('student.projects.submit', [$project, $deliverable]), [
+                'files' => [UploadedFile::fake()->create('huge.pdf', 2048, 'application/pdf')],
+            ])
+            ->assertSessionHasErrors('files.0');
     }
 
     #[Test]
