@@ -80,11 +80,12 @@ Use these in this order. Each row is a **persona**, not just a login.
 | `student5@spims.test` | David Bishoy | en | DIP-THEO **Rejected** | none | Rejection state |
 | `student6@spims.test` | Hannah Rizk | **ar** | CERT-LIT Accepted | TH101, BI101, BI102 | Arabic enrolled student; marked **Late** on TH101 Week 1; pending assignment submission on TH101 |
 | `student7@spims.test` | Peter Atallah | en | CERT-LIT Accepted | same three | Marked **Absent** then **excused** on TH101 Week 1 |
-| `student8@spims.test` | Rebecca Fawzy | en | CERT-LIT **Draft** | none | Unfinished application |
+| `student8@spims.test` | Rebecca Fawzy | en | CERT-LIT **Draft** (answers filled, not submitted) | none | Unfinished application |
 | `student9@spims.test` | Andrew Naguib | en | DEG-BTH Accepted | same three | Degree-program student; first invoice is **paid** (manual cash) |
 | `student10@spims.test` | Christine Wahba | **ar** | DEG-BTH Submitted | none | Second Arabic applicant |
+| `student11@spims.test` | Lydia Newcomer | en | **none** | none | Brand-new student: empty dashboard, no application, no enrollments |
 
-Progress percents on enrollments are still hard-coded in the seeder. They do not reflect completed lessons.
+Progress percents on enrollments are still hard-coded in the seeder. They do not reflect completed lessons. Every seeded application (including drafts and student1’s withdrawn CERT-BIB row) has dummy answers for the required “Why do you want to join?” and “Parish name” fields.
 
 ---
 
@@ -94,7 +95,7 @@ After `migrate:fresh --seed` with `SEED_DEMO_DATA=true` (approximate; Phase D co
 
 | Entity | Count | Notes |
 |---|---|---|
-| Users | 18 | 1 super admin + 17 demo |
+| Users | 19 | 1 super admin + 18 demo |
 | Programs | 5–6 | `DIP-THEO`, `CERT-LIT`, `DEG-BTH`, `CERT-BIB`, `DEG-DIAC`, plus sample `DEMO-DIP` when sample seed is on |
 | Courses | 13 | 12 demo + `DEMO101` |
 | Offerings | 14 | 8 Fall Open cohort + 1 ET101 self-paced + 4 Spring Draft + 1 sample |
@@ -106,7 +107,7 @@ After `migrate:fresh --seed` with `SEED_DEMO_DATA=true` (approximate; Phase D co
 | Assignments / submissions | 1 / 2 | TH101 Week 1 reflection; student1 graded, student6 pending review |
 | Gradebook components | 2 | Exam + Attendance on TH101 (grades submitted then **locked**) |
 | Application forms | 4 | “Why join?” + “Parish name” |
-| Application field values | 4 | student1 and student3 |
+| Application field values | 22+ | dummy answers on every required field for every seeded application |
 | Applications | 10+ | All statuses including Withdrawn |
 | Student programs | 4 | The four Accepted students |
 | Enrollments | 13 | 12 from accepted students + dual on ET101 self-paced; TH101 grades **Locked** |
@@ -160,7 +161,7 @@ Do this on **https://demo.spims-edu.com** after a fresh seed (or local/`staging`
 
 1. **Public catalog** (logged out) → `/catalog`.
 2. **Student** `student1@spims.test` → `/learn/{TH101}` (Week 1 lessons + reflection assignment), `/announcements`, `/finance` (open invoices + EGP wallet), `/attendance` (Present on Week 1), `/live-quiz/join` with the Lobby join code from teach, `/events`. Show the graded quiz attempt and assignment score on the grades surface.
-3. **Admin** `adm@spims.test` → `/admin/applications`. student1/student3 have “Why join?” / “Parish name” answers. `/admin/events` for Orientation Day.
+3. **Admin** `adm@spims.test` → `/admin/applications`. Every queued application has dummy “Why join?” / “Parish name” answers. `/admin/events` for Orientation Day. Optionally log in as `student11@spims.test` to show a brand-new student (empty dashboard, no application).
 4. **Academic** `aca@spims.test` → `/admin/programs` → DIP-THEO. `/admin/offerings` → Fall vs Spring Draft. Gradebook for TH101 shows **locked** grades. `/admin/email-templates`, `/admin/assessment-templates`.
 5. **Instructor** `ins1@spims.test` → `/teach/{TH101}` (content, roster, announcements, live-quiz Lobby). Assignment queue has student6 pending; student1 already graded. Also `/teach/{BI102}` has Week 1 content. Attendance at `/teach/{TH101}/attendance`.
 6. **Instructor (ar)** `ins2@spims.test` → `/teach/{LI101}` Week 1 lessons (Arabic UI).
