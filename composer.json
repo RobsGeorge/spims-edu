@@ -11,6 +11,7 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "maennchen/zipstream-php": "^2.1",
         "phpoffice/phpspreadsheet": "^1.29"
     },
     "require-dev": {
@@ -61,6 +62,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "platform": {
+            "php": "8.2.33"
         }
     },
     "minimum-stability": "stable",
