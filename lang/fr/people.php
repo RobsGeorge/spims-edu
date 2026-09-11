@@ -123,6 +123,7 @@ return [
     'status_ACTIVE' => 'Actif',
     'status_SUSPENDED' => 'Suspendu',
     'status_PENDING' => 'En attente',
+    'status_ARCHIVED' => 'Archivé (sans connexion)',
     'role_SUPER_ADMIN' => 'Super Admin',
     'role_ADMINISTRATIVE_ADMIN' => 'Admin administratif',
     'role_ACADEMIC_ADMIN' => 'Admin académique',

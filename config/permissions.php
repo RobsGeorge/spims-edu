@@ -539,6 +539,33 @@ return [
     ],
 
     /*
+     * Legacy data import (Populi + Canvas -> SPIMS). None of these are offering-scoped
+     * — they act school-wide by nature — so none appears in permission_scopes.php's
+     * offering_scoped list; see the note there. A FINANCE-entity batch additionally
+     * requires finance.manage and an ACTIVE-population batch additionally requires
+     * users.manage, enforced in the controller rather than here, since those checks
+     * depend on the specific batch being acted on. See docs/legacy-data-import-plan.md §12.
+     */
+    'import.view' => [
+        'ADMINISTRATIVE_ADMIN' => 'R',
+        'ACADEMIC_ADMIN' => 'R',
+        'FINANCIAL_ADMIN' => 'R',
+    ],
+    'import.configure' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'import.stage' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+        'ACADEMIC_ADMIN' => 'F',
+    ],
+    'import.commit' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'import.rollback' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+
+    /*
      * Super Admin control-plane keys (SA0+). Empty role maps: Super Admin bypasses
      * AuthorizeService. Roles Hub lists them so they stay visible and grantable later.
      */

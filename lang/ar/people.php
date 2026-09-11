@@ -123,6 +123,7 @@ return [
     'status_ACTIVE' => 'نشط',
     'status_SUSPENDED' => 'موقوف',
     'status_PENDING' => 'معلّق',
+    'status_ARCHIVED' => 'مؤرشف (بدون تسجيل دخول)',
     'role_SUPER_ADMIN' => 'مشرف أعلى',
     'role_ADMINISTRATIVE_ADMIN' => 'مدير إداري',
     'role_ACADEMIC_ADMIN' => 'مدير أكاديمي',

@@ -53,6 +53,8 @@ return [
     'credentials_desc' => 'Émettre certificats et relevés.',
     'users' => 'Annuaire des personnes',
     'users_desc' => 'Chercher des comptes, ouvrir un dossier, assigner des rôles et aider une personne.',
+    'imports' => 'Importation de données',
+    'imports_desc' => 'Importer les étudiants historiques et actuels depuis Populi et Canvas.',
     'enrollment_admin' => 'Exceptions d’inscription',
     'enrollment_admin_desc' => 'Holds financiers, inscription forcée et listes d’attente.',
     'theme' => 'Thème',

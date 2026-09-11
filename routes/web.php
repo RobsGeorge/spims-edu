@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AttendanceAdminController;
 use App\Http\Controllers\Admin\CertificateTemplateController;
 use App\Http\Controllers\Admin\CommunicationAdminController;
 use App\Http\Controllers\Admin\CompletionCriteriaController;
+use App\Http\Controllers\Admin\ContentItemController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\CredentialAdminController;
 use App\Http\Controllers\Admin\DiscussionAdminController;
@@ -17,19 +18,21 @@ use App\Http\Controllers\Admin\EventAdminController;
 use App\Http\Controllers\Admin\FinanceAdminController;
 use App\Http\Controllers\Admin\GradebookController;
 use App\Http\Controllers\Admin\GradingSchemeController;
+use App\Http\Controllers\Admin\HelpArticleAdminController;
+use App\Http\Controllers\Admin\HelpCategoryController;
+use App\Http\Controllers\Admin\ImportBatchController;
+use App\Http\Controllers\Admin\ImportSourceController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
 use App\Http\Controllers\Admin\OfferingClosingController;
-use App\Http\Controllers\Admin\ContentItemController;
 use App\Http\Controllers\Admin\OfferingController;
 use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SemesterController;
 use App\Http\Controllers\Admin\SurveyController as AdminSurveyController;
-use App\Http\Controllers\Admin\HelpArticleAdminController;
-use App\Http\Controllers\Admin\HelpCategoryController;
 use App\Http\Controllers\Admin\ThemeEditorController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AdvisingController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\Api\BrandingController;
 use App\Http\Controllers\Api\PaymentWebhookController;
@@ -47,14 +50,12 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CommunicationOpenController;
 use App\Http\Controllers\ContentItemFileController;
 use App\Http\Controllers\CoursePlayerController;
-use App\Http\Controllers\StudentPreviewController;
 use App\Http\Controllers\CredentialDownloadController;
 use App\Http\Controllers\CredentialVerifyController;
 use App\Http\Controllers\CredentialVerifySerialController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\DonationController;
-use App\Http\Controllers\AdvisingController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\Events\StudentEventController;
 use App\Http\Controllers\ExamAttemptController;
@@ -64,7 +65,6 @@ use App\Http\Controllers\GradesController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\SystemDocsController;
 use App\Http\Controllers\HubController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\LiveQuizController;
@@ -74,16 +74,20 @@ use App\Http\Controllers\MeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationSettingsController;
 use App\Http\Controllers\OfferingPreviewController;
+use App\Http\Controllers\ProgramCatalogController;
 use App\Http\Controllers\ProjectController as StudentProjectController;
+use App\Http\Controllers\PublicCourseController;
 use App\Http\Controllers\RolesHub\RolesHubController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentCompletionController;
-use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\StudentPreviewController;
 use App\Http\Controllers\SuperAdmin\AuditExplorerController;
 use App\Http\Controllers\SuperAdmin\FeedbackRevealController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\SystemDocsPublishController;
+use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\SystemDocsController;
 use App\Http\Controllers\Teach\AssessmentController as TeachAssessmentController;
 use App\Http\Controllers\Teach\AssignmentController as TeachAssignmentController;
 use App\Http\Controllers\Teach\AttendanceController as TeachAttendanceController;
@@ -97,8 +101,6 @@ use App\Http\Controllers\Teach\SurveyController as TeachSurveyController;
 use App\Http\Controllers\Teach\TeachController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TranscriptController;
-use App\Http\Controllers\ProgramCatalogController;
-use App\Http\Controllers\PublicCourseController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -1162,6 +1164,63 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/events/{event}/check-in', [EventAdminController::class, 'checkIn'])
             ->middleware('permission:events.check_in')
             ->name('events.check-in');
+
+        // --- TRACK: legacy-import --- see docs/legacy-data-import-plan.md
+        Route::get('/imports', [ImportBatchController::class, 'index'])
+            ->middleware('permission:import.view')
+            ->name('imports.index');
+        Route::get('/imports/sources', [ImportSourceController::class, 'index'])
+            ->middleware('permission:import.view')
+            ->name('imports.sources.index');
+        Route::post('/imports/sources', [ImportSourceController::class, 'store'])
+            ->middleware('permission:import.configure')
+            ->name('imports.sources.store');
+        Route::post('/imports/sources/{source}', [ImportSourceController::class, 'update'])
+            ->middleware('permission:import.configure')
+            ->name('imports.sources.update');
+        Route::post('/imports/sources/{source}/grades', [ImportSourceController::class, 'storeGradeMapping'])
+            ->middleware('permission:import.configure')
+            ->name('imports.sources.grades.store');
+        Route::post('/imports/sources/{source}/grades/{grade}', [ImportSourceController::class, 'updateGradeMapping'])
+            ->middleware('permission:import.configure')
+            ->name('imports.sources.grades.update');
+        Route::delete('/imports/sources/{source}/grades/{grade}', [ImportSourceController::class, 'destroyGradeMapping'])
+            ->middleware('permission:import.configure')
+            ->name('imports.sources.grades.destroy');
+
+        Route::get('/imports/create', [ImportBatchController::class, 'create'])
+            ->middleware('permission:import.stage')
+            ->name('imports.create');
+        Route::post('/imports', [ImportBatchController::class, 'store'])
+            ->middleware('permission:import.stage')
+            ->name('imports.store');
+        Route::get('/imports/{batch}', [ImportBatchController::class, 'show'])
+            ->middleware('permission:import.view')
+            ->name('imports.show');
+        Route::get('/imports/{batch}/map', [ImportBatchController::class, 'map'])
+            ->middleware('permission:import.stage')
+            ->name('imports.map');
+        Route::post('/imports/{batch}/map', [ImportBatchController::class, 'updateMap'])
+            ->middleware('permission:import.stage')
+            ->name('imports.map.update');
+        Route::post('/imports/{batch}/map/profile', [ImportBatchController::class, 'applyProfile'])
+            ->middleware('permission:import.stage')
+            ->name('imports.map.profile.apply');
+        Route::post('/imports/{batch}/save-profile', [ImportBatchController::class, 'saveProfile'])
+            ->middleware('permission:import.stage')
+            ->name('imports.save-profile');
+        Route::get('/imports/{batch}/dry-run', [ImportBatchController::class, 'dryRunReport'])
+            ->middleware('permission:import.stage')
+            ->name('imports.dry-run');
+        Route::post('/imports/{batch}/dry-run', [ImportBatchController::class, 'runDryRun'])
+            ->middleware('permission:import.stage')
+            ->name('imports.dry-run.run');
+        Route::post('/imports/{batch}/commit', [ImportBatchController::class, 'commit'])
+            ->middleware('permission:import.commit')
+            ->name('imports.commit');
+        Route::post('/imports/{batch}/rollback', [ImportBatchController::class, 'rollback'])
+            ->middleware('permission:import.rollback')
+            ->name('imports.rollback');
     });
 });
 

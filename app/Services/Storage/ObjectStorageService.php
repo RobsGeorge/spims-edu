@@ -19,6 +19,7 @@ class ObjectStorageService
         'credentials',
         'project-deliverables',
         'discussion-attachments',
+        'imports',
     ];
 
     public function disk(): Filesystem

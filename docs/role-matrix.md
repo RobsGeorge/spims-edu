@@ -16,7 +16,7 @@ Sources of truth, in the order the runtime consults them:
 Product intent: `docs/spims-spec-summary.md` §Roles. This file is the mechanical companion —
 every key, every level, every scope caveat.
 
-**Counts as shipped:** 120 permission keys · 45 offering-scoped · 12 Super-Admin-only (empty role map).
+**Counts as shipped:** 125 permission keys · 45 offering-scoped · 12 Super-Admin-only (empty role map).
 
 ---
 
@@ -325,6 +325,19 @@ Groups follow the Roles Hub grouping (`RolePermissionService::groupedPermissionK
 | Permission key | Scope | ADM | ACA | FIN | INS | TA | STU |
 |---|---|:--:|:--:|:--:|:--:|:--:|:--:|
 | `foundation.demo` | School | – | `F` | – | – | – | – |
+
+### Import (`import.*`)
+
+Legacy data import from Populi and Canvas — see [`docs/legacy-data-import-plan.md`](legacy-data-import-plan.md).
+None of these keys are offering-scoped; a batch is school-wide by nature.
+
+| Permission key | Scope | ADM | ACA | FIN | INS | TA | STU |
+|---|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| `import.view` | School | `R` | `R` | `R` | – | – | – |
+| `import.configure` | School | `F` | – | – | – | – | – |
+| `import.stage` | School | `F` | `F` | – | – | – | – |
+| `import.commit` | School | `F` | – | – | – | – | – |
+| `import.rollback` | School | `F` | – | – | – | – | – |
 
 ### Gradebook (`gradebook.*`)
 

@@ -139,7 +139,6 @@ class NavigationHub
             ];
         }
 
-
         $items[] = [
             'label' => __('help.nav'),
             'route' => 'help.index',
@@ -260,6 +259,7 @@ class NavigationHub
 
         return array_values(array_filter([
             self::link('admin.users.index', 'hubs.users', 'bi-people', 'hubs.users_desc'),
+            self::link('admin.imports.index', 'hubs.imports', 'bi-cloud-upload', 'hubs.imports_desc'),
             self::link('advising.index', 'hubs.advising', 'bi-person-lines-fill', 'hubs.advising_desc'),
             self::link('admin.enrollments.index', 'hubs.enrollment_admin', 'bi-person-plus', 'hubs.enrollment_admin_desc'),
             self::link('admin.theme.edit', 'hubs.theme', 'bi-palette', 'hubs.theme_desc'),
