@@ -18,26 +18,37 @@
 
 <x-card variant="panel" class="mb-4">
     <h2 class="h6 spims-title">{{ __('enrollment.register') }}</h2>
-    <form method="POST" action="{{ route('enrollments.store') }}" class="row g-2">
-        @csrf
-        <div class="col-12 col-md-5">
-            <select name="offering_id" class="form-select" required>
-                @foreach($offerings as $offering)
-                    @php $modeLabel = __('offering_mode.'.$offering->mode->value); @endphp
-                    <option value="{{ $offering->id }}">{{ $offering->course->code }} ({{ $modeLabel }})</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-12 col-md-4">
-            <select name="student_program_id" class="form-select">
-                <option value="">{{ __('enrollment.standalone_or_none') }}</option>
-                @foreach($programs as $sp)
-                    <option value="{{ $sp->id }}">{{ $sp->program->code }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-12 col-md-3"><button class="btn btn-primary w-100">{{ __('enrollment.register') }}</button></div>
-    </form>
+    @if($offerings->isEmpty())
+        <x-empty-state
+            :title="__('enrollment.no_registerable_offerings')"
+            :message="__('enrollment.apply_first_help')"
+            icon="bi-journal-plus"
+        >
+            <x-slot:actions>
+                <a href="{{ route('applications.index') }}" class="btn btn-primary">{{ __('enrollment.apply_first') }}</a>
+            </x-slot:actions>
+        </x-empty-state>
+    @else
+        <form method="POST" action="{{ route('enrollments.store') }}" class="row g-2">
+            @csrf
+            <div class="col-12 col-md-5">
+                <select name="offering_id" class="form-select" required>
+                    @foreach($offerings as $offering)
+                        <option value="{{ $offering->id }}">{{ $offering->course->code }} ({{ $offering->mode_label }})</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-12 col-md-4">
+                <select name="student_program_id" class="form-select">
+                    <option value="">{{ __('enrollment.standalone_or_none') }}</option>
+                    @foreach($programs as $sp)
+                        <option value="{{ $sp->id }}">{{ $sp->program->code }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-12 col-md-3"><button class="btn btn-primary w-100">{{ __('enrollment.register') }}</button></div>
+        </form>
+    @endif
     @error('enrollment')<div class="text-danger mt-2">{{ $message }}</div>@enderror
 </x-card>
 
@@ -77,10 +88,10 @@
                         <td><x-badge :value="$enrollment->status" /></td>
                         <td>{{ number_format($enrollment->progress_percent, 0) }}%</td>
                         <td class="d-flex gap-1 flex-wrap justify-content-end">
-                            @if(in_array($enrollment->status->value, ['ENROLLED', 'COMPLETED'], true))
+                            @if(in_array($enrollment->status, [\App\Enums\EnrollmentStatus::Enrolled, \App\Enums\EnrollmentStatus::Completed], true))
                             <a class="btn btn-sm btn-primary" href="{{ route('learn.offering', $enrollment->offering) }}">{{ __('learning.open_player') }}</a>
                             @endif
-                            @if($enrollment->status->value === 'ENROLLED')
+                            @if($enrollment->status === \App\Enums\EnrollmentStatus::Enrolled)
                             <form method="POST" action="{{ route('enrollments.drop', $enrollment) }}">@csrf<button class="btn btn-sm btn-outline-danger">{{ __('enrollment.drop') }}</button></form>
                             <form method="POST" action="{{ route('enrollments.withdraw', $enrollment) }}">@csrf<button class="btn btn-sm btn-outline-warning">{{ __('enrollment.withdraw') }}</button></form>
                             @endif

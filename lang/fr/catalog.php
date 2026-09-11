@@ -15,6 +15,7 @@ return [
     'interest_count' => ':count intéressés',
     'preview' => 'Aperçu de l’offre',
     'apply' => 'Postuler au programme',
+    'apply_to' => 'Postuler à :program',
     'no_offering' => 'Pas encore d’offre ouverte',
     'flag_interest' => 'Marquer mon intérêt',
     'programs' => 'Programmes',

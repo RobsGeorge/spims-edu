@@ -77,4 +77,6 @@ return [
     'grade_status_failed' => 'راسب',
     'grade_status_graded' => 'مُقيَّم',
     'grade_status_pending' => 'قيد الانتظار',
+    'apply_to_study' => 'التقديم للدراسة',
+    'start_enrollment' => 'بدء التسجيل',
 ];

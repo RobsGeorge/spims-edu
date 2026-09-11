@@ -434,6 +434,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/applications/forms/{form}', [ApplicationController::class, 'create'])
         ->middleware('permission:admissions.apply')
         ->name('applications.create');
+    Route::get('/applications/{application}', [ApplicationController::class, 'show'])
+        ->name('applications.show');
     Route::post('/applications/{application}', [ApplicationController::class, 'store'])
         ->middleware('permission:admissions.apply')
         ->name('applications.store');

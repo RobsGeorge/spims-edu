@@ -2,9 +2,11 @@
 
 namespace App\Services\Learning;
 
+use App\Enums\ApplicationStatus;
 use App\Enums\Currency;
 use App\Enums\EnrollmentStatus;
 use App\Enums\WalletKind;
+use App\Models\Application;
 use App\Models\Assessment;
 use App\Models\Enrollment;
 use App\Models\LiveSession;
@@ -71,8 +73,31 @@ class StudentDashboardService
             ->limit(5)
             ->get();
 
+        $applications = Application::query()
+            ->where('applicant_id', $user->id)
+            ->with('program')
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        $reviewApplication = $applications->first(
+            fn (Application $application) => in_array($application->status, [
+                ApplicationStatus::UnderReview,
+                ApplicationStatus::Submitted,
+                ApplicationStatus::Waitlisted,
+            ], true)
+        );
+
+        $acceptedReadyToEnroll = $enrollments->isEmpty()
+            && $applications->contains(
+                fn (Application $application) => $application->status === ApplicationStatus::Accepted
+            );
+
         return [
             'enrollments' => $enrollments,
+            'admissions_applications' => $applications,
+            'review_application' => $reviewApplication,
+            'accepted_ready_to_enroll' => $acceptedReadyToEnroll,
             'next_live' => $nextLive,
             'due_assessments' => $dueAssessments,
             'wallet' => [

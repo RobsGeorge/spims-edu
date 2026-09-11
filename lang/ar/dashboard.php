@@ -18,4 +18,6 @@ return [
     'notifications_desc' => 'التنبيهات والإشارات.',
     'surveys' => 'الاستبيانات',
     'surveys_desc' => 'أجب عن استبيانات المقررات والمدرسة.',
+    'admissions_cue_review' => 'طلبك قيد المراجعة.',
+    'admissions_cue_accepted' => 'تم قبولك. سجّل في مقرراتك للبدء.',
 ];

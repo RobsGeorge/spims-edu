@@ -77,4 +77,6 @@ return [
     'grade_status_failed' => 'Échoué',
     'grade_status_graded' => 'Noté',
     'grade_status_pending' => 'En attente',
+    'apply_to_study' => 'Postuler pour étudier',
+    'start_enrollment' => 'Commencer l’inscription',
 ];

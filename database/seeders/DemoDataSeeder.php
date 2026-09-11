@@ -187,6 +187,7 @@ class DemoDataSeeder extends Seeder
             'student8@spims.test' => ['Rebecca', 'Fawzy', RoleType::Student, 'en'],
             'student9@spims.test' => ['Andrew', 'Naguib', RoleType::Student, 'en'],
             'student10@spims.test' => ['Christine', 'Wahba', RoleType::Student, 'ar'],
+            'student11@spims.test' => ['Lydia', 'Newcomer', RoleType::Student, 'en'],
         ];
 
         $users = [];
@@ -615,6 +616,24 @@ class DemoDataSeeder extends Seeder
                     'options' => null,
                 ]
             );
+            ApplicationFormField::query()->updateOrCreate(
+                ['form_id' => $form->id, 'order' => 3],
+                [
+                    'label' => 'Date of birth',
+                    'type' => FormFieldType::Date,
+                    'required' => true,
+                    'options' => null,
+                ]
+            );
+            ApplicationFormField::query()->updateOrCreate(
+                ['form_id' => $form->id, 'order' => 4],
+                [
+                    'label' => 'Preferred track',
+                    'type' => FormFieldType::Select,
+                    'required' => true,
+                    'options' => ['Pastoral', 'Academic', 'Liturgical'],
+                ]
+            );
             $forms[$code] = $form;
         }
 
@@ -632,7 +651,8 @@ class DemoDataSeeder extends Seeder
         $adm = $users['adm@spims.test'];
         $students = [];
         foreach ($users as $email => $user) {
-            if (str_starts_with($email, 'student')) {
+            // student11 is a brand-new account: no application, no enrollments.
+            if (str_starts_with($email, 'student') && $email !== 'student11@spims.test') {
                 $students[] = $user;
             }
         }
@@ -780,7 +800,7 @@ class DemoDataSeeder extends Seeder
         $this->seedTh101Announcement($ins1, $th101);
         $this->seedTh101LiveSession($ins1, $th101);
         $this->seedTh101Discussion($ins1, $student1, $th101);
-        $this->seedApplicationAnswers($student1, $student3);
+        $this->seedApplicationAnswers();
         $this->seedDualRoleAccess($aca, $dual, $free1, $et101SelfPaced);
 
         // 8A additions
@@ -1155,32 +1175,34 @@ class DemoDataSeeder extends Seeder
         $discussions->post($student1, $thread, 'Looking forward to this course.');
     }
 
-    private function seedApplicationAnswers(User $student1, User $student3): void
+    private function seedApplicationAnswers(): void
     {
-        $answers = [
-            $student1->id => [
+        $overrides = [
+            'student1@spims.test' => [
                 'Why do you want to join?' => 'I want to study theology in a structured program.',
                 'Parish name' => 'St. Mark Parish',
             ],
-            $student3->id => [
+            'student3@spims.test' => [
                 'Why do you want to join?' => 'I hope to join the diploma this year.',
                 'Parish name' => 'St. Mary Parish',
             ],
         ];
 
-        foreach ($answers as $applicantId => $byLabel) {
-            $application = Application::query()
-                ->where('applicant_id', $applicantId)
-                ->with('form.fields')
-                ->first();
+        $applications = Application::query()
+            ->with(['form.fields', 'applicant'])
+            ->get();
 
-            if ($application === null || $application->form === null) {
+        foreach ($applications as $application) {
+            if ($application->form === null || $application->applicant === null) {
                 continue;
             }
 
-            foreach ($application->form->fields as $field) {
-                $value = $byLabel[$field->label] ?? null;
-                if ($value === null) {
+            $email = $application->applicant->email;
+            $byLabel = $overrides[$email] ?? $this->dummyRequiredAnswersFor($application->applicant);
+
+            foreach ($application->form->fields->where('active', true) as $field) {
+                $value = $byLabel[$field->label] ?? $this->dummyValueForField($field, $application->applicant);
+                if ($value === null || $value === '') {
                     continue;
                 }
 
@@ -1190,6 +1212,51 @@ class DemoDataSeeder extends Seeder
                 );
             }
         }
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function dummyRequiredAnswersFor(User $student): array
+    {
+        $parish = match ($student->preferred_locale) {
+            'ar' => 'St. Mary Parish',
+            'fr' => 'St. Mark Parish',
+            default => 'St. George Parish',
+        };
+
+        return [
+            'Why do you want to join?' => sprintf(
+                'I am %s %s and I want to study at SPIMS this year.',
+                $student->first_name,
+                $student->last_name
+            ),
+            'Parish name' => $parish,
+        ];
+    }
+
+    private function dummyValueForField(ApplicationFormField $field, User $student): ?string
+    {
+        if (! $field->required) {
+            return null;
+        }
+
+        $options = is_array($field->options) ? array_values($field->options) : [];
+
+        return match ($field->type) {
+            FormFieldType::Textarea => sprintf(
+                'I am %s %s and I want to study at SPIMS this year.',
+                $student->first_name,
+                $student->last_name
+            ),
+            FormFieldType::Number => '1998',
+            FormFieldType::Date => '2005-01-07',
+            FormFieldType::Select => isset($options[0]) ? (string) $options[0] : 'Pastoral',
+            FormFieldType::Multiselect => json_encode($options === [] ? ['Bible'] : array_slice($options, 0, 2)),
+            FormFieldType::Checkbox => '1',
+            FormFieldType::File => 'application-docs/demo-id-scan.pdf',
+            default => $student->first_name.' '.$student->last_name,
+        };
     }
 
     private function seedDualRoleAccess(User $aca, User $dual, CourseOffering $free1, CourseOffering $et101SelfPaced): void

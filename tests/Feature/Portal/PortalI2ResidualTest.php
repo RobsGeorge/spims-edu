@@ -182,7 +182,7 @@ class PortalI2ResidualTest extends TestCase
         $this->actingAs($student)->post(route('applications.store', $application), [
             'files' => [$fieldId => $file],
             'submit' => '0',
-        ])->assertRedirect(route('applications.index'));
+        ])->assertRedirect(route('applications.show', $application));
 
         $application->refresh()->load('values');
         $value = $application->values->first();

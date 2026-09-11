@@ -13,6 +13,18 @@
         :subtitle="__('ui.dashboard_subheading')"
     />
 
+    @if(! empty($accepted_ready_to_enroll))
+        <div class="alert alert-success academic-alert mb-4">
+            {{ __('dashboard.admissions_cue_accepted') }}
+            <a href="{{ route('enrollments.index') }}" class="alert-link">{{ __('enrollment.enroll_now') }}</a>
+        </div>
+    @elseif(! empty($review_application))
+        <div class="alert alert-info academic-alert mb-4">
+            {{ __('dashboard.admissions_cue_review') }}
+            <a href="{{ route('applications.show', $review_application) }}" class="alert-link">{{ __('admissions.view_application') }}</a>
+        </div>
+    @endif
+
     <div class="bento-grid mb-4">
         <section class="bento-courses app-card academic-card p-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -25,7 +37,8 @@
                     icon="bi-journal-bookmark"
                 >
                     <x-slot:actions>
-                        <a href="{{ route('catalog.index') }}" class="btn btn-primary">{{ __('learning.browse_catalog') }}</a>
+                        <a href="{{ route('applications.index') }}" class="btn btn-primary">{{ __('learning.apply_to_study') }}</a>
+                        <a href="{{ route('catalog.index') }}" class="btn btn-outline-primary">{{ __('learning.browse_catalog') }}</a>
                     </x-slot:actions>
                 </x-empty-state>
             @else
