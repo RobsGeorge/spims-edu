@@ -53,6 +53,8 @@ return [
     'credentials_desc' => 'Issue certificates and transcripts.',
     'users' => 'People directory',
     'users_desc' => 'Search accounts, open a dossier, assign roles, and support a person.',
+    'imports' => 'Data import',
+    'imports_desc' => 'Import historical and current students from Populi and Canvas.',
     'enrollment_admin' => 'Enrollment exceptions',
     'enrollment_admin_desc' => 'Financial holds, override-register, and waitlists.',
     'theme' => 'Theme',

@@ -23,6 +23,7 @@ class StudentProgram extends Model
         'completed_at',
         'cached_gpa',
         'academic_standing',
+        'source_system',
     ];
 
     protected $casts = [

@@ -40,6 +40,7 @@ class User extends Authenticatable
         'is_reviewer',
         'last_reviewed_at',
         'date_of_birth',
+        'source_system',
     ];
 
     protected $hidden = [

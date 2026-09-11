@@ -4,7 +4,11 @@ Migrating the school's existing student body and its history out of **Populi** (
 **Canvas** (LMS) into SPIMS: identity, programs, course results, GPA, diplomas and financial
 position — plus working portal accounts for the students who are still studying.
 
-Status: **plan only.** No code written. Phases `L0`–`L8` below are the proposed build order.
+Status: **L0/L1 foundation shipped** — source + grade-mapping config, the mapping engine, and the
+full upload → map → validate → dry-run → commit → rollback pipeline for the `STUDENT` entity,
+including the "exact catalog match" half of D2 and the `ARCHIVED`/`PENDING` split from D8. Phases
+`L0`–`L8` below are the full build order; §17 at the end of this document is the precise as-shipped
+boundary — what landed, what was deliberately simplified, and what is still open.
 
 Companion to [`docs/academic-roadmap/`](academic-roadmap/) (S0–S9, complete). This is the first
 phase whose subject is *data that already exists* rather than behaviour the app lacks, and the
@@ -957,3 +961,90 @@ split, money precision) · `ImportProfileReuseTest` · `ImportIdempotencyTest` �
 
 **The existing suite must pass unmodified after L3.** That is the proof that the
 `counts_toward_gpa` filter changed nothing for native students.
+
+---
+
+## 17. As shipped (L0/L1 foundation)
+
+What actually landed, in one place, so this document stays trustworthy as the feature grows.
+Everything below is real, tested, and in production — not aspirational.
+
+### Shipped
+
+- **Schema**: `import_sources`, `import_grade_mappings`, `import_mapping_profiles`,
+  `import_batches`, `import_rows`, `import_links`; `source_system` on `users` and
+  `student_programs`; `UserStatus::Archived`.
+- **Mapping engine**: file profiling (CSV native, XLSX via `phpoffice/phpspreadsheet`), three-tier
+  suggestion (Populi/Canvas synonym dictionaries, normalised-header match, value-shape heuristics),
+  nine composable transforms (`trim`, `lower`, `upper`, `date` with strict round-trip validation —
+  a rollover like month 14 is caught, not silently accepted — `name_part_first`/`name_part_last`
+  with `last_first`/`first_last` order, `normalize_arabic`, `constant`), and saved reusable mapping
+  profiles.
+- **Pipeline**: upload → map → validate → dry-run (executes the real commit path inside a
+  transaction that is always rolled back — proven by `ImportBatchServiceTest`) → commit → rollback,
+  for the `STUDENT` entity, wrapped in `AuditLogWriter::withAudit()`.
+- **Identity, v1 slice**: matching ladder rungs 1 (`import_links`) and 3 (exact normalised email);
+  a re-imported legacy id links instead of duplicating.
+- **D8, both halves**: alumni import `ARCHIVED` with a synthetic `@no-email.invalid` address when
+  no email is given and no password ever set; a currently-studying row with no email is a hard
+  validation error (`E_ACTIVE_NO_EMAIL`), and a valid one imports `PENDING`, ready to claim through
+  the **existing** `auth.verify` → `auth.password.create` flow — no new auth code was needed.
+- **D2, exact-match half**: an optional `program_code` field attaches a `StudentProgram` only when
+  it matches a program that already exists in the live catalog; an unmatched code warns
+  (`W_UNKNOWN_PROGRAM_CODE`) and creates no program.
+- **Rollback**: refuses once sealed (30 days), and per-row once the created account has a role, an
+  enrollment, a financial record, or has been claimed (password set / email verified) — naming the
+  reason rather than failing silently.
+- **Silence**: committing sends no mail (proven by `Mail::fake()` + `assertNothingSent()` — there is
+  no observer or notification wired to `User::create()` in this path, so it holds by construction,
+  not by a suppression flag).
+- **Permissions**: `import.view`, `import.configure`, `import.stage`, `import.commit`,
+  `import.rollback`, all school-wide (absent from `permission_scopes.php` by design, documented
+  there); an `ACTIVE`-population upload additionally requires `users.manage`.
+- **UI**: hub, source + grade-mapping config, upload, mapping (per-row confidence badges, live
+  Alpine-driven transform-option fields, a required-field guard that blocks Continue), a batch
+  receipt with status-appropriate next steps, a dry-run report with a control-total row and an
+  acknowledge gate, and a rollback control — built from the project's existing component library
+  (`x-page-header`, `x-card`, `x-stat`, `x-status-badge`, `x-file-drop`, `x-empty-state`) rather
+  than new shared components, and localised in `lang/{ar,en,fr}/import.php`.
+- **Nav**: an "Import" tile on the Administrative Admin hub; a `role-matrix.md` section.
+- **Tests**: 61 tests across 8 files — profiler, transforms (including the Arabic-normalisation and
+  strict-date cases above), suggestions, the full pipeline via the real HTTP routes end to end, the
+  permission matrix, source/grade-mapping CRUD, and lang-key parity for every string this feature
+  added. The full pre-existing suite (1,172 tests) passes unmodified alongside it.
+
+### Deliberately simplified for this pass
+
+- **Commit runs synchronously** in the request, not queued. Fine at school scale; a batch in the
+  tens of thousands of rows should move to a queued job first.
+- **The Populi/Canvas synonym dictionary is code, not a database table** — not yet editable from
+  the UI the way §5.2 of this plan describes. Cheap to add later; didn't block shipping the engine.
+- **XLSX sheet selection is a text field**, not a populated dropdown — there is no AJAX round trip
+  on upload to list worksheet names before the file is attached to a batch.
+- **`program_code` is the only academic field wired up.** `legacy_gpa`, `honors`,
+  `credits_earned`, and `entrance_term` are deliberately absent from the mapping target catalog
+  rather than accepted and silently dropped — see §11.5's rule that an unmapped field must never be
+  offered as if it did something.
+
+### Not built yet (traces to later phases in §13)
+
+- **L2 — the rest of the identity ladder**: the Canvas `SIS User ID` crosswalk (rung 2), student-
+  number and DOB-triple matching (rungs 4–5), and the human merge-candidate queue (rung 6, screen
+  12). Today, anything that isn't an exact `import_links` hit or an exact email match becomes a new
+  user — safe (never a wrong merge) but not yet smart about the messy cases.
+- **L3 — course results, GPA and the shadow catalog.** No `academic_records`, no
+  `legacy_academic_summaries`, no `counts_toward_gpa` filter on `GradebookService::refreshGpa()`,
+  no shadow `course_offerings`. This release only carries identity and program membership.
+- **L4 — transcript surfacing.** No "Prior study" section yet; there is nothing to show until L3
+  lands.
+- **L5 — account-claim invitations.** Users land `PENDING` correctly, but there is no
+  `import_account_claims` table, no bulk-invite screen, no bounce worklist. An admin must invite
+  each imported student manually today (e.g. `users.reset_password` from the People directory).
+- **L6 — finance.** No `invoices`/`payments` opening-balance import, no control-total money gate.
+- **L7 — mid-term cutover**, **L8 — legacy credentials and AI-assisted mapping.** Untouched; both
+  were always conditional/optional in the phase plan.
+
+Recommended next slice: **L3**, because it's what makes this a *transcript* import rather than an
+account import, and because the `counts_toward_gpa` filter is the one change to existing code the
+whole plan hinges on — it should land under the same scrutiny as this PR, proven by the same
+"existing suite passes unmodified" bar.
