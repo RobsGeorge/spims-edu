@@ -15,6 +15,7 @@ return [
     'interest_count' => ':count مهتمون',
     'preview' => 'معاينة العرض',
     'apply' => 'التقديم للبرنامج',
+    'apply_to' => 'التقديم إلى :program',
     'no_offering' => 'لا يوجد عرض مفتوح بعد',
     'flag_interest' => 'أبدِ اهتماماً',
     'programs' => 'البرامج',

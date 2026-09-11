@@ -58,4 +58,8 @@ return [
     'sequence_warning' => 'Attention : inscription avant d\'avoir terminé les cours des niveaux inférieurs. L\'inscription a été enregistrée.',
     'sequence_blocked' => 'Les cours des niveaux inférieurs doivent être complétés avant de s\'inscrire à ce cours.',
     'already_passed' => 'Vous avez déjà réussi ce cours.',
+    'apply_first' => 'Postulez d’abord à un programme',
+    'apply_first_help' => 'Les cours du programme deviennent disponibles après acceptation.',
+    'no_registerable_offerings' => 'Aucun cours n’est ouvert à l’inscription pour le moment.',
+    'enroll_now' => 'S’inscrire maintenant',
 ];

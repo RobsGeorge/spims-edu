@@ -18,4 +18,6 @@ return [
     'notifications_desc' => 'Alertes et mentions.',
     'surveys' => 'Sondages',
     'surveys_desc' => 'Répondre aux sondages de cours et d’école.',
+    'admissions_cue_review' => 'Votre candidature est en cours d’examen.',
+    'admissions_cue_accepted' => 'Vous avez été accepté. Inscrivez-vous à vos cours pour commencer.',
 ];

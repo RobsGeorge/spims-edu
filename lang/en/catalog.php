@@ -15,6 +15,7 @@ return [
     'interest_count' => ':count interested',
     'preview' => 'Preview offering',
     'apply' => 'Apply to program',
+    'apply_to' => 'Apply to :program',
     'no_offering' => 'No open offering yet',
     'flag_interest' => 'Flag interest',
     'programs' => 'Programs',

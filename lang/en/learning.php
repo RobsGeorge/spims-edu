@@ -77,4 +77,6 @@ return [
     'grade_status_failed' => 'Failed',
     'grade_status_graded' => 'Graded',
     'grade_status_pending' => 'Pending',
+    'apply_to_study' => 'Apply to study',
+    'start_enrollment' => 'Start enrollment',
 ];

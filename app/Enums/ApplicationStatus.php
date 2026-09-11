@@ -39,6 +39,16 @@ enum ApplicationStatus: string
         return $this->isOpen();
     }
 
+    public function isEditable(): bool
+    {
+        return in_array($this, [self::Draft, self::Submitted], true);
+    }
+
+    public function label(): string
+    {
+        return __('application_status.'.$this->value);
+    }
+
     public function badgeTone(): string
     {
         return match ($this) {

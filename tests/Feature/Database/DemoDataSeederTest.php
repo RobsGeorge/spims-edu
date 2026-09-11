@@ -21,6 +21,7 @@ use App\Models\AdvisingHold;
 use App\Models\AdvisorAssignment;
 use App\Models\Announcement;
 use App\Models\Application;
+use App\Models\ApplicationFieldValue;
 use App\Models\Assessment;
 use App\Models\AssessmentAttempt;
 use App\Models\AssessmentTemplate;
@@ -471,6 +472,34 @@ class DemoDataSeederTest extends TestCase
 
         $this->assertContains(ApplicationStatus::Withdrawn->value, $statuses,
             'student1 should have a Withdrawn application');
+    }
+
+    #[Test]
+    public function new_student11_has_no_application_and_every_required_field_has_a_dummy_answer(): void
+    {
+        $this->seed();
+
+        $newcomer = User::query()->where('email', 'student11@spims.test')->firstOrFail();
+        $this->assertSame(0, Application::query()->where('applicant_id', $newcomer->id)->count());
+        $this->assertSame(0, Enrollment::query()->where('student_id', $newcomer->id)->count());
+
+        $applications = Application::query()->with('form.fields')->get();
+        $this->assertGreaterThanOrEqual(10, $applications->count());
+
+        foreach ($applications as $application) {
+            $required = $application->form?->fields->where('active', true)->where('required', true) ?? collect();
+            foreach ($required as $field) {
+                $this->assertTrue(
+                    ApplicationFieldValue::query()
+                        ->where('application_id', $application->id)
+                        ->where('field_id', $field->id)
+                        ->whereNotNull('value')
+                        ->where('value', '!=', '')
+                        ->exists(),
+                    "Application {$application->id} is missing a dummy answer for required field {$field->label}"
+                );
+            }
+        }
     }
 
     // ─── Phase C gate tests ───────────────────────────────────────────────────

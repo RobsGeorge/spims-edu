@@ -58,4 +58,8 @@ return [
     'sequence_warning' => 'Warning: enrolling before completing earlier year-level courses. Enrollment was saved.',
     'sequence_blocked' => 'Earlier year-level courses must be completed before enrolling in this course.',
     'already_passed' => 'You have already passed this course.',
+    'apply_first' => 'Apply to a program first',
+    'apply_first_help' => 'Program courses become available after you are accepted.',
+    'no_registerable_offerings' => 'No courses are open for you to register yet.',
+    'enroll_now' => 'Enroll now',
 ];

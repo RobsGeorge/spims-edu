@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\OfferingStatus;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\ProgramCourse;
@@ -16,9 +15,15 @@ use Illuminate\View\View;
 
 class EnrollmentController extends Controller
 {
-    public function index(Request $request, DegreeAuditService $audit): View
+    public function index(Request $request, DegreeAuditService $audit, EnrollmentService $enrollments): View
     {
         $user = $request->user();
+
+        $offerings = $enrollments->registerableOfferings($user)->map(function (CourseOffering $offering) {
+            $offering->setAttribute('mode_label', __('offering_mode.'.$offering->mode->value));
+
+            return $offering;
+        });
 
         return view('enrollments.index', [
             'enrollments' => Enrollment::query()
@@ -27,11 +32,7 @@ class EnrollmentController extends Controller
                 ->latest('enrolled_at')
                 ->get(),
             'programs' => $audit->activePrograms($user),
-            'offerings' => CourseOffering::query()
-                ->with(['course', 'semester'])
-                ->where('status', OfferingStatus::Open)
-                ->latest()
-                ->get(),
+            'offerings' => $offerings,
         ]);
     }
 
