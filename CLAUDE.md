@@ -9,6 +9,7 @@ Role matrix (every permission key × role, scope rules): docs/role-matrix.md.
 Design gaps & next phases: docs/portal-design-gap-analysis.md.
 Academic roadmap (S0–S9, SIS gaps + mobile API): docs/academic-roadmap/.
 Super Admin remaining work: docs/superadmin-control-plane-plan.md.
+Legacy data import (L0–L6, two predecessor systems): docs/legacy-data-import-plan.md.
 Out-of-phase ideas: PARKING-LOT.md.
 
 ## Hard rules
