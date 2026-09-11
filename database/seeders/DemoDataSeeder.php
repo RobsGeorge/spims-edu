@@ -616,6 +616,24 @@ class DemoDataSeeder extends Seeder
                     'options' => null,
                 ]
             );
+            ApplicationFormField::query()->updateOrCreate(
+                ['form_id' => $form->id, 'order' => 3],
+                [
+                    'label' => 'Date of birth',
+                    'type' => FormFieldType::Date,
+                    'required' => true,
+                    'options' => null,
+                ]
+            );
+            ApplicationFormField::query()->updateOrCreate(
+                ['form_id' => $form->id, 'order' => 4],
+                [
+                    'label' => 'Preferred track',
+                    'type' => FormFieldType::Select,
+                    'required' => true,
+                    'options' => ['Pastoral', 'Academic', 'Liturgical'],
+                ]
+            );
             $forms[$code] = $form;
         }
 

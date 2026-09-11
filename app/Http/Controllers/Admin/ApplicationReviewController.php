@@ -46,13 +46,27 @@ class ApplicationReviewController extends Controller
         ]);
     }
 
-    public function show(Request $request, Application $application, AuthorizeService $authorize): View
+    public function show(Request $request, Application $application, AuthorizeService $authorize, ApplicationService $service): View
     {
         $authorize->authorize($request->user(), 'admissions.review');
 
         $application->load(['applicant', 'program', 'form.fields', 'values.field', 'reviewer']);
 
-        return view('admin.applications.show', compact('application'));
+        $decisions = [
+            ApplicationStatus::Accepted,
+            ApplicationStatus::Rejected,
+            ApplicationStatus::Waitlisted,
+        ];
+
+        return view('admin.applications.show', [
+            'application' => $application,
+            'answers' => $service->displayAnswers($application),
+            'statusLabel' => $application->status->label(),
+            'decisions' => array_map(fn (ApplicationStatus $status) => [
+                'value' => $status->value,
+                'label' => $status->label(),
+            ], $decisions),
+        ]);
     }
 
     public function decide(Request $request, Application $application, ApplicationService $service): RedirectResponse

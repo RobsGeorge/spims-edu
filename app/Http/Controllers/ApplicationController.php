@@ -24,9 +24,25 @@ class ApplicationController extends Controller
         ]);
     }
 
-    public function create(Request $request, ApplicationForm $form, ApplicationService $service): View
+    public function show(Request $request, Application $application, ApplicationService $service): View
+    {
+        abort_unless($application->applicant_id === $request->user()->id, 403);
+
+        $application->load(['program', 'form.fields', 'values.field']);
+
+        return view('applications.show', [
+            'application' => $application,
+            'answers' => $service->displayAnswers($application),
+        ]);
+    }
+
+    public function create(Request $request, ApplicationForm $form, ApplicationService $service): View|RedirectResponse
     {
         $application = $service->start($request->user(), $form->load('fields', 'program'));
+
+        if (! $application->status->isEditable()) {
+            return redirect()->route('applications.show', $application);
+        }
 
         // Prefill from prior applications' common field labels.
         $prior = Application::query()
@@ -41,7 +57,7 @@ class ApplicationController extends Controller
             foreach ($prior as $app) {
                 $match = $app->values->first(fn ($v) => $v->field?->label === $field->label);
                 if ($match) {
-                    $prefill[$field->id] = $match->value;
+                    $prefill[$field->id] = $match->getAttribute('value');
                     break;
                 }
             }
@@ -56,6 +72,8 @@ class ApplicationController extends Controller
 
     public function store(Request $request, Application $application, ApplicationService $service): RedirectResponse
     {
+        abort_unless($application->applicant_id === $request->user()->id, 403);
+
         $data = $request->validate([
             'answers' => 'array',
             'answers.*' => 'nullable',
@@ -72,12 +90,17 @@ class ApplicationController extends Controller
         );
 
         if ($request->boolean('submit')) {
-            // Reload values after save
             $application->refresh()->load('values', 'form.fields');
             $service->submit($request->user(), $application);
+
+            return redirect()
+                ->route('applications.show', $application)
+                ->with('status', __('admissions.application_submitted'));
         }
 
-        return redirect()->route('applications.index')->with('status', __('admissions.application_saved'));
+        return redirect()
+            ->route('applications.show', $application)
+            ->with('status', __('admissions.application_saved'));
     }
 
     public function withdraw(Request $request, Application $application, ApplicationService $service): RedirectResponse

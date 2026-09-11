@@ -13,10 +13,14 @@
     $prereqCount = $course->prerequisites->count();
     $priceMinor  = $course->is_free ? 0 : (int) ($course->default_price_usd ?? 0);
 
-    $form = $course->programCourses
-        ->map(fn ($pc) => $pc->program?->applicationForms?->first())
+    $applyTargets = $programs
+        ->map(function ($prog) {
+            $form = $prog->applicationForms?->first();
+
+            return $form ? ['program' => $prog, 'form' => $form] : null;
+        })
         ->filter()
-        ->first();
+        ->values();
 @endphp
 
 <article class="h-100">
@@ -75,11 +79,11 @@
                 <span class="spims-text-dim small align-self-center">{{ __('catalog.no_offering') }}</span>
             @endif
             @auth
-                @if($form)
-                    <a class="btn btn-sm btn-outline-secondary" href="{{ route('applications.create', $form) }}">
-                        {{ __('catalog.apply') }}
+                @foreach($applyTargets as $target)
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ route('applications.create', $target['form']) }}">
+                        {{ __('catalog.apply_to', ['program' => $target['program']->code]) }}
                     </a>
-                @endif
+                @endforeach
                 <form method="POST" action="{{ route('catalog.interest', $course) }}">
                     @csrf
                     <button class="btn btn-sm btn-outline-secondary">{{ __('catalog.flag_interest') }}</button>

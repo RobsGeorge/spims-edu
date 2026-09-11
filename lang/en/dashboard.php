@@ -18,4 +18,6 @@ return [
     'notifications_desc' => 'Alerts and mentions.',
     'surveys' => 'Surveys',
     'surveys_desc' => 'Fill assigned course and school surveys.',
+    'admissions_cue_review' => 'Your application is under review.',
+    'admissions_cue_accepted' => 'You have been accepted. Enroll in your courses to begin.',
 ];

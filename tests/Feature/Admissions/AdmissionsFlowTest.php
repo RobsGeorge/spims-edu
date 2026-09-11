@@ -64,7 +64,7 @@ class AdmissionsFlowTest extends TestCase
         $this->actingAs($student)->post(route('applications.store', $application), [
             'answers' => [$fieldId => 'I want to study theology'],
             'submit' => '1',
-        ])->assertRedirect(route('applications.index'));
+        ])->assertRedirect(route('applications.show', $application));
 
         $application->refresh();
         $this->assertSame(ApplicationStatus::UnderReview, $application->status);
@@ -177,12 +177,13 @@ class AdmissionsFlowTest extends TestCase
         $this->actingAs($student)->post(route('applications.store', $first), [
             'answers' => [$fieldId => 'First cycle'],
             'submit' => '1',
-        ])->assertRedirect(route('applications.index'));
+        ])->assertRedirect(route('applications.show', $first));
 
         $this->assertSame(ApplicationStatus::UnderReview, $first->fresh()->status);
         $this->assertSame(1, Application::query()->where('applicant_id', $student->id)->count());
 
-        $this->actingAs($student)->get(route('applications.create', $form))->assertOk();
+        $this->actingAs($student)->get(route('applications.create', $form))
+            ->assertRedirect(route('applications.show', $first));
         $this->assertSame(1, Application::query()->where('applicant_id', $student->id)->count());
 
         $this->actingAs($adm)->post(route('admin.applications.decide', $first), [
@@ -280,7 +281,7 @@ class AdmissionsFlowTest extends TestCase
         $this->actingAs($student)->post(route('applications.store', $first), [
             'answers' => [$fieldId => 'Withdraw later'],
             'submit' => '1',
-        ])->assertRedirect(route('applications.index'));
+        ])->assertRedirect(route('applications.show', $first));
 
         $this->assertSame(ApplicationStatus::UnderReview, $first->fresh()->status);
 
@@ -315,7 +316,7 @@ class AdmissionsFlowTest extends TestCase
         $this->actingAs($student)
             ->get(route('applications.index'))
             ->assertOk()
-            ->assertSee(ApplicationStatus::Withdrawn->value)
+            ->assertSee(ApplicationStatus::Withdrawn->label())
             ->assertSee('THEO');
     }
 
@@ -391,7 +392,7 @@ class AdmissionsFlowTest extends TestCase
             ->assertOk()
             ->assertSee(__('admissions.withdraw'), false)
             ->assertSee('withdraw-'.$application->id, false)
-            ->assertSee(ApplicationStatus::Draft->value);
+            ->assertSee(ApplicationStatus::Draft->label());
     }
 
     #[Test]

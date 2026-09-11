@@ -517,4 +517,41 @@ class EnrollmentService
 
         return (int) floor($days / 7) + 1;
     }
+
+    /**
+     * Open offerings a student can actually register for: standalone courses,
+     * plus program courses they are already matriculated into.
+     *
+     * @return \Illuminate\Support\Collection<int, CourseOffering>
+     */
+    public function registerableOfferings(User $student)
+    {
+        $open = CourseOffering::query()
+            ->with(['course', 'semester'])
+            ->where('status', OfferingStatus::Open)
+            ->latest()
+            ->get();
+
+        $programIds = StudentProgram::query()
+            ->where('student_id', $student->id)
+            ->where('status', StudentProgramStatus::Active)
+            ->pluck('program_id');
+
+        $courseIdsInPrograms = $programIds->isEmpty()
+            ? collect()
+            : ProgramCourse::query()
+                ->whereIn('program_id', $programIds)
+                ->pluck('course_id');
+
+        return $open
+            ->filter(function (CourseOffering $offering) use ($courseIdsInPrograms) {
+                $course = $offering->course;
+                if ($course === null) {
+                    return false;
+                }
+
+                return $course->is_standalone || $courseIdsInPrograms->contains($course->id);
+            })
+            ->values();
+    }
 }

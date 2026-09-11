@@ -85,7 +85,7 @@ Use these in this order. Each row is a **persona**, not just a login.
 | `student10@spims.test` | Christine Wahba | **ar** | DEG-BTH Submitted | none | Second Arabic applicant |
 | `student11@spims.test` | Lydia Newcomer | en | **none** | none | Brand-new student: empty dashboard, no application, no enrollments |
 
-Progress percents on enrollments are still hard-coded in the seeder. They do not reflect completed lessons. Every seeded application (including drafts and student1’s withdrawn CERT-BIB row) has dummy answers for the required “Why do you want to join?” and “Parish name” fields.
+Progress percents on enrollments are still hard-coded in the seeder. They do not reflect completed lessons. Every seeded application (including drafts and student1’s withdrawn CERT-BIB row) has dummy answers for every required field: “Why do you want to join?”, “Parish name”, “Date of birth”, and “Preferred track”.
 
 ---
 
@@ -106,7 +106,7 @@ After `migrate:fresh --seed` with `SEED_DEMO_DATA=true` (approximate; Phase D co
 | Assessment attempts | 1+ | student1 submitted + graded on “TH101 Week 1 check” |
 | Assignments / submissions | 1 / 2 | TH101 Week 1 reflection; student1 graded, student6 pending review |
 | Gradebook components | 2 | Exam + Attendance on TH101 (grades submitted then **locked**) |
-| Application forms | 4 | “Why join?” + “Parish name” |
+| Application forms | 4 | Why join, Parish name, Date of birth, Preferred track |
 | Application field values | 22+ | dummy answers on every required field for every seeded application |
 | Applications | 10+ | All statuses including Withdrawn |
 | Student programs | 4 | The four Accepted students |
@@ -161,7 +161,7 @@ Do this on **https://demo.spims-edu.com** after a fresh seed (or local/`staging`
 
 1. **Public catalog** (logged out) → `/catalog`.
 2. **Student** `student1@spims.test` → `/learn/{TH101}` (Week 1 lessons + reflection assignment), `/announcements`, `/finance` (open invoices + EGP wallet), `/attendance` (Present on Week 1), `/live-quiz/join` with the Lobby join code from teach, `/events`. Show the graded quiz attempt and assignment score on the grades surface.
-3. **Admin** `adm@spims.test` → `/admin/applications`. Every queued application has dummy “Why join?” / “Parish name” answers. `/admin/events` for Orientation Day. Optionally log in as `student11@spims.test` to show a brand-new student (empty dashboard, no application).
+3. **Admin** `adm@spims.test` → `/admin/applications`. Every queued application has dummy answers for all required fields. `/admin/events` for Orientation Day. Optionally log in as `student11@spims.test` to show a brand-new student (empty dashboard, no application).
 4. **Academic** `aca@spims.test` → `/admin/programs` → DIP-THEO. `/admin/offerings` → Fall vs Spring Draft. Gradebook for TH101 shows **locked** grades. `/admin/email-templates`, `/admin/assessment-templates`.
 5. **Instructor** `ins1@spims.test` → `/teach/{TH101}` (content, roster, announcements, live-quiz Lobby). Assignment queue has student6 pending; student1 already graded. Also `/teach/{BI102}` has Week 1 content. Attendance at `/teach/{TH101}/attendance`.
 6. **Instructor (ar)** `ins2@spims.test` → `/teach/{LI101}` Week 1 lessons (Arabic UI).

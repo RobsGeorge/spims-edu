@@ -22,7 +22,11 @@
 </x-card>
 
 @if($applications->isEmpty())
-    <x-empty-state :title="__('admissions.no_applications')" />
+    <x-empty-state :title="__('admissions.no_applications')" :message="__('admissions.no_applications_help')">
+        <x-slot:actions>
+            <a href="{{ route('catalog.index') }}" class="btn btn-primary">{{ __('learning.browse_catalog') }}</a>
+        </x-slot:actions>
+    </x-empty-state>
 @else
     <x-card variant="panel">
         <div class="table-responsive spims-table-wrap">
@@ -39,27 +43,37 @@
                     <tr>
                         <td>{{ $application->program->code }}</td>
                         <td>
-                            <x-status-badge :status="$application->status->badgeTone()" :label="$application->status->value" />
+                            <x-status-badge :status="$application->status->badgeTone()" :label="$application->status->label()" />
                         </td>
                         <td class="text-end">
-                            @if($application->status->isWithdrawable())
-                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#withdraw-{{ $application->id }}">
-                                    {{ __('admissions.withdraw') }}
-                                </button>
-                                <form method="POST" action="{{ route('applications.withdraw', $application) }}" id="withdraw-form-{{ $application->id }}">
-                                    @csrf
-                                </form>
-                                <x-confirm-dialog
-                                    id="withdraw-{{ $application->id }}"
-                                    :title="__('admissions.withdraw_confirm_title')"
-                                    :message="__('admissions.withdraw_confirm_body')"
-                                    tone="danger"
-                                >
-                                    <x-slot:confirm>
-                                        <button type="submit" form="withdraw-form-{{ $application->id }}" class="btn btn-danger">{{ __('admissions.withdraw') }}</button>
-                                    </x-slot:confirm>
-                                </x-confirm-dialog>
-                            @endif
+                            <div class="d-flex flex-wrap gap-2 justify-content-end">
+                                <a href="{{ route('applications.show', $application) }}" class="btn btn-sm btn-outline-primary">
+                                    {{ __('admissions.view_application') }}
+                                </a>
+                                @if($application->status === \App\Enums\ApplicationStatus::Accepted)
+                                    <a href="{{ route('enrollments.index') }}" class="btn btn-sm btn-primary">
+                                        {{ __('enrollment.enroll_now') }}
+                                    </a>
+                                @endif
+                                @if($application->status->isWithdrawable())
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#withdraw-{{ $application->id }}">
+                                        {{ __('admissions.withdraw') }}
+                                    </button>
+                                    <form method="POST" action="{{ route('applications.withdraw', $application) }}" id="withdraw-form-{{ $application->id }}">
+                                        @csrf
+                                    </form>
+                                    <x-confirm-dialog
+                                        id="withdraw-{{ $application->id }}"
+                                        :title="__('admissions.withdraw_confirm_title')"
+                                        :message="__('admissions.withdraw_confirm_body')"
+                                        tone="danger"
+                                    >
+                                        <x-slot:confirm>
+                                            <button type="submit" form="withdraw-form-{{ $application->id }}" class="btn btn-danger">{{ __('admissions.withdraw') }}</button>
+                                        </x-slot:confirm>
+                                    </x-confirm-dialog>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @endforeach

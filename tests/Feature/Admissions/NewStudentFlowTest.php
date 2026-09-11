@@ -20,6 +20,7 @@ use App\Models\Enrollment;
 use App\Models\GradingScheme;
 use App\Models\Program;
 use App\Models\ProgramCourse;
+use App\Models\Notification;
 use App\Models\StudentProgram;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -208,19 +209,25 @@ class NewStudentFlowTest extends TestCase
         $this->actingAs($student)->get(route('dashboard'))
             ->assertOk()
             ->assertSee(__('learning.my_courses_empty'))
+            ->assertSee(__('learning.apply_to_study'))
             ->assertSee(__('learning.browse_catalog'))
             ->assertSee(__('learning.next_live_empty'))
             ->assertSee(__('learning.due_empty'))
-            ->assertSee(__('learning.notifications_empty'));
+            ->assertSee(__('learning.notifications_empty'))
+            ->assertSee(__('ui.nav_my_applications'))
+            ->assertSee(__('ui.nav_enrollments'));
 
         $this->actingAs($student)->get(route('applications.index'))
             ->assertOk()
-            ->assertSee(__('admissions.no_applications'));
+            ->assertSee(__('admissions.no_applications'))
+            ->assertSee(__('admissions.no_applications_help'));
 
         $this->actingAs($student)->get(route('enrollments.index'))
             ->assertOk()
             ->assertSee(__('enrollment.no_enrollments'))
-            ->assertSee(__('enrollment.no_programs'));
+            ->assertSee(__('enrollment.no_programs'))
+            ->assertSee(__('enrollment.apply_first'))
+            ->assertDontSee('name="offering_id"', false);
 
         $this->actingAs($student)->get(route('finance.index'))
             ->assertOk()
@@ -292,7 +299,8 @@ class NewStudentFlowTest extends TestCase
             'answers' => $payload['answers'],
             'files' => $payload['files'],
             'submit' => '0',
-        ])->assertRedirect(route('applications.index'));
+        ])->assertRedirect(route('applications.show', $application))
+            ->assertSessionHas('status', __('admissions.application_saved'));
 
         $application->refresh();
         $this->assertSame(ApplicationStatus::Draft, $application->status);
@@ -301,15 +309,45 @@ class NewStudentFlowTest extends TestCase
             $application->values()->count()
         );
 
+        $this->actingAs($student)->get(route('applications.show', $application))
+            ->assertOk()
+            ->assertSee(__('admissions.continue_draft'))
+            ->assertSee('Lydia Newcomer');
+
         $this->actingAs($student)->post(route('applications.store', $application), [
             'answers' => $payload['answers'],
             'files' => $payload['files'],
             'submit' => '1',
-        ])->assertRedirect(route('applications.index'));
+        ])->assertRedirect(route('applications.show', $application))
+            ->assertSessionHas('status', __('admissions.application_submitted'));
 
         $application->refresh();
         $this->assertSame(ApplicationStatus::UnderReview, $application->status);
         $this->assertSame($fixture['adm']->id, $application->reviewer_id);
+
+        $this->actingAs($student)->get(route('applications.show', $application))
+            ->assertOk()
+            ->assertSee(__('admissions.waiting_review'))
+            ->assertDontSee(__('admissions.submit'));
+
+        $this->actingAs($student)->get(route('applications.create', $fixture['form']))
+            ->assertRedirect(route('applications.show', $application));
+
+        $this->actingAs($student)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee(__('dashboard.admissions_cue_review'));
+
+        $this->assertTrue(
+            Notification::query()
+                ->where('user_id', $student->id)
+                ->where('type', 'admissions.submitted')
+                ->exists()
+        );
+
+        $this->actingAs($student)->get(route('enrollments.index'))
+            ->assertOk()
+            ->assertSee('ORIENT1')
+            ->assertDontSee('THEO101');
 
         $this->actingAs($student)->post(route('enrollments.store'), [
             'offering_id' => $fixture['programOffering']->id,
@@ -323,12 +361,33 @@ class NewStudentFlowTest extends TestCase
         ])->assertRedirect();
 
         $this->assertSame(ApplicationStatus::Accepted, $application->fresh()->status);
+        $this->assertTrue(
+            Notification::query()
+                ->where('user_id', $student->id)
+                ->where('type', 'admissions.decided')
+                ->exists()
+        );
         $studentProgram = StudentProgram::query()
             ->where('student_id', $student->id)
             ->where('program_id', $fixture['program']->id)
             ->first();
         $this->assertNotNull($studentProgram);
         $this->assertSame(StudentProgramStatus::Active, $studentProgram->status);
+
+        $this->actingAs($student)->get(route('applications.show', $application))
+            ->assertOk()
+            ->assertSee(__('admissions.accepted_enroll_cue'))
+            ->assertSee(__('enrollment.enroll_now'));
+
+        $this->actingAs($student)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee(__('dashboard.admissions_cue_accepted'))
+            ->assertSee(__('enrollment.enroll_now'));
+
+        $this->actingAs($student)->get(route('enrollments.index'))
+            ->assertOk()
+            ->assertSee('THEO101')
+            ->assertSee('ORIENT1');
 
         $this->actingAs($student)->post(route('enrollments.store'), [
             'offering_id' => $fixture['programOffering']->id,
@@ -350,7 +409,8 @@ class NewStudentFlowTest extends TestCase
         $this->actingAs($student)->get(route('applications.index'))
             ->assertOk()
             ->assertSee('NEW-DIP')
-            ->assertSee(ApplicationStatus::Accepted->value);
+            ->assertSee(ApplicationStatus::Accepted->label())
+            ->assertSee(__('enrollment.enroll_now'));
 
         $this->actingAs($student)->get(route('enrollments.index'))
             ->assertOk()
@@ -455,5 +515,102 @@ class NewStudentFlowTest extends TestCase
             $form->fields()->where('required', true)->count(),
             $application->values()->count()
         );
+        $this->assertTrue(
+            Notification::query()
+                ->where('user_id', $student->id)
+                ->where('type', 'admissions.submitted')
+                ->exists()
+        );
+    }
+
+    #[Test]
+    public function new_student_can_save_a_partial_draft_then_must_complete_required_fields_to_submit(): void
+    {
+        $fixture = $this->seedCatalogAndForm();
+        $student = User::factory()->withRole(RoleType::Student)->create([
+            'first_name' => 'Lydia',
+            'last_name' => 'Newcomer',
+        ]);
+
+        $this->actingAs($student)->get(route('applications.create', $fixture['form']))
+            ->assertOk()
+            ->assertSee('name="submit" value="0"', false)
+            ->assertSee('formnovalidate', false)
+            ->assertSee('<select', false);
+
+        $application = Application::query()->where('applicant_id', $student->id)->firstOrFail();
+        $nameFieldId = $fixture['form']->fields()->where('label', 'Full name')->value('id');
+
+        $this->actingAs($student)->post(route('applications.store', $application), [
+            'answers' => [$nameFieldId => 'Lydia Newcomer'],
+            'submit' => '0',
+        ])->assertRedirect(route('applications.show', $application))
+            ->assertSessionHas('status', __('admissions.application_saved'));
+
+        $this->assertSame(ApplicationStatus::Draft, $application->fresh()->status);
+        $this->assertSame(1, $application->values()->count());
+
+        $this->actingAs($student)->post(route('applications.store', $application), [
+            'answers' => [$nameFieldId => 'Lydia Newcomer'],
+            'submit' => '1',
+        ])->assertSessionHasErrors();
+
+        $this->assertSame(ApplicationStatus::Draft, $application->fresh()->status);
+    }
+
+    #[Test]
+    public function other_student_cannot_view_someone_elses_application(): void
+    {
+        $fixture = $this->seedCatalogAndForm();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+        $other = User::factory()->withRole(RoleType::Student)->create();
+
+        $this->actingAs($student)->get(route('applications.create', $fixture['form']))->assertOk();
+        $application = Application::query()->where('applicant_id', $student->id)->firstOrFail();
+
+        $this->actingAs($other)->get(route('applications.show', $application))->assertForbidden();
+    }
+
+    #[Test]
+    public function catalog_apply_names_the_program(): void
+    {
+        $fixture = $this->seedCatalogAndForm();
+        $student = User::factory()->withRole(RoleType::Student)->create();
+
+        $this->actingAs($student)
+            ->get(route('catalog.index'))
+            ->assertOk()
+            ->assertSee(__('catalog.apply_to', ['program' => 'NEW-DIP']));
+    }
+
+    #[Test]
+    public function new_student_flow_copy_exists_in_all_locales(): void
+    {
+        $keys = [
+            'admissions.application_submitted',
+            'admissions.waiting_review',
+            'admissions.accepted_enroll_cue',
+            'admissions.continue_draft',
+            'admissions.view_application',
+            'admissions.notify_submitted_title',
+            'admissions.notify_decided_body',
+            'admissions.select_placeholder',
+            'catalog.apply_to',
+            'enrollment.apply_first',
+            'enrollment.enroll_now',
+            'learning.apply_to_study',
+            'dashboard.admissions_cue_review',
+            'dashboard.admissions_cue_accepted',
+        ];
+
+        foreach (['en', 'ar', 'fr'] as $locale) {
+            foreach ($keys as $key) {
+                $this->assertNotSame(
+                    $key,
+                    __($key, ['program' => 'NEW-DIP', 'status' => 'Accepted'], $locale),
+                    "Missing {$key} in {$locale}"
+                );
+            }
+        }
     }
 }
