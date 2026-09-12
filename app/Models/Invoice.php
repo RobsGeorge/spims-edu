@@ -21,6 +21,7 @@ class Invoice extends Model
         'total_minor',
         'status',
         'due_date',
+        'source_system',
     ];
 
     protected $casts = [

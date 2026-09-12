@@ -16,7 +16,7 @@ Sources of truth, in the order the runtime consults them:
 Product intent: `docs/spims-spec-summary.md` §Roles. This file is the mechanical companion —
 every key, every level, every scope caveat.
 
-**Counts as shipped:** 127 permission keys · 45 offering-scoped · 12 Super-Admin-only (empty role map).
+**Counts as shipped:** 130 permission keys · 46 offering-scoped · 11 Super-Admin-only (empty role map).
 
 ---
 
@@ -315,6 +315,7 @@ Groups follow the Roles Hub grouping (`RolePermissionService::groupedPermissionK
 |---|---|:--:|:--:|:--:|:--:|:--:|:--:|
 | `finance.donate` | Self | `O` | `O` | `O` | `O` | `O` | `O` |
 | `finance.invoices` | School | `R` | – | `F` | – | – | – |
+| `finance.manage` | School | – | – | `F` | – | – | – |
 | `finance.manual` | School | – | – | `F` | – | – | – |
 | `finance.pay` | Self | – | – | – | – | – | `O` |
 | `finance.refunds` | School | – | – | `F` | – | – | – |
@@ -340,6 +341,11 @@ None of these keys are offering-scoped; a batch is school-wide by nature.
 | `import.rollback` | School | `F` | – | – | – | – | – |
 | `import.activate` | School | `F` | – | – | – | – | – |
 | `import.merge_resolve` | School | `F` | – | – | – | – | – |
+
+An `ACTIVE`-population `STUDENT` batch additionally requires `users.manage` on commit; a
+`BALANCE`-entity batch additionally requires `finance.manage` on commit — so a registrar
+holding only `import.commit` can stage and validate a balances file but cannot itself commit
+money. See docs/legacy-data-import-plan.md §12 and §8.
 
 ### Gradebook (`gradebook.*`)
 
