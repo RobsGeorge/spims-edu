@@ -58,4 +58,9 @@ return [
     'legacy_gpa_line' => 'GPA :gpa / :scale as recorded by :source, as of :date',
     'legacy_gpa_scope_PROGRAM' => 'program GPA',
     'legacy_gpa_scope_CUMULATIVE' => 'cumulative GPA',
+
+    // L8 — legacy credentials, docs/legacy-data-import-plan.md §22.1
+    'legacy_no_reissue' => 'This is a historical record imported from a previous system. It cannot be regenerated under a new SPIMS serial — the original document is the record of issuance, not this system.',
+    'historical_valid' => 'Historical record — not eligible for reissue',
+    'historical_note' => 'Imported from :source. This credential was not issued by SPIMS; it represents a record from the school\'s previous system, kept for verification only.',
 ];

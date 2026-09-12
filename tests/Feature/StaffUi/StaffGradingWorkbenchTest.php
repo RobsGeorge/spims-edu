@@ -15,8 +15,8 @@ use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\User;
 use App\Models\Week;
-use App\Services\Assessment\AssignmentService;
 use App\Services\Ai\AiClient;
+use App\Services\Assessment\AssignmentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -37,47 +37,47 @@ class StaffGradingWorkbenchTest extends TestCase
         $this->seed(\Database\Seeders\SettingsSeeder::class);
 
         $instructor = User::factory()->withRole(RoleType::Instructor)->create();
-        $student    = User::factory()->withRole(RoleType::Student)->create();
+        $student = User::factory()->withRole(RoleType::Student)->create();
 
         $course = Course::query()->create([
-            'code'          => $code,
-            'title'         => 'Workbench Test',
-            'credit_hours'  => 3,
+            'code' => $code,
+            'title' => 'Workbench Test',
+            'credit_hours' => 3,
             'is_standalone' => true,
-            'active'        => true,
+            'active' => true,
         ]);
         $offering = CourseOffering::query()->create([
             'course_id' => $course->id,
-            'mode'      => OfferingMode::SelfPaced,
-            'status'    => 'OPEN',
+            'mode' => OfferingMode::SelfPaced,
+            'status' => 'OPEN',
         ]);
         $this->staffOffering($instructor, $offering);
         Enrollment::query()->create([
-            'student_id'  => $student->id,
+            'student_id' => $student->id,
             'offering_id' => $offering->id,
-            'status'      => EnrollmentStatus::Enrolled,
+            'status' => EnrollmentStatus::Enrolled,
             'enrolled_at' => now(),
         ]);
 
         $week = Week::query()->create([
             'offering_id' => $offering->id,
-            'number'      => 1,
-            'title'       => 'Week 1',
-            'order'       => 1,
+            'number' => 1,
+            'title' => 'Week 1',
+            'order' => 1,
         ]);
         $item = ContentItem::query()->create([
             'week_id' => $week->id,
-            'type'    => ContentItemType::Assignment,
-            'title'   => 'Essay',
-            'order'   => 1,
+            'type' => ContentItemType::Assignment,
+            'title' => 'Essay',
+            'order' => 1,
         ]);
         $assignment = Assignment::query()->create([
             'content_item_id' => $item->id,
-            'instructions'    => 'Write an essay.',
+            'instructions' => 'Write an essay.',
             'allowed_file_types' => ['pdf'],
-            'max_points'      => 100,
+            'max_points' => 100,
         ]);
-        $service    = app(AssignmentService::class);
+        $service = app(AssignmentService::class);
         $submission = $service->submit($student, $assignment, textBody: 'This is my essay.');
 
         return compact('instructor', 'student', 'offering', 'assignment', 'submission');
@@ -100,7 +100,7 @@ class StaffGradingWorkbenchTest extends TestCase
                 $bundle['submission'],
             ]), [
                 'raw_score' => 88,
-                'feedback'  => 'Well done.',
+                'feedback' => 'Well done.',
             ])
             ->assertRedirect();
 
@@ -121,7 +121,7 @@ class StaffGradingWorkbenchTest extends TestCase
     #[Test]
     public function submission_view_shows_all_versions(): void
     {
-        $bundle  = $this->makeBundle('WB13B');
+        $bundle = $this->makeBundle('WB13B');
         $service = app(AssignmentService::class);
 
         // First version is already submitted. Now allow and do a resubmission.
@@ -213,16 +213,26 @@ class StaffGradingWorkbenchTest extends TestCase
         $bundle = $this->makeBundle('WB13F');
 
         // Mock the AiClient to return a deterministic suggestion
-        $this->instance(AiClient::class, new class implements AiClient {
-            public function translate(string $text, string $source, string $target): ?string { return null; }
+        $this->instance(AiClient::class, new class implements AiClient
+        {
+            public function translate(string $text, string $source, string $target): ?string
+            {
+                return null;
+            }
+
             public function suggestEssayScore(string $prompt): ?array
             {
                 return ['score' => 75.0, 'rationale' => 'Good attempt.'];
             }
+
+            public function suggestFieldMapping(array $schema): ?array
+            {
+                return null;
+            }
         });
 
         $auditCountBefore = AuditLog::query()->count();
-        $scoreBefore      = $bundle['submission']->raw_score;
+        $scoreBefore = $bundle['submission']->raw_score;
 
         $this->actingAs($bundle['instructor'])
             ->postJson(route('teach.assignments.submissions.ai-suggest', [
@@ -250,11 +260,21 @@ class StaffGradingWorkbenchTest extends TestCase
     {
         $bundle = $this->makeBundle('WB13G');
 
-        $this->instance(AiClient::class, new class implements AiClient {
-            public function translate(string $text, string $source, string $target): ?string { return null; }
+        $this->instance(AiClient::class, new class implements AiClient
+        {
+            public function translate(string $text, string $source, string $target): ?string
+            {
+                return null;
+            }
+
             public function suggestEssayScore(string $prompt): ?array
             {
                 return ['score' => 60.0, 'rationale' => 'Decent essay.'];
+            }
+
+            public function suggestFieldMapping(array $schema): ?array
+            {
+                return null;
             }
         });
 
@@ -292,11 +312,21 @@ class StaffGradingWorkbenchTest extends TestCase
     {
         $bundle = $this->makeBundle('WB13I');
 
-        $this->instance(AiClient::class, new class implements AiClient {
-            public function translate(string $text, string $source, string $target): ?string { return null; }
+        $this->instance(AiClient::class, new class implements AiClient
+        {
+            public function translate(string $text, string $source, string $target): ?string
+            {
+                return null;
+            }
+
             public function suggestEssayScore(string $prompt): ?array
             {
                 return ['score' => 50.0, 'rationale' => 'Average.'];
+            }
+
+            public function suggestFieldMapping(array $schema): ?array
+            {
+                return null;
             }
         });
 
@@ -317,7 +347,7 @@ class StaffGradingWorkbenchTest extends TestCase
                 $bundle['submission'],
             ]), [
                 'raw_score' => 92,
-                'feedback'  => 'Actually excellent.',
+                'feedback' => 'Actually excellent.',
             ])
             ->assertRedirect();
 

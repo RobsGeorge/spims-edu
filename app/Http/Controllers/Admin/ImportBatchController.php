@@ -10,9 +10,11 @@ use App\Models\ImportBatch;
 use App\Models\ImportMappingProfile;
 use App\Models\ImportRow;
 use App\Models\ImportSource;
+use App\Services\Import\ImportAiMappingSuggester;
 use App\Services\Import\ImportBalanceFields;
 use App\Services\Import\ImportBatchService;
 use App\Services\Import\ImportCourseResultFields;
+use App\Services\Import\ImportCredentialFields;
 use App\Services\Import\ImportStudentFields;
 use App\Services\Import\ImportTransformService;
 use App\Support\AuthorizeService;
@@ -148,6 +150,10 @@ class ImportBatchController extends Controller
                 'fields' => ImportBalanceFields::catalog(),
                 'required' => ImportBalanceFields::requiredFor($batch->population),
             ],
+            ImportEntityType::Credential => [
+                'fields' => ImportCredentialFields::catalog(),
+                'required' => ImportCredentialFields::requiredFor($batch->population),
+            ],
             default => throw new \RuntimeException("No field catalog registered for import entity type {$batch->entity_type->value}."),
         };
     }
@@ -169,6 +175,10 @@ class ImportBatchController extends Controller
                 ->get(),
             'missingFields' => $this->missingRequiredFields($mapping, $batch),
             'unresolved' => collect($mapping)->contains(fn ($m) => empty($m['target_field']) && empty($m['ignored'])),
+            // L8, Part B — gates the "AI suggest" affordance itself (§22.3); the
+            // aiSuggest() action re-checks this independently so a stale page can
+            // never trigger a call the setting no longer allows.
+            'aiEnabled' => (bool) config('import.ai_mapping_enabled'),
         ]);
     }
 
@@ -183,12 +193,13 @@ class ImportBatchController extends Controller
         ]);
 
         $validTargets = array_keys($this->fieldCatalogFor($batch)['fields']);
-        $previousConfidence = collect($batch->mapping ?? [])->keyBy('column')->map(fn ($m) => $m['confidence'] ?? 'None');
+        $previous = collect($batch->mapping ?? [])->keyBy('column');
 
         $mapping = [];
         foreach ($data['columns'] as $i => $column) {
             $target = $data['target_field'][$i] ?? '';
             $ignored = in_array((string) $i, $data['ignored'] ?? [], true) || in_array($i, $data['ignored'] ?? [], true);
+            $prior = $previous->get($column, []);
 
             $mapping[] = [
                 'column' => $column,
@@ -196,7 +207,12 @@ class ImportBatchController extends Controller
                 'transform' => $data['transform'][$i] ?? 'none',
                 'options' => $this->decodeOptions($data['options'][$i] ?? null),
                 'ignored' => $ignored,
-                'confidence' => $previousConfidence->get($column, 'None'),
+                'confidence' => $prior['confidence'] ?? 'None',
+                // L8, Part B — carried forward so a re-save of the mapping form (e.g.
+                // fixing one other column) doesn't erase which suggestions came from
+                // AI vs. a deterministic tier. See §22.3.
+                'origin' => $prior['origin'] ?? null,
+                'rationale' => $prior['rationale'] ?? null,
             ];
         }
 
@@ -230,6 +246,27 @@ class ImportBatchController extends Controller
         $imports->saveAsProfile($batch, $request->user(), $data['name']);
 
         return redirect()->route('admin.imports.map', $batch)->with('status', __('import.profile_saved'));
+    }
+
+    /**
+     * L8, Part B — the "AI suggest" button on the mapping screen. Only ever runs when
+     * the admin explicitly clicks it, and `ImportAiMappingSuggester::fillGaps()` itself
+     * refuses to call the AI client at all unless `import.ai_mapping_enabled` is true
+     * (checked again here so a disabled setting never even reaches the service) —
+     * see docs/legacy-data-import-plan.md §22.3.
+     */
+    public function aiSuggest(ImportBatch $batch, ImportAiMappingSuggester $suggester): RedirectResponse
+    {
+        if (! config('import.ai_mapping_enabled')) {
+            return redirect()->route('admin.imports.map', $batch)->with('error', __('import.ai_disabled'));
+        }
+
+        $catalog = $this->fieldCatalogFor($batch);
+        $updated = $suggester->fillGaps($batch->mapping ?? [], $batch->profile ?? [], $batch->source->code, $catalog['fields']);
+
+        app(ImportBatchService::class)->updateMapping($batch, $updated);
+
+        return redirect()->route('admin.imports.map', $batch)->with('status', __('import.ai_suggestions_applied'));
     }
 
     public function show(ImportBatch $batch): View

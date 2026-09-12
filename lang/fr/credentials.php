@@ -58,4 +58,9 @@ return [
     'legacy_gpa_line' => 'Moyenne :gpa / :scale telle qu\'enregistrée par :source, au :date',
     'legacy_gpa_scope_PROGRAM' => 'moyenne du programme',
     'legacy_gpa_scope_CUMULATIVE' => 'moyenne cumulative',
+
+    // L8 — diplômes historiques, docs/legacy-data-import-plan.md §22.1
+    'legacy_no_reissue' => 'Ceci est un dossier historique importé d\'un système précédent. Il ne peut pas être régénéré sous un nouveau numéro de série SPIMS — le document original est le registre d\'émission, pas ce système.',
+    'historical_valid' => 'Dossier historique — non éligible à une réémission',
+    'historical_note' => 'Importé depuis :source. Ce diplôme n\'a pas été émis par SPIMS ; il représente un dossier de l\'ancien système de l\'école, conservé uniquement à des fins de vérification.',
 ];

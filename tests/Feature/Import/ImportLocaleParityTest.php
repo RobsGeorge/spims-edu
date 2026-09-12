@@ -88,12 +88,14 @@ class ImportLocaleParityTest extends TestCase
             'E_DUPLICATE_NATURAL_KEY',
             'W_NO_EMAIL_ALUMNUS',
             'W_UNKNOWN_PROGRAM_CODE',
+            'E_UNKNOWN_CREDENTIAL_TYPE',
+            'E_DUPLICATE_SERIAL',
         ];
 
         foreach (['ar', 'en', 'fr'] as $locale) {
             app()->setLocale($locale);
             foreach ($codes as $code) {
-                $translated = __('import.error_code.'.$code, ['field' => 'x', 'column' => 'x', 'value' => 'x', 'legacy_id' => 'x', 'program_code' => 'x']);
+                $translated = __('import.error_code.'.$code, ['field' => 'x', 'column' => 'x', 'value' => 'x', 'legacy_id' => 'x', 'program_code' => 'x', 'credential_type' => 'x', 'serial' => 'x']);
                 $this->assertNotSame('import.error_code.'.$code, $translated, "Missing translation for {$code} in {$locale}");
             }
         }

@@ -90,6 +90,12 @@
                 </x-card>
             </div>
 
+            <div class="col-12" x-show="entityType === 'CREDENTIAL'">
+                <x-card variant="quiet">
+                    <p class="small spims-text-dim mb-0">{{ __('import.credential_help') }}</p>
+                </x-card>
+            </div>
+
             <div class="col-12" x-show="entityType === 'BALANCE'">
                 <x-card variant="quiet">
                     <h2 class="h6 page-title mb-2">{{ __('import.balance_totals_title') }}</h2>
