@@ -41,6 +41,7 @@ class User extends Authenticatable
         'last_reviewed_at',
         'date_of_birth',
         'source_system',
+        'student_number',
     ];
 
     protected $hidden = [
@@ -93,6 +94,16 @@ class User extends Authenticatable
     public function identitySessions(): HasMany
     {
         return $this->hasMany(Session::class);
+    }
+
+    /**
+     * L5 — the account-claim invitation cohort for currently-studying legacy
+     * students. Null for every native (non-imported) user. See
+     * docs/legacy-data-import-plan.md §9.
+     */
+    public function importAccountClaim(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ImportAccountClaim::class);
     }
 
     public function hasRole(RoleType $role): bool

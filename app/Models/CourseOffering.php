@@ -29,6 +29,8 @@ class CourseOffering extends Model
         'start_date',
         'end_date',
         'gradebook_locked_at',
+        'source_system',
+        'legacy_term',
     ];
 
     protected $casts = [

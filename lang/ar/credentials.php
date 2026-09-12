@@ -42,4 +42,20 @@ return [
     'type_standalone_certificate' => 'شهادة مقرر مستقل',
     'type_offering_completion' => 'إتمام العرض',
     'verify_qr' => 'رمز QR',
+
+    // L4 — «الدراسة السابقة» (استيراد البيانات القديمة)
+    'computed_gpa_label' => 'معدل SPIMS المحسوب',
+    'prior_study_title' => 'الدراسة السابقة',
+    'prior_study_lead' => 'مقررات ودرجات منقولة من نظام سابق. مفصولة عن سجل SPIMS أعلاه — لا شيء منها يُغيّر معدلك المحسوب ما لم يُرقِّ المسجِّل سجلاً معيناً.',
+    'prior_study_empty' => 'لا توجد دراسة سابقة مسجّلة.',
+    'col_recorded_source' => 'المصدر',
+    'col_counts_gpa' => 'يُحتسب ضمن المعدل',
+    'counts_gpa_yes' => 'نعم',
+    'counts_gpa_no' => 'لا',
+    'promote_button' => 'ترقية إلى ساعات معتمدة منقولة',
+    'promote_confirm' => 'سيجعل هذا السجل الواحد يُحتسب ضمن معدل SPIMS المحسوب، ويُعاد الحساب فوراً. هل تريد المتابعة؟',
+    'prior_study_promoted' => 'تمت ترقية السجل — أُعيد حساب المعدل.',
+    'legacy_gpa_line' => 'معدل :gpa من :scale كما سجّله :source، بتاريخ :date',
+    'legacy_gpa_scope_PROGRAM' => 'معدل البرنامج',
+    'legacy_gpa_scope_CUMULATIVE' => 'المعدل التراكمي',
 ];

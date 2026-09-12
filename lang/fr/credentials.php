@@ -42,4 +42,20 @@ return [
     'type_standalone_certificate' => 'Certificat autonome',
     'type_offering_completion' => 'Achèvement de l’offre',
     'verify_qr' => 'QR',
+
+    // L4 — « Études antérieures » (import de données historiques)
+    'computed_gpa_label' => 'Moyenne SPIMS calculée',
+    'prior_study_title' => 'Études antérieures',
+    'prior_study_lead' => 'Cours et notes reportés d\'un système précédent. Séparés de votre dossier SPIMS ci-dessus — rien ici ne modifie votre moyenne calculée, sauf si un responsable a promu un dossier en particulier.',
+    'prior_study_empty' => 'Aucune étude antérieure enregistrée.',
+    'col_recorded_source' => 'Source',
+    'col_counts_gpa' => 'Compte dans la moyenne',
+    'counts_gpa_yes' => 'Oui',
+    'counts_gpa_no' => 'Non',
+    'promote_button' => 'Promouvoir en crédit de transfert',
+    'promote_confirm' => 'Ceci fera compter ce seul dossier dans la moyenne SPIMS calculée, recalculée immédiatement. Continuer ?',
+    'prior_study_promoted' => 'Dossier promu — la moyenne a été recalculée.',
+    'legacy_gpa_line' => 'Moyenne :gpa / :scale telle qu\'enregistrée par :source, au :date',
+    'legacy_gpa_scope_PROGRAM' => 'moyenne du programme',
+    'legacy_gpa_scope_CUMULATIVE' => 'moyenne cumulative',
 ];

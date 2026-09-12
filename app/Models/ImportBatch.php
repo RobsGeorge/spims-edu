@@ -80,6 +80,15 @@ class ImportBatch extends Model
         return $this->hasMany(ImportRow::class, 'batch_id');
     }
 
+    /**
+     * L5 — the account-claim invitation rows queued when this batch committed.
+     * See docs/legacy-data-import-plan.md §9.
+     */
+    public function accountClaims(): HasMany
+    {
+        return $this->hasMany(ImportAccountClaim::class, 'batch_id');
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by_id');

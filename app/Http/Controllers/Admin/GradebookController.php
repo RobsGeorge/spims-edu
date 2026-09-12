@@ -24,6 +24,11 @@ class GradebookController extends Controller
 {
     public function show(CourseOffering $offering, GradebookService $gradebook): View
     {
+        // A shadow offering (source_system set) has no weeks, content, or gradebook
+        // components by construction and must never surface in the live gradebook UI —
+        // see docs/legacy-data-import-plan.md §4.2 and ImportCatalogIsolationTest.
+        abort_if($offering->source_system !== null, 404);
+
         $grid = $gradebook->gridForOffering($offering);
 
         return view('admin.gradebook.show', [
@@ -38,6 +43,8 @@ class GradebookController extends Controller
 
     public function export(Request $request, CourseOffering $offering, GradebookService $gradebook): Response
     {
+        abort_if($offering->source_system !== null, 404);
+
         $csv = $gradebook->exportCsv($request->user(), $offering);
 
         return response($csv, 200, [

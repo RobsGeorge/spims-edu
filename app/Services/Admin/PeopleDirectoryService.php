@@ -5,6 +5,7 @@ namespace App\Services\Admin;
 use App\Enums\InvoiceStatus;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Services\Credentials\CredentialService;
 use App\Support\AuthorizeService;
 use App\Support\Money;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -14,6 +15,7 @@ class PeopleDirectoryService
 {
     public function __construct(
         private readonly AuthorizeService $authorize,
+        private readonly CredentialService $credentials,
     ) {}
 
     /**
@@ -86,6 +88,10 @@ class PeopleDirectoryService
             ->latest('created_at')
             ->first();
 
+        // L4 — the staff "Prior study" surface, docs/legacy-data-import-plan.md §7,
+        // §11.12. Reuses the same data the student's own transcript renders.
+        $transcript = $this->credentials->transcriptData($target);
+
         return [
             'enrollments' => $enrollments,
             'invoices' => $invoices,
@@ -94,6 +100,10 @@ class PeopleDirectoryService
             'lastLogin' => $lastLogin,
             'identitySessions' => $target->identitySessions()->orderByDesc('created_at')->get(),
             'studentPrograms' => $target->studentPrograms,
+            'priorStudy' => $transcript['prior_study'],
+            'legacySummaries' => $transcript['legacy_summaries'],
+            'computedGpa' => $transcript['gpa'],
+            'canPromote' => $this->authorize->allows($actor, 'import.commit'),
         ];
     }
 

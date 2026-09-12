@@ -32,6 +32,7 @@ class Enrollment extends Model
         'grade_locked_by_id',
         'grade_locked_at',
         'progress_percent',
+        'source_system',
     ];
 
     protected $casts = [

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
+use App\Models\LegacyAcademicSummary;
 use App\Models\ProgramCourse;
 use App\Models\StudentProgram;
 use App\Services\Enrollment\AdvisingService;
@@ -98,11 +99,22 @@ class EnrollmentController extends Controller
             ->get()
             ->filter(fn (ProgramCourse $pc) => ! in_array($pc->course->code, $metCodes, true));
 
+        // L4 — the attested legacy PROGRAM-scope GPA, rendered beside the audit,
+        // never merged into it. See docs/legacy-data-import-plan.md §7, §11.12.
+        $legacySummary = LegacyAcademicSummary::query()
+            ->where('student_id', $studentProgram->student_id)
+            ->where('scope', 'PROGRAM')
+            ->where(fn ($q) => $q->where('student_program_id', $studentProgram->id)
+                ->orWhere('program_id', $studentProgram->program_id))
+            ->with('source')
+            ->first();
+
         return view('enrollments.audit', [
             'audit' => $result,
             'studentProgram' => $studentProgram,
             'remainingCourses' => $remainingCourses,
             'selectedHypothetical' => $hypothetical,
+            'legacySummary' => $legacySummary,
         ]);
     }
 }

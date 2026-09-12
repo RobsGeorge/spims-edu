@@ -23,6 +23,8 @@ class AcademicRecord extends Model
         'term',
         'is_passing',
         'completed_at',
+        'source_system',
+        'counts_toward_gpa',
     ];
 
     protected $casts = [
@@ -31,6 +33,7 @@ class AcademicRecord extends Model
         'credit_hours' => 'integer',
         'is_passing' => 'boolean',
         'completed_at' => 'datetime',
+        'counts_toward_gpa' => 'boolean',
     ];
 
     public function student(): BelongsTo

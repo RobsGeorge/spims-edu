@@ -5,6 +5,11 @@
 @section('content')
 <x-page-header :title="__('import.title')" :subtitle="__('import.subtitle')">
     <x-slot:actions>
+        @if(app(\App\Support\AuthorizeService::class)->allows(auth()->user(), 'import.activate'))
+            <a href="{{ route('admin.imports.activation') }}" class="btn btn-outline-primary">
+                {{ __('import.activation_title') }}
+            </a>
+        @endif
         <a href="{{ route('admin.imports.sources.index') }}" class="btn btn-outline-primary">
             <x-icon name="settings" size="sm" /> {{ __('import.configure_sources') }}
         </a>
@@ -18,14 +23,23 @@
 @if(session('warning'))<div class="alert alert-warning" role="status">{{ session('warning') }}</div>@endif
 
 <div class="row g-3 mb-4">
-    <div class="col-6 col-lg-4">
+    <div class="col-6 col-lg-3">
         <x-stat :label="__('import.stat_students_imported')" :value="$stats['students_imported']" icon="student" />
     </div>
-    <div class="col-6 col-lg-4">
+    <div class="col-6 col-lg-3">
         <x-stat :label="__('import.stat_pending_batches')" :value="$stats['pending_batches']" />
     </div>
-    <div class="col-6 col-lg-4">
+    <div class="col-6 col-lg-3">
         <x-stat :label="__('import.stat_committed_batches')" :value="$stats['committed_batches']" icon="success" />
+    </div>
+    <div class="col-6 col-lg-3">
+        @if($stats['pending_merges'] > 0)
+            <a href="{{ route('admin.imports.merges') }}" class="text-decoration-none">
+                <x-stat :label="__('import.stat_pending_merges')" :value="$stats['pending_merges']" icon="warning" />
+            </a>
+        @else
+            <x-stat :label="__('import.stat_pending_merges')" :value="$stats['pending_merges']" />
+        @endif
     </div>
 </div>
 

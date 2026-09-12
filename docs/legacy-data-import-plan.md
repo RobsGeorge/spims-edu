@@ -1028,23 +1028,252 @@ Everything below is real, tested, and in production — not aspirational.
 
 ### Not built yet (traces to later phases in §13)
 
-- **L2 — the rest of the identity ladder**: the Canvas `SIS User ID` crosswalk (rung 2), student-
-  number and DOB-triple matching (rungs 4–5), and the human merge-candidate queue (rung 6, screen
-  12). Today, anything that isn't an exact `import_links` hit or an exact email match becomes a new
-  user — safe (never a wrong merge) but not yet smart about the messy cases.
-- **L3 — course results, GPA and the shadow catalog.** No `academic_records`, no
-  `legacy_academic_summaries`, no `counts_toward_gpa` filter on `GradebookService::refreshGpa()`,
-  no shadow `course_offerings`. This release only carries identity and program membership.
-- **L4 — transcript surfacing.** No "Prior study" section yet; there is nothing to show until L3
-  lands.
-- **L5 — account-claim invitations.** Users land `PENDING` correctly, but there is no
-  `import_account_claims` table, no bulk-invite screen, no bounce worklist. An admin must invite
-  each imported student manually today (e.g. `users.reset_password` from the People directory).
-- **L6 — finance.** No `invoices`/`payments` opening-balance import, no control-total money gate.
-- **L7 — mid-term cutover**, **L8 — legacy credentials and AI-assisted mapping.** Untouched; both
-  were always conditional/optional in the phase plan.
+As of §21, every phase through L6 has shipped: L2 (identity ladder + merge queue), L3/L4 (course
+results, GPA isolation, shadow catalog, transcript surfacing), L5 (account-claim invitations) and L6
+(finance opening balances) — see §18, §21, §19 and §20 respectively for their design notes. What
+remains is only what was always conditional/optional in the phase plan:
 
-Recommended next slice: **L3**, because it's what makes this a *transcript* import rather than an
-account import, and because the `counts_toward_gpa` filter is the one change to existing code the
-whole plan hinges on — it should land under the same scrutiny as this PR, proven by the same
-"existing suite passes unmodified" bar.
+- **L7 — mid-term cutover.**
+- **L8 — legacy credentials and AI-assisted mapping.**
+
+Neither is scheduled; both stay here as future options rather than committed next work.
+
+---
+
+## 18. L2 design notes — the rest of the identity ladder and the merge queue
+
+Rungs 2, 4 and 5 and the merge queue (rung 6, screen 12) shipped on top of the L1 foundation in
+§17. This section records the design decisions made while building them, additively — §17 stays
+exactly as it was.
+
+### 18.1 When rung 6 actually fires
+
+A literal reading of §6's ladder table — "anything else... queued" — would send *every* row that
+isn't an exact match to the merge queue, including the ordinary case for a first-time migration: a
+person nobody in SPIMS has any record of at all. That would make the queue the main event for every
+import rather than the exception the plan's own screen mock describes (17 of 1,284 rows, §11.10),
+and it would silently break every L1 test that imports a brand-new alumnus with no prior SPIMS
+counterpart — the existing suite passing unmodified is a hard bar (§16).
+
+The rule actually implemented: a row reaches the merge queue only when there is a genuine reason to
+suspect it might already exist —
+
+- an **escalation**, carried forward from rung 4 or 5 finding *more than one* exact match (an
+  ambiguous student number, or an ambiguous normalised name+DOB triple — e.g. twins); or
+- a **looser signal** found once rungs 1-5 are exhausted with no escalation: an exact
+  normalised-name match with no usable DOB, or PHP `similar_text` name similarity at or above a 60%
+  floor.
+
+A row with no signal at all under either of those — the ordinary case — is created directly, exactly
+as before L2. This is also why two different rows created together in the *same* file must never be
+compared against each other by the looser search: a shared surname between two unrelated siblings on
+one sheet is common, would otherwise flag them as a possible duplicate of each other, and has nothing
+to do with rung 6's actual job (catching a row that might duplicate someone *already in SPIMS*).
+`ImportBatchService::applyRows()` tracks every user id created earlier in the same run and excludes
+it from that row's candidate search.
+
+The "no candidate — create new?" case the plan calls out (`candidate_user_id` null) is real and
+handled gracefully end to end (the merge screen offers only "create new" / "skip" for it, and `merge`
+is refused with a clear error) — it just isn't something the ladder produces on its own from a
+plain, signal-free new row, for the reason above. `ImportIdentityLadderTest` builds it directly by
+validating a batch (never committing it) and inserting the `import_merge_candidates` row itself,
+exercising the resolution paths independently of how such a row would arise in practice (most
+plausibly: a genuine ambiguity elsewhere prompts a registrar to look, and a *different* row in the
+same worklist turns out to have nothing to go on).
+
+### 18.2 The Canvas/SIS crosswalk and commit ordering
+
+Rung 2 looks up `import_links` for `entity_type = 'user'` with the same `legacy_id`, a *different*
+`source_id`, and a source of `kind = SIS`. On a hit it creates a new `import_links` row for the
+current (LMS) source pointing at the same user, so a later re-import of the same Canvas file hits
+rung 1 directly rather than re-walking the crosswalk.
+
+"Import Populi first, then Canvas" (§6) is enforced in `ImportBatchService::commit()`: a batch whose
+source is `kind = LMS` is refused with a localized `E_CANVAS_BEFORE_POPULI` message unless at least
+one `STUDENT` batch from a `kind = SIS` source has already committed. It is a commit-time gate only —
+mapping, validating and dry-running a Canvas batch ahead of Populi is harmless and useful for
+rehearsal; only the real write is blocked.
+
+### 18.3 Student number and DOB-triple matching
+
+`users.student_number` is a new nullable, indexed column (native SPIMS users simply never populate
+it). Rung 4 links only when exactly one existing user carries the incoming value; more than one is
+an escalation (§18.1), never a silent pick.
+
+Rung 5 normalises `first_name`/`last_name` for comparison with the same Arabic-normalisation rules as
+§6 (strip tashkeel, unify alef/ta-marbuta variants, never transliterate) plus a lowercase+trim pass
+that is a no-op on Arabic text, applied identically to the incoming row and every candidate read back
+from `users` — the comparison is fair regardless of which side, if either, is Arabic.
+
+### 18.4 What merge queue resolution actually does
+
+`ImportBatchService::resolveMergeCandidate()` is the one code path behind all three actions on
+screen 12, each wrapped in `AuditLogWriter::withAudit('import.merge_resolve', ...)`:
+
+- **merge** — links exactly as rungs 2-5 would have (the same `linkUser()`/`attachProgram()` helpers),
+  and is refused if the candidate is null (nothing to merge with).
+- **reject → create new** — creates a user exactly as an unresolved row would have
+  (`createUser()`), then links the new user to this source + legacy id.
+- **skip** — audited, but changes nothing; the candidate stays `PENDING` for a later pass.
+
+All three read the original `import_rows` normalized snapshot (via `batch_id` + `natural_key` =
+`legacy_id`) rather than re-deriving fields from `payload_preview`, since the latter is the raw sheet
+row kept only for the compare panel, not shaped like `normalized`.
+
+---
+
+## 19. L5 design notes — account-claim invitations
+
+Screen 13 (§9) shipped on top of §17/§18. This section records the design decisions made while
+building it, additively — §17 and §18 stay exactly as they were.
+
+### 19.1 Who gets queued, and when
+
+`ImportBatchService::queueAccountClaims()` runs once, at the end of `commit()`, after `applyRows()`
+has already written every row's `import_rows.action`/`target_id`. It is a no-op for anything other
+than a `STUDENT` batch with `population = ACTIVE` — an alumni batch never queues a claim, matching
+D8: alumni get no portal login at all.
+
+For an eligible batch, it collects every row whose action was `CREATE` or `LINK` and whose target user
+is still `status = PENDING`, then `firstOrCreate`s one `import_account_claims` row per user —
+deliberately `firstOrCreate`, not `updateOrCreate`: a claim already `SENT`, `BOUNCED` or `CLAIMED` by
+an earlier batch keeps its own history and is never reset to `QUEUED` just because a later batch
+happens to reference the same person (e.g. a Canvas batch linking to a user Populi already created and
+queued).
+
+### 19.2 Sending is a separate, throttled step
+
+Queueing never sends mail — a registrar reviews the headcount on screen 13 first, then triggers
+sending explicitly. Sending chunks the queued cohort (`import.claim_send_chunk_size`,
+`import.claim_send_chunk_delay_ms` — both configurable, defaulting to values safe for the mail
+provider's rate limit) rather than firing every invitation in one burst. Each claim transitions
+`QUEUED` → `SENT` (or `BOUNCED` on a hard mailer failure) independently, so a failure partway through
+a large batch never blocks the rows already sent or silently retries them.
+
+### 19.3 Claiming reuses the existing auth flow
+
+An invited student claims their account through the **existing** `auth.verify` → `auth.password.create`
+flow (§17 already noted this needs no new auth code) — the claim link is only what routes them there
+and marks the claim `CLAIMED` once the password is set. No password or token is ever imported or
+generated by this service itself, per the original open-question decision: SPIMS always issues its
+own.
+
+---
+
+## 20. L6 design notes — finance opening balances
+
+D4 and §8 shipped on top of §17-§19. This section records the design decisions made while building
+it, additively.
+
+### 20.1 The hard gate has no override, by design
+
+Every other control-total check in this feature (the `STUDENT` entity's declared-vs-computed row
+count) has an acknowledge checkbox — a registrar can proceed past a mismatch once they've reviewed
+why. `BALANCE` deliberately has none: `ImportBatchService::assertFinanceTotalsMatchExactly()` compares
+declared vs. computed, per currency, to the minor unit, and refuses commit outright on any difference,
+recomputed fresh at commit time rather than trusted from a possibly-stale dry run. This is not an
+oversight carried over from the `STUDENT` path — it is the acceptance criterion §8 exists to state:
+money is never imported on a "close enough" basis. A currency the registrar never declared a total for
+is compared against zero, so real money in an undeclared currency still fails loudly.
+
+### 20.2 What one committed row actually writes
+
+Per valid row, independently: `owed_minor > 0` creates exactly one `Invoice` (status `Open`,
+`source_system` set, one `InvoiceLine` describing the source and cutover date, no `offering_id`) and
+`credit_minor > 0` creates exactly one wallet credit (`WalletService::credit()`, reason
+`LEGACY_CARRY_FORWARD`) against the student's wallet. A row can do both. A row with neither is a
+no-op (`ImportRowAction::Noop`), not an error — §8's "no empty invoices" rule.
+
+### 20.3 Legacy invoices are real, but excluded from automated dunning by default
+
+A legacy opening-balance invoice is a real, payable invoice from the student's side — it appears on
+their statement and can be paid down like any other. `PaymentPlanService::dunnOverdue()` excludes any
+invoice with a non-null `source_system` from the automated overdue-reminder sweep, because an invoice
+dated at cutover is "overdue" only as an artifact of that date, not because the student missed a real
+deadline. A registrar can still chase these manually; nothing about the exclusion prevents payment or
+hides the balance.
+
+### 20.4 BALANCE rollback is out of scope
+
+`ImportBatchService::rollback()` now refuses outright (`import.rollback_unsupported_entity`) for any
+batch whose `entity_type` is `BALANCE`. Reversing a `STUDENT` batch's created users is safe because nothing
+external depends on them yet in the ordinary case; reversing a committed invoice or wallet credit is
+not the same problem — the invoice may already carry a payment, the wallet credit may already have
+been spent. That is a distinct feature with its own rules (crediting back what remains, voiding what
+doesn't), not a copy of the `STUDENT` rollback's delete-the-user logic, and is deliberately deferred
+rather than shipped half-safe.
+
+### 20.5 Committing a BALANCE batch requires `finance.manage` in addition to `import.commit`
+
+Mirroring the `ACTIVE`-population `STUDENT` commit's extra `users.manage` check (§17), a `BALANCE`
+commit additionally requires `finance.manage` — held by `FINANCIAL_ADMIN`, not
+`ADMINISTRATIVE_ADMIN`. A registrar who can stage and validate a finance batch still cannot commit
+real money into the ledger on their own signature; a financial admin's sign-off is a second, separate
+gate, exactly as the plan's permission table (§12) describes.
+
+---
+
+## 21. L3/L4 design notes — course results, GPA isolation, shadow catalog, transcript surfacing
+
+Screens for a third entity type, `COURSE_RESULT`, and the transcript's "Prior study" section shipped
+on top of §17-§20. This section records the design decisions made while building them, additively.
+
+### 21.1 GPA isolation is enforced at write time, not read time
+
+The plan's central acceptance criterion for L3 — a legacy course result must never move a student's
+live GPA on import — is enforced the simplest possible way: every `AcademicRecord` a `COURSE_RESULT`
+commit writes sets `counts_toward_gpa = false` unconditionally, regardless of what the grade mapping
+itself says about the grade. `GradebookService::refreshGpa()` filters on this column, so a freshly
+imported record is invisible to the live GPA calculation from the moment it exists — there is no
+separate "hide legacy records from GPA" pass to keep in sync, and no way for the filter and the import
+path to drift apart, because the filter is the only thing that ever reads the column.
+
+A registrar moves one record into the live GPA deliberately, one at a time, via
+`GradebookService::promoteToTransferCredit()` — the only code path that ever flips
+`counts_toward_gpa` to `true`. This is D7 from §7: transfer credit is a human decision made per
+record, never a side effect of the import itself.
+
+### 21.2 The shadow catalog is find-or-create, keyed loosely on purpose
+
+A `COURSE_RESULT` row's `course_code` reuses an existing live course on an exact code match; anything
+else find-or-creates a shadow `Course` (`active = false`, `source_system` set) and, per (course,
+`legacy_term`) pair, a shadow `CourseOffering` (`status = Archived`, `semester_id = null`,
+`legacy_term` carrying the source's own term string verbatim — §14 Q5's default: no attempt to map a
+legacy term onto a real `semesters` row). "Loosely keyed" here means `legacy_term` is free text, not a
+foreign key into anything — two files that spell the same term differently create two shadow
+offerings, which is an acceptable, correctable-later outcome rather than a blocking validation error,
+consistent with the plan's general bias toward "import now, tidy later" for anything that isn't
+identity or money.
+
+Every native-facing surface that lists courses or offerings — the public catalog, the admin offerings
+index, the enrollment roster picker, the live gradebook grid, headcount/grade reports — filters on
+`active = true` / a real `semester_id`, so a shadow record is structurally invisible everywhere a
+registrar or student would otherwise stumble onto it, without needing a bespoke "is this legacy"
+check bolted onto each of those surfaces. `ImportCatalogIsolationTest` asserts this for every listed
+surface directly, rather than trusting the pattern by inspection.
+
+### 21.3 `legacy_academic_summaries` is a fact, not an input
+
+The source system's own attested GPA, credits, and standing figures — §4.1 — are stored verbatim in
+`legacy_academic_summaries`, on their own reported scale (`gpa_scale`, never converted or rescaled to
+SPIMS's), and rendered on the transcript beside the live SPIMS GPA. The two numbers are never
+combined, averaged, or reconciled against each other: the legacy figure is a historical fact about
+what the source system once said, not an input to any SPIMS calculation, matching D3's "never merged
+into" rule from §17.
+
+### 21.4 Rollback is per-record, not per-course
+
+A `COURSE_RESULT` row's rollback (`ImportBatchService::rollbackCourseResultRow()`) deletes its
+`AcademicRecord`, any `ProgramRequirementFulfillment` it created, and the `Enrollment` it was posted
+against — but leaves the shadow `Course`/`CourseOffering` in place. They are idempotent
+find-or-create infrastructure that other rows, or a later batch, may already be sharing; deleting them
+on one row's rollback would either orphan those other rows or require tracking cross-row references
+that don't otherwise exist. Leaving them behind is harmless — §21.2's isolation makes them invisible
+regardless of whether anything still points at them.
+
+Rollback is refused per-record once that record has been promoted to transfer credit
+(`counts_toward_gpa = true`): a promotion is a human decision that has already taken effect in the
+live GPA, and reversing the import underneath it would silently move that GPA back without anyone
+having decided to. This mirrors the `STUDENT` rollback's own rule (§17) that a record already put to
+native use blocks its own reversal — same principle, applied to `COURSE_RESULT`'s specific kind of
+"native use."

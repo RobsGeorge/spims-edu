@@ -156,6 +156,11 @@ class PaymentPlanService
             ->whereNull('dunning_sent_at')
             ->whereNull('payment_id')
             ->whereHas('plan', fn ($q) => $q->where('status', PaymentPlanStatus::Open->value))
+            // Legacy opening-balance invoices (L6, docs/legacy-data-import-plan.md §8/§14
+            // Q9) are visible and payable by the student but excluded from *automated*
+            // dunning by default until a registrar opts a cohort in — a real invoice
+            // "overdue" only because it was dated at cutover must never trigger a chase.
+            ->whereHas('plan.invoice', fn ($q) => $q->whereNull('source_system'))
             ->with(['plan.invoice.student'])
             ->orderBy('due_on')
             ->get();

@@ -177,6 +177,14 @@ return [
     'finance.wallet' => [
         'FINANCIAL_ADMIN' => 'F',
     ],
+    /*
+     * Gates a BALANCE-entity legacy import commit, in addition to import.commit — see
+     * docs/legacy-data-import-plan.md §12. Deliberately absent for ADMINISTRATIVE_ADMIN
+     * (who holds import.commit): "a registrar cannot commit money" on their own.
+     */
+    'finance.manage' => [
+        'FINANCIAL_ADMIN' => 'F',
+    ],
     'finance.donate' => [
         'STUDENT' => 'O',
         'INSTRUCTOR' => 'O',
@@ -562,6 +570,12 @@ return [
         'ADMINISTRATIVE_ADMIN' => 'F',
     ],
     'import.rollback' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'import.activate' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
+    'import.merge_resolve' => [
         'ADMINISTRATIVE_ADMIN' => 'F',
     ],
 

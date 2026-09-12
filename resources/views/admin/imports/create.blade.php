@@ -42,7 +42,8 @@
             </x-slot:actions>
         </x-empty-state>
     @else
-        <form method="POST" action="{{ route('admin.imports.store') }}" enctype="multipart/form-data" class="row g-4">
+        <form method="POST" action="{{ route('admin.imports.store') }}" enctype="multipart/form-data" class="row g-4"
+            x-data="{ entityType: '{{ old('entity_type', 'STUDENT') }}' }">
             @csrf
 
             <div class="col-md-6">
@@ -55,6 +56,17 @@
             </div>
 
             <div class="col-md-6">
+                <label class="form-label fw-semibold" for="entity_type">{{ __('import.field_entity_type') }}</label>
+                <select id="entity_type" name="entity_type" class="form-select" x-model="entityType" required>
+                    @foreach($entityTypes as $type)
+                        @php $typeValue = $type->value; @endphp
+                        <option value="{{ $typeValue }}" @selected(old('entity_type', 'STUDENT') === $typeValue)>{{ __('import.entity_'.$typeValue) }}</option>
+                    @endforeach
+                </select>
+                <p class="form-text mb-0">{{ __('import.field_entity_type_help') }}</p>
+            </div>
+
+            <div class="col-12" x-show="entityType === 'STUDENT'">
                 <span class="form-label fw-semibold d-block">{{ __('import.field_population') }}</span>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="population" id="pop-alumni" value="ALUMNI" @checked(old('population', 'ALUMNI') === 'ALUMNI')>
@@ -70,6 +82,45 @@
                         <span class="d-block small spims-text-dim">{{ __('import.population_active_help') }}</span>
                     </label>
                 </div>
+            </div>
+
+            <div class="col-12" x-show="entityType === 'COURSE_RESULT'">
+                <x-card variant="quiet">
+                    <p class="small spims-text-dim mb-0">{{ __('import.course_result_help') }}</p>
+                </x-card>
+            </div>
+
+            <div class="col-12" x-show="entityType === 'BALANCE'">
+                <x-card variant="quiet">
+                    <h2 class="h6 page-title mb-2">{{ __('import.balance_totals_title') }}</h2>
+                    <p class="small spims-text-dim mb-3">{{ __('import.balance_totals_help') }}</p>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small" for="as_of">{{ __('import.field_as_of') }}</label>
+                            <input id="as_of" name="as_of" type="date" class="form-control form-control-sm" value="{{ old('as_of') }}">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-3">
+                            <label class="form-label small" for="declared_owed_EGP">{{ __('import.field_declared_owed_egp') }}</label>
+                            <input id="declared_owed_EGP" name="declared_owed_EGP" class="form-control form-control-sm" placeholder="0.00" value="{{ old('declared_owed_EGP') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small" for="declared_credit_EGP">{{ __('import.field_declared_credit_egp') }}</label>
+                            <input id="declared_credit_EGP" name="declared_credit_EGP" class="form-control form-control-sm" placeholder="0.00" value="{{ old('declared_credit_EGP') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small" for="declared_owed_USD">{{ __('import.field_declared_owed_usd') }}</label>
+                            <input id="declared_owed_USD" name="declared_owed_USD" class="form-control form-control-sm" placeholder="0.00" value="{{ old('declared_owed_USD') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small" for="declared_credit_USD">{{ __('import.field_declared_credit_usd') }}</label>
+                            <input id="declared_credit_USD" name="declared_credit_USD" class="form-control form-control-sm" placeholder="0.00" value="{{ old('declared_credit_USD') }}">
+                        </div>
+                    </div>
+                </x-card>
             </div>
 
             <div class="col-12">

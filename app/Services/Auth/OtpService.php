@@ -17,6 +17,26 @@ class OtpService
 
     public function issue(User $user, OtpPurpose $purpose): string
     {
+        $plain = $this->issueSilently($user, $purpose);
+
+        $this->mailer->send(
+            (string) $user->email,
+            'SPIMS OTP',
+            'Your verification code is: '.$plain
+        );
+
+        return $plain;
+    }
+
+    /**
+     * Same token creation as issue() — same OtpToken table, same purpose, same
+     * hash/expiry — but without sending the generic OTP mail. For callers that send
+     * their own contextual message containing this code (e.g. the legacy-import
+     * account-claim invite, docs/legacy-data-import-plan.md §9), so a claimant never
+     * receives two emails for one invitation.
+     */
+    public function issueSilently(User $user, OtpPurpose $purpose): string
+    {
         OtpToken::query()
             ->where('user_id', $user->id)
             ->where('purpose', $purpose)
@@ -40,12 +60,6 @@ class OtpService
                 'purpose' => $purpose->value,
             ]);
         }
-
-        $this->mailer->send(
-            (string) $user->email,
-            'SPIMS OTP',
-            'Your verification code is: '.$plain
-        );
 
         return $plain;
     }

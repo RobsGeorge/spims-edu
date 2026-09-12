@@ -91,6 +91,8 @@ return [
     'programs_title' => 'Programmes',
     'programs_help' => 'Lignes student-program (parcours diplôme / certificat).',
     'programs_empty' => 'Non matriculé dans un programme.',
+    'prior_study_title' => 'Études antérieures',
+    'prior_study_help' => 'Cours historiques importés de Populi/Canvas, groupés par source. Exclus de la moyenne calculée ci-dessus sauf promotion.',
     'invoices_title' => 'Factures',
     'invoices_help' => 'Montants en unités mineures entières, formatés. Remboursements et paiements manuels restent au bureau finance.',
     'invoices_empty' => 'Pas encore de factures.',

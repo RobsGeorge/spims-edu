@@ -30,6 +30,7 @@ class Payment extends Model
         'verified_by_id',
         'receipt_serial',
         'receipt_url',
+        'source_system',
     ];
 
     protected $casts = [
