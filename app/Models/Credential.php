@@ -26,6 +26,7 @@ class Credential extends Model
         'file_url',
         'issued_at',
         'revoked_at',
+        'source_system',
     ];
 
     protected $casts = [
@@ -52,6 +53,17 @@ class Credential extends Model
     public function isValid(): bool
     {
         return $this->revoked_at === null;
+    }
+
+    /**
+     * L8 — a legacy-imported credential (a historical Populi/Canvas diploma or
+     * certificate). `null` means native SPIMS-issued, same convention as every other
+     * `source_system` column this feature added. See
+     * docs/legacy-data-import-plan.md §22.1.
+     */
+    public function isLegacy(): bool
+    {
+        return $this->source_system !== null;
     }
 
     public function verifyUrl(): string

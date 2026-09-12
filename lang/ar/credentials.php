@@ -58,4 +58,9 @@ return [
     'legacy_gpa_line' => 'معدل :gpa من :scale كما سجّله :source، بتاريخ :date',
     'legacy_gpa_scope_PROGRAM' => 'معدل البرنامج',
     'legacy_gpa_scope_CUMULATIVE' => 'المعدل التراكمي',
+
+    // L8 — الشهادات القديمة، راجع docs/legacy-data-import-plan.md §22.1
+    'legacy_no_reissue' => 'هذا سجل تاريخي مستورد من نظام سابق. لا يمكن إعادة إصداره برقم تسلسلي جديد من SPIMS — المستند الأصلي هو سجل الإصدار، وليس هذا النظام.',
+    'historical_valid' => 'سجل تاريخي — غير مؤهل لإعادة الإصدار',
+    'historical_note' => 'مستورد من :source. لم تُصدر هذه الشهادة عن طريق SPIMS؛ إنها تمثل سجلاً من نظام المدرسة السابق، محفوظاً لغرض التحقق فقط.',
 ];

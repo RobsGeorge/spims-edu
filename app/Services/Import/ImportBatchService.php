@@ -2,6 +2,7 @@
 
 namespace App\Services\Import;
 
+use App\Enums\CredentialType;
 use App\Enums\Currency;
 use App\Enums\EnrollmentStatus;
 use App\Enums\GradeStatus;
@@ -24,6 +25,7 @@ use App\Enums\WalletKind;
 use App\Models\AcademicRecord;
 use App\Models\Course;
 use App\Models\CourseOffering;
+use App\Models\Credential;
 use App\Models\Enrollment;
 use App\Models\ImportAccountClaim;
 use App\Models\ImportBatch;
@@ -45,6 +47,7 @@ use App\Support\AuditLogWriter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
@@ -71,6 +74,12 @@ use RuntimeException;
  * - BALANCE (L6): finance opening balances. One carried-forward invoice (owed) and/or
  *   one wallet credit (in hand) per student per currency, gated by an exact
  *   control-total match with no acknowledge override — see §8.
+ * - CREDENTIAL (L8): a legacy diploma/certificate row imported as a historical
+ *   `Credential` — §22.1. The source's own serial is kept verbatim in the existing
+ *   `serial` column and never passes through `CredentialService::nextSerial()`, so it
+ *   can never collide with or consume from SPIMS's own issuance counter.
+ *   `regenerate()` refuses a legacy-sourced credential outright, and `/verify` renders
+ *   it as a historical record rather than a SPIMS-issued one.
  *
  * Every public entry point (`validate`, `dryRun`, `commit`) dispatches on
  * `$batch->entity_type` to the entity-specific private methods below, so adding a
@@ -225,6 +234,7 @@ class ImportBatchService
         return match ($batch->entity_type) {
             ImportEntityType::CourseResult => $this->validateCourseResult($batch),
             ImportEntityType::Balance => $this->validateBalanceRows($batch),
+            ImportEntityType::Credential => $this->validateCredentialRows($batch),
             default => $this->validateStudentRows($batch),
         };
     }
@@ -667,6 +677,167 @@ class ImportBatchService
     }
 
     /**
+     * L8 — legacy credentials (§22.1). Per row: legacy_id must already resolve via an
+     * existing import_links user row (E_UNKNOWN_STUDENT, same as COURSE_RESULT and
+     * BALANCE); credential_type must be one of the existing CredentialType values
+     * (E_UNKNOWN_CREDENTIAL_TYPE); serial is required and, if it already belongs to a
+     * different credential (native, or a different legacy source), is a hard error
+     * (E_DUPLICATE_SERIAL) rather than letting the database's own unique constraint on
+     * `credentials.serial` fail the commit — a serial already carried by *this* same
+     * legacy source is not an error, since that is exactly what a corrected re-export
+     * of the same record looks like (see applyCredentialRows()'s find-or-update).
+     */
+    private function validateCredentialRows(ImportBatch $batch): ImportBatch
+    {
+        $disk = $this->storage->diskName();
+        $parsed = $this->reader->read($disk, $batch->file_path, $batch->sheet_name, $batch->header_row);
+        $mapping = collect($batch->mapping ?? [])->filter(fn ($m) => ! empty($m['target_field']));
+
+        $headerIndex = array_flip($parsed['headers']);
+        $seenKeys = [];
+        $errorCount = 0;
+        $warningCount = 0;
+
+        DB::transaction(function () use ($batch, $parsed, $mapping, $headerIndex, &$seenKeys, &$errorCount, &$warningCount) {
+            ImportRow::query()->where('batch_id', $batch->id)->delete();
+
+            foreach ($parsed['rows'] as $i => $row) {
+                $normalized = [];
+                $rowMessages = [];
+
+                foreach ($mapping as $m) {
+                    $colIndex = $headerIndex[$m['column']] ?? null;
+                    $raw = $colIndex !== null ? ($row[$colIndex] ?? null) : null;
+                    $result = $this->transforms->apply($m['transform'], $raw, $m['options'] ?? []);
+
+                    if (! $result['ok'] && $raw !== null && trim((string) $raw) !== '') {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_BAD_DATE',
+                            'field' => $m['target_field'],
+                            'params' => ['column' => $m['column'], 'value' => $raw],
+                        ];
+                    }
+
+                    if (! isset($normalized[$m['target_field']]) || $normalized[$m['target_field']] === null) {
+                        $normalized[$m['target_field']] = $result['value'];
+                    }
+                }
+
+                foreach (ImportCredentialFields::requiredFor() as $required) {
+                    if (empty($normalized[$required])) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_REQUIRED_FIELD_MISSING',
+                            'field' => $required,
+                            'params' => ['field' => $required],
+                        ];
+                    }
+                }
+
+                $legacyId = $normalized['legacy_id'] ?? null;
+                $serial = isset($normalized['serial']) ? trim((string) $normalized['serial']) : null;
+                $normalized['serial'] = $serial;
+
+                $naturalKey = ($legacyId !== null && $legacyId !== '' && $serial !== null && $serial !== '')
+                    ? $legacyId.'|'.$serial
+                    : 'row-'.($i + 1);
+                if (isset($seenKeys[$naturalKey])) {
+                    $rowMessages[] = [
+                        'level' => 'error',
+                        'code' => 'E_DUPLICATE_NATURAL_KEY',
+                        'field' => 'legacy_id',
+                        'params' => ['legacy_id' => (string) $naturalKey],
+                    ];
+                    $naturalKey = $naturalKey.'#dup-'.($i + 1);
+                }
+                $seenKeys[$naturalKey] = true;
+
+                if ($legacyId !== null && $legacyId !== '') {
+                    $linked = ImportLink::query()
+                        ->where('source_id', $batch->source_id)
+                        ->where('entity_type', 'user')
+                        ->where('legacy_id', $legacyId)
+                        ->exists();
+                    if (! $linked) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_UNKNOWN_STUDENT',
+                            'field' => 'legacy_id',
+                            'params' => ['legacy_id' => (string) $legacyId],
+                        ];
+                    }
+                }
+
+                $credentialType = isset($normalized['credential_type']) && $normalized['credential_type'] !== ''
+                    ? CredentialType::tryFrom(strtoupper(trim((string) $normalized['credential_type'])))
+                    : null;
+                if (! empty($normalized['credential_type']) && $credentialType === null) {
+                    $rowMessages[] = [
+                        'level' => 'error',
+                        'code' => 'E_UNKNOWN_CREDENTIAL_TYPE',
+                        'field' => 'credential_type',
+                        'params' => ['credential_type' => (string) $normalized['credential_type']],
+                    ];
+                }
+
+                if ($serial !== null && $serial !== '') {
+                    $existingCredential = Credential::query()->where('serial', $serial)->first();
+                    if ($existingCredential !== null && $existingCredential->source_system !== $batch->source->code) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_DUPLICATE_SERIAL',
+                            'field' => 'serial',
+                            'params' => ['serial' => $serial],
+                        ];
+                    }
+                }
+
+                if (! empty($normalized['program_code'])) {
+                    $exists = Program::query()->where('code', $normalized['program_code'])->exists();
+                    if (! $exists) {
+                        $rowMessages[] = [
+                            'level' => 'warning',
+                            'code' => 'W_UNKNOWN_PROGRAM_CODE',
+                            'field' => 'program_code',
+                            'params' => ['program_code' => $normalized['program_code']],
+                        ];
+                    }
+                }
+
+                $hasError = collect($rowMessages)->contains(fn ($m) => $m['level'] === 'error');
+                $hasWarning = collect($rowMessages)->contains(fn ($m) => $m['level'] === 'warning');
+                if ($hasError) {
+                    $errorCount++;
+                } elseif ($hasWarning) {
+                    $warningCount++;
+                }
+
+                ImportRow::query()->create([
+                    'batch_id' => $batch->id,
+                    'row_number' => $i + 1,
+                    'natural_key' => $naturalKey,
+                    'payload' => array_combine($parsed['headers'], array_pad($row, count($parsed['headers']), null)),
+                    'normalized' => $normalized,
+                    'action' => null,
+                    'status' => $hasError ? ImportRowStatus::Error : ($hasWarning ? ImportRowStatus::Warn : ImportRowStatus::Valid),
+                    'messages' => $rowMessages,
+                ]);
+            }
+        });
+
+        $batch->update([
+            'error_count' => $errorCount,
+            'warning_count' => $warningCount,
+            'row_count' => count($parsed['rows']),
+            'status' => ImportBatchStatus::Validated,
+            'validated_at' => now(),
+        ]);
+
+        return $batch->fresh();
+    }
+
+    /**
      * Runs the full commit path inside a transaction that is always rolled back, and
      * reports what would happen. Nothing is written — verified by ImportDryRunTest /
      * ImportBatchServiceTest, which assert the row counts are identical before and
@@ -880,6 +1051,7 @@ class ImportBatchService
         return match ($batch->entity_type) {
             ImportEntityType::CourseResult => $this->applyCourseResultRows($batch, $persist),
             ImportEntityType::Balance => $this->applyBalanceRows($batch, $persist, $actor),
+            ImportEntityType::Credential => $this->applyCredentialRows($batch, $persist),
             default => $this->applyStudentRows($batch, $persist),
         };
     }
@@ -1561,6 +1733,123 @@ class ImportBatchService
     }
 
     /**
+     * L8 commit logic (§22.1). Per valid row: resolve the student via the existing
+     * import_links row (validate() already blocked any row that can't), resolve the
+     * credential type and, optionally, an exact-match live program, and write one
+     * `Credential` row with `source_system` set and the source's own serial kept
+     * verbatim in the existing `serial` column — never through
+     * `CredentialService::nextSerial()`, which stays reserved for SPIMS's own
+     * issuance. A serial already carried by *this* source's Credential is updated in
+     * place rather than duplicated, so re-importing a corrected export is idempotent
+     * exactly like every other entity type (D6).
+     *
+     * @return array{create: int, link: int, skip: int, distinct_students: int}
+     */
+    private function applyCredentialRows(ImportBatch $batch, bool $persist): array
+    {
+        $created = 0;
+        $updated = 0;
+        $skip = 0;
+        $studentIds = [];
+
+        /** @var Collection<int, ImportRow> $rows */
+        $rows = ImportRow::query()->where('batch_id', $batch->id)
+            ->whereIn('status', [ImportRowStatus::Valid, ImportRowStatus::Warn])
+            ->orderBy('row_number')
+            ->get();
+
+        foreach ($rows as $row) {
+            $normalized = $row->normalized ?? [];
+            $legacyId = $normalized['legacy_id'] ?? null;
+            $serial = $normalized['serial'] ?? null;
+
+            $link = $legacyId !== null
+                ? ImportLink::query()
+                    ->where('source_id', $batch->source_id)
+                    ->where('entity_type', 'user')
+                    ->where('legacy_id', $legacyId)
+                    ->first()
+                : null;
+
+            $credentialType = CredentialType::tryFrom(strtoupper(trim((string) ($normalized['credential_type'] ?? ''))));
+
+            if ($link === null || $serial === null || $serial === '' || $credentialType === null) {
+                // validate() would already have blocked this row.
+                $skip++;
+
+                continue;
+            }
+
+            if (! $persist) {
+                $created++;
+
+                continue;
+            }
+
+            $student = User::query()->find($link->target_id);
+            if ($student === null) {
+                $skip++;
+
+                continue;
+            }
+
+            $studentIds[$student->id] = true;
+
+            $programId = null;
+            if (! empty($normalized['program_code'])) {
+                $programId = Program::query()->where('code', $normalized['program_code'])->value('id');
+            }
+
+            $issuedAt = $normalized['issued_at'] ?? null;
+            $language = ! empty($normalized['language']) ? (string) $normalized['language'] : 'en';
+
+            $attributes = [
+                'student_id' => $student->id,
+                'type' => $credentialType,
+                'program_id' => $programId,
+                'offering_id' => null,
+                'language' => $language,
+                'signatory_name' => $normalized['signatory_name'] ?? null,
+                'signatory_title' => $normalized['signatory_title'] ?? null,
+                'issued_at' => $issuedAt,
+                'source_system' => $batch->source->code,
+            ];
+
+            // A serial already belonging to *this* source's own Credential is a
+            // corrected re-export of the same record — update in place rather than
+            // duplicating (D6). validate() already refused a serial collision with any
+            // credential from a different source or a native one.
+            $existing = Credential::query()->where('serial', $serial)->first();
+
+            if ($existing !== null) {
+                $existing->update($attributes);
+                $target = $existing;
+                $updated++;
+            } else {
+                $target = Credential::query()->create($attributes + [
+                    'serial' => $serial,
+                    'qr_token' => (string) Str::ulid(),
+                ]);
+                $created++;
+            }
+
+            $row->update([
+                'action' => $existing !== null ? ImportRowAction::Update : ImportRowAction::Create,
+                'target_type' => Credential::class,
+                'target_id' => $target->id,
+                'status' => ImportRowStatus::Applied,
+            ]);
+        }
+
+        return [
+            'create' => $created,
+            'link' => $updated,
+            'skip' => $skip,
+            'distinct_students' => count($studentIds),
+        ];
+    }
+
+    /**
      * @param  array<string, mixed>  $normalized
      */
     private function createUser(ImportBatch $batch, array $normalized, string $legacyId): User
@@ -1671,15 +1960,20 @@ class ImportBatchService
      * Reverses every CREATE this batch made. Refused once the batch is sealed, and
      * refused per-row when the created record is now referenced by native data (a role
      * assignment, an enrollment, a payment — for STUDENT; a promotion to transfer
-     * credit — for COURSE_RESULT) — the rollback names exactly what blocks it rather
-     * than failing vaguely.
+     * credit — for COURSE_RESULT; a revocation — for CREDENTIAL) — the rollback names
+     * exactly what blocks it rather than failing vaguely.
      *
-     * Scope note: only STUDENT and COURSE_RESULT are reversible today. A BALANCE
-     * batch's invoices and wallet credits are real financial records the moment they
-     * commit — reversing them safely (crediting back a wallet that may already have
-     * been spent from, voiding an invoice that may already carry a payment) is a
-     * distinct feature with its own rules, not a copy of the STUDENT rollback's
-     * delete-the-row logic, and is out of scope for this phase.
+     * Scope note: STUDENT, COURSE_RESULT and CREDENTIAL are reversible today. A
+     * CREDENTIAL row stays reversible for the same window as STUDENT (until the batch
+     * seals) rather than being blocked the moment `/verify` is viewed or the file is
+     * downloaded — a historical record has no downstream financial/enrollment
+     * dependents the way a STUDENT or COURSE_RESULT row can, so the only "native use"
+     * that should block it is an actual state change: the credential being revoked.
+     * See §22.2. A BALANCE batch's invoices and wallet credits are real financial
+     * records the moment they commit — reversing them safely (crediting back a wallet
+     * that may already have been spent from, voiding an invoice that may already carry
+     * a payment) is a distinct feature with its own rules, not a copy of the STUDENT
+     * rollback's delete-the-row logic, and is out of scope for this phase.
      *
      * @return array{rolled_back: int, blocked: array<int, array{row: int, reason: string}>}
      */
@@ -1698,19 +1992,19 @@ class ImportBatchService
         $blocked = [];
         $rolledBack = 0;
 
-        $isCourseResult = $batch->entity_type === ImportEntityType::CourseResult;
-
-        $this->audit->withAudit($actor, 'import.batch_rollback', function () use ($batch, $actor, $isCourseResult, &$blocked, &$rolledBack) {
-            DB::transaction(function () use ($batch, $actor, $isCourseResult, &$blocked, &$rolledBack) {
+        $this->audit->withAudit($actor, 'import.batch_rollback', function () use ($batch, $actor, &$blocked, &$rolledBack) {
+            DB::transaction(function () use ($batch, $actor, &$blocked, &$rolledBack) {
                 $rows = ImportRow::query()->where('batch_id', $batch->id)
                     ->where('status', ImportRowStatus::Applied)
                     ->where('action', ImportRowAction::Create)
                     ->get();
 
                 foreach ($rows as $row) {
-                    $reason = $isCourseResult
-                        ? $this->rollbackCourseResultRow($batch, $row)
-                        : $this->rollbackStudentRow($batch, $row);
+                    $reason = match ($batch->entity_type) {
+                        ImportEntityType::CourseResult => $this->rollbackCourseResultRow($batch, $row),
+                        ImportEntityType::Credential => $this->rollbackCredentialRow($batch, $row),
+                        default => $this->rollbackStudentRow($batch, $row),
+                    };
 
                     if ($reason === false) {
                         // Nothing to reverse (target already gone) — leave the row as is.
@@ -1812,6 +2106,34 @@ class ImportBatchService
         if ($enrollmentId !== null) {
             Enrollment::query()->where('id', $enrollmentId)->delete();
         }
+
+        return null;
+    }
+
+    /**
+     * Reverses one CREDENTIAL row (§22.2): deletes the Credential outright. Refused
+     * once the credential has been revoked — a revocation is a deliberate state change
+     * made through this system since the import, exactly the same "native use" rule
+     * STUDENT and COURSE_RESULT rollback already apply to their own kind of downstream
+     * reference. A stray or duplicate import that nobody has acted on yet is always
+     * reversible until the batch seals, matching STUDENT's own rollback window — a
+     * historical record has no enrollment or financial dependents to protect.
+     *
+     * @return string|false|null a blocking reason, `false` if there was nothing to
+     *                           reverse, or `null` once successfully rolled back
+     */
+    private function rollbackCredentialRow(ImportBatch $batch, ImportRow $row): string|false|null
+    {
+        $credential = $row->target_id !== null ? Credential::query()->find($row->target_id) : null;
+        if ($credential === null) {
+            return false;
+        }
+
+        if ($credential->revoked_at !== null) {
+            return 'This credential has since been revoked.';
+        }
+
+        $credential->delete();
 
         return null;
     }

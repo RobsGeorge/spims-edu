@@ -1277,3 +1277,164 @@ live GPA, and reversing the import underneath it would silently move that GPA ba
 having decided to. This mirrors the `STUDENT` rollback's own rule (§17) that a record already put to
 native use blocks its own reversal — same principle, applied to `COURSE_RESULT`'s specific kind of
 "native use."
+
+---
+
+## 22. L8 design notes — legacy credentials and AI-assisted mapping
+
+L8's two independent halves — legacy credentials (Part A) and AI-assisted mapping (Part B) — shipped
+on top of §17-§21. This section records the design decisions made while building them, additively;
+§17-§21 stay exactly as they were. L8 was optional and never blocked go-live (§13); both halves ship
+together on one branch.
+
+### 22.1 Part A — a legacy credential is a fact about a document, not a fresh issuance
+
+The acceptance bar was stated precisely: *"a migrated diploma verifies as historical and cannot be
+reissued under a SPIMS serial."* Two design choices make that true by construction rather than by a
+rule someone could forget to check.
+
+**The serial never touches the counter, and the database backstops it.** `CredentialService::nextSerial()`
+mints `SPIMS-CRED-{year}-{n}` from a `settings` row counter. A `CREDENTIAL` batch's `applyCredentialRows()`
+never calls it — the source's own serial (a Populi diploma number, say) is written verbatim into the
+existing `serial` column, which is unrelated code entirely from the counter's own read-lock-increment-save
+cycle. There is consequently no code path by which a legacy import could consume from or collide with the
+counter, which `ImportCredentialTest::a_legacy_credential_never_touches_the_spims_serial_counter` asserts
+two ways: the `settings` row for `credentials.serial_counter` stays absent (never created) across a legacy
+commit, and a native `issueTranscript()` call immediately afterward still starts at `00001` — proof the
+counter was never incremented by the import. `credentials.serial` already carries a database-level unique
+constraint (the original credentials migration), which is what actually prevents two rows from ever sharing
+one serial; `validateCredentialRows()`'s own `E_DUPLICATE_SERIAL` check exists only to turn that constraint
+violation into a readable, row-level validation message instead of a 500 at commit time.
+
+**A serial re-imported from the *same* source is a correction, not a duplicate.** The natural next question
+is what happens when a registrar re-exports the same diploma after fixing a typo in Populi. `E_DUPLICATE_SERIAL`
+only fires when an existing credential with that serial belongs to a *different* `source_system` (including
+`null`, i.e. native) — a serial that already belongs to *this* batch's own source is treated as the same D6
+"fix-and-re-import cycle" every other entity type gets: `applyCredentialRows()` finds the existing row by
+serial and updates it in place (`ImportRowAction::Update`) rather than creating a second row that would
+collide on the unique constraint anyway.
+
+**`regenerate()` refuses at the top, before anything else runs.** `CredentialService::regenerate()` checks
+`$credential->isLegacy()` (`source_system !== null`) as its very first line, before the existing revoke-then-
+reissue transaction begins, and throws `ValidationException::withMessages(['credential' => [__('credentials.legacy_no_reissue')]])`
+— the same exception class and per-field-key shape every other user-facing refusal in `CredentialService`
+already uses (see `issueProgramCertificate()`'s `not_in_program`/`requirements_incomplete` checks), rather
+than inventing a new error convention for this one case. Refusing before the transaction opens means a
+legacy credential's `revoked_at` is never touched by a failed `regenerate()` call — `ImportCredentialTest`
+asserts this directly, not just that the call throws.
+
+**`/verify` tells the two states apart with different copy, not a footnote.** A legacy credential still
+renders `isValid()`'s ordinary true/false — a revoked historical record is still "revoked" — but a valid one
+gets a distinct `alert-info` block (`credentials.historical_valid` / `historical_note`) instead of the normal
+`alert-success`, naming the source system, rather than the same "This credential is valid" copy a SPIMS-issued
+one gets. This is the one place in the feature where the distinction has to reach an end user (a third party
+checking a diploma) rather than just a registrar, so it gets its own sentence rather than a badge alone.
+
+**Rollback stays open until the batch seals, like `STUDENT`'s own window — with one blocking condition.**
+§7's `COURSE_RESULT` rollback blocks on "promoted to transfer credit" because that is the one action that
+puts a legacy record to genuine native use. A `CREDENTIAL` row has no analogous downstream dependent — no
+enrollment, no fulfilment, no payment can reference a `Credential` row the way they can an `AcademicRecord`
+or a `User` — so the reasoning that motivated `STUDENT`'s and `COURSE_RESULT`'s *extra* blocking conditions
+doesn't produce one here. The one state change that *can* happen to a credential after import is revocation,
+so `rollbackCredentialRow()` blocks on exactly that (`revoked_at !== null`) and nothing else: a stray or
+duplicate legacy import is reversible for the full 30-day window, matching `STUDENT`, and the only way to
+lose that reversibility is a deliberate revocation having already happened. (As shipped, nothing in the admin
+UI can revoke a credential outside of `regenerate()`, which is now refused for a legacy one — so in practice
+today a `CREDENTIAL` row's rollback window is simply "until sealed." The check is left in place rather than
+removed, both as a direct answer to the task's "make a reasonable call, document your reasoning" and as
+forward compatibility for a future standalone revoke action, which is a foreseeable and small addition.)
+
+**`credential_type` maps onto the existing `CredentialType` enum rather than growing a new case.** The task
+brief allowed either. `ImportCredentialFields` asks the source file to name one of SPIMS's own four types
+(`TRANSCRIPT`, `PROGRAM_CERTIFICATE`, `STANDALONE_CERTIFICATE`, `OFFERING_COMPLETION`) per row —
+`validateCredentialRows()` resolves it with `CredentialType::tryFrom()` and rejects anything else with
+`E_UNKNOWN_CREDENTIAL_TYPE` — rather than inventing a fifth, generic "legacy diploma" case. A registrar doing
+the Populi export already knows whether a given historical record was a transcript, a program diploma, or a
+course certificate; asking them to say so costs one mapped column and keeps every downstream consumer of
+`CredentialType` (the `/verify` badge, the transcript's credentials list, any future reporting) working
+unchanged for a legacy row, instead of needing a special case for one enum value that means "look at
+`source_system` to find out what this actually is."
+
+### 22.2 Part A — what stayed out of scope
+
+`offering_id` is never populated by a `CREDENTIAL` import — the task named only "optionally a program
+reference," and a legacy `STANDALONE_CERTIFICATE`/`OFFERING_COMPLETION` row would need to resolve against a
+live `CourseOffering` the same "exact match only, never invent" way `program_code` does, which is a real
+but separate piece of work with its own warning code. `download()` (PDF/HTML rendering via
+`CertificateTemplateService`) is also untouched: a legacy credential that has never been downloaded still
+renders on demand through the normal SPIMS certificate template the first time someone asks for a file,
+which is arguably a second place a historical record could look SPIMS-issued. This is flagged here rather
+than silently left as a possible follow-up gap: the task's acceptance bar was specifically about `/verify`
+and `regenerate()`, both of which are unambiguously closed; a distinct "this rendered file is a reproduction,
+not the original" watermark on the legacy download path is a reasonable next increment, not a defect in
+this one.
+
+### 22.3 Part B — the masking payload is minimal by construction, not by redaction
+
+The task named this the single most important test in the phase, and the design choice behind it is what
+makes that test simple rather than merely thorough: `ImportAiMasking::samplesForType()` never receives a
+real sample value at all. It takes only the column's *inferred type* (`email`, `date`, `integer`, `decimal`,
+`boolean`, or the `text`/`unknown` default) and returns a **fixed, canonical placeholder pair** for that
+type — `a***@g***.com` for `email`, `Xxxx Xxxx` for `text`, `3.4_` for `decimal`, and so on. There is no
+redaction routine sitting between a real value and the outbound payload that could have a bug in it, because
+the real values (`$profile[...]['samples']`) are simply never passed into the masking function's argument
+list in the first place. `ImportAiMappingTest::the_outbound_schema_never_contains_a_raw_sample_value_and_matches_the_exact_allowlist`
+proves this the way the task asked — not by checking one example input, but by building a profile carrying
+real-looking PII (an actual email, an actual name, an actual GPA-shaped decimal) in its `samples` arrays,
+capturing the exact schema `ImportAiMappingSuggester::buildSchema()` hands to the `AiClient`, asserting the
+top-level and per-column key sets match a hard allowlist exactly (`['source', 'target_fields', 'columns']`
+and `['column', 'type', 'empty_percent', 'distinct_count', 'masked_samples']` — nothing else may ride along),
+and then searching the whole serialized payload for every one of the raw PII strings and asserting none of
+them appear. `empty_percent` and `distinct_count` do travel as real, column-level statistics (per §5.5's
+own text) — they describe the *shape* of a column, not any one person's data, and are exactly the kind of
+signal a distinct-value-count or null-rate heuristic already uses in tier 3 (§5.2) without controversy.
+
+**Off unless explicitly switched on, with no path to a silent call.** `import.ai_mapping_enabled` is a
+`config/import.php` key (`env('IMPORT_AI_MAPPING_ENABLED', false)`), following that file's own established
+convention for this feature's settings (`claim_send_chunk_size` and friends are the same shape) rather than
+a `settings`-table row — this feature has no settings-management UI to put a runtime toggle in, and building
+one was explicitly out of scope per the task brief's "doesn't need a settings-management UI if one doesn't
+already exist." The check is deliberately duplicated in two places rather than trusted to one: the mapping
+screen only renders an active "AI suggest" button when the setting is on (an explanatory tooltip otherwise,
+with the masking policy stated above it so an admin reads it before ever finding a way to turn the setting
+on); the `aiSuggest()` controller action re-checks the same config key before calling anything, so a stale
+page, a replayed request, or a direct POST can never reach the AI-calling code path while the setting is
+off; and `ImportAiMappingSuggester::fillGaps()` checks it a third time as its first line, before building a
+schema or touching the injected `AiClient` at all — the layer the "never calls the AI client" test actually
+exercises, with a spy `AiClient` that records whether it was invoked. Three checks sounds redundant, but
+each one guards a different caller (a human clicking, a replayed request, and a future second caller of the
+service that might forget the controller's own check exists) — cheap insurance for a control the task
+explicitly called non-negotiable.
+
+### 22.4 Part B — AI fills gaps because a cheaper, more precise signal always wins when one exists
+
+`fillGaps()` only ever considers a column already sitting at `None` confidence after the three deterministic
+tiers have run, and never rewrites a column already carrying `High`, `Medium`, or `Low`. This isn't a
+policy bolted on top of an otherwise-general "suggest a mapping" method — it's the reason the method is
+named `fillGaps()` rather than `suggest()`. A tier-1 synonym-dictionary hit or a tier-2 normalised-header
+match is a deterministic fact about the column header text; even tier 3's value-shape heuristic is a
+majority-vote over every real value in the column. An LLM's guess, working only from a header string, an
+inferred type, and a fixed placeholder shape (§22.3), is strictly less informed than any of the three — it
+never sees a real value at all, by design. Letting it override a confident deterministic match would trade
+a stronger signal for a weaker one for no reason; `ImportAiMappingTest::ai_suggestions_never_override_an_existing_confident_deterministic_match`
+proves this directly by handing a fake `AiClient` that *tries* to hijack an already-`High`-confidence column
+and asserting the attempt is silently ignored. §5.5's honest framing — "AI mapping earns its place on the
+messy files... not the clean ones" — is exactly this rule stated as a design principle: on a clean Populi or
+Canvas export, tier 1 alone maps almost everything, so `fillGaps()` has almost nothing to do; on a
+registrar's hand-maintained spreadsheet of old diplomas, where headers are inconsistent and undocumented,
+most columns land at `None` and this tier does real work. The same "never override" boundary is also why a
+malformed or `null` AI response is safe to simply discard (`ImportAiMappingTest::a_malformed_or_null_ai_response_degrades_gracefully_...`):
+because this tier can only ever fill columns the deterministic tiers already gave up on, the worst case for a
+degraded AI call is that those columns stay unmapped exactly as they were — never a worse, or wrong, mapping
+than what existed a moment before.
+
+Every AI-sourced suggestion still lands in the same `mapping` array, JSON-serialized on the batch, that the
+registrar edits through the ordinary mapping form — `origin: 'AI'` and `rationale` are just two more fields
+on that array's entries, read by the Blade view to render the distinct badge and tooltip described in §11.5's
+original mock, and carried forward across an ordinary form re-save (`ImportBatchController::updateMap()`) so
+fixing one other column doesn't silently erase which suggestions came from where. Nothing about this tier
+changes how a mapping gets applied: `updateMap()` still requires every column mapped or explicitly ignored,
+and Continue still runs the same `validate()` path regardless of whether a given row's `target_field` came
+from a synonym dictionary or an AI guess — constraint 1 ("a proposal, never a commit") holds because the
+approval gate that already existed for tiers 1-3 was never bypassed for tier 4, not because a special case
+was added to preserve it.

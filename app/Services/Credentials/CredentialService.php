@@ -128,6 +128,15 @@ class CredentialService
     {
         $this->authorize->authorize($actor, 'credentials.issue');
 
+        // L8 acceptance bar: "a migrated diploma verifies as historical and cannot be
+        // reissued under a SPIMS serial." A legacy-sourced credential's serial is the
+        // source system's own certificate number, kept verbatim — reissuing it would
+        // mint a fresh SPIMS-format serial for a record SPIMS never actually issued.
+        // See docs/legacy-data-import-plan.md §22.1.
+        if ($credential->isLegacy()) {
+            throw ValidationException::withMessages(['credential' => [__('credentials.legacy_no_reissue')]]);
+        }
+
         return DB::transaction(function () use ($actor, $credential) {
             $credential->update(['revoked_at' => now()]);
             $this->audit->write($actor, 'credentials.revoke', 'Credential', $credential->id);

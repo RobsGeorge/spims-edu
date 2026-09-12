@@ -27,6 +27,7 @@ return [
     'entity_STUDENT' => 'Students',
     'entity_COURSE_RESULT' => 'Course results',
     'entity_BALANCE' => 'Finance opening balances',
+    'entity_CREDENTIAL' => 'Legacy credentials',
     'population_ALUMNI' => 'Alumni',
     'population_ACTIVE' => 'Currently studying',
 
@@ -74,6 +75,7 @@ return [
     'field_entity_type' => 'What is in this file?',
     'field_entity_type_help' => 'Students creates or links people. Course results posts grades and credits against the shadow catalog for students already imported as students.',
     'course_result_help' => 'Every row must reference a student already imported. Legacy letters convert through this source\'s grade mapping — an unmapped letter blocks the row (E_UNMAPPED_GRADE). No portal accounts or programs are affected.',
+    'credential_help' => 'Every row must reference a student already imported, and states which of SPIMS\'s own credential types the record corresponds to. The source\'s own serial or diploma number is kept exactly as given — it never becomes a SPIMS-format serial, and the resulting credential verifies as a historical record that cannot be reissued through SPIMS.',
     'field_population' => 'Who is in this file?',
     'population_alumni_help' => 'No portal login. Records import for the transcript only.',
     'population_active_help' => 'Creates a pending account the student can claim. Every row needs a real email address.',
@@ -130,6 +132,15 @@ return [
     'continue_button' => 'Validate :count rows',
     'back_to_upload' => '← Start over',
     'transform_help' => 'Change the transform to see the field it produces update instantly below.',
+
+    // L8, Part B — AI-assisted mapping (§5.5, §22.3)
+    'ai_suggest_title' => 'AI suggest',
+    'ai_suggest_button' => '✨ Suggest with AI',
+    'ai_suggest_masking_policy' => 'Fills in columns the rules above could not match. Only column headers, inferred types and fixed placeholder samples (never a real name, email, or value from your file) are sent to the AI provider. Every suggestion still needs your review before Continue.',
+    'ai_suggest_disabled_tooltip' => 'AI-assisted mapping is switched off for this school. An administrator can turn it on after reviewing the masking policy above.',
+    'ai_origin_badge' => 'AI',
+    'ai_disabled' => 'AI-assisted mapping is switched off — no suggestion was requested.',
+    'ai_suggestions_applied' => 'AI suggestions added for the unmapped columns — review each one below before continuing.',
 
     // Batch show / receipt
     'batch_title' => 'Import batch',
@@ -240,6 +251,8 @@ return [
         'E_BAD_MONEY' => 'Column ":column" did not parse as an amount: ":value".',
         'E_UNMAPPED_GRADE' => 'Legacy letter ":legacy_letter" has no grade mapping for this source. Add one under Configure sources → Grade conversion.',
         'W_CREDIT_HOURS_DIFFER' => 'The file says :sheet credit hours; the matched SPIMS course says :course. The record keeps the file\'s value.',
+        'E_UNKNOWN_CREDENTIAL_TYPE' => 'Credential type ":credential_type" is not one of TRANSCRIPT, PROGRAM_CERTIFICATE, STANDALONE_CERTIFICATE, or OFFERING_COMPLETION.',
+        'E_DUPLICATE_SERIAL' => 'Serial ":serial" already belongs to a different credential (native, or imported from a different source).',
     ],
 
     // L5 — account activation (screen 13)

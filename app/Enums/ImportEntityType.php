@@ -11,10 +11,13 @@ namespace App\Enums;
  *   default (§7).
  * - Balance: L6, finance opening balances (one carried-forward invoice or wallet
  *   credit per student per currency, gated by an exact control-total match — §8).
+ * - Credential: L8, a legacy diploma/certificate record imported as a historical
+ *   `Credential` row — never reissued under a SPIMS serial (§22.1).
  */
 enum ImportEntityType: string
 {
     case Student = 'STUDENT';
     case CourseResult = 'COURSE_RESULT';
     case Balance = 'BALANCE';
+    case Credential = 'CREDENTIAL';
 }
