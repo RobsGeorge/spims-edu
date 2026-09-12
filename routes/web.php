@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\GradebookController;
 use App\Http\Controllers\Admin\GradingSchemeController;
 use App\Http\Controllers\Admin\HelpArticleAdminController;
 use App\Http\Controllers\Admin\HelpCategoryController;
+use App\Http\Controllers\Admin\ImportActivationController;
 use App\Http\Controllers\Admin\ImportBatchController;
 use App\Http\Controllers\Admin\ImportSourceController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
@@ -41,6 +42,7 @@ use App\Http\Controllers\Api\ZoomWebhookController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\Auth\ClaimAccountController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -114,6 +116,13 @@ Route::post('/api/webhooks/zoom', ZoomWebhookController::class)
     ->middleware('throttle:webhooks')
     ->name('api.webhooks.zoom');
 Route::get('/verify/{token}', CredentialVerifyController::class)->name('credentials.verify');
+// legacy-import: L5 account-claim invitation link — establishes the pending_user_id
+// session and hands off to the existing, unmodified auth.verify flow. Not under the
+// admin permission-protected block below because it must work for a signed-out
+// guest arriving from email. See docs/legacy-data-import-plan.md §9.
+Route::get('/claim-account/{user}', [ClaimAccountController::class, 'show'])
+    ->middleware('signed')
+    ->name('import.claim.show');
 Route::get('/communications/open/{log}', CommunicationOpenController::class)->name('communications.open');
 Route::get('/offerings/{offering}/preview', [OfferingPreviewController::class, 'show'])->name('offerings.preview');
 Route::get('/offerings/{offering}/preview/items/{item}/file', [ContentItemFileController::class, 'publicPreview'])
@@ -1194,6 +1203,23 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/imports', [ImportBatchController::class, 'store'])
             ->middleware('permission:import.stage')
             ->name('imports.store');
+
+        // L5 — account-claim invitations (§9, §11.11). Registered here, ahead of the
+        // '/imports/{batch}' wildcard below, so '/imports/activation' is never
+        // swallowed by that route's implicit ImportBatch model binding.
+        Route::get('/imports/activation', [ImportActivationController::class, 'index'])
+            ->middleware('permission:import.activate')
+            ->name('imports.activation');
+        Route::post('/imports/activation/send', [ImportActivationController::class, 'send'])
+            ->middleware('permission:import.activate')
+            ->name('imports.activation.send');
+        Route::post('/imports/activation/{claim}/bounce', [ImportActivationController::class, 'bounce'])
+            ->middleware('permission:import.activate')
+            ->name('imports.activation.bounce');
+        Route::post('/imports/activation/{claim}/correct-email', [ImportActivationController::class, 'correctEmail'])
+            ->middleware('permission:import.activate')
+            ->name('imports.activation.correct-email');
+
         Route::get('/imports/{batch}', [ImportBatchController::class, 'show'])
             ->middleware('permission:import.view')
             ->name('imports.show');

@@ -564,6 +564,9 @@ return [
     'import.rollback' => [
         'ADMINISTRATIVE_ADMIN' => 'F',
     ],
+    'import.activate' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
 
     /*
      * Super Admin control-plane keys (SA0+). Empty role maps: Super Admin bypasses
