@@ -25,6 +25,8 @@ use App\Models\AcademicRecord;
 use App\Models\Course;
 use App\Models\CourseOffering;
 use App\Models\Enrollment;
+use App\Models\GradebookComponent;
+use App\Models\GradebookComponentScore;
 use App\Models\ImportAccountClaim;
 use App\Models\ImportBatch;
 use App\Models\ImportGradeMapping;
@@ -71,6 +73,13 @@ use RuntimeException;
  * - BALANCE (L6): finance opening balances. One carried-forward invoice (owed) and/or
  *   one wallet credit (in hand) per student per currency, gated by an exact
  *   control-total match with no acknowledge override — see §8.
+ * - MIDTERM_ENROLLMENT (L7, conditional): mid-term cutover — §22. One row per
+ *   (student, live CourseOffering, GradebookComponent) score. Unlike COURSE_RESULT,
+ *   this entity type never shadow-creates anything: the target offering must already
+ *   exist, live (`source_system IS NULL`), built by a registrar in the ordinary way,
+ *   or the row is a hard error. Creates one Enrollment per (student, offering) pair
+ *   — grade_status IN_PROGRESS — and one GradebookComponentScore per row. Refuses,
+ *   never overwrites, when an Enrollment already exists for that pair.
  *
  * Every public entry point (`validate`, `dryRun`, `commit`) dispatches on
  * `$batch->entity_type` to the entity-specific private methods below, so adding a
@@ -225,6 +234,7 @@ class ImportBatchService
         return match ($batch->entity_type) {
             ImportEntityType::CourseResult => $this->validateCourseResult($batch),
             ImportEntityType::Balance => $this->validateBalanceRows($batch),
+            ImportEntityType::MidtermEnrollment => $this->validateMidtermEnrollmentRows($batch),
             default => $this->validateStudentRows($batch),
         };
     }
@@ -487,6 +497,193 @@ class ImportBatchService
                             'code' => 'W_UNKNOWN_PROGRAM_CODE',
                             'field' => 'program_code',
                             'params' => ['program_code' => $normalized['program_code']],
+                        ];
+                    }
+                }
+
+                $hasError = collect($rowMessages)->contains(fn ($m) => $m['level'] === 'error');
+                $hasWarning = collect($rowMessages)->contains(fn ($m) => $m['level'] === 'warning');
+                if ($hasError) {
+                    $errorCount++;
+                } elseif ($hasWarning) {
+                    $warningCount++;
+                }
+
+                ImportRow::query()->create([
+                    'batch_id' => $batch->id,
+                    'row_number' => $i + 1,
+                    'natural_key' => $naturalKey,
+                    'payload' => array_combine($parsed['headers'], array_pad($row, count($parsed['headers']), null)),
+                    'normalized' => $normalized,
+                    'action' => null,
+                    'status' => $hasError ? ImportRowStatus::Error : ($hasWarning ? ImportRowStatus::Warn : ImportRowStatus::Valid),
+                    'messages' => $rowMessages,
+                ]);
+            }
+        });
+
+        $batch->update([
+            'error_count' => $errorCount,
+            'warning_count' => $warningCount,
+            'row_count' => count($parsed['rows']),
+            'status' => ImportBatchStatus::Validated,
+            'validated_at' => now(),
+        ]);
+
+        return $batch->fresh();
+    }
+
+    /**
+     * MIDTERM_ENROLLMENT validation — L7, §22. legacy_id must already resolve via an
+     * existing import_links user row (E_UNKNOWN_STUDENT, same as COURSE_RESULT).
+     * course_code + semester_name (or the offering_id override) must resolve to
+     * exactly one *live* CourseOffering (`source_system IS NULL`) —
+     * E_OFFERING_NOT_FOUND / E_OFFERING_AMBIGUOUS, never a fuzzy match, never a
+     * fallback to shadow-creation (§22.2). component_name must match exactly one
+     * GradebookComponent on that offering — E_UNKNOWN_COMPONENT / E_AMBIGUOUS_COMPONENT
+     * (§22.3). score must be numeric and within 0-100 — E_BAD_SCORE / E_SCORE_RANGE.
+     * An Enrollment already existing for the resolved (student, offering) pair is a
+     * hard E_ENROLLMENT_ALREADY_EXISTS error, never silently updated (§22.5).
+     */
+    private function validateMidtermEnrollmentRows(ImportBatch $batch): ImportBatch
+    {
+        $disk = $this->storage->diskName();
+        $parsed = $this->reader->read($disk, $batch->file_path, $batch->sheet_name, $batch->header_row);
+        $mapping = collect($batch->mapping ?? [])->filter(fn ($m) => ! empty($m['target_field']));
+
+        $headerIndex = array_flip($parsed['headers']);
+        $seenKeys = [];
+        $errorCount = 0;
+        $warningCount = 0;
+
+        DB::transaction(function () use ($batch, $parsed, $mapping, $headerIndex, &$seenKeys, &$errorCount, &$warningCount) {
+            ImportRow::query()->where('batch_id', $batch->id)->delete();
+
+            foreach ($parsed['rows'] as $i => $row) {
+                $normalized = [];
+                $rowMessages = [];
+
+                foreach ($mapping as $m) {
+                    $colIndex = $headerIndex[$m['column']] ?? null;
+                    $raw = $colIndex !== null ? ($row[$colIndex] ?? null) : null;
+                    $result = $this->transforms->apply($m['transform'], $raw, $m['options'] ?? []);
+
+                    if (! $result['ok'] && $raw !== null && trim((string) $raw) !== '') {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_BAD_DATE',
+                            'field' => $m['target_field'],
+                            'params' => ['column' => $m['column'], 'value' => $raw],
+                        ];
+                    }
+
+                    if (! isset($normalized[$m['target_field']]) || $normalized[$m['target_field']] === null) {
+                        $normalized[$m['target_field']] = $result['value'];
+                    }
+                }
+
+                foreach (ImportMidtermEnrollmentFields::requiredFor() as $required) {
+                    if (empty($normalized[$required])) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_REQUIRED_FIELD_MISSING',
+                            'field' => $required,
+                            'params' => ['field' => $required],
+                        ];
+                    }
+                }
+
+                $legacyId = $normalized['legacy_id'] ?? null;
+                $componentName = $normalized['component_name'] ?? null;
+                $offeringRef = ! empty($normalized['offering_id'])
+                    ? (string) $normalized['offering_id']
+                    : (($normalized['course_code'] ?? '').'@'.($normalized['semester_name'] ?? ''));
+
+                // The natural key for a midterm-enrollment score is per (student,
+                // offering, component) — one legacy student legitimately appears on
+                // many rows (one per component), and many students share one offering.
+                $naturalKey = ($legacyId !== null && $legacyId !== '' && $componentName !== null && $componentName !== '')
+                    ? $legacyId.'|'.$offeringRef.'|'.$componentName
+                    : 'row-'.($i + 1);
+                if (isset($seenKeys[$naturalKey])) {
+                    $rowMessages[] = [
+                        'level' => 'error',
+                        'code' => 'E_DUPLICATE_NATURAL_KEY',
+                        'field' => 'legacy_id',
+                        'params' => ['legacy_id' => (string) $naturalKey],
+                    ];
+                    $naturalKey = $naturalKey.'#dup-'.($i + 1);
+                }
+                $seenKeys[$naturalKey] = true;
+
+                $studentId = null;
+                if ($legacyId !== null && $legacyId !== '') {
+                    $link = ImportLink::query()
+                        ->where('source_id', $batch->source_id)
+                        ->where('entity_type', 'user')
+                        ->where('legacy_id', $legacyId)
+                        ->first();
+                    if ($link === null) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_UNKNOWN_STUDENT',
+                            'field' => 'legacy_id',
+                            'params' => ['legacy_id' => (string) $legacyId],
+                        ];
+                    } else {
+                        $studentId = $link->target_id;
+                    }
+                }
+
+                $resolved = $this->resolveLiveOffering($normalized);
+                foreach ($resolved['errors'] as $e) {
+                    $rowMessages[] = ['level' => 'error', ...$e];
+                }
+                foreach ($resolved['warnings'] as $w) {
+                    $rowMessages[] = ['level' => 'warning', ...$w];
+                }
+                $offering = $resolved['offering'];
+
+                $component = null;
+                if ($offering !== null && $componentName !== null && $componentName !== '') {
+                    $componentResolution = $this->resolveGradebookComponent($offering, $componentName);
+                    foreach ($componentResolution['errors'] as $e) {
+                        $rowMessages[] = ['level' => 'error', ...$e];
+                    }
+                    $component = $componentResolution['component'];
+                }
+
+                $scoreResolution = $this->parseScorePercent($normalized['score'] ?? null);
+                foreach ($scoreResolution['errors'] as $e) {
+                    $rowMessages[] = ['level' => 'error', ...$e];
+                }
+
+                if ($studentId !== null && $offering !== null) {
+                    $existingEnrollment = Enrollment::query()
+                        ->where('student_id', $studentId)
+                        ->where('offering_id', $offering->id)
+                        ->exists();
+                    if ($existingEnrollment) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_ENROLLMENT_ALREADY_EXISTS',
+                            'field' => 'legacy_id',
+                            'params' => ['legacy_id' => (string) $legacyId, 'course_code' => (string) ($normalized['course_code'] ?? '')],
+                        ];
+                    }
+                }
+
+                if ($studentId !== null && $offering !== null && $component !== null) {
+                    $existingScore = GradebookComponentScore::query()
+                        ->where('component_id', $component->id)
+                        ->where('student_id', $studentId)
+                        ->exists();
+                    if ($existingScore) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_SCORE_ALREADY_EXISTS',
+                            'field' => 'component_name',
+                            'params' => ['component_name' => (string) $componentName],
                         ];
                     }
                 }
@@ -880,6 +1077,7 @@ class ImportBatchService
         return match ($batch->entity_type) {
             ImportEntityType::CourseResult => $this->applyCourseResultRows($batch, $persist),
             ImportEntityType::Balance => $this->applyBalanceRows($batch, $persist, $actor),
+            ImportEntityType::MidtermEnrollment => $this->applyMidtermEnrollmentRows($batch, $persist, $actor),
             default => $this->applyStudentRows($batch, $persist),
         };
     }
@@ -1421,6 +1619,266 @@ class ImportBatchService
     }
 
     /**
+     * Resolves a MIDTERM_ENROLLMENT row's target *live* CourseOffering — decision #2
+     * (§22.2). `offering_id`, when given, is authoritative: it is looked up directly
+     * (scoped to `source_system IS NULL`) and course_code/semester_name are only
+     * cross-checked for a soft `W_OFFERING_ID_MISMATCH` warning, never used to
+     * override it. Otherwise resolves via (course_code, semester_name) among live
+     * offerings only. Zero matches or more than one is always a hard error — never a
+     * fuzzy match, never a fallback to shadow-creation, unlike COURSE_RESULT.
+     *
+     * Shared by validate() and apply() so the two can never disagree about which
+     * offering a row resolves to.
+     *
+     * @param  array<string, mixed>  $normalized
+     * @return array{offering: ?CourseOffering, errors: array<int, array<string, mixed>>, warnings: array<int, array<string, mixed>>}
+     */
+    private function resolveLiveOffering(array $normalized): array
+    {
+        $errors = [];
+        $warnings = [];
+
+        $courseCode = ! empty($normalized['course_code']) ? trim((string) $normalized['course_code']) : null;
+        $semesterName = ! empty($normalized['semester_name']) ? trim((string) $normalized['semester_name']) : null;
+        $offeringId = ! empty($normalized['offering_id']) ? trim((string) $normalized['offering_id']) : null;
+
+        if ($offeringId !== null) {
+            $offering = CourseOffering::query()->whereNull('source_system')->find($offeringId);
+            if ($offering === null) {
+                $errors[] = ['code' => 'E_OFFERING_NOT_FOUND', 'field' => 'offering_id', 'params' => ['reference' => $offeringId]];
+
+                return ['offering' => null, 'errors' => $errors, 'warnings' => $warnings];
+            }
+
+            $mismatch = ($courseCode !== null && $offering->course?->code !== $courseCode)
+                || ($semesterName !== null && mb_strtolower((string) $offering->semester?->name) !== mb_strtolower($semesterName));
+            if ($mismatch) {
+                $warnings[] = ['code' => 'W_OFFERING_ID_MISMATCH', 'field' => 'offering_id', 'params' => ['reference' => $offeringId]];
+            }
+
+            return ['offering' => $offering, 'errors' => $errors, 'warnings' => $warnings];
+        }
+
+        if ($courseCode === null || $semesterName === null) {
+            // The required-field check already reports E_REQUIRED_FIELD_MISSING for
+            // whichever of these is empty; nothing more to resolve without them.
+            return ['offering' => null, 'errors' => $errors, 'warnings' => $warnings];
+        }
+
+        $matches = CourseOffering::query()
+            ->whereNull('source_system')
+            ->whereHas('course', fn ($q) => $q->where('code', $courseCode))
+            ->whereHas('semester', fn ($q) => $q->whereRaw('LOWER(name) = ?', [mb_strtolower($semesterName)]))
+            ->get();
+
+        if ($matches->count() === 0) {
+            $errors[] = ['code' => 'E_OFFERING_NOT_FOUND', 'field' => 'course_code', 'params' => ['course_code' => $courseCode, 'semester_name' => $semesterName]];
+
+            return ['offering' => null, 'errors' => $errors, 'warnings' => $warnings];
+        }
+
+        if ($matches->count() > 1) {
+            $errors[] = ['code' => 'E_OFFERING_AMBIGUOUS', 'field' => 'course_code', 'params' => ['course_code' => $courseCode, 'semester_name' => $semesterName]];
+
+            return ['offering' => null, 'errors' => $errors, 'warnings' => $warnings];
+        }
+
+        return ['offering' => $matches->first(), 'errors' => $errors, 'warnings' => $warnings];
+    }
+
+    /**
+     * Resolves a MIDTERM_ENROLLMENT row's target GradebookComponent on an already-
+     * resolved live offering — decision #3 (§22.3). Case-insensitive exact match on
+     * `name`, scoped to that one offering. No match, or more than one (no unique
+     * constraint stops a registrar creating two same-named components), is a hard
+     * error — never silently dropped.
+     *
+     * @return array{component: ?GradebookComponent, errors: array<int, array<string, mixed>>}
+     */
+    private function resolveGradebookComponent(CourseOffering $offering, ?string $componentName): array
+    {
+        $name = $componentName !== null ? trim($componentName) : null;
+        if ($name === null || $name === '') {
+            return ['component' => null, 'errors' => []];
+        }
+
+        $matches = GradebookComponent::query()
+            ->where('offering_id', $offering->id)
+            ->whereRaw('LOWER(name) = ?', [mb_strtolower($name)])
+            ->get();
+
+        if ($matches->count() === 0) {
+            return ['component' => null, 'errors' => [['code' => 'E_UNKNOWN_COMPONENT', 'field' => 'component_name', 'params' => ['component_name' => $name]]]];
+        }
+
+        if ($matches->count() > 1) {
+            return ['component' => null, 'errors' => [['code' => 'E_AMBIGUOUS_COMPONENT', 'field' => 'component_name', 'params' => ['component_name' => $name]]]];
+        }
+
+        return ['component' => $matches->first(), 'errors' => []];
+    }
+
+    /**
+     * Parses a MIDTERM_ENROLLMENT row's score — a direct 0-100 percent override on
+     * `gradebook_component_scores.score`, the same range `GradebookService::setCellScore()`
+     * enforces for an instructor entering one by hand. A missing value is not an error
+     * here — the required-field check already reports it once, under `score` — but a
+     * present, non-numeric or out-of-range value is (`E_BAD_SCORE` / `E_SCORE_RANGE`).
+     *
+     * @return array{value: ?float, errors: array<int, array<string, mixed>>}
+     */
+    private function parseScorePercent(mixed $raw): array
+    {
+        if ($raw === null || trim((string) $raw) === '') {
+            return ['value' => null, 'errors' => []];
+        }
+
+        $str = trim((string) $raw);
+        if (! is_numeric($str)) {
+            return ['value' => null, 'errors' => [['code' => 'E_BAD_SCORE', 'field' => 'score', 'params' => ['value' => $str]]]];
+        }
+
+        $value = (float) $str;
+        if ($value < 0 || $value > 100) {
+            return ['value' => null, 'errors' => [['code' => 'E_SCORE_RANGE', 'field' => 'score', 'params' => ['value' => $str]]]];
+        }
+
+        return ['value' => $value, 'errors' => []];
+    }
+
+    /**
+     * The MIDTERM_ENROLLMENT commit path — L7, §22. For each valid row: resolve the
+     * student via the existing import_links row, re-resolve the live target
+     * CourseOffering and GradebookComponent exactly as validate() did (§22.2/§22.3),
+     * then create the student's Enrollment on it (`grade_status = IN_PROGRESS`,
+     * `source_system` set) and one GradebookComponentScore for the mapped component.
+     *
+     * Multiple rows commonly share one (student, offering) pair — one row per
+     * component. The first row for that pair creates the Enrollment; every later row
+     * in the same run reuses it. An Enrollment (or score) that already existed
+     * *before this run* is a defensive re-check-and-skip — validate() should already
+     * have refused every row for that pair with E_ENROLLMENT_ALREADY_EXISTS /
+     * E_SCORE_ALREADY_EXISTS; this is defense in depth, the same posture §20.1 uses
+     * for BALANCE's money gate (recomputed fresh, never trusted from validate alone).
+     * Decision #5, §22.5: this entity type never updates an existing Enrollment or
+     * score — only ever creates.
+     *
+     * @return array<string, int>
+     */
+    private function applyMidtermEnrollmentRows(ImportBatch $batch, bool $persist, ?User $actor = null): array
+    {
+        $enrollmentsCreated = 0;
+        $scoresCreated = 0;
+        $skip = 0;
+        $studentIds = [];
+
+        /** @var array<string, true> $enrollmentPairsThisRun "studentId:offeringId" pairs created earlier in this same run */
+        $enrollmentPairsThisRun = [];
+
+        /** @var Collection<int, ImportRow> $rows */
+        $rows = ImportRow::query()->where('batch_id', $batch->id)
+            ->whereIn('status', [ImportRowStatus::Valid, ImportRowStatus::Warn])
+            ->orderBy('row_number')
+            ->get();
+
+        foreach ($rows as $row) {
+            $normalized = $row->normalized ?? [];
+            $legacyId = $normalized['legacy_id'] ?? null;
+
+            $link = $legacyId !== null
+                ? ImportLink::query()
+                    ->where('source_id', $batch->source_id)
+                    ->where('entity_type', 'user')
+                    ->where('legacy_id', $legacyId)
+                    ->first()
+                : null;
+            $student = $link !== null ? User::query()->find($link->target_id) : null;
+
+            $offering = $this->resolveLiveOffering($normalized)['offering'];
+            $component = $offering !== null
+                ? $this->resolveGradebookComponent($offering, $normalized['component_name'] ?? null)['component']
+                : null;
+            $scoreValue = $this->parseScorePercent($normalized['score'] ?? null)['value'];
+
+            // validate() would already have blocked any row where one of these can't
+            // resolve — defensive re-check, same convention as
+            // applyCourseResultRows's "validate() would already have blocked this row".
+            if ($student === null || $offering === null || $component === null || $scoreValue === null) {
+                $skip++;
+
+                continue;
+            }
+
+            $pairKey = $student->id.':'.$offering->id;
+            $alreadyExisted = ! isset($enrollmentPairsThisRun[$pairKey])
+                && Enrollment::query()->where('student_id', $student->id)->where('offering_id', $offering->id)->exists();
+
+            if ($alreadyExisted) {
+                // Pre-existing before this run — decision #5 (§22.5): never write on
+                // top of a live enrollment an instructor may already be grading.
+                $skip++;
+
+                continue;
+            }
+
+            $scoreAlreadyExists = GradebookComponentScore::query()
+                ->where('component_id', $component->id)
+                ->where('student_id', $student->id)
+                ->exists();
+            if ($scoreAlreadyExists) {
+                // Paranoia guard — should be unreachable given the check just above,
+                // but a score is never silently overwritten. See §22.6.
+                $skip++;
+
+                continue;
+            }
+
+            $studentIds[$student->id] = true;
+
+            if (! isset($enrollmentPairsThisRun[$pairKey])) {
+                $enrollmentPairsThisRun[$pairKey] = true;
+                $enrollmentsCreated++;
+                if ($persist) {
+                    Enrollment::query()->create([
+                        'student_id' => $student->id,
+                        'offering_id' => $offering->id,
+                        'status' => EnrollmentStatus::Enrolled,
+                        'is_audit' => false,
+                        'enrolled_at' => now(),
+                        'grade_type' => GradeType::InProgress,
+                        'grade_status' => GradeStatus::InProgress,
+                        'source_system' => $batch->source->code,
+                    ]);
+                }
+            }
+
+            $scoresCreated++;
+            if ($persist) {
+                $score = GradebookComponentScore::query()->create([
+                    'component_id' => $component->id,
+                    'student_id' => $student->id,
+                    'score' => round($scoreValue, 4),
+                    'updated_by_id' => $actor?->id,
+                ]);
+
+                $row->update([
+                    'action' => ImportRowAction::Create,
+                    'target_type' => GradebookComponentScore::class,
+                    'target_id' => $score->id,
+                    'status' => ImportRowStatus::Applied,
+                ]);
+            }
+        }
+
+        return [
+            'create' => $scoresCreated,
+            'enrollments_created' => $enrollmentsCreated,
+            'skip' => $skip,
+            'distinct_students' => count($studentIds),
+        ];
+    }
+
+    /**
      * L6 commit logic. Per valid row: `owed_minor > 0` creates exactly one Invoice
      * (source_system set, status Open, one InvoiceLine, offering_id null) and
      * `credit_minor > 0` creates exactly one WalletTransaction (kind Money, direction
@@ -1674,12 +2132,12 @@ class ImportBatchService
      * credit — for COURSE_RESULT) — the rollback names exactly what blocks it rather
      * than failing vaguely.
      *
-     * Scope note: only STUDENT and COURSE_RESULT are reversible today. A BALANCE
-     * batch's invoices and wallet credits are real financial records the moment they
-     * commit — reversing them safely (crediting back a wallet that may already have
-     * been spent from, voiding an invoice that may already carry a payment) is a
-     * distinct feature with its own rules, not a copy of the STUDENT rollback's
-     * delete-the-row logic, and is out of scope for this phase.
+     * Scope note: STUDENT, COURSE_RESULT and MIDTERM_ENROLLMENT are reversible today.
+     * A BALANCE batch's invoices and wallet credits are real financial records the
+     * moment they commit — reversing them safely (crediting back a wallet that may
+     * already have been spent from, voiding an invoice that may already carry a
+     * payment) is a distinct feature with its own rules, not a copy of the STUDENT
+     * rollback's delete-the-row logic, and is out of scope for this phase.
      *
      * @return array{rolled_back: int, blocked: array<int, array{row: int, reason: string}>}
      */
@@ -1698,19 +2156,21 @@ class ImportBatchService
         $blocked = [];
         $rolledBack = 0;
 
-        $isCourseResult = $batch->entity_type === ImportEntityType::CourseResult;
+        $entityType = $batch->entity_type;
 
-        $this->audit->withAudit($actor, 'import.batch_rollback', function () use ($batch, $actor, $isCourseResult, &$blocked, &$rolledBack) {
-            DB::transaction(function () use ($batch, $actor, $isCourseResult, &$blocked, &$rolledBack) {
+        $this->audit->withAudit($actor, 'import.batch_rollback', function () use ($batch, $actor, $entityType, &$blocked, &$rolledBack) {
+            DB::transaction(function () use ($batch, $actor, $entityType, &$blocked, &$rolledBack) {
                 $rows = ImportRow::query()->where('batch_id', $batch->id)
                     ->where('status', ImportRowStatus::Applied)
                     ->where('action', ImportRowAction::Create)
                     ->get();
 
                 foreach ($rows as $row) {
-                    $reason = $isCourseResult
-                        ? $this->rollbackCourseResultRow($batch, $row)
-                        : $this->rollbackStudentRow($batch, $row);
+                    $reason = match ($entityType) {
+                        ImportEntityType::CourseResult => $this->rollbackCourseResultRow($batch, $row),
+                        ImportEntityType::MidtermEnrollment => $this->rollbackMidtermEnrollmentRow($batch, $row),
+                        default => $this->rollbackStudentRow($batch, $row),
+                    };
 
                     if ($reason === false) {
                         // Nothing to reverse (target already gone) — leave the row as is.
@@ -1811,6 +2271,63 @@ class ImportBatchService
         $record->delete();
         if ($enrollmentId !== null) {
             Enrollment::query()->where('id', $enrollmentId)->delete();
+        }
+
+        return null;
+    }
+
+    /**
+     * Reverses one MIDTERM_ENROLLMENT row: deletes the GradebookComponentScore it
+     * created. Refused — decision #7, §22.7 — if the enrollment's grade_status has
+     * moved past IN_PROGRESS (the instructor has submitted or locked grades since
+     * import) or if this exact score has been touched by anyone other than the actor
+     * who committed this import (an instructor grading in the live gradebook since
+     * go-live — precisely the scenario this whole entity type exists to protect).
+     * Neither check needed a new column: `grade_status` already exists on
+     * `enrollments`, and `gradebook_component_scores.updated_by_id` already records
+     * who last wrote a score.
+     *
+     * The shared Enrollment this row's score was posted against is left in place
+     * while any other row still has a score against it — same "shared infrastructure"
+     * reasoning as §21.4's COURSE_RESULT rollback — but once the last
+     * MIDTERM_ENROLLMENT-created score against it is gone, the (now-empty) Enrollment
+     * this import created is removed too, so a full rollback of the batch leaves
+     * nothing behind for that student.
+     *
+     * @return string|false|null a blocking reason, `false` if there was nothing to
+     *                           reverse, or `null` once successfully rolled back
+     */
+    private function rollbackMidtermEnrollmentRow(ImportBatch $batch, ImportRow $row): string|false|null
+    {
+        $score = $row->target_id !== null ? GradebookComponentScore::query()->find($row->target_id) : null;
+        if ($score === null) {
+            return false;
+        }
+
+        $component = GradebookComponent::query()->find($score->component_id);
+        $enrollment = $component !== null
+            ? Enrollment::query()->where('student_id', $score->student_id)->where('offering_id', $component->offering_id)->first()
+            : null;
+
+        if ($enrollment !== null && $enrollment->grade_status !== GradeStatus::InProgress) {
+            return 'The instructor has moved grading forward on this enrollment since import — grades are no longer in progress.';
+        }
+
+        if ($score->updated_by_id !== $batch->committed_by_id) {
+            return 'This score has been edited in the gradebook since import.';
+        }
+
+        $score->delete();
+
+        if ($enrollment !== null && $enrollment->source_system === $batch->source->code) {
+            $stillHasScores = GradebookComponentScore::query()
+                ->whereIn('component_id', GradebookComponent::query()->where('offering_id', $enrollment->offering_id)->pluck('id'))
+                ->where('student_id', $enrollment->student_id)
+                ->exists();
+
+            if (! $stillHasScores) {
+                $enrollment->delete();
+            }
         }
 
         return null;

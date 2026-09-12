@@ -9,6 +9,7 @@
 
     $isBalance = $batch->entity_type === ImportEntityType::Balance;
     $isCourseResult = $batch->entity_type === ImportEntityType::CourseResult;
+    $isMidtermEnrollment = $batch->entity_type === ImportEntityType::MidtermEnrollment;
     $totals = $batch->control_totals ?? null;
     $report = $batch->dry_run_report ?? null;
     $hasRun = in_array($batch->status->value, ['DRY_RUN', 'COMMITTED', 'ROLLED_BACK'], true) && $report !== null;
@@ -156,6 +157,66 @@
                 </div>
             </div>
         @endif
+
+        <x-card variant="quiet" class="mb-4">
+            <h2 class="h6 page-title mb-3">{{ __('import.control_totals_title') }}</h2>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr><th></th><th class="text-end">{{ __('import.control_totals_declared') }}</th><th class="text-end">{{ __('import.control_totals_computed') }}</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ __('import.col_rows') }}</td>
+                            <td class="text-end">{{ number_format($totals['declared_rows'] ?? 0) }}</td>
+                            <td class="text-end">{{ number_format($totals['computed_rows'] ?? 0) }}</td>
+                            <td>
+                                @if($mismatch)
+                                    <span class="spims-status-badge spims-status-warning">{{ __('import.control_totals_differ', ['count' => abs(($totals['declared_rows'] ?? 0) - ($totals['computed_rows'] ?? 0))]) }}</span>
+                                @else
+                                    <span class="spims-status-badge spims-status-success">{{ __('import.control_totals_match') }}</span>
+                                @endif
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </x-card>
+
+        @if($batch->status->value === 'DRY_RUN')
+            <x-card variant="panel" x-data="{ ack: {{ $mismatch ? 'false' : 'true' }} }">
+                @if($mismatch)
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="ack" x-model="ack">
+                        <label class="form-check-label small" for="ack">{{ __('import.ack_label') }}</label>
+                    </div>
+                @endif
+                <div class="d-flex gap-2 flex-wrap">
+                    <form method="POST" action="{{ route('admin.imports.dry-run.run', $batch) }}">
+                        @csrf
+                        <button class="btn btn-outline-secondary">{{ __('import.rerun_button') }}</button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.imports.commit', $batch) }}" onsubmit="return confirm('{{ __('import.commit_confirm') }}')">
+                        @csrf
+                        <button class="btn btn-primary" :disabled="!ack">{{ __('import.commit_button') }}</button>
+                    </form>
+                </div>
+            </x-card>
+        @elseif($batch->status->value === 'COMMITTED')
+            <a href="{{ route('admin.imports.show', $batch) }}" class="btn btn-outline-primary">{{ __('import.batch_title') }}</a>
+        @endif
+    @elseif($isMidtermEnrollment)
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-4">
+                <x-stat :label="__('import.report_enrollments_created')" :value="$report['enrollments_created'] ?? 0" />
+            </div>
+            <div class="col-6 col-lg-4">
+                <x-stat :label="__('import.report_scores_created')" :value="$report['create'] ?? 0" />
+            </div>
+            <div class="col-6 col-lg-4">
+                <x-stat :label="__('import.report_skip')" :value="$report['skip'] ?? 0" />
+            </div>
+        </div>
 
         <x-card variant="quiet" class="mb-4">
             <h2 class="h6 page-title mb-3">{{ __('import.control_totals_title') }}</h2>

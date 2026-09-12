@@ -88,12 +88,25 @@ class ImportLocaleParityTest extends TestCase
             'E_DUPLICATE_NATURAL_KEY',
             'W_NO_EMAIL_ALUMNUS',
             'W_UNKNOWN_PROGRAM_CODE',
+            // L7 — mid-term cutover (MIDTERM_ENROLLMENT), §22.
+            'E_OFFERING_NOT_FOUND',
+            'E_OFFERING_AMBIGUOUS',
+            'W_OFFERING_ID_MISMATCH',
+            'E_UNKNOWN_COMPONENT',
+            'E_AMBIGUOUS_COMPONENT',
+            'E_BAD_SCORE',
+            'E_SCORE_RANGE',
+            'E_ENROLLMENT_ALREADY_EXISTS',
+            'E_SCORE_ALREADY_EXISTS',
         ];
 
         foreach (['ar', 'en', 'fr'] as $locale) {
             app()->setLocale($locale);
             foreach ($codes as $code) {
-                $translated = __('import.error_code.'.$code, ['field' => 'x', 'column' => 'x', 'value' => 'x', 'legacy_id' => 'x', 'program_code' => 'x']);
+                $translated = __('import.error_code.'.$code, [
+                    'field' => 'x', 'column' => 'x', 'value' => 'x', 'legacy_id' => 'x', 'program_code' => 'x',
+                    'course_code' => 'x', 'semester_name' => 'x', 'component_name' => 'x', 'reference' => 'x',
+                ]);
                 $this->assertNotSame('import.error_code.'.$code, $translated, "Missing translation for {$code} in {$locale}");
             }
         }

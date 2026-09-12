@@ -13,6 +13,7 @@ use App\Models\ImportSource;
 use App\Services\Import\ImportBalanceFields;
 use App\Services\Import\ImportBatchService;
 use App\Services\Import\ImportCourseResultFields;
+use App\Services\Import\ImportMidtermEnrollmentFields;
 use App\Services\Import\ImportStudentFields;
 use App\Services\Import\ImportTransformService;
 use App\Support\AuthorizeService;
@@ -147,6 +148,10 @@ class ImportBatchController extends Controller
             ImportEntityType::Balance => [
                 'fields' => ImportBalanceFields::catalog(),
                 'required' => ImportBalanceFields::requiredFor($batch->population),
+            ],
+            ImportEntityType::MidtermEnrollment => [
+                'fields' => ImportMidtermEnrollmentFields::catalog(),
+                'required' => ImportMidtermEnrollmentFields::requiredFor($batch->population),
             ],
             default => throw new \RuntimeException("No field catalog registered for import entity type {$batch->entity_type->value}."),
         };
