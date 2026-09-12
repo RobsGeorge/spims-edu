@@ -90,6 +90,12 @@
                 </x-card>
             </div>
 
+            <div class="col-12" x-show="entityType === 'MIDTERM_ENROLLMENT'">
+                <x-card variant="quiet">
+                    <p class="small spims-text-dim mb-0">{{ __('import.midterm_enrollment_help') }}</p>
+                </x-card>
+            </div>
+
             <div class="col-12" x-show="entityType === 'CREDENTIAL'">
                 <x-card variant="quiet">
                     <p class="small spims-text-dim mb-0">{{ __('import.credential_help') }}</p>

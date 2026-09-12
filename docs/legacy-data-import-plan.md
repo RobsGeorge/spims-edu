@@ -1028,15 +1028,14 @@ Everything below is real, tested, and in production — not aspirational.
 
 ### Not built yet (traces to later phases in §13)
 
-As of §21, every phase through L6 has shipped: L2 (identity ladder + merge queue), L3/L4 (course
-results, GPA isolation, shadow catalog, transcript surfacing), L5 (account-claim invitations) and L6
-(finance opening balances) — see §18, §21, §19 and §20 respectively for their design notes. What
-remains is only what was always conditional/optional in the phase plan:
+Every phase in the plan has now shipped, including the two that were always conditional/optional
+rather than on the critical path: L2 (identity ladder + merge queue), L3/L4 (course results, GPA
+isolation, shadow catalog, transcript surfacing), L5 (account-claim invitations), L6 (finance opening
+balances), L7 (mid-term cutover — built ahead of the calendar actually forcing it) and L8 (legacy
+credentials + AI-assisted mapping) — see §18–§23 respectively for their design notes.
 
-- **L7 — mid-term cutover.**
-- **L8 — legacy credentials and AI-assisted mapping.**
-
-Neither is scheduled; both stay here as future options rather than committed next work.
+There is no remaining phase from the original plan. Anything further is a new feature, not a gap in
+this one.
 
 ---
 
@@ -1280,14 +1279,216 @@ native use blocks its own reversal — same principle, applied to `COURSE_RESULT
 
 ---
 
-## 22. L8 design notes — legacy credentials and AI-assisted mapping
+## 22. L7 design notes — the mid-term cutover (MIDTERM_ENROLLMENT)
+
+A fourth entity type, `MIDTERM_ENROLLMENT`, shipped on top of §17-§21 — the conditional V2 path from
+§3's cutover-timing subsection, built because the task brief called for it directly rather than
+because the calendar forced it (§13's own stated trigger). This section records the design decisions
+made while building it, additively — §17-§21 stay exactly as they were.
+
+### 22.1 Why this is not a fourth `COURSE_RESULT` variant
+
+`COURSE_RESULT` and `MIDTERM_ENROLLMENT` look structurally similar — both walk the same identity
+ladder rung, both post an `Enrollment`, both are gated by the same `import.stage`/`import.commit`
+permissions — but they operate on data with opposite trust models, and every design decision below
+follows from that one difference:
+
+- A `COURSE_RESULT` row is **closed history**. Nothing else in SPIMS will ever write to the shadow
+  offering it posts against, so find-or-creating that offering is safe, and re-importing the same row
+  later safely *updates* it (§21's `updateOrCreate`).
+- A `MIDTERM_ENROLLMENT` row is **live, currently-in-progress state that a real instructor is actively
+  grading in SPIMS this term**, on an offering a registrar already built by hand. Shadow-creating
+  anything here would be nonsensical (there is nothing to shadow — the whole point is landing on the
+  *live* offering), and silently updating on a second import could throw away grading work an
+  instructor has entered since go-live.
+
+So `MIDTERM_ENROLLMENT` never find-or-creates a `Course` or `CourseOffering` — an unresolved reference
+is always a hard row error (§22.2) — and it never updates an existing `Enrollment` or
+`GradebookComponentScore` — an already-existing one is always a hard row error too (§22.5/§22.6).
+Where `COURSE_RESULT` is optimistic ("link if you can, otherwise build the shadow and move on"),
+`MIDTERM_ENROLLMENT` is pessimistic ("resolve exactly, or refuse the row") — the same posture §20.1
+describes for `BALANCE`'s money gate, applied here to live academic state instead of live financial
+state.
+
+### 22.2 Resolving the target live offering unambiguously
+
+`course_code` alone cannot identify one offering — a school can run more than one live section of the
+same course in the same semester — so a `MIDTERM_ENROLLMENT` row identifies its target with
+**`course_code` + `semester_name` together**, resolved only among offerings with `source_system IS
+NULL` (`ImportBatchService::resolveLiveOffering()`, shared verbatim by `validate()` and the committer
+so the two can never disagree about which offering a row means):
+
+- Zero live offerings match → `E_OFFERING_NOT_FOUND`.
+- Exactly one matches → resolved.
+- More than one matches (the multi-section case) → `E_OFFERING_AMBIGUOUS`, naming the course and
+  semester and pointing the registrar at the escape hatch below. **Never** a fuzzy match, never a
+  fallback to picking the first one, never a fallback to shadow-creation.
+
+The escape hatch is an optional `offering_id` field carrying the exact SPIMS `CourseOffering` ulid.
+When present it is authoritative — looked up directly (still scoped to `source_system IS NULL`, so an
+`offering_id` that happens to name a *shadow* offering is still refused) — and `course_code` /
+`semester_name` are only cross-checked against it for a soft `W_OFFERING_ID_MISMATCH` warning, never
+used to override it. `course_code` and `semester_name` stay required on every row even when
+`offering_id` is also given (`ImportMidtermEnrollmentFields::alwaysRequired()`): the mapping screen's
+required-field guard (§11.5) is a plain per-batch AND set everywhere else in this feature, and
+inventing per-row OR-required logic just for this one field would be new surface area for a rare case
+a registrar can solve by filling in one more column. `semester_name` matches case-insensitively
+(registrar-typed free text); `course_code` matches exactly, the same convention `COURSE_RESULT`
+already uses for its own course-code lookups.
+
+### 22.3 Resolving the target gradebook component
+
+`component_name` is matched case-insensitively against `GradebookComponent.name`, scoped to the one
+already-resolved offering (`ImportBatchService::resolveGradebookComponent()`). No match is
+`E_UNKNOWN_COMPONENT`; more than one match — nothing stops a registrar creating two components with
+the same name on one offering, there is no unique constraint — is `E_AMBIGUOUS_COMPONENT`. Both are
+hard errors, never a silently-dropped score, per the task brief's explicit instruction.
+
+### 22.4 The row shape: one row per (student, offering, component) score
+
+Decision #4's simplest, safest option — one row per (student, offering, component) score, the "long"
+format that mirrors how `COURSE_RESULT` already does one row per (student, course, term) — is what
+shipped. `ImportMidtermEnrollmentFields` is the field catalog: `legacy_id`, `course_code`,
+`semester_name`, `offering_id` (optional), `component_name`, `score`.
+
+A real Canvas gradebook export is wide (one column per assignment). Reshaping it into this long format
+is the registrar's/admin's job before upload, exactly as the task brief allows — documented in the
+upload screen's help text (`import.midterm_enrollment_help`) rather than solved in code. A
+reshape-on-upload transform was left out of scope: the core entity type's correctness and safety came
+first, and a spreadsheet pivot (wide Canvas columns → long SPIMS rows) is a mechanical, well-understood
+step for whoever runs the export — it does not need this phase to also carry a general-purpose
+column-melting transform that nothing else in the mapping engine's transform vocabulary (§5.3) has a
+precedent for.
+
+### 22.5 Enrollment creation vs. update — decision #5
+
+The common case is create: SPIMS is going live for the first time this term, so these students
+typically have no prior `Enrollment` on the offering at all. The rule for the uncommon case — an
+`Enrollment` already exists for (student, live offering) — is: **refuse the row outright, never
+update it.** `E_ENROLLMENT_ALREADY_EXISTS` names the course code so the registrar can see why.
+
+This is checked twice, on purpose — once at `validate()` time (a plain existence query against
+`enrollments`, safe because nothing has written anything yet) and again, defensively, inside the
+committer itself, the same "recomputed fresh, never trusted from validate alone" posture §20.1
+describes for `BALANCE`'s money gate. It is also backed by a real constraint one layer down: `create()`
+would fail rows attempting a duplicate committer `(student_id, offering_id)` — because if
+somehow both application-level checks were bypassed, the *actual* database schema already carries a
+`unique(['student_id', 'offering_id'])` constraint on `enrollments` (from the original L1
+`gradebook_tables` migration, predating this phase entirely) — so a race between two concurrent
+imports fails loudly with a DB error rather than silently double-writing. No new migration was needed
+for any of this — see §22.9.
+
+One real consequence worth stating plainly: because an existing `Enrollment` always refuses the row,
+**every gradebook component already graded for a mid-term student must be included together in one
+upload.** A follow-up file adding a missed component for a student who was already imported will be
+refused for that student — `E_ENROLLMENT_ALREADY_EXISTS` fires on every row for that pair, not just
+the first. Fixing that requires rolling back the earlier batch's rows for that student first (§22.7),
+not appending a correction file. This is the direct, deliberate cost of "never silently clobber
+instructor work" (the task brief's own framing) — a looser rule that allowed appending scores to an
+existing import-created enrollment would reopen exactly the ambiguity decision #5 exists to close:
+*was this second file also written before the instructor touched anything, or after?* Refusing outright
+means that question never has to be answered by guessing.
+
+### 22.6 Never silently overwriting an existing score either
+
+Symmetrically, if a `GradebookComponentScore` already exists for the resolved `(component, student)`
+pair, the row is refused (`E_SCORE_ALREADY_EXISTS`) rather than updated. In the ordinary flow this is
+unreachable — §22.5 already blocks the row before an `Enrollment` exists, and a score for a student
+with no `Enrollment` on that offering is not something the ordinary product creates — but it costs one
+query to check, and the brief's instruction was "never guess, never silently overwrite," not "never
+overwrite in the cases we can think of." The check stays as a second line of defense that outlives
+whatever assumption made it seem unreachable at the time this was written.
+
+### 22.7 Rollback — no new migration needed, by design
+
+A `MIDTERM_ENROLLMENT` row's rollback (`ImportBatchService::rollbackMidtermEnrollmentRow()`) deletes
+the `GradebookComponentScore` it created and — once every score it wrote against the shared
+`Enrollment` is gone — the `Enrollment` itself, so a full rollback of the batch leaves nothing behind
+for that student (unlike `COURSE_RESULT`'s rollback, which deliberately leaves the shadow
+`Course`/`CourseOffering` behind as shared infrastructure, §21.4 — there is no "shared infrastructure"
+concept here to preserve, since the offering was never this import's to create in the first place).
+
+Rollback is refused, per row, on either of two conditions — decision #7, and the task brief's own
+suggested pair:
+
+1. **The enrollment's `grade_status` has moved past `IN_PROGRESS`.** `submitGrades()`/`lockGrades()`
+   are the only two code paths that ever change it, and both are instructor actions — grading has
+   moved forward since import, and reversing underneath that would be exactly the kind of silent
+   clobber this phase exists to prevent.
+2. **This exact score's `updated_by_id` no longer equals the actor who committed this import.**
+   `gradebook_component_scores.updated_by_id` already records who last wrote a score — the same column
+   `GradebookService::setCellScore()` writes when an instructor edits a cell by hand — so comparing it
+   against `import_batches.committed_by_id` is a direct, existing signal that someone other than the
+   import itself has touched this specific score since. No new column was needed.
+
+Both checks reuse a column that already existed before this phase (`enrollments.grade_status`,
+`gradebook_component_scores.updated_by_id`) rather than adding a `source_system` marker to
+`gradebook_component_scores` to track "did the import write this." That is why **this phase shipped
+with no new migration at all** — CLAUDE.md's hard rule 5 note that migrations are additive-only was
+satisfied by finding nothing that needed adding, not by adding nothing carelessly; both
+`enrollments.source_system`/`grade_status` and `gradebook_component_scores.updated_by_id` were already
+in place from earlier phases (§4.2, and the base gradebook migration respectively) and this phase
+checked for a gap before writing one, per the task brief's own instruction to "check."
+
+### 22.8 Identity resolution — reused exactly, rung 1 only
+
+`legacy_id` resolves through the same `import_links` lookup `COURSE_RESULT` already uses — a legacy id
+not already linked by a committed `STUDENT` batch is `E_UNKNOWN_STUDENT`, a hard error, exactly as
+§18's rung 1. No new identity-matching code was written for this phase, per the task brief's explicit
+instruction not to reinvent it.
+
+### 22.9 Permissions — reused exactly, nothing new
+
+`MIDTERM_ENROLLMENT` batches go through the same `import.stage` / `import.commit` / `import.rollback`
+keys every other entity type does — no new permission key, no change to `config/permissions.php`,
+`config/permission_scopes.php`, or `docs/role-matrix.md`. Two additions were considered and rejected:
+
+- **An additional `finance.manage`-style gate**, mirroring `BALANCE`'s extra check (§20.5). Rejected:
+  this entity type never touches money, so there is nothing for a second financial sign-off to guard.
+- **A per-offering `gradebook.configure` check**, since writing `GradebookComponentScore` rows is
+  otherwise something only staff with that offering-scoped permission can do (`GradebookService::
+  setCellScore()`). Rejected: a single mid-term cutover file legitimately spans many offerings across
+  many instructors, and the registrar running the import is not expected to hold `gradebook.configure`
+  on every one of them. The bulk-import authority is already gated at the school-wide `import.commit`
+  key, same as every other entity type; the safety net here is the refuse-never-overwrite row rules
+  above, not a second, narrower permission check that would make a routine cutover impossible to run
+  in one pass.
+
+### 22.10 What shipped, and what stayed out of scope
+
+Shipped: the `MIDTERM_ENROLLMENT` entity type end to end — mapping, validate, dry run (executes the
+real commit path inside a transaction that is always rolled back, exactly like every other entity
+type), commit, rollback, the wizard's create/dry-run screens, and full ar/en/fr localisation including
+every new error code. Twelve tests in `tests/Feature/Import/ImportMidtermEnrollmentTest.php` cover the
+happy path (a live `Enrollment` + `GradebookComponentScore` are created, never a shadow anything),
+`E_OFFERING_NOT_FOUND`, `E_OFFERING_AMBIGUOUS` with the `offering_id` escape hatch resolving it,
+`E_UNKNOWN_COMPONENT`, `E_UNKNOWN_STUDENT`, `E_ENROLLMENT_ALREADY_EXISTS` refusing rather than
+overwriting, a dry run writing nothing, a successful rollback that cleans up both the score and the
+now-empty enrollment, rollback refused once an instructor has edited the score, rollback refused once
+grading has moved past `IN_PROGRESS`, the audit-log entry, and that a commit sends no mail. The
+pre-existing suite (now 1,300+ tests across the whole app) passes unmodified alongside them.
+
+Left out of scope, deliberately:
+
+- **A wide-to-long Canvas gradebook reshape helper.** §22.4 — the registrar's/admin's job for now, as
+  the task brief allowed.
+- **A batch-level "STUDENT must already be committed" gate at `commit()`**, the kind `E_CANVAS_BEFORE_
+  POPULI` enforces for `STUDENT`/LMS batches (§18.2). Not added, matching `COURSE_RESULT`'s own
+  precedent: `E_UNKNOWN_STUDENT` already blocks each offending row individually, and a batch-level gate
+  would only save a registrar from discovering that at the row level instead of the batch level.
+- **Legacy credentials, AI-assisted mapping (L8)** — unrelated to this phase; see §23, which shipped
+  alongside this one.
+
+---
+
+## 23. L8 design notes — legacy credentials and AI-assisted mapping
 
 L8's two independent halves — legacy credentials (Part A) and AI-assisted mapping (Part B) — shipped
 on top of §17-§21. This section records the design decisions made while building them, additively;
 §17-§21 stay exactly as they were. L8 was optional and never blocked go-live (§13); both halves ship
 together on one branch.
 
-### 22.1 Part A — a legacy credential is a fact about a document, not a fresh issuance
+### 23.1 Part A — a legacy credential is a fact about a document, not a fresh issuance
 
 The acceptance bar was stated precisely: *"a migrated diploma verifies as historical and cannot be
 reissued under a SPIMS serial."* Two design choices make that true by construction rather than by a
@@ -1355,7 +1556,7 @@ course certificate; asking them to say so costs one mapped column and keeps ever
 unchanged for a legacy row, instead of needing a special case for one enum value that means "look at
 `source_system` to find out what this actually is."
 
-### 22.2 Part A — what stayed out of scope
+### 23.2 Part A — what stayed out of scope
 
 `offering_id` is never populated by a `CREDENTIAL` import — the task named only "optionally a program
 reference," and a legacy `STANDALONE_CERTIFICATE`/`OFFERING_COMPLETION` row would need to resolve against a
@@ -1369,7 +1570,7 @@ and `regenerate()`, both of which are unambiguously closed; a distinct "this ren
 not the original" watermark on the legacy download path is a reasonable next increment, not a defect in
 this one.
 
-### 22.3 Part B — the masking payload is minimal by construction, not by redaction
+### 23.3 Part B — the masking payload is minimal by construction, not by redaction
 
 The task named this the single most important test in the phase, and the design choice behind it is what
 makes that test simple rather than merely thorough: `ImportAiMasking::samplesForType()` never receives a
@@ -1406,7 +1607,7 @@ each one guards a different caller (a human clicking, a replayed request, and a 
 service that might forget the controller's own check exists) — cheap insurance for a control the task
 explicitly called non-negotiable.
 
-### 22.4 Part B — AI fills gaps because a cheaper, more precise signal always wins when one exists
+### 23.4 Part B — AI fills gaps because a cheaper, more precise signal always wins when one exists
 
 `fillGaps()` only ever considers a column already sitting at `None` confidence after the three deterministic
 tiers have run, and never rewrites a column already carrying `High`, `Medium`, or `Low`. This isn't a
@@ -1414,7 +1615,7 @@ policy bolted on top of an otherwise-general "suggest a mapping" method — it's
 named `fillGaps()` rather than `suggest()`. A tier-1 synonym-dictionary hit or a tier-2 normalised-header
 match is a deterministic fact about the column header text; even tier 3's value-shape heuristic is a
 majority-vote over every real value in the column. An LLM's guess, working only from a header string, an
-inferred type, and a fixed placeholder shape (§22.3), is strictly less informed than any of the three — it
+inferred type, and a fixed placeholder shape (§23.3), is strictly less informed than any of the three — it
 never sees a real value at all, by design. Letting it override a confident deterministic match would trade
 a stronger signal for a weaker one for no reason; `ImportAiMappingTest::ai_suggestions_never_override_an_existing_confident_deterministic_match`
 proves this directly by handing a fake `AiClient` that *tries* to hijack an already-`High`-confidence column
