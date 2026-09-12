@@ -16,7 +16,7 @@ Sources of truth, in the order the runtime consults them:
 Product intent: `docs/spims-spec-summary.md` §Roles. This file is the mechanical companion —
 every key, every level, every scope caveat.
 
-**Counts as shipped:** 125 permission keys · 45 offering-scoped · 12 Super-Admin-only (empty role map).
+**Counts as shipped:** 127 permission keys · 45 offering-scoped · 12 Super-Admin-only (empty role map).
 
 ---
 
@@ -339,6 +339,7 @@ None of these keys are offering-scoped; a batch is school-wide by nature.
 | `import.commit` | School | `F` | – | – | – | – | – |
 | `import.rollback` | School | `F` | – | – | – | – | – |
 | `import.activate` | School | `F` | – | – | – | – | – |
+| `import.merge_resolve` | School | `F` | – | – | – | – | – |
 
 ### Gradebook (`gradebook.*`)
 

@@ -567,6 +567,9 @@ return [
     'import.activate' => [
         'ADMINISTRATIVE_ADMIN' => 'F',
     ],
+    'import.merge_resolve' => [
+        'ADMINISTRATIVE_ADMIN' => 'F',
+    ],
 
     /*
      * Super Admin control-plane keys (SA0+). Empty role maps: Super Admin bypasses

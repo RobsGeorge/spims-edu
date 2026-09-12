@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\HelpArticleAdminController;
 use App\Http\Controllers\Admin\HelpCategoryController;
 use App\Http\Controllers\Admin\ImportActivationController;
 use App\Http\Controllers\Admin\ImportBatchController;
+use App\Http\Controllers\Admin\ImportMergeController;
 use App\Http\Controllers\Admin\ImportSourceController;
 use App\Http\Controllers\Admin\LiveSessionAdminController;
 use App\Http\Controllers\Admin\OfferingClosingController;
@@ -1196,6 +1197,17 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/imports/sources/{source}/grades/{grade}', [ImportSourceController::class, 'destroyGradeMapping'])
             ->middleware('permission:import.configure')
             ->name('imports.sources.grades.destroy');
+
+        // L2 — the identity review queue (rung 6 of the matching ladder). Registered
+        // here, ahead of the `/imports/{batch}` wildcard below, so "merges" is never
+        // captured as a batch id — the same static-before-wildcard ordering already
+        // used for /imports/sources above.
+        Route::get('/imports/merges', [ImportMergeController::class, 'index'])
+            ->middleware('permission:import.merge_resolve')
+            ->name('imports.merges');
+        Route::post('/imports/merges/{candidate}/resolve', [ImportMergeController::class, 'resolve'])
+            ->middleware('permission:import.merge_resolve')
+            ->name('imports.merges.resolve');
 
         Route::get('/imports/create', [ImportBatchController::class, 'create'])
             ->middleware('permission:import.stage')

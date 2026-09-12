@@ -35,16 +35,28 @@
     </x-card>
 @else
     <div class="row g-3 mb-4">
-        <div class="col-4">
+        <div class="col-6 col-lg-3">
             <x-stat :label="__('import.report_create')" :value="$report['create'] ?? 0" />
         </div>
-        <div class="col-4">
+        <div class="col-6 col-lg-3">
             <x-stat :label="__('import.report_link')" :value="$report['link'] ?? 0" />
         </div>
-        <div class="col-4">
+        <div class="col-6 col-lg-3">
             <x-stat :label="__('import.report_skip')" :value="$report['skip'] ?? 0" />
         </div>
+        <div class="col-6 col-lg-3">
+            <x-stat :label="__('import.report_queued')" :value="$report['queued'] ?? 0" icon="warning" />
+        </div>
     </div>
+
+    @if(($report['queued'] ?? 0) > 0)
+        <x-card variant="quiet" class="mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <span class="small">{{ __('import.report_queued_body', ['count' => $report['queued']]) }}</span>
+                <a href="{{ route('admin.imports.merges') }}" class="btn btn-outline-primary btn-sm">{{ __('import.review_merges') }}</a>
+            </div>
+        </x-card>
+    @endif
 
     <x-card variant="quiet" class="mb-4">
         <h2 class="h6 page-title mb-3">{{ __('import.control_totals_title') }}</h2>
