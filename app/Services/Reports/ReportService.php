@@ -84,6 +84,10 @@ class ReportService
             ->leftJoin('programs', 'programs.id', '=', 'student_programs.program_id')
             ->whereNull('course_offerings.deleted_at')
             ->whereNull('courses.deleted_at')
+            // A shadow enrollment created by the legacy importer never appears in a
+            // headcount report — see docs/legacy-data-import-plan.md §4.2 and
+            // ImportCatalogIsolationTest.
+            ->whereNull('enrollments.source_system')
             ->selectRaw('programs.code as program_code')
             ->selectRaw('programs.name as program_name')
             ->selectRaw('courses.code as course_code')
@@ -140,6 +144,7 @@ class ReportService
         $sessionOfferingIds = ClassSession::query()->select('offering_id')->distinct();
 
         $offerings = CourseOffering::query()
+            ->whereNull('source_system')
             ->with('course')
             ->where(function ($q) use ($offeringIds, $sessionOfferingIds) {
                 $q->whereIn('id', $offeringIds)
@@ -183,6 +188,7 @@ class ReportService
             ->whereNotNull('enrollments.final_letter')
             ->whereNull('course_offerings.deleted_at')
             ->whereNull('courses.deleted_at')
+            ->whereNull('enrollments.source_system')
             ->selectRaw('courses.code as course_code')
             ->selectRaw('courses.title as course_title')
             ->selectRaw('enrollments.final_letter as final_letter')

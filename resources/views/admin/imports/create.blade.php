@@ -63,6 +63,7 @@
                         <option value="{{ $typeValue }}" @selected(old('entity_type', 'STUDENT') === $typeValue)>{{ __('import.entity_'.$typeValue) }}</option>
                     @endforeach
                 </select>
+                <p class="form-text mb-0">{{ __('import.field_entity_type_help') }}</p>
             </div>
 
             <div class="col-12" x-show="entityType === 'STUDENT'">
@@ -81,6 +82,12 @@
                         <span class="d-block small spims-text-dim">{{ __('import.population_active_help') }}</span>
                     </label>
                 </div>
+            </div>
+
+            <div class="col-12" x-show="entityType === 'COURSE_RESULT'">
+                <x-card variant="quiet">
+                    <p class="small spims-text-dim mb-0">{{ __('import.course_result_help') }}</p>
+                </x-card>
             </div>
 
             <div class="col-12" x-show="entityType === 'BALANCE'">

@@ -91,6 +91,8 @@ return [
     'programs_title' => 'Programs',
     'programs_help' => 'Matriculated student-program rows (degree / certificate track).',
     'programs_empty' => 'Not matriculated in a program.',
+    'prior_study_title' => 'Prior study',
+    'prior_study_help' => 'Legacy coursework imported from Populi/Canvas, grouped by source. Excluded from the computed GPA above unless promoted.',
     'invoices_title' => 'Invoices',
     'invoices_help' => 'Amounts are integer minor units, formatted. Finance desks still own refunds and manual payments.',
     'invoices_empty' => 'No invoices yet.',

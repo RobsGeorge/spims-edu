@@ -24,7 +24,10 @@ class OfferingController extends Controller
     public function index(): View
     {
         return view('admin.offerings.index', [
-            'offerings' => CourseOffering::query()->with(['course', 'semester'])->latest()->paginate(20),
+            // A shadow offering created by the legacy importer (source_system set) is
+            // never listed here — see docs/legacy-data-import-plan.md §4.2 and
+            // ImportCatalogIsolationTest.
+            'offerings' => CourseOffering::query()->whereNull('source_system')->with(['course', 'semester'])->latest()->paginate(20),
         ]);
     }
 

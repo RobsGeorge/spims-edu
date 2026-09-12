@@ -26,6 +26,7 @@ class Course extends Model
         'assessment_template_id',
         'active',
         'description',
+        'source_system',
     ];
 
     protected $casts = [

@@ -3,6 +3,9 @@
 namespace App\Services\Import;
 
 use App\Enums\Currency;
+use App\Enums\EnrollmentStatus;
+use App\Enums\GradeStatus;
+use App\Enums\GradeType;
 use App\Enums\ImportAccountClaimStatus;
 use App\Enums\ImportBatchStatus;
 use App\Enums\ImportEntityType;
@@ -13,11 +16,18 @@ use App\Enums\ImportRowStatus;
 use App\Enums\ImportSourceKind;
 use App\Enums\InvoiceStatus;
 use App\Enums\LedgerReason;
+use App\Enums\OfferingMode;
+use App\Enums\OfferingStatus;
 use App\Enums\StudentProgramStatus;
 use App\Enums\UserStatus;
 use App\Enums\WalletKind;
+use App\Models\AcademicRecord;
+use App\Models\Course;
+use App\Models\CourseOffering;
+use App\Models\Enrollment;
 use App\Models\ImportAccountClaim;
 use App\Models\ImportBatch;
+use App\Models\ImportGradeMapping;
 use App\Models\ImportLink;
 use App\Models\ImportMergeCandidate;
 use App\Models\ImportRow;
@@ -25,6 +35,8 @@ use App\Models\ImportSource;
 use App\Models\Invoice;
 use App\Models\InvoiceLine;
 use App\Models\Program;
+use App\Models\ProgramCourse;
+use App\Models\ProgramRequirementFulfillment;
 use App\Models\StudentProgram;
 use App\Models\User;
 use App\Services\Finance\WalletService;
@@ -39,7 +51,7 @@ use RuntimeException;
  * Orchestrates the whole batch pipeline: upload -> profile -> map -> validate -> dry
  * run -> commit -> (rollback). See docs/legacy-data-import-plan.md §10.
  *
- * Two entity types are implemented:
+ * Three entity types are implemented:
  * - STUDENT (L0/L1/L2/L5): identity + program linkage, resolved via the full matching
  *   ladder from §6 — 1) an `import_links` hit on this source, 2) the Canvas/SIS
  *   crosswalk, 3) exact normalised email, 4) exact unambiguous student number,
@@ -49,6 +61,13 @@ use RuntimeException;
  *   "exact code match" half of D2) and never creates a shadow program. Every row that
  *   results in a still-PENDING ACTIVE-population user is queued for an account-claim
  *   invitation (L5) — see §9.
+ * - COURSE_RESULT (L3/L4): course results against the shadow catalog — §7. Every row
+ *   must reference a student already linked by a committed STUDENT batch. Posts an
+ *   Enrollment + AcademicRecord, find-or-creating a shadow Course/CourseOffering when
+ *   no live one matches exactly. `counts_toward_gpa` is forced false on every imported
+ *   record regardless of the grade mapping, so a legacy result never moves a student's
+ *   live GPA on import — a registrar promotes individual records to transfer credit
+ *   one at a time via `GradebookService`.
  * - BALANCE (L6): finance opening balances. One carried-forward invoice (owed) and/or
  *   one wallet credit (in hand) per student per currency, gated by an exact
  *   control-total match with no acknowledge override — see §8.
@@ -204,8 +223,9 @@ class ImportBatchService
     public function validate(ImportBatch $batch): ImportBatch
     {
         return match ($batch->entity_type) {
-            ImportEntityType::Student => $this->validateStudentRows($batch),
+            ImportEntityType::CourseResult => $this->validateCourseResult($batch),
             ImportEntityType::Balance => $this->validateBalanceRows($batch),
+            default => $this->validateStudentRows($batch),
         };
     }
 
@@ -294,6 +314,169 @@ class ImportBatchService
                         'field' => 'email',
                         'params' => [],
                     ];
+                }
+
+                if (! empty($normalized['program_code'])) {
+                    $exists = Program::query()->where('code', $normalized['program_code'])->exists();
+                    if (! $exists) {
+                        $rowMessages[] = [
+                            'level' => 'warning',
+                            'code' => 'W_UNKNOWN_PROGRAM_CODE',
+                            'field' => 'program_code',
+                            'params' => ['program_code' => $normalized['program_code']],
+                        ];
+                    }
+                }
+
+                $hasError = collect($rowMessages)->contains(fn ($m) => $m['level'] === 'error');
+                $hasWarning = collect($rowMessages)->contains(fn ($m) => $m['level'] === 'warning');
+                if ($hasError) {
+                    $errorCount++;
+                } elseif ($hasWarning) {
+                    $warningCount++;
+                }
+
+                ImportRow::query()->create([
+                    'batch_id' => $batch->id,
+                    'row_number' => $i + 1,
+                    'natural_key' => $naturalKey,
+                    'payload' => array_combine($parsed['headers'], array_pad($row, count($parsed['headers']), null)),
+                    'normalized' => $normalized,
+                    'action' => null,
+                    'status' => $hasError ? ImportRowStatus::Error : ($hasWarning ? ImportRowStatus::Warn : ImportRowStatus::Valid),
+                    'messages' => $rowMessages,
+                ]);
+            }
+        });
+
+        $batch->update([
+            'error_count' => $errorCount,
+            'warning_count' => $warningCount,
+            'row_count' => count($parsed['rows']),
+            'status' => ImportBatchStatus::Validated,
+            'validated_at' => now(),
+        ]);
+
+        return $batch->fresh();
+    }
+
+    /**
+     * COURSE_RESULT validation: legacy_id must already resolve via an existing
+     * import_links user row (E_UNKNOWN_STUDENT), legacy_letter must resolve via this
+     * source's ImportGradeMapping table (E_UNMAPPED_GRADE), and a credit-hours mismatch
+     * against an exact-matching live course is a warning, not an error
+     * (W_CREDIT_HOURS_DIFFER) — see docs/legacy-data-import-plan.md §7, §14 Q6.
+     */
+    private function validateCourseResult(ImportBatch $batch): ImportBatch
+    {
+        $disk = $this->storage->diskName();
+        $parsed = $this->reader->read($disk, $batch->file_path, $batch->sheet_name, $batch->header_row);
+        $mapping = collect($batch->mapping ?? [])->filter(fn ($m) => ! empty($m['target_field']));
+
+        $headerIndex = array_flip($parsed['headers']);
+        $seenKeys = [];
+        $errorCount = 0;
+        $warningCount = 0;
+
+        DB::transaction(function () use ($batch, $parsed, $mapping, $headerIndex, &$seenKeys, &$errorCount, &$warningCount) {
+            ImportRow::query()->where('batch_id', $batch->id)->delete();
+
+            foreach ($parsed['rows'] as $i => $row) {
+                $normalized = [];
+                $rowMessages = [];
+
+                foreach ($mapping as $m) {
+                    $colIndex = $headerIndex[$m['column']] ?? null;
+                    $raw = $colIndex !== null ? ($row[$colIndex] ?? null) : null;
+                    $result = $this->transforms->apply($m['transform'], $raw, $m['options'] ?? []);
+
+                    if (! $result['ok'] && $raw !== null && trim((string) $raw) !== '') {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_BAD_DATE',
+                            'field' => $m['target_field'],
+                            'params' => ['column' => $m['column'], 'value' => $raw],
+                        ];
+                    }
+
+                    if (! isset($normalized[$m['target_field']]) || $normalized[$m['target_field']] === null) {
+                        $normalized[$m['target_field']] = $result['value'];
+                    }
+                }
+
+                foreach (ImportCourseResultFields::requiredFor() as $required) {
+                    if (empty($normalized[$required])) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_REQUIRED_FIELD_MISSING',
+                            'field' => $required,
+                            'params' => ['field' => $required],
+                        ];
+                    }
+                }
+
+                $legacyId = $normalized['legacy_id'] ?? null;
+                $courseCode = $normalized['course_code'] ?? null;
+                $term = $normalized['term'] ?? null;
+
+                // The natural key for a course result is per (student, course, term) —
+                // one legacy student legitimately appears on many rows.
+                $naturalKey = ($legacyId !== null && $legacyId !== '' && $courseCode !== null && $term !== null)
+                    ? $legacyId.'|'.$courseCode.'|'.$term
+                    : 'row-'.($i + 1);
+                if (isset($seenKeys[$naturalKey])) {
+                    $rowMessages[] = [
+                        'level' => 'error',
+                        'code' => 'E_DUPLICATE_NATURAL_KEY',
+                        'field' => 'legacy_id',
+                        'params' => ['legacy_id' => (string) $naturalKey],
+                    ];
+                    $naturalKey = $naturalKey.'#dup-'.($i + 1);
+                }
+                $seenKeys[$naturalKey] = true;
+
+                if ($legacyId !== null && $legacyId !== '') {
+                    $linked = ImportLink::query()
+                        ->where('source_id', $batch->source_id)
+                        ->where('entity_type', 'user')
+                        ->where('legacy_id', $legacyId)
+                        ->exists();
+                    if (! $linked) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_UNKNOWN_STUDENT',
+                            'field' => 'legacy_id',
+                            'params' => ['legacy_id' => (string) $legacyId],
+                        ];
+                    }
+                }
+
+                $legacyLetter = $normalized['legacy_letter'] ?? null;
+                if ($legacyLetter !== null && $legacyLetter !== '') {
+                    $gradeMapping = ImportGradeMapping::query()
+                        ->where('source_id', $batch->source_id)
+                        ->where('legacy_letter', $legacyLetter)
+                        ->first();
+                    if ($gradeMapping === null) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_UNMAPPED_GRADE',
+                            'field' => 'legacy_letter',
+                            'params' => ['legacy_letter' => (string) $legacyLetter],
+                        ];
+                    }
+                }
+
+                if (! empty($courseCode) && ! empty($normalized['credit_hours'])) {
+                    $liveCourse = Course::query()->whereNull('source_system')->where('code', $courseCode)->first();
+                    if ($liveCourse !== null && (int) $liveCourse->credit_hours !== (int) $normalized['credit_hours']) {
+                        $rowMessages[] = [
+                            'level' => 'warning',
+                            'code' => 'W_CREDIT_HOURS_DIFFER',
+                            'field' => 'credit_hours',
+                            'params' => ['sheet' => (string) $normalized['credit_hours'], 'course' => (string) $liveCourse->credit_hours],
+                        ];
+                    }
                 }
 
                 if (! empty($normalized['program_code'])) {
@@ -518,15 +701,19 @@ class ImportBatchService
     private function controlTotals(ImportBatch $batch): array
     {
         return match ($batch->entity_type) {
-            ImportEntityType::Student => $this->studentControlTotals($batch),
             ImportEntityType::Balance => $this->balanceControlTotals($batch),
+            default => $this->defaultControlTotals($batch),
         };
     }
 
     /**
+     * The plain "rows in file vs. rows that would import" count, shared by STUDENT and
+     * COURSE_RESULT — neither needs a richer control total than a row count, unlike
+     * BALANCE's per-currency money gate below.
+     *
      * @return array{declared_rows: int, computed_rows: int, distinct_students: int}
      */
-    private function studentControlTotals(ImportBatch $batch): array
+    private function defaultControlTotals(ImportBatch $batch): array
     {
         $valid = ImportRow::query()->where('batch_id', $batch->id)
             ->whereIn('status', [ImportRowStatus::Valid, ImportRowStatus::Warn])
@@ -669,8 +856,8 @@ class ImportBatchService
      * of even one minor unit, in any currency, refuses commit outright — no
      * acknowledge override exists for money, unlike the STUDENT entity's row-count
      * mismatch. A currency the registrar never declared a total for is compared
-     * against zero, so an un-declared currency with real money in the file still
-     * fails loudly rather than committing silently.
+     * against zero, so real money in an undeclared currency still fails loudly rather
+     * than committing silently.
      */
     private function assertFinanceTotalsMatchExactly(ImportBatch $batch): void
     {
@@ -691,8 +878,9 @@ class ImportBatchService
     private function applyRows(ImportBatch $batch, bool $persist, ?User $actor = null): array
     {
         return match ($batch->entity_type) {
-            ImportEntityType::Student => $this->applyStudentRows($batch, $persist),
+            ImportEntityType::CourseResult => $this->applyCourseResultRows($batch, $persist),
             ImportEntityType::Balance => $this->applyBalanceRows($batch, $persist, $actor),
+            default => $this->applyStudentRows($batch, $persist),
         };
     }
 
@@ -1033,6 +1221,206 @@ class ImportBatchService
     }
 
     /**
+     * The COURSE_RESULT commit path — §7. For each valid row: resolve the student via
+     * the existing import_links row (validate() already blocked any row that can't),
+     * reuse a live course on an exact code match or find-or-create a shadow one,
+     * find-or-create a shadow CourseOffering for (course, term), and create/update the
+     * Enrollment + AcademicRecord. `counts_toward_gpa` is forced false on every row
+     * regardless of the grade mapping — the plan's explicit instruction — so no GPA is
+     * touched here; a registrar promotes individual records later via
+     * GradebookService::promoteToTransferCredit().
+     *
+     * @return array<string, int>
+     */
+    private function applyCourseResultRows(ImportBatch $batch, bool $persist): array
+    {
+        $created = 0;
+        $updated = 0;
+        $skip = 0;
+        $shadowCoursesCreated = 0;
+        $shadowOfferingsCreated = 0;
+
+        /** @var Collection<int, ImportRow> $rows */
+        $rows = ImportRow::query()->where('batch_id', $batch->id)
+            ->whereIn('status', [ImportRowStatus::Valid, ImportRowStatus::Warn])
+            ->orderBy('row_number')
+            ->get();
+
+        foreach ($rows as $row) {
+            $normalized = $row->normalized ?? [];
+            $legacyId = $normalized['legacy_id'] ?? null;
+
+            $link = $legacyId !== null
+                ? ImportLink::query()
+                    ->where('source_id', $batch->source_id)
+                    ->where('entity_type', 'user')
+                    ->where('legacy_id', $legacyId)
+                    ->first()
+                : null;
+
+            if ($link === null) {
+                $skip++;
+
+                continue;
+            }
+
+            if (! $persist) {
+                $created++;
+
+                continue;
+            }
+
+            $student = User::query()->find($link->target_id);
+            if ($student === null) {
+                $skip++;
+
+                continue;
+            }
+
+            $gradeMapping = ImportGradeMapping::query()
+                ->where('source_id', $batch->source_id)
+                ->where('legacy_letter', $normalized['legacy_letter'])
+                ->first();
+            if ($gradeMapping === null) {
+                // validate() would already have blocked this row with E_UNMAPPED_GRADE.
+                $skip++;
+
+                continue;
+            }
+
+            $courseCode = (string) $normalized['course_code'];
+            $course = Course::query()->where('code', $courseCode)->first();
+            if ($course === null) {
+                $course = Course::query()->create([
+                    'code' => $courseCode,
+                    'title' => $normalized['course_title'] ?? $courseCode,
+                    'credit_hours' => (int) $normalized['credit_hours'],
+                    'is_standalone' => false,
+                    // Hidden from the public catalog regardless of this flag — the
+                    // catalog, prerequisites and interest-flag surfaces all filter on
+                    // `active = true`, and a shadow course never is. See
+                    // ImportCatalogIsolationTest.
+                    'active' => false,
+                    'source_system' => $batch->source->code,
+                ]);
+                $shadowCoursesCreated++;
+            }
+
+            $term = (string) $normalized['term'];
+            $offering = CourseOffering::query()
+                ->where('course_id', $course->id)
+                ->where('legacy_term', $term)
+                ->whereNotNull('source_system')
+                ->first();
+            if ($offering === null) {
+                $offering = CourseOffering::query()->create([
+                    'course_id' => $course->id,
+                    'semester_id' => null,
+                    'mode' => OfferingMode::SelfPaced,
+                    'status' => OfferingStatus::Archived,
+                    'source_system' => $batch->source->code,
+                    'legacy_term' => $term,
+                ]);
+                $shadowOfferingsCreated++;
+            }
+
+            $isWithdrawal = $gradeMapping->spims_letter === 'W' || in_array(strtoupper((string) $normalized['legacy_letter']), ['W', 'WD'], true);
+
+            $studentProgram = null;
+            if (! empty($normalized['program_code'])) {
+                $program = Program::query()->where('code', $normalized['program_code'])->first();
+                if ($program !== null) {
+                    $studentProgram = StudentProgram::query()
+                        ->where('student_id', $student->id)
+                        ->where('program_id', $program->id)
+                        ->first();
+                }
+            }
+
+            $percent = $normalized['legacy_percent'] ?? null;
+            if ($percent === null) {
+                // academic_records.percent is NOT NULL; fall back to the grade
+                // mapping's own percent band when the source gave no percent at all.
+                $percent = $gradeMapping->min_percent !== null && $gradeMapping->max_percent !== null
+                    ? round(($gradeMapping->min_percent + $gradeMapping->max_percent) / 2, 2)
+                    : 0.0;
+            }
+
+            $enrollment = Enrollment::query()->updateOrCreate(
+                ['student_id' => $student->id, 'offering_id' => $offering->id],
+                [
+                    'student_program_id' => $studentProgram?->id,
+                    'status' => $isWithdrawal ? EnrollmentStatus::Withdrawn : EnrollmentStatus::Completed,
+                    'is_audit' => false,
+                    'grade_type' => $isWithdrawal ? GradeType::Withdrawal : GradeType::Standard,
+                    'final_percent' => (float) $percent,
+                    'final_letter' => $gradeMapping->spims_letter,
+                    'final_gpa_points' => $gradeMapping->gpa_points,
+                    'grade_status' => GradeStatus::Locked,
+                    'progress_percent' => 100,
+                    'source_system' => $batch->source->code,
+                ],
+            );
+
+            $existedBefore = AcademicRecord::query()->where('enrollment_id', $enrollment->id)->exists();
+
+            $record = AcademicRecord::query()->updateOrCreate(
+                ['enrollment_id' => $enrollment->id],
+                [
+                    'student_id' => $student->id,
+                    'course_id' => $course->id,
+                    'letter_grade' => $gradeMapping->spims_letter,
+                    'percent' => (float) $percent,
+                    'gpa_points' => $gradeMapping->gpa_points,
+                    'credit_hours' => (int) $normalized['credit_hours'],
+                    'term' => $term,
+                    'is_passing' => $gradeMapping->is_passing,
+                    // Forced false regardless of the grade mapping's own value — every
+                    // legacy row at import time, per plan §7. A registrar promotes one
+                    // record at a time via GradebookService::promoteToTransferCredit().
+                    'counts_toward_gpa' => false,
+                    'source_system' => $batch->source->code,
+                ],
+            );
+
+            if ($studentProgram !== null) {
+                $programCourse = ProgramCourse::query()
+                    ->where('program_id', $studentProgram->program_id)
+                    ->where('course_id', $course->id)
+                    ->first();
+                if ($programCourse !== null) {
+                    ProgramRequirementFulfillment::query()->updateOrCreate(
+                        ['student_program_id' => $studentProgram->id, 'program_course_id' => $programCourse->id],
+                        ['academic_record_id' => $record->id, 'applied_at' => now()],
+                    );
+                }
+            }
+
+            if ($existedBefore) {
+                $updated++;
+            } else {
+                $created++;
+            }
+
+            $row->update([
+                'action' => $existedBefore ? ImportRowAction::Update : ImportRowAction::Create,
+                'target_type' => AcademicRecord::class,
+                'target_id' => $record->id,
+                'status' => ImportRowStatus::Applied,
+            ]);
+        }
+
+        return [
+            'create' => $created,
+            'link' => $updated,
+            'skip' => $skip,
+            'distinct_students' => $created + $updated,
+            'shadow_courses_created' => $shadowCoursesCreated,
+            'shadow_offerings_created' => $shadowOfferingsCreated,
+        ];
+    }
+
+    /**
      * L6 commit logic. Per valid row: `owed_minor > 0` creates exactly one Invoice
      * (source_system set, status Open, one InvoiceLine, offering_id null) and
      * `credit_minor > 0` creates exactly one WalletTransaction (kind Money, direction
@@ -1281,16 +1669,17 @@ class ImportBatchService
 
     /**
      * Reverses every CREATE this batch made. Refused once the batch is sealed, and
-     * refused per-row when the created user is now referenced by native data (a role
-     * assignment, an enrollment, a payment) — the rollback names exactly what blocks it
-     * rather than failing vaguely.
+     * refused per-row when the created record is now referenced by native data (a role
+     * assignment, an enrollment, a payment — for STUDENT; a promotion to transfer
+     * credit — for COURSE_RESULT) — the rollback names exactly what blocks it rather
+     * than failing vaguely.
      *
-     * Scope note: only the STUDENT entity is reversible today. A BALANCE batch's
-     * invoices and wallet credits are real financial records the moment they commit —
-     * reversing them safely (crediting back a wallet that may already have been spent
-     * from, voiding an invoice that may already carry a payment) is a distinct feature
-     * with its own rules, not a copy of the STUDENT rollback's user-deletion logic, and
-     * is out of scope for this phase.
+     * Scope note: only STUDENT and COURSE_RESULT are reversible today. A BALANCE
+     * batch's invoices and wallet credits are real financial records the moment they
+     * commit — reversing them safely (crediting back a wallet that may already have
+     * been spent from, voiding an invoice that may already carry a payment) is a
+     * distinct feature with its own rules, not a copy of the STUDENT rollback's
+     * delete-the-row logic, and is out of scope for this phase.
      *
      * @return array{rolled_back: int, blocked: array<int, array{row: int, reason: string}>}
      */
@@ -1302,36 +1691,37 @@ class ImportBatchService
         if ($batch->isSealed()) {
             throw new RuntimeException('This batch was sealed on '.$batch->sealed_at->toDateString().' and can no longer be rolled back.');
         }
-        if ($batch->entity_type !== ImportEntityType::Student) {
+        if ($batch->entity_type === ImportEntityType::Balance) {
             throw new RuntimeException(__('import.rollback_unsupported_entity'));
         }
 
         $blocked = [];
         $rolledBack = 0;
 
-        $this->audit->withAudit($actor, 'import.batch_rollback', function () use ($batch, $actor, &$blocked, &$rolledBack) {
-            DB::transaction(function () use ($batch, $actor, &$blocked, &$rolledBack) {
+        $isCourseResult = $batch->entity_type === ImportEntityType::CourseResult;
+
+        $this->audit->withAudit($actor, 'import.batch_rollback', function () use ($batch, $actor, $isCourseResult, &$blocked, &$rolledBack) {
+            DB::transaction(function () use ($batch, $actor, $isCourseResult, &$blocked, &$rolledBack) {
                 $rows = ImportRow::query()->where('batch_id', $batch->id)
                     ->where('status', ImportRowStatus::Applied)
                     ->where('action', ImportRowAction::Create)
                     ->get();
 
                 foreach ($rows as $row) {
-                    $user = $row->target_id !== null ? User::query()->find($row->target_id) : null;
-                    if ($user === null) {
+                    $reason = $isCourseResult
+                        ? $this->rollbackCourseResultRow($batch, $row)
+                        : $this->rollbackStudentRow($batch, $row);
+
+                    if ($reason === false) {
+                        // Nothing to reverse (target already gone) — leave the row as is.
                         continue;
                     }
 
-                    $reason = $this->blockingReasonFor($user);
-                    if ($reason !== null) {
+                    if (is_string($reason)) {
                         $blocked[] = ['row' => $row->row_number, 'reason' => $reason];
 
                         continue;
                     }
-
-                    StudentProgram::query()->where('student_id', $user->id)->where('source_system', $batch->source->code)->delete();
-                    ImportLink::query()->where('target_type', User::class)->where('target_id', $user->id)->delete();
-                    $user->forceDelete();
 
                     $row->update(['status' => ImportRowStatus::RolledBack]);
                     $rolledBack++;
@@ -1350,6 +1740,29 @@ class ImportBatchService
         return ['rolled_back' => $rolledBack, 'blocked' => $blocked];
     }
 
+    /**
+     * @return string|false|null a blocking reason, `false` if there was nothing to
+     *                           reverse, or `null` once successfully rolled back
+     */
+    private function rollbackStudentRow(ImportBatch $batch, ImportRow $row): string|false|null
+    {
+        $user = $row->target_id !== null ? User::query()->find($row->target_id) : null;
+        if ($user === null) {
+            return false;
+        }
+
+        $reason = $this->blockingReasonFor($user);
+        if ($reason !== null) {
+            return $reason;
+        }
+
+        StudentProgram::query()->where('student_id', $user->id)->where('source_system', $batch->source->code)->delete();
+        ImportLink::query()->where('target_type', User::class)->where('target_id', $user->id)->delete();
+        $user->forceDelete();
+
+        return null;
+    }
+
     private function blockingReasonFor(User $user): ?string
     {
         if ($user->email_verified || $user->password_hash !== null) {
@@ -1364,6 +1777,40 @@ class ImportBatchService
         if (DB::table('payments')->where('student_id', $user->id)->exists()
             || DB::table('invoices')->where('student_id', $user->id)->exists()) {
             return 'A financial record now references this person.';
+        }
+
+        return null;
+    }
+
+    /**
+     * Reverses one COURSE_RESULT row: deletes the AcademicRecord, its
+     * ProgramRequirementFulfillment (if any) and the Enrollment it was posted against.
+     * The shadow Course/CourseOffering it was posted on are left in place — they are
+     * find-or-create idempotent infrastructure that other rows and other batches may
+     * already be sharing, and leaving them behind is harmless (they stay invisible to
+     * every native surface regardless). Refused once the record has been promoted to
+     * transfer credit (D7) — that is native use of imported data, same rule as a
+     * STUDENT row that has since been referenced elsewhere.
+     *
+     * @return string|false|null a blocking reason, `false` if there was nothing to
+     *                           reverse, or `null` once successfully rolled back
+     */
+    private function rollbackCourseResultRow(ImportBatch $batch, ImportRow $row): string|false|null
+    {
+        $record = $row->target_id !== null ? AcademicRecord::query()->find($row->target_id) : null;
+        if ($record === null) {
+            return false;
+        }
+
+        if ($record->counts_toward_gpa) {
+            return 'This record has been promoted to transfer credit and now counts toward GPA.';
+        }
+
+        ProgramRequirementFulfillment::query()->where('academic_record_id', $record->id)->delete();
+        $enrollmentId = $record->enrollment_id;
+        $record->delete();
+        if ($enrollmentId !== null) {
+            Enrollment::query()->where('id', $enrollmentId)->delete();
         }
 
         return null;

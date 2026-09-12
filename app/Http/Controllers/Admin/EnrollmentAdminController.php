@@ -27,7 +27,10 @@ class EnrollmentAdminController extends Controller
                 ->orderBy('last_name')
                 ->orderBy('first_name')
                 ->get(),
+            // A shadow offering from the legacy importer is never an option here — see
+            // docs/legacy-data-import-plan.md §4.2 and ImportCatalogIsolationTest.
             'offerings' => CourseOffering::query()
+                ->whereNull('source_system')
                 ->with(['course', 'semester'])
                 ->latest()
                 ->get(),

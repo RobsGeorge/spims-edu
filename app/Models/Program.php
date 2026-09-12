@@ -36,6 +36,7 @@ class Program extends Model
         'standing_good_min',
         'standing_suspension_below',
         'enforce_year_sequence',
+        'source_system',
     ];
 
     protected $casts = [
@@ -66,7 +67,7 @@ class Program extends Model
             : __('academics.rule_preview_year_warned');
 
         return __('academics.rule_preview_sentence', [
-            'credits'   => $credits,
+            'credits' => $credits,
             'semesters' => $semesters,
             'threshold' => $threshold,
             'year_order' => $yearOrder,

@@ -12,6 +12,7 @@ use App\Models\ImportRow;
 use App\Models\ImportSource;
 use App\Services\Import\ImportBalanceFields;
 use App\Services\Import\ImportBatchService;
+use App\Services\Import\ImportCourseResultFields;
 use App\Services\Import\ImportStudentFields;
 use App\Services\Import\ImportTransformService;
 use App\Support\AuthorizeService;
@@ -138,6 +139,10 @@ class ImportBatchController extends Controller
             ImportEntityType::Student => [
                 'fields' => ImportStudentFields::catalog(),
                 'required' => ImportStudentFields::requiredFor($batch->population),
+            ],
+            ImportEntityType::CourseResult => [
+                'fields' => ImportCourseResultFields::catalog(),
+                'required' => ImportCourseResultFields::requiredFor($batch->population),
             ],
             ImportEntityType::Balance => [
                 'fields' => ImportBalanceFields::catalog(),

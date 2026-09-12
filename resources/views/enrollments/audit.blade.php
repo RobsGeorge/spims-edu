@@ -15,6 +15,19 @@
     <div class="alert alert-info border-0 mb-4">{{ __('advising.what_if_active') }} · {{ __('advising.what_if_help') }}</div>
 @endif
 
+@if($legacySummary)
+    <x-card variant="quiet" class="mb-4">
+        <span class="spims-status-badge spims-status-info">
+            {{ __('credentials.legacy_gpa_line', [
+                'gpa' => number_format((float) $legacySummary->gpa, 2),
+                'scale' => number_format((float) $legacySummary->gpa_scale, 2),
+                'source' => $legacySummary->source->name,
+                'date' => $legacySummary->as_of->format('Y-m-d'),
+            ]) }}
+        </span>
+    </x-card>
+@endif
+
 <x-progress :value="(int) $audit['overall_percent']" :label="__('learning.overall_progress')" class="mb-4" />
 
 <div class="row g-3 mb-4">

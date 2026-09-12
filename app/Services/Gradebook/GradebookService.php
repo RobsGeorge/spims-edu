@@ -27,8 +27,6 @@ use App\Models\ProgramCourse;
 use App\Models\ProgramRequirementFulfillment;
 use App\Models\StudentProgram;
 use App\Models\User;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\ValidationException;
 use App\Services\Assessment\AttemptService;
 use App\Services\Assessment\ResultsVisibilityService;
 use App\Services\Live\AttendanceService;
@@ -36,8 +34,10 @@ use App\Services\Projects\ProjectGradingService;
 use App\Services\Reports\AcademicStandingService;
 use App\Support\AuditLogWriter;
 use App\Support\AuthorizeService;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class GradebookService
 {
@@ -451,8 +451,8 @@ class GradebookService
      * Blocked when the offering's gradebook is locked.
      * Writes an AuditLog entry with before/after values.
      *
-     * @throws HttpResponseException  when offering is locked (403)
-     * @throws ValidationException   when score is out of range
+     * @throws HttpResponseException when offering is locked (403)
+     * @throws ValidationException when score is out of range
      */
     public function setCellScore(User $actor, CourseOffering $offering, GradebookComponent $component, User $student, float $score): GradebookComponentScore
     {
@@ -721,11 +721,48 @@ class GradebookService
         }
     }
 
+    /**
+     * D7 — registrar-approved transfer credit, one record at a time. Flips a single
+     * legacy AcademicRecord's `counts_toward_gpa` from false to true and refreshes
+     * cached_gpa for every StudentProgram it is attached to via a
+     * ProgramRequirementFulfillment. Reuses `import.commit` rather than a new
+     * permission key — this is an admin action on already-imported academic data, the
+     * same tier of action as committing the import itself. See
+     * docs/legacy-data-import-plan.md §7, D7 and the L3/L4 task brief.
+     */
+    public function promoteToTransferCredit(User $actor, AcademicRecord $record): AcademicRecord
+    {
+        $this->authorize->authorize($actor, 'import.commit');
+
+        return $this->audit->withAudit($actor, 'import.promote_transfer_credit', function () use ($record) {
+            if (! $record->counts_toward_gpa) {
+                $record->update(['counts_toward_gpa' => true]);
+            }
+
+            $studentProgramIds = ProgramRequirementFulfillment::query()
+                ->where('academic_record_id', $record->id)
+                ->pluck('student_program_id')
+                ->unique();
+
+            foreach (StudentProgram::query()->whereIn('id', $studentProgramIds)->get() as $sp) {
+                $this->refreshGpa($sp);
+            }
+
+            return $record->fresh();
+        }, 'AcademicRecord');
+    }
+
     private function refreshGpa(StudentProgram $sp): void
     {
+        // The one change L3 makes to this pre-existing method (see
+        // docs/legacy-data-import-plan.md §7): a fulfilment whose AcademicRecord does
+        // not count toward GPA (every legacy import row, by default) is excluded from
+        // the sum. Native records default `counts_toward_gpa` to true, so this is a
+        // no-op for every student who has never had legacy data imported — proven by
+        // the pre-existing test suite passing unmodified.
         $records = ProgramRequirementFulfillment::query()
             ->where('student_program_id', $sp->id)
-            ->with('academicRecord')
+            ->with(['academicRecord' => fn ($q) => $q->where('counts_toward_gpa', true)])
             ->get()
             ->pluck('academicRecord')
             ->filter();
