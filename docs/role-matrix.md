@@ -338,6 +338,7 @@ None of these keys are offering-scoped; a batch is school-wide by nature.
 | `import.stage` | School | `F` | `F` | – | – | – | – |
 | `import.commit` | School | `F` | – | – | – | – | – |
 | `import.rollback` | School | `F` | – | – | – | – | – |
+| `import.merge_resolve` | School | `F` | – | – | – | – | – |
 
 ### Gradebook (`gradebook.*`)
 

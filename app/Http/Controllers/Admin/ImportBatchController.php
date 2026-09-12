@@ -31,6 +31,7 @@ class ImportBatchController extends Controller
                 'students_imported' => \App\Models\ImportLink::query()->where('entity_type', 'user')->count(),
                 'pending_batches' => ImportBatch::query()->whereIn('status', [ImportBatchStatus::Draft, ImportBatchStatus::Mapped, ImportBatchStatus::Validated])->count(),
                 'committed_batches' => ImportBatch::query()->where('status', ImportBatchStatus::Committed)->count(),
+                'pending_merges' => \App\Models\ImportMergeCandidate::query()->where('status', \App\Enums\ImportMergeCandidateStatus::Pending)->count(),
             ],
         ]);
     }

@@ -4,13 +4,16 @@ namespace App\Services\Import;
 
 use App\Enums\ImportBatchStatus;
 use App\Enums\ImportEntityType;
+use App\Enums\ImportMergeCandidateStatus;
 use App\Enums\ImportPopulation;
 use App\Enums\ImportRowAction;
 use App\Enums\ImportRowStatus;
+use App\Enums\ImportSourceKind;
 use App\Enums\StudentProgramStatus;
 use App\Enums\UserStatus;
 use App\Models\ImportBatch;
 use App\Models\ImportLink;
+use App\Models\ImportMergeCandidate;
 use App\Models\ImportRow;
 use App\Models\ImportSource;
 use App\Models\Program;
@@ -28,11 +31,11 @@ use RuntimeException;
  * upload -> profile -> map -> validate -> dry run -> commit -> (rollback).
  * See docs/legacy-data-import-plan.md §10.
  *
- * v1 scope: identity + program linkage only (rungs 1 and 3 of the matching ladder —
- * import_links and exact email). Course results, finance and credentials are not yet
- * implemented; a `program_code` mapping links only to a program that already exists
- * in the live catalog (the "exact code match" half of D2) and never creates a shadow
- * program.
+ * v1/L2 scope: identity + program linkage only — the full matching ladder (rungs 1-6,
+ * §6) plus the human merge queue for anything the ladder cannot resolve
+ * deterministically. Course results, finance and credentials are not yet implemented;
+ * a `program_code` mapping links only to a program that already exists in the live
+ * catalog (the "exact code match" half of D2) and never creates a shadow program.
  */
 class ImportBatchService
 {
@@ -329,6 +332,22 @@ class ImportBatchService
             throw new RuntimeException('Batch must be validated before it can be committed.');
         }
 
+        // "Import Populi first, then Canvas" — rung 2 of the matching ladder (the
+        // SIS User ID crosswalk) only works once the SIS source's own import_links
+        // rows exist, so an LMS-kind batch is refused until at least one STUDENT
+        // batch from a SIS-kind source has committed. See §6.
+        if ($batch->source->kind === ImportSourceKind::Lms) {
+            $sisCommitted = ImportBatch::query()
+                ->where('entity_type', ImportEntityType::Student)
+                ->where('status', ImportBatchStatus::Committed)
+                ->whereHas('source', fn ($q) => $q->where('kind', ImportSourceKind::Sis))
+                ->exists();
+
+            if (! $sisCommitted) {
+                throw new RuntimeException(__('import.error_code.E_CANVAS_BEFORE_POPULI'));
+            }
+        }
+
         $this->audit->withAudit($actor, 'import.batch_commit', function () use ($batch, $actor) {
             DB::transaction(function () use ($batch) {
                 $this->applyRows($batch, persist: true);
@@ -349,18 +368,37 @@ class ImportBatchService
 
     /**
      * The single code path behind both the dry run and the real commit. Row-level
-     * identity resolution: rung 1 (an existing import_links row) then rung 3 (exact
-     * normalised email match). Anything else is created new. See §6 of the plan for the
-     * full ladder — rungs 2, 4-6 (Canvas crosswalk, student number, DOB triple, and the
-     * human merge queue) are not yet implemented.
+     * identity resolution walks the full matching ladder from §6 of the plan:
      *
-     * @return array{create: int, link: int, skip: int, distinct_students: int}
+     *   1. `import_links` hit on (this source, legacy_id) — same person, link.
+     *   2. Canvas/SIS crosswalk — an LMS-kind source's legacy_id matches an
+     *      import_links row for a *different* SIS-kind source — same person, link.
+     *   3. Exact normalised email match against an existing user — link.
+     *   4. Exact, unambiguous legacy student number match — link.
+     *   5. Normalised (first, last, date_of_birth) triple, unique school-wide — link.
+     *      Ambiguous (more than one match) never auto-links; falls through to 6.
+     *   6. Anything else — never auto-linked. Queued in import_merge_candidates with a
+     *      best-guess candidate when one can be found via a looser signal.
+     *
+     * Two *existing native* SPIMS users are never merged by this method — every rung
+     * above only ever matches an incoming row against one existing `users` row.
+     *
+     * @return array{create: int, link: int, skip: int, queued: int, distinct_students: int}
      */
     private function applyRows(ImportBatch $batch, bool $persist): array
     {
         $create = 0;
         $link = 0;
         $skip = 0;
+        $queued = 0;
+
+        // Rows created earlier in this same run must never be compared against later
+        // rows by the loose rung-6 search: two different rows in one file are, by
+        // construction, two different people (a genuine repeat shares a legacy_id and
+        // is already an E_DUPLICATE_NATURAL_KEY error). Without this, two unrelated
+        // siblings on the same sheet — sharing a surname is common — would flag each
+        // other as a possible duplicate purely because they were imported together.
+        $createdThisRun = [];
 
         /** @var Collection<int, ImportRow> $rows */
         $rows = ImportRow::query()->where('batch_id', $batch->id)
@@ -378,6 +416,7 @@ class ImportBatchService
                 continue;
             }
 
+            // Rung 1: import_links hit on this exact source.
             $existingLink = ImportLink::query()
                 ->where('source_id', $batch->source_id)
                 ->where('entity_type', 'user')
@@ -396,25 +435,112 @@ class ImportBatchService
                 continue;
             }
 
+            // Rung 2: the Canvas/SIS crosswalk. Only applies to an LMS-kind source's
+            // rows; the "legacy_id" of a Canvas row is its SIS User ID, which *is* the
+            // Populi person id in a competently configured integration.
+            if ($batch->source->kind === ImportSourceKind::Lms) {
+                $crosswalk = ImportLink::query()
+                    ->where('entity_type', 'user')
+                    ->where('legacy_id', $legacyId)
+                    ->where('source_id', '!=', $batch->source_id)
+                    ->whereHas('source', fn ($q) => $q->where('kind', ImportSourceKind::Sis))
+                    ->first();
+
+                if ($crosswalk !== null) {
+                    $link++;
+                    if ($persist) {
+                        $user = User::query()->find($crosswalk->target_id);
+                        $this->linkUser($batch, $legacyId, $user);
+                        $this->attachProgram($batch, $user, $normalized);
+                        $row->update(['action' => ImportRowAction::Link, 'target_type' => User::class, 'target_id' => $user?->id, 'status' => ImportRowStatus::Applied]);
+                    }
+
+                    continue;
+                }
+            }
+
+            // Rung 3: exact normalised email match.
             $email = $normalized['email'] ?? null;
-            $matchedUser = $email !== null
+            $matchedUser = $email !== null && $email !== ''
                 ? User::query()->whereRaw('LOWER(email) = ?', [mb_strtolower($email)])->first()
                 : null;
+
+            // An "escalation" is a genuine ambiguity signal picked up along the ladder —
+            // more than one exact match on a rung that is supposed to be unambiguous.
+            // It always carries a candidate (the ambiguous set is never empty) and is
+            // never overwritten once set, since the earliest concrete signal is the one
+            // worth showing a human. A row with *no* signal at all — the common case for
+            // a person nobody in SPIMS has ever heard of — is not an escalation and, if
+            // the looser search below finds nothing either, is simply created.
+            $escalation = null;
+
+            // Rung 4: exact, unambiguous legacy student number match.
+            if ($matchedUser === null) {
+                $studentNumber = $normalized['student_number'] ?? null;
+                if ($studentNumber !== null && $studentNumber !== '') {
+                    $numberMatches = User::query()->where('student_number', $studentNumber)->get();
+                    if ($numberMatches->count() === 1) {
+                        $matchedUser = $numberMatches->first();
+                    } elseif ($numberMatches->count() > 1) {
+                        $escalation = [$numberMatches->first(), ['student_number'], 1.0];
+                    }
+                }
+            }
+
+            // Rung 5: normalised (first, last, date_of_birth) triple, unique school-wide.
+            if ($matchedUser === null) {
+                $dob = $normalized['date_of_birth'] ?? null;
+                $first = $normalized['first_name'] ?? null;
+                $last = $normalized['last_name'] ?? null;
+
+                if ($dob !== null && $dob !== '' && $first && $last) {
+                    $normFirst = $this->normalizeNameForMatch($first);
+                    $normLast = $this->normalizeNameForMatch($last);
+
+                    $dobMatches = User::query()->whereDate('date_of_birth', $dob)->get()
+                        ->filter(fn (User $u) => $this->normalizeNameForMatch((string) $u->first_name) === $normFirst
+                            && $this->normalizeNameForMatch((string) $u->last_name) === $normLast);
+
+                    if ($dobMatches->count() === 1) {
+                        $matchedUser = $dobMatches->first();
+                    } elseif ($dobMatches->count() > 1 && $escalation === null) {
+                        $escalation = [$dobMatches->first(), ['name', 'date_of_birth'], 1.0];
+                    }
+                }
+            }
 
             if ($matchedUser !== null) {
                 $link++;
                 if ($persist) {
-                    ImportLink::query()->create([
-                        'source_id' => $batch->source_id,
-                        'entity_type' => 'user',
-                        'legacy_id' => $legacyId,
-                        'target_type' => User::class,
-                        'target_id' => $matchedUser->id,
-                        'first_batch_id' => $batch->id,
-                        'last_batch_id' => $batch->id,
-                    ]);
+                    $this->linkUser($batch, $legacyId, $matchedUser);
                     $this->attachProgram($batch, $matchedUser, $normalized);
                     $row->update(['action' => ImportRowAction::Link, 'target_type' => User::class, 'target_id' => $matchedUser->id, 'status' => ImportRowStatus::Applied]);
+                }
+
+                continue;
+            }
+
+            // Rung 6: the human merge queue. An explicit escalation from rung 4/5 above
+            // always queues; otherwise a looser signal (an exact name match without a
+            // usable DOB, or name similarity) is tried, and only a row with genuinely
+            // no resemblance to anyone at all — the ordinary case for a first-time
+            // import — falls through to a plain create, exactly as before L2.
+            [$candidateUser, $matchedOn, $score] = $escalation ?? $this->bestGuessCandidate($normalized, $createdThisRun);
+
+            if ($escalation !== null || $candidateUser !== null) {
+                $queued++;
+                if ($persist) {
+                    ImportMergeCandidate::query()->create([
+                        'source_id' => $batch->source_id,
+                        'legacy_id' => $legacyId,
+                        'batch_id' => $batch->id,
+                        'candidate_user_id' => $candidateUser?->id,
+                        'score' => $score,
+                        'matched_on' => $matchedOn,
+                        'payload_preview' => $row->payload,
+                        'status' => ImportMergeCandidateStatus::Pending,
+                    ]);
+                    $row->update(['action' => ImportRowAction::Queued]);
                 }
 
                 continue;
@@ -423,15 +549,8 @@ class ImportBatchService
             $create++;
             if ($persist) {
                 $user = $this->createUser($batch, $normalized, $legacyId);
-                ImportLink::query()->create([
-                    'source_id' => $batch->source_id,
-                    'entity_type' => 'user',
-                    'legacy_id' => $legacyId,
-                    'target_type' => User::class,
-                    'target_id' => $user->id,
-                    'first_batch_id' => $batch->id,
-                    'last_batch_id' => $batch->id,
-                ]);
+                $createdThisRun[] = $user->id;
+                $this->linkUser($batch, $legacyId, $user);
                 $this->attachProgram($batch, $user, $normalized);
                 $row->update(['action' => ImportRowAction::Create, 'target_type' => User::class, 'target_id' => $user->id, 'status' => ImportRowStatus::Applied]);
             }
@@ -441,8 +560,142 @@ class ImportBatchService
             'create' => $create,
             'link' => $link,
             'skip' => $skip,
+            'queued' => $queued,
             'distinct_students' => $create + $link,
         ];
+    }
+
+    /**
+     * The looser signal tried once the deterministic ladder (rungs 1-5) and any genuine
+     * ambiguity there have both come up empty. Tries, in order: an exact normalised-name
+     * match without a usable DOB; then PHP's `similar_text` name similarity over
+     * existing users. Never invents a match with no signal at all — a null candidate
+     * (nothing above the similarity floor) tells the caller this row has no resemblance
+     * to anyone and should simply be created.
+     *
+     * @param  array<string, mixed>  $normalized
+     * @param  array<int, string>  $excludeUserIds  users created earlier in this same
+     *                                              run — never a candidate for a later
+     *                                              row in the same file (see applyRows)
+     * @return array{0: ?User, 1: array<int, string>, 2: float}
+     */
+    private function bestGuessCandidate(array $normalized, array $excludeUserIds = []): array
+    {
+        $first = (string) ($normalized['first_name'] ?? '');
+        $last = (string) ($normalized['last_name'] ?? '');
+        if ($first === '' || $last === '') {
+            return [null, [], 0.0];
+        }
+
+        $normFirst = $this->normalizeNameForMatch($first);
+        $normLast = $this->normalizeNameForMatch($last);
+        $pool = User::query()->whereNotIn('id', $excludeUserIds)->get(['id', 'first_name', 'last_name']);
+
+        $nameMatches = $pool->filter(fn (User $u) => $this->normalizeNameForMatch((string) $u->first_name) === $normFirst
+            && $this->normalizeNameForMatch((string) $u->last_name) === $normLast);
+
+        if ($nameMatches->count() >= 1) {
+            return [$nameMatches->first(), ['name'], 0.9];
+        }
+
+        $needle = $normFirst.' '.$normLast;
+        $best = null;
+        $bestPercent = 0.0;
+
+        foreach ($pool as $candidate) {
+            $haystack = $this->normalizeNameForMatch((string) $candidate->first_name).' '.$this->normalizeNameForMatch((string) $candidate->last_name);
+            similar_text($needle, $haystack, $percent);
+            if ($percent > $bestPercent) {
+                $bestPercent = $percent;
+                $best = $candidate;
+            }
+        }
+
+        if ($best !== null && $bestPercent >= 60.0) {
+            return [$best, ['name_similarity'], round($bestPercent / 100, 2)];
+        }
+
+        return [null, [], 0.0];
+    }
+
+    /**
+     * Normalises a name for identity matching only — never for display or storage.
+     * Trims, lowercases, and strips Arabic tashkeel/alef/ta-marbuta variants (never
+     * transliterates — see §6). Applied identically to incoming rows and stored users
+     * so the comparison is fair regardless of which side is Arabic.
+     */
+    private function normalizeNameForMatch(string $value): string
+    {
+        return $this->transforms->normalizeArabic(mb_strtolower(trim($value)));
+    }
+
+    /**
+     * Creates the permanent import_links row for this source + legacy id pointing at
+     * an already-existing user (rungs 2-5) — shared by applyRows() and the merge queue
+     * resolution below, so a future re-import of the same legacy id hits rung 1.
+     */
+    private function linkUser(ImportBatch $batch, string $legacyId, ?User $user): void
+    {
+        if ($user === null) {
+            return;
+        }
+
+        ImportLink::query()->create([
+            'source_id' => $batch->source_id,
+            'entity_type' => 'user',
+            'legacy_id' => $legacyId,
+            'target_type' => User::class,
+            'target_id' => $user->id,
+            'first_batch_id' => $batch->id,
+            'last_batch_id' => $batch->id,
+        ]);
+    }
+
+    /**
+     * Resolves one merge-queue row (rung 6). `merge` links to the stored candidate
+     * exactly as rungs 1-5 would have; `reject` creates a brand-new user exactly as an
+     * unresolved row would have; `skip` leaves it PENDING for later. Every decision is
+     * audited. See docs/legacy-data-import-plan.md §11.10.
+     */
+    public function resolveMergeCandidate(User $actor, ImportMergeCandidate $candidate, string $decision): ImportMergeCandidate
+    {
+        if ($candidate->status !== ImportMergeCandidateStatus::Pending) {
+            throw new RuntimeException('This merge candidate has already been resolved.');
+        }
+        if (! in_array($decision, ['merge', 'reject', 'skip'], true)) {
+            throw new RuntimeException('Unknown merge decision.');
+        }
+        if ($decision === 'merge' && $candidate->candidate_user_id === null) {
+            throw new RuntimeException('There is no candidate to merge with — reject and create a new person, or skip.');
+        }
+
+        return $this->audit->withAudit($actor, 'import.merge_resolve', function () use ($candidate, $actor, $decision) {
+            return DB::transaction(function () use ($candidate, $actor, $decision) {
+                $batch = $candidate->batch;
+                $row = ImportRow::query()->where('batch_id', $candidate->batch_id)->where('natural_key', $candidate->legacy_id)->first();
+                if ($row === null) {
+                    throw new RuntimeException('The original import row for this merge candidate could not be found.');
+                }
+                $normalized = $row->normalized ?? [];
+
+                if ($decision === 'merge') {
+                    $user = $candidate->candidateUser;
+                    $this->linkUser($batch, $candidate->legacy_id, $user);
+                    $this->attachProgram($batch, $user, $normalized);
+                    $row->update(['action' => ImportRowAction::Link, 'target_type' => User::class, 'target_id' => $user?->id, 'status' => ImportRowStatus::Applied]);
+                    $candidate->update(['status' => ImportMergeCandidateStatus::Merged, 'resolved_by_id' => $actor->id, 'resolved_at' => now()]);
+                } elseif ($decision === 'reject') {
+                    $user = $this->createUser($batch, $normalized, $candidate->legacy_id);
+                    $this->linkUser($batch, $candidate->legacy_id, $user);
+                    $this->attachProgram($batch, $user, $normalized);
+                    $row->update(['action' => ImportRowAction::Create, 'target_type' => User::class, 'target_id' => $user->id, 'status' => ImportRowStatus::Applied]);
+                    $candidate->update(['status' => ImportMergeCandidateStatus::NewUser, 'resolved_by_id' => $actor->id, 'resolved_at' => now()]);
+                }
+                // 'skip' leaves the candidate PENDING — still audited, nothing else changes.
+
+                return $candidate->fresh();
+            });
+        }, entityType: ImportMergeCandidate::class);
     }
 
     /**
@@ -469,6 +722,7 @@ class ImportBatchService
             'country_code' => $normalized['country_code'] ?? null,
             'date_of_birth' => $normalized['date_of_birth'] ?? null,
             'source_system' => $batch->source->code,
+            'student_number' => $normalized['student_number'] ?? null,
         ]);
     }
 

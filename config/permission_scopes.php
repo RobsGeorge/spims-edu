@@ -21,9 +21,10 @@ return [
      * `projects.join` and `projects.peer_eval` all describe acting on your own behalf, and
      * their membership checks live in the services that own the data.
      *
-     * `import.view`, `import.configure`, `import.stage`, `import.commit` and
-     * `import.rollback` are also deliberately absent: a legacy import batch is not owned
-     * by an offering, it is school-wide by nature. See docs/legacy-data-import-plan.md §12.
+     * `import.view`, `import.configure`, `import.stage`, `import.commit`,
+     * `import.rollback` and `import.merge_resolve` are also deliberately absent: a legacy
+     * import batch is not owned by an offering, it is school-wide by nature. See
+     * docs/legacy-data-import-plan.md §12.
      */
     'offering_scoped' => [
         'offerings.view',

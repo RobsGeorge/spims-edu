@@ -1048,3 +1048,85 @@ Recommended next slice: **L3**, because it's what makes this a *transcript* impo
 account import, and because the `counts_toward_gpa` filter is the one change to existing code the
 whole plan hinges on — it should land under the same scrutiny as this PR, proven by the same
 "existing suite passes unmodified" bar.
+
+---
+
+## 18. L2 design notes — the rest of the identity ladder and the merge queue
+
+Rungs 2, 4 and 5 and the merge queue (rung 6, screen 12) shipped on top of the L1 foundation in
+§17. This section records the design decisions made while building them, additively — §17 stays
+exactly as it was.
+
+### 18.1 When rung 6 actually fires
+
+A literal reading of §6's ladder table — "anything else... queued" — would send *every* row that
+isn't an exact match to the merge queue, including the ordinary case for a first-time migration: a
+person nobody in SPIMS has any record of at all. That would make the queue the main event for every
+import rather than the exception the plan's own screen mock describes (17 of 1,284 rows, §11.10),
+and it would silently break every L1 test that imports a brand-new alumnus with no prior SPIMS
+counterpart — the existing suite passing unmodified is a hard bar (§16).
+
+The rule actually implemented: a row reaches the merge queue only when there is a genuine reason to
+suspect it might already exist —
+
+- an **escalation**, carried forward from rung 4 or 5 finding *more than one* exact match (an
+  ambiguous student number, or an ambiguous normalised name+DOB triple — e.g. twins); or
+- a **looser signal** found once rungs 1-5 are exhausted with no escalation: an exact
+  normalised-name match with no usable DOB, or PHP `similar_text` name similarity at or above a 60%
+  floor.
+
+A row with no signal at all under either of those — the ordinary case — is created directly, exactly
+as before L2. This is also why two different rows created together in the *same* file must never be
+compared against each other by the looser search: a shared surname between two unrelated siblings on
+one sheet is common, would otherwise flag them as a possible duplicate of each other, and has nothing
+to do with rung 6's actual job (catching a row that might duplicate someone *already in SPIMS*).
+`ImportBatchService::applyRows()` tracks every user id created earlier in the same run and excludes
+it from that row's candidate search.
+
+The "no candidate — create new?" case the plan calls out (`candidate_user_id` null) is real and
+handled gracefully end to end (the merge screen offers only "create new" / "skip" for it, and `merge`
+is refused with a clear error) — it just isn't something the ladder produces on its own from a
+plain, signal-free new row, for the reason above. `ImportIdentityLadderTest` builds it directly by
+validating a batch (never committing it) and inserting the `import_merge_candidates` row itself,
+exercising the resolution paths independently of how such a row would arise in practice (most
+plausibly: a genuine ambiguity elsewhere prompts a registrar to look, and a *different* row in the
+same worklist turns out to have nothing to go on).
+
+### 18.2 The Canvas/SIS crosswalk and commit ordering
+
+Rung 2 looks up `import_links` for `entity_type = 'user'` with the same `legacy_id`, a *different*
+`source_id`, and a source of `kind = SIS`. On a hit it creates a new `import_links` row for the
+current (LMS) source pointing at the same user, so a later re-import of the same Canvas file hits
+rung 1 directly rather than re-walking the crosswalk.
+
+"Import Populi first, then Canvas" (§6) is enforced in `ImportBatchService::commit()`: a batch whose
+source is `kind = LMS` is refused with a localized `E_CANVAS_BEFORE_POPULI` message unless at least
+one `STUDENT` batch from a `kind = SIS` source has already committed. It is a commit-time gate only —
+mapping, validating and dry-running a Canvas batch ahead of Populi is harmless and useful for
+rehearsal; only the real write is blocked.
+
+### 18.3 Student number and DOB-triple matching
+
+`users.student_number` is a new nullable, indexed column (native SPIMS users simply never populate
+it). Rung 4 links only when exactly one existing user carries the incoming value; more than one is
+an escalation (§18.1), never a silent pick.
+
+Rung 5 normalises `first_name`/`last_name` for comparison with the same Arabic-normalisation rules as
+§6 (strip tashkeel, unify alef/ta-marbuta variants, never transliterate) plus a lowercase+trim pass
+that is a no-op on Arabic text, applied identically to the incoming row and every candidate read back
+from `users` — the comparison is fair regardless of which side, if either, is Arabic.
+
+### 18.4 What merge queue resolution actually does
+
+`ImportBatchService::resolveMergeCandidate()` is the one code path behind all three actions on
+screen 12, each wrapped in `AuditLogWriter::withAudit('import.merge_resolve', ...)`:
+
+- **merge** — links exactly as rungs 2-5 would have (the same `linkUser()`/`attachProgram()` helpers),
+  and is refused if the candidate is null (nothing to merge with).
+- **reject → create new** — creates a user exactly as an unresolved row would have
+  (`createUser()`), then links the new user to this source + legacy id.
+- **skip** — audited, but changes nothing; the candidate stays `PENDING` for a later pass.
+
+All three read the original `import_rows` normalized snapshot (via `batch_id` + `natural_key` =
+`legacy_id`) rather than re-deriving fields from `payload_preview`, since the latter is the raw sheet
+row kept only for the compare panel, not shaped like `normalized`.

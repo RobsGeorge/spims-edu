@@ -104,4 +104,49 @@ class ImportPermissionTest extends TestCase
     {
         $this->get(route('admin.imports.index'))->assertRedirect(route('auth.login'));
     }
+
+    #[Test]
+    public function only_administrative_admin_can_view_the_merge_queue(): void
+    {
+        $administrativeAdmin = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+        $academicAdmin = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+        $financialAdmin = User::factory()->withRole(RoleType::FinancialAdmin)->create();
+        $instructor = User::factory()->withRole(RoleType::Instructor)->create();
+
+        $this->actingAs($administrativeAdmin)->get(route('admin.imports.merges'))->assertOk();
+        $this->actingAs($academicAdmin)->get(route('admin.imports.merges'))->assertForbidden();
+        $this->actingAs($financialAdmin)->get(route('admin.imports.merges'))->assertForbidden();
+        $this->actingAs($instructor)->get(route('admin.imports.merges'))->assertForbidden();
+    }
+
+    #[Test]
+    public function only_administrative_admin_can_resolve_a_merge_candidate(): void
+    {
+        $source = $this->populi();
+        $administrativeAdmin = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+        $academicAdmin = User::factory()->withRole(RoleType::AcademicAdmin)->create();
+
+        $candidate = \App\Models\ImportMergeCandidate::query()->create([
+            'source_id' => $source->id,
+            'legacy_id' => 'LEG-1',
+            'batch_id' => app(\App\Services\Import\ImportBatchService::class)->createFromUpload(
+                $administrativeAdmin,
+                $source,
+                \Illuminate\Http\UploadedFile::fake()->createWithContent('r.csv', "ID,Name,Email\n1,\"A, B\",a@example.org\n"),
+                \App\Enums\ImportPopulation::Alumni,
+            )->id,
+            'candidate_user_id' => null,
+            'score' => 0,
+            'matched_on' => [],
+            'status' => 'PENDING',
+        ]);
+
+        $this->actingAs($academicAdmin)
+            ->post(route('admin.imports.merges.resolve', $candidate), ['decision' => 'skip'])
+            ->assertForbidden();
+
+        $this->actingAs($administrativeAdmin)
+            ->post(route('admin.imports.merges.resolve', $candidate), ['decision' => 'skip'])
+            ->assertRedirect(route('admin.imports.merges'));
+    }
 }

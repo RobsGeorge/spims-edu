@@ -27,6 +27,7 @@ class ImportStudentFields
             'country_code' => 'Country',
             'preferred_locale' => 'Preferred locale',
             'program_code' => 'Program code (matched against the live catalog only)',
+            'student_number' => 'Legacy student number',
         ];
     }
 
