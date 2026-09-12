@@ -42,4 +42,20 @@ return [
     'type_standalone_certificate' => 'Standalone certificate',
     'type_offering_completion' => 'Offering completion',
     'verify_qr' => 'QR',
+
+    // L4 — "Prior study" (legacy import), docs/legacy-data-import-plan.md §7, §11.12
+    'computed_gpa_label' => 'Computed SPIMS GPA',
+    'prior_study_title' => 'Prior study',
+    'prior_study_lead' => 'Coursework and grades carried over from a previous system. Kept separate from your SPIMS record above — none of it moves your computed GPA unless a registrar has promoted a specific record.',
+    'prior_study_empty' => 'No prior study on file.',
+    'col_recorded_source' => 'Source',
+    'col_counts_gpa' => 'Counts toward GPA',
+    'counts_gpa_yes' => 'Yes',
+    'counts_gpa_no' => 'No',
+    'promote_button' => 'Promote to transfer credit',
+    'promote_confirm' => 'This makes this one record count toward the computed SPIMS GPA, recalculated immediately. Continue?',
+    'prior_study_promoted' => 'Record promoted — the GPA has been recalculated.',
+    'legacy_gpa_line' => 'GPA :gpa / :scale as recorded by :source, as of :date',
+    'legacy_gpa_scope_PROGRAM' => 'program GPA',
+    'legacy_gpa_scope_CUMULATIVE' => 'cumulative GPA',
 ];

@@ -607,6 +607,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transcript', TranscriptController::class)
         ->middleware('permission:transcript.view')
         ->name('transcript.show');
+    // L3/L4 legacy-import — see docs/legacy-data-import-plan.md §7, D7. Kept beside
+    // transcript.show (its own group's middleware stack) rather than at the
+    // TRACK: legacy-import anchor, which is nested under the admin prefix/group.
+    Route::post('/transcript/promote/{record}', [TranscriptController::class, 'promote'])
+        ->middleware('permission:import.commit')
+        ->name('transcript.promote');
 
     Route::get('/offerings/{offering}/completion', [StudentCompletionController::class, 'show'])
         ->middleware('permission:completion.view')

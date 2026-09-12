@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\ImportBatchStatus;
+use App\Enums\ImportEntityType;
 use App\Enums\ImportPopulation;
 use App\Http\Controllers\Controller;
 use App\Models\ImportBatch;
@@ -10,6 +11,7 @@ use App\Models\ImportMappingProfile;
 use App\Models\ImportRow;
 use App\Models\ImportSource;
 use App\Services\Import\ImportBatchService;
+use App\Services\Import\ImportCourseResultFields;
 use App\Services\Import\ImportStudentFields;
 use App\Services\Import\ImportTransformService;
 use App\Support\AuthorizeService;
@@ -46,13 +48,15 @@ class ImportBatchController extends Controller
     {
         $data = $request->validate([
             'source_id' => ['required', 'exists:import_sources,id'],
-            'population' => ['required', 'in:ALUMNI,ACTIVE'],
+            'entity_type' => ['nullable', 'in:STUDENT,COURSE_RESULT'],
+            'population' => ['nullable', 'required_if:entity_type,STUDENT', 'in:ALUMNI,ACTIVE'],
             'sheet_name' => ['nullable', 'string', 'max:120'],
             'header_row' => ['nullable', 'integer', 'min:1', 'max:20'],
             'file' => ['required', 'file', 'mimes:csv,txt,xlsx,xls', 'max:20480'],
         ]);
 
-        $population = ImportPopulation::from($data['population']);
+        $entityType = ImportEntityType::from($data['entity_type'] ?? 'STUDENT');
+        $population = isset($data['population']) ? ImportPopulation::from($data['population']) : null;
 
         // A batch that will create login-capable accounts is a bigger action than a
         // historical import — require users.manage in addition to import.stage.
@@ -70,8 +74,9 @@ class ImportBatchController extends Controller
             $source,
             $request->file('file'),
             $population,
-            $data['sheet_name'] ?? null,
-            (int) ($data['header_row'] ?? 1),
+            entityType: $entityType,
+            sheetName: $data['sheet_name'] ?? null,
+            headerRow: (int) ($data['header_row'] ?? 1),
         );
 
         $redirect = redirect()->route('admin.imports.map', $batch);
@@ -85,11 +90,12 @@ class ImportBatchController extends Controller
     public function map(ImportBatch $batch): View
     {
         $mapping = $batch->mapping ?? [];
+        $fieldsClass = $this->fieldsClassFor($batch);
 
         return view('admin.imports.map', [
             'batch' => $batch,
-            'fields' => ImportStudentFields::catalog(),
-            'required' => ImportStudentFields::requiredFor($batch->population),
+            'fields' => $fieldsClass::catalog(),
+            'required' => $fieldsClass::requiredFor($batch->population),
             'transforms' => (new ImportTransformService)->available(),
             'profiles' => ImportMappingProfile::query()
                 ->where('source_id', $batch->source_id)
@@ -111,7 +117,8 @@ class ImportBatchController extends Controller
             'ignored' => ['sometimes', 'array'],
         ]);
 
-        $validTargets = array_keys(ImportStudentFields::catalog());
+        $fieldsClass = $this->fieldsClassFor($batch);
+        $validTargets = array_keys($fieldsClass::catalog());
         $previousConfidence = collect($batch->mapping ?? [])->keyBy('column')->map(fn ($m) => $m['confidence'] ?? 'None');
 
         $mapping = [];
@@ -232,9 +239,20 @@ class ImportBatchController extends Controller
     private function missingRequiredFields(array $mapping, ImportBatch $batch): array
     {
         $produced = collect($mapping)->pluck('target_field')->filter()->unique()->all();
-        $required = ImportStudentFields::requiredFor($batch->population);
+        $fieldsClass = $this->fieldsClassFor($batch);
+        $required = $fieldsClass::requiredFor($batch->population);
 
         return array_values(array_diff($required, $produced));
+    }
+
+    /**
+     * @return class-string<ImportStudentFields>|class-string<ImportCourseResultFields>
+     */
+    private function fieldsClassFor(ImportBatch $batch): string
+    {
+        return $batch->entity_type === ImportEntityType::CourseResult
+            ? ImportCourseResultFields::class
+            : ImportStudentFields::class;
     }
 
     /**

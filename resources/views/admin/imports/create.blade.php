@@ -42,7 +42,7 @@
             </x-slot:actions>
         </x-empty-state>
     @else
-        <form method="POST" action="{{ route('admin.imports.store') }}" enctype="multipart/form-data" class="row g-4">
+        <form method="POST" action="{{ route('admin.imports.store') }}" enctype="multipart/form-data" class="row g-4" x-data="{ entity: '{{ old('entity_type', 'STUDENT') }}' }">
             @csrf
 
             <div class="col-md-6">
@@ -55,6 +55,15 @@
             </div>
 
             <div class="col-md-6">
+                <label class="form-label fw-semibold" for="entity_type">{{ __('import.field_entity_type') }}</label>
+                <select id="entity_type" name="entity_type" class="form-select" x-model="entity">
+                    <option value="STUDENT">{{ __('import.entity_STUDENT') }}</option>
+                    <option value="COURSE_RESULT">{{ __('import.entity_COURSE_RESULT') }}</option>
+                </select>
+                <p class="form-text mb-0">{{ __('import.field_entity_type_help') }}</p>
+            </div>
+
+            <div class="col-md-6" x-show="entity === 'STUDENT'">
                 <span class="form-label fw-semibold d-block">{{ __('import.field_population') }}</span>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="population" id="pop-alumni" value="ALUMNI" @checked(old('population', 'ALUMNI') === 'ALUMNI')>
@@ -70,6 +79,12 @@
                         <span class="d-block small spims-text-dim">{{ __('import.population_active_help') }}</span>
                     </label>
                 </div>
+            </div>
+
+            <div class="col-md-6" x-show="entity === 'COURSE_RESULT'">
+                <x-card variant="quiet">
+                    <p class="small spims-text-dim mb-0">{{ __('import.course_result_help') }}</p>
+                </x-card>
             </div>
 
             <div class="col-12">

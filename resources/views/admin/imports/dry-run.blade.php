@@ -46,6 +46,17 @@
         </div>
     </div>
 
+    @if(isset($report['shadow_courses_created']) || isset($report['shadow_offerings_created']))
+        <div class="row g-3 mb-4">
+            <div class="col-6">
+                <x-stat :label="__('import.report_shadow_courses')" :value="$report['shadow_courses_created'] ?? 0" />
+            </div>
+            <div class="col-6">
+                <x-stat :label="__('import.report_shadow_offerings')" :value="$report['shadow_offerings_created'] ?? 0" />
+            </div>
+        </div>
+    @endif
+
     <x-card variant="quiet" class="mb-4">
         <h2 class="h6 page-title mb-3">{{ __('import.control_totals_title') }}</h2>
         <div class="table-responsive">

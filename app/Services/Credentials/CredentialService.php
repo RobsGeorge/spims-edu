@@ -8,6 +8,7 @@ use App\Enums\StudentProgramStatus;
 use App\Models\AcademicRecord;
 use App\Models\CourseOffering;
 use App\Models\Credential;
+use App\Models\LegacyAcademicSummary;
 use App\Models\Program;
 use App\Models\ProgramCourse;
 use App\Models\ProgramRequirementFulfillment;
@@ -199,22 +200,56 @@ class CredentialService
     }
 
     /**
-     * @return array{records: \Illuminate\Support\Collection, gpa: float|null}
+     * L4 — the "Prior study" surface, docs/legacy-data-import-plan.md §7 and §11.12.
+     * `records` stays native-only (as before L3); a legacy AcademicRecord
+     * (`source_system` set) is grouped separately under `prior_study` by source, and
+     * never mixed into the main table. The computed SPIMS GPA sums every record whose
+     * `counts_toward_gpa` is true — true by default for every native record (so this
+     * is unchanged from before L3) and true for a legacy record only once a registrar
+     * has promoted it (D7), at which point it correctly joins the live GPA.
+     * `legacy_summaries` is the attested Populi/Canvas figure (D3) — rendered beside
+     * the computed GPA, never averaged into it.
+     *
+     * @return array{records: \Illuminate\Support\Collection, gpa: float|null, prior_study: \Illuminate\Support\Collection, legacy_summaries: \Illuminate\Support\Collection}
      */
     public function transcriptData(User $student): array
     {
         $records = AcademicRecord::query()
             ->where('student_id', $student->id)
+            ->whereNull('source_system')
             ->with('course')
             ->orderByDesc('completed_at')
             ->get();
 
-        $credits = $records->sum('credit_hours');
+        $gpaRecords = AcademicRecord::query()
+            ->where('student_id', $student->id)
+            ->where('counts_toward_gpa', true)
+            ->get();
+
+        $credits = $gpaRecords->sum('credit_hours');
         $gpa = $credits > 0
-            ? round($records->sum(fn (AcademicRecord $r) => $r->gpa_points * $r->credit_hours) / $credits, 2)
+            ? round($gpaRecords->sum(fn (AcademicRecord $r) => $r->gpa_points * $r->credit_hours) / $credits, 2)
             : null;
 
-        return ['records' => $records, 'gpa' => $gpa];
+        $priorStudy = AcademicRecord::query()
+            ->where('student_id', $student->id)
+            ->whereNotNull('source_system')
+            ->with('course')
+            ->orderBy('term')
+            ->get()
+            ->groupBy('source_system');
+
+        $legacySummaries = LegacyAcademicSummary::query()
+            ->where('student_id', $student->id)
+            ->with(['source', 'program'])
+            ->get();
+
+        return [
+            'records' => $records,
+            'gpa' => $gpa,
+            'prior_study' => $priorStudy,
+            'legacy_summaries' => $legacySummaries,
+        ];
     }
 
     private function programRequirementsMet(StudentProgram $sp): bool

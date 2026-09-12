@@ -345,6 +345,52 @@
                     </ul>
                 @endif
             </section>
+
+            @if($priorStudy->isNotEmpty() || $legacySummaries->isNotEmpty())
+                <section class="app-card p-3 mb-4">
+                    <h2 class="h6 page-title">{{ __('people.prior_study_title') }}</h2>
+                    <p class="small spims-text-dim">{{ __('people.prior_study_help') }}</p>
+
+                    @foreach($legacySummaries as $summary)
+                        <p class="small mb-2">
+                            <span class="spims-status-badge spims-status-info">
+                                {{ __('credentials.legacy_gpa_line', [
+                                    'gpa' => number_format((float) $summary->gpa, 2),
+                                    'scale' => number_format((float) $summary->gpa_scale, 2),
+                                    'source' => $summary->source->name,
+                                    'date' => $summary->as_of->format('Y-m-d'),
+                                ]) }}
+                            </span>
+                        </p>
+                    @endforeach
+
+                    @if($computedGpa !== null)
+                        <p class="small spims-text-dim mb-2">{{ __('credentials.computed_gpa_label') }}: {{ $computedGpa }}</p>
+                    @endif
+
+                    @forelse($priorStudy as $source => $records)
+                        <div class="mb-3">
+                            <div class="fw-semibold small">{{ $source }}</div>
+                            <ul class="list-unstyled mb-0">
+                                @foreach($records as $record)
+                                    <li class="py-1 small border-bottom border-opacity-25 d-flex flex-wrap align-items-center gap-2">
+                                        <span>{{ $record->course->code }} · {{ $record->term }} · {{ $record->letter_grade }} ({{ $record->percent }}%)</span>
+                                        <x-status-badge :status="$record->counts_toward_gpa ? 'success' : 'neutral'"
+                                            :label="$record->counts_toward_gpa ? __('credentials.counts_gpa_yes') : __('credentials.counts_gpa_no')" />
+                                        @if($canPromote && ! $record->counts_toward_gpa)
+                                            <form method="POST" action="{{ route('transcript.promote', $record) }}" onsubmit="return confirm('{{ __('credentials.promote_confirm') }}')">
+                                                @csrf
+                                                <button class="btn btn-sm btn-outline-primary">{{ __('credentials.promote_button') }}</button>
+                                            </form>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @empty
+                    @endforelse
+                </section>
+            @endif
         </div>
         <div class="col-lg-6">
             <section class="app-card p-3 mb-4">
