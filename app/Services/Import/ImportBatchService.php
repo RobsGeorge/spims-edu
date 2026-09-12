@@ -2,6 +2,7 @@
 
 namespace App\Services\Import;
 
+use App\Enums\ImportAccountClaimStatus;
 use App\Enums\ImportBatchStatus;
 use App\Enums\ImportEntityType;
 use App\Enums\ImportPopulation;
@@ -9,6 +10,7 @@ use App\Enums\ImportRowAction;
 use App\Enums\ImportRowStatus;
 use App\Enums\StudentProgramStatus;
 use App\Enums\UserStatus;
+use App\Models\ImportAccountClaim;
 use App\Models\ImportBatch;
 use App\Models\ImportLink;
 use App\Models\ImportRow;
@@ -332,6 +334,7 @@ class ImportBatchService
         $this->audit->withAudit($actor, 'import.batch_commit', function () use ($batch, $actor) {
             DB::transaction(function () use ($batch) {
                 $this->applyRows($batch, persist: true);
+                $this->queueAccountClaims($batch);
             });
 
             $batch->update([
@@ -501,6 +504,53 @@ class ImportBatchService
                 'source_system' => $batch->source->code,
             ],
         );
+    }
+
+    /**
+     * L5 — queues the active-student account-claim cohort. See
+     * docs/legacy-data-import-plan.md §9: every row that resulted in a still-PENDING
+     * user (freshly created, or linked to a user left PENDING by an earlier batch)
+     * gets an import_account_claims row so a registrar can review the headcount and
+     * send invitations later — this method never sends mail itself, it only queues.
+     * A user who is already ACTIVE, ARCHIVED or Suspended is never touched: the
+     * `status = Pending` filter below is exactly that guard.
+     *
+     * Reads import_rows written by applyRows() moments ago in the same transaction
+     * rather than changing applyRows()'s own return value or side effects, so the
+     * existing ImportBatchServiceTest suite is untouched by this addition.
+     */
+    private function queueAccountClaims(ImportBatch $batch): void
+    {
+        if ($batch->entity_type !== ImportEntityType::Student || $batch->population !== ImportPopulation::Active) {
+            return;
+        }
+
+        $userIds = ImportRow::query()->where('batch_id', $batch->id)
+            ->where('target_type', User::class)
+            ->whereIn('action', [ImportRowAction::Create, ImportRowAction::Link])
+            ->where('status', ImportRowStatus::Applied)
+            ->pluck('target_id')
+            ->filter()
+            ->unique();
+
+        if ($userIds->isEmpty()) {
+            return;
+        }
+
+        $eligibleUserIds = User::query()
+            ->whereIn('id', $userIds)
+            ->where('status', UserStatus::Pending)
+            ->pluck('id');
+
+        foreach ($eligibleUserIds as $userId) {
+            // firstOrCreate, not updateOrCreate: a claim already SENT/BOUNCED/CLAIMED
+            // by an earlier batch keeps its own history and is never reset to QUEUED
+            // just because a later batch happens to reference the same person.
+            ImportAccountClaim::query()->firstOrCreate(
+                ['user_id' => $userId],
+                ['batch_id' => $batch->id, 'status' => ImportAccountClaimStatus::Queued],
+            );
+        }
     }
 
     /**

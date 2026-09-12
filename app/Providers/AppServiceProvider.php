@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Theme;
 use App\Models\User;
+use App\Observers\UserObserver;
 use App\Services\Ai\AiClient;
 use App\Services\Ai\GeminiAiClient;
 use App\Services\Communications\AnnouncementService;
@@ -26,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // L5 — flips import_account_claims to CLAIMED on a genuine password-hash set;
+        // see docs/legacy-data-import-plan.md §9 and app/Observers/UserObserver.php.
+        User::observe(UserObserver::class);
+
         View::composer('layouts.app', function ($view): void {
             $cookieTheme = request()->cookie('theme', 'light');
             if (! in_array($cookieTheme, ['light', 'dark', 'system'], true)) {

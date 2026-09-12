@@ -95,6 +95,16 @@ class User extends Authenticatable
         return $this->hasMany(Session::class);
     }
 
+    /**
+     * L5 — the account-claim invitation cohort for currently-studying legacy
+     * students. Null for every native (non-imported) user. See
+     * docs/legacy-data-import-plan.md §9.
+     */
+    public function importAccountClaim(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ImportAccountClaim::class);
+    }
+
     public function hasRole(RoleType $role): bool
     {
         return $this->roles->contains(fn (UserRole $userRole): bool => $userRole->role === $role);

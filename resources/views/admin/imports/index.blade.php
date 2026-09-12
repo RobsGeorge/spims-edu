@@ -5,6 +5,11 @@
 @section('content')
 <x-page-header :title="__('import.title')" :subtitle="__('import.subtitle')">
     <x-slot:actions>
+        @if(app(\App\Support\AuthorizeService::class)->allows(auth()->user(), 'import.activate'))
+            <a href="{{ route('admin.imports.activation') }}" class="btn btn-outline-primary">
+                {{ __('import.activation_title') }}
+            </a>
+        @endif
         <a href="{{ route('admin.imports.sources.index') }}" class="btn btn-outline-primary">
             <x-icon name="settings" size="sm" /> {{ __('import.configure_sources') }}
         </a>
