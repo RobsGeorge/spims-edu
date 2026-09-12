@@ -62,6 +62,64 @@ class GeminiAiClient implements AiClient
         ];
     }
 
+    /**
+     * L8, Part B — mirrors suggestEssayScore()'s degrade-gracefully / parse-JSON /
+     * never-throw shape exactly: no key, no suggestions; a non-2xx response, a
+     * non-JSON body, or JSON missing the expected keys all degrade to null rather than
+     * throwing. `$schema` is already the fully masked, allowlisted payload built by
+     * `ImportAiMappingSuggester` — this method does not touch or re-derive it.
+     *
+     * @param  array<string, mixed>  $schema
+     * @return array{suggestions: array<int, array{column: string, target_field: ?string, confidence: string, rationale: string}>}|null
+     */
+    public function suggestFieldMapping(array $schema): ?array
+    {
+        $key = $this->apiKey();
+        if ($key === null) {
+            return null;
+        }
+
+        $instruction = implode("\n", [
+            'You are mapping spreadsheet columns from a legacy school records export to a fixed set of target fields.',
+            'Only column headers, inferred types and masked example shapes are given below — no real student data.',
+            'For each column, suggest the single best target_field (or null if none fits), a confidence of "High", "Medium" or "Low", and a one-sentence rationale.',
+            'Schema: '.json_encode($schema),
+            'Respond with JSON only, matching exactly: {"suggestions": [{"column": "<string>", "target_field": "<string or null>", "confidence": "<High|Medium|Low>", "rationale": "<string>"}]}',
+        ]);
+
+        $raw = $this->generateText($key, $instruction);
+        if ($raw === null) {
+            return null;
+        }
+
+        if (preg_match('/\{.*\}/s', $raw, $matches) !== 1) {
+            Log::warning('Gemini field-mapping response was not JSON', ['snippet' => mb_substr($raw, 0, 200)]);
+
+            return null;
+        }
+
+        /** @var array<string, mixed>|null $decoded */
+        $decoded = json_decode($matches[0], true);
+        if (! is_array($decoded) || ! isset($decoded['suggestions']) || ! is_array($decoded['suggestions'])) {
+            return null;
+        }
+
+        $suggestions = [];
+        foreach ($decoded['suggestions'] as $entry) {
+            if (! is_array($entry) || ! isset($entry['column'])) {
+                continue;
+            }
+            $suggestions[] = [
+                'column' => (string) $entry['column'],
+                'target_field' => isset($entry['target_field']) && $entry['target_field'] !== '' ? (string) $entry['target_field'] : null,
+                'confidence' => (string) ($entry['confidence'] ?? 'Low'),
+                'rationale' => (string) ($entry['rationale'] ?? ''),
+            ];
+        }
+
+        return ['suggestions' => $suggestions];
+    }
+
     private function apiKey(): ?string
     {
         $key = config('services.gemini.key');

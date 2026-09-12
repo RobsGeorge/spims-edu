@@ -52,6 +52,28 @@
     </div>
 </x-card>
 
+{{-- L8, Part B — "AI suggest" fills gaps only (columns still at None confidence);
+     it never overrides a tier 1-3 match, and the button is inert unless
+     import.ai_mapping_enabled is on. See docs/legacy-data-import-plan.md §22.3. --}}
+<x-card variant="quiet" class="mb-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div>
+            <h2 class="h6 page-title mb-1">{{ __('import.ai_suggest_title') }}</h2>
+            <p class="small spims-text-dim mb-0">{{ __('import.ai_suggest_masking_policy') }}</p>
+        </div>
+        @if($aiEnabled)
+            <form method="POST" action="{{ route('admin.imports.map.ai-suggest', $batch) }}">
+                @csrf
+                <button class="btn btn-sm btn-outline-primary text-nowrap">{{ __('import.ai_suggest_button') }}</button>
+            </form>
+        @else
+            <span tabindex="0" data-bs-toggle="tooltip" title="{{ __('import.ai_suggest_disabled_tooltip') }}">
+                <button class="btn btn-sm btn-outline-secondary text-nowrap" disabled>{{ __('import.ai_suggest_button') }}</button>
+            </span>
+        @endif
+    </div>
+</x-card>
+
 <form method="POST" action="{{ route('admin.imports.map.update', $batch) }}">
     @csrf
 
@@ -60,7 +82,7 @@
             // A freshly suggested mapping (from ImportMappingSuggestionService) carries
             // column/target_field/transform/confidence/options but not yet 'ignored' —
             // that key only exists once an admin has saved the mapping form once.
-            $m = array_merge(['target_field' => null, 'transform' => 'none', 'options' => [], 'ignored' => false, 'confidence' => 'None'], $m);
+            $m = array_merge(['target_field' => null, 'transform' => 'none', 'options' => [], 'ignored' => false, 'confidence' => 'None', 'origin' => null, 'rationale' => null], $m);
             $profile = $profileByColumn->get($m['column'], []);
         @endphp
         <x-card variant="panel" class="mb-3 {{ empty($m['target_field']) && empty($m['ignored']) ? 'border-danger' : '' }}"
@@ -74,7 +96,15 @@
                         <span class="spims-status-badge spims-status-{{ ['High' => 'success', 'Medium' => 'info', 'Low' => 'warning', 'None' => 'danger'][$m['confidence'] ?? 'None'] }}">
                             {{ __('import.confidence_'.($m['confidence'] ?? 'None')) }}
                         </span>
+                        @if(($m['origin'] ?? null) === 'AI')
+                            <span class="spims-status-badge spims-status-neutral" title="{{ $m['rationale'] ?? '' }}">
+                                {{ __('import.ai_origin_badge') }}
+                            </span>
+                        @endif
                     </div>
+                    @if(($m['origin'] ?? null) === 'AI' && filled($m['rationale'] ?? null))
+                        <p class="small spims-text-dim mb-1 fst-italic">{{ $m['rationale'] }}</p>
+                    @endif
                     <p class="small spims-text-dim mb-1">
                         {{ $profile['type'] ?? '' }} &middot;
                         {{ __('import.empty_percent_label', ['percent' => $profile['empty_percent'] ?? 0]) }} &middot;

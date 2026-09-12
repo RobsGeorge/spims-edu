@@ -1028,15 +1028,14 @@ Everything below is real, tested, and in production — not aspirational.
 
 ### Not built yet (traces to later phases in §13)
 
-As of §21, every phase through L6 has shipped: L2 (identity ladder + merge queue), L3/L4 (course
-results, GPA isolation, shadow catalog, transcript surfacing), L5 (account-claim invitations) and L6
-(finance opening balances) — see §18, §21, §19 and §20 respectively for their design notes. What
-remains is only what was always conditional/optional in the phase plan:
+Every phase in the plan has now shipped, including the two that were always conditional/optional
+rather than on the critical path: L2 (identity ladder + merge queue), L3/L4 (course results, GPA
+isolation, shadow catalog, transcript surfacing), L5 (account-claim invitations), L6 (finance opening
+balances), L7 (mid-term cutover — built ahead of the calendar actually forcing it) and L8 (legacy
+credentials + AI-assisted mapping) — see §18–§23 respectively for their design notes.
 
-- **L7 — mid-term cutover.**
-- **L8 — legacy credentials and AI-assisted mapping.**
-
-Neither is scheduled; both stay here as future options rather than committed next work.
+There is no remaining phase from the original plan. Anything further is a new feature, not a gap in
+this one.
 
 ---
 
@@ -1277,3 +1276,366 @@ live GPA, and reversing the import underneath it would silently move that GPA ba
 having decided to. This mirrors the `STUDENT` rollback's own rule (§17) that a record already put to
 native use blocks its own reversal — same principle, applied to `COURSE_RESULT`'s specific kind of
 "native use."
+
+---
+
+## 22. L7 design notes — the mid-term cutover (MIDTERM_ENROLLMENT)
+
+A fourth entity type, `MIDTERM_ENROLLMENT`, shipped on top of §17-§21 — the conditional V2 path from
+§3's cutover-timing subsection, built because the task brief called for it directly rather than
+because the calendar forced it (§13's own stated trigger). This section records the design decisions
+made while building it, additively — §17-§21 stay exactly as they were.
+
+### 22.1 Why this is not a fourth `COURSE_RESULT` variant
+
+`COURSE_RESULT` and `MIDTERM_ENROLLMENT` look structurally similar — both walk the same identity
+ladder rung, both post an `Enrollment`, both are gated by the same `import.stage`/`import.commit`
+permissions — but they operate on data with opposite trust models, and every design decision below
+follows from that one difference:
+
+- A `COURSE_RESULT` row is **closed history**. Nothing else in SPIMS will ever write to the shadow
+  offering it posts against, so find-or-creating that offering is safe, and re-importing the same row
+  later safely *updates* it (§21's `updateOrCreate`).
+- A `MIDTERM_ENROLLMENT` row is **live, currently-in-progress state that a real instructor is actively
+  grading in SPIMS this term**, on an offering a registrar already built by hand. Shadow-creating
+  anything here would be nonsensical (there is nothing to shadow — the whole point is landing on the
+  *live* offering), and silently updating on a second import could throw away grading work an
+  instructor has entered since go-live.
+
+So `MIDTERM_ENROLLMENT` never find-or-creates a `Course` or `CourseOffering` — an unresolved reference
+is always a hard row error (§22.2) — and it never updates an existing `Enrollment` or
+`GradebookComponentScore` — an already-existing one is always a hard row error too (§22.5/§22.6).
+Where `COURSE_RESULT` is optimistic ("link if you can, otherwise build the shadow and move on"),
+`MIDTERM_ENROLLMENT` is pessimistic ("resolve exactly, or refuse the row") — the same posture §20.1
+describes for `BALANCE`'s money gate, applied here to live academic state instead of live financial
+state.
+
+### 22.2 Resolving the target live offering unambiguously
+
+`course_code` alone cannot identify one offering — a school can run more than one live section of the
+same course in the same semester — so a `MIDTERM_ENROLLMENT` row identifies its target with
+**`course_code` + `semester_name` together**, resolved only among offerings with `source_system IS
+NULL` (`ImportBatchService::resolveLiveOffering()`, shared verbatim by `validate()` and the committer
+so the two can never disagree about which offering a row means):
+
+- Zero live offerings match → `E_OFFERING_NOT_FOUND`.
+- Exactly one matches → resolved.
+- More than one matches (the multi-section case) → `E_OFFERING_AMBIGUOUS`, naming the course and
+  semester and pointing the registrar at the escape hatch below. **Never** a fuzzy match, never a
+  fallback to picking the first one, never a fallback to shadow-creation.
+
+The escape hatch is an optional `offering_id` field carrying the exact SPIMS `CourseOffering` ulid.
+When present it is authoritative — looked up directly (still scoped to `source_system IS NULL`, so an
+`offering_id` that happens to name a *shadow* offering is still refused) — and `course_code` /
+`semester_name` are only cross-checked against it for a soft `W_OFFERING_ID_MISMATCH` warning, never
+used to override it. `course_code` and `semester_name` stay required on every row even when
+`offering_id` is also given (`ImportMidtermEnrollmentFields::alwaysRequired()`): the mapping screen's
+required-field guard (§11.5) is a plain per-batch AND set everywhere else in this feature, and
+inventing per-row OR-required logic just for this one field would be new surface area for a rare case
+a registrar can solve by filling in one more column. `semester_name` matches case-insensitively
+(registrar-typed free text); `course_code` matches exactly, the same convention `COURSE_RESULT`
+already uses for its own course-code lookups.
+
+### 22.3 Resolving the target gradebook component
+
+`component_name` is matched case-insensitively against `GradebookComponent.name`, scoped to the one
+already-resolved offering (`ImportBatchService::resolveGradebookComponent()`). No match is
+`E_UNKNOWN_COMPONENT`; more than one match — nothing stops a registrar creating two components with
+the same name on one offering, there is no unique constraint — is `E_AMBIGUOUS_COMPONENT`. Both are
+hard errors, never a silently-dropped score, per the task brief's explicit instruction.
+
+### 22.4 The row shape: one row per (student, offering, component) score
+
+Decision #4's simplest, safest option — one row per (student, offering, component) score, the "long"
+format that mirrors how `COURSE_RESULT` already does one row per (student, course, term) — is what
+shipped. `ImportMidtermEnrollmentFields` is the field catalog: `legacy_id`, `course_code`,
+`semester_name`, `offering_id` (optional), `component_name`, `score`.
+
+A real Canvas gradebook export is wide (one column per assignment). Reshaping it into this long format
+is the registrar's/admin's job before upload, exactly as the task brief allows — documented in the
+upload screen's help text (`import.midterm_enrollment_help`) rather than solved in code. A
+reshape-on-upload transform was left out of scope: the core entity type's correctness and safety came
+first, and a spreadsheet pivot (wide Canvas columns → long SPIMS rows) is a mechanical, well-understood
+step for whoever runs the export — it does not need this phase to also carry a general-purpose
+column-melting transform that nothing else in the mapping engine's transform vocabulary (§5.3) has a
+precedent for.
+
+### 22.5 Enrollment creation vs. update — decision #5
+
+The common case is create: SPIMS is going live for the first time this term, so these students
+typically have no prior `Enrollment` on the offering at all. The rule for the uncommon case — an
+`Enrollment` already exists for (student, live offering) — is: **refuse the row outright, never
+update it.** `E_ENROLLMENT_ALREADY_EXISTS` names the course code so the registrar can see why.
+
+This is checked twice, on purpose — once at `validate()` time (a plain existence query against
+`enrollments`, safe because nothing has written anything yet) and again, defensively, inside the
+committer itself, the same "recomputed fresh, never trusted from validate alone" posture §20.1
+describes for `BALANCE`'s money gate. It is also backed by a real constraint one layer down: `create()`
+would fail rows attempting a duplicate committer `(student_id, offering_id)` — because if
+somehow both application-level checks were bypassed, the *actual* database schema already carries a
+`unique(['student_id', 'offering_id'])` constraint on `enrollments` (from the original L1
+`gradebook_tables` migration, predating this phase entirely) — so a race between two concurrent
+imports fails loudly with a DB error rather than silently double-writing. No new migration was needed
+for any of this — see §22.9.
+
+One real consequence worth stating plainly: because an existing `Enrollment` always refuses the row,
+**every gradebook component already graded for a mid-term student must be included together in one
+upload.** A follow-up file adding a missed component for a student who was already imported will be
+refused for that student — `E_ENROLLMENT_ALREADY_EXISTS` fires on every row for that pair, not just
+the first. Fixing that requires rolling back the earlier batch's rows for that student first (§22.7),
+not appending a correction file. This is the direct, deliberate cost of "never silently clobber
+instructor work" (the task brief's own framing) — a looser rule that allowed appending scores to an
+existing import-created enrollment would reopen exactly the ambiguity decision #5 exists to close:
+*was this second file also written before the instructor touched anything, or after?* Refusing outright
+means that question never has to be answered by guessing.
+
+### 22.6 Never silently overwriting an existing score either
+
+Symmetrically, if a `GradebookComponentScore` already exists for the resolved `(component, student)`
+pair, the row is refused (`E_SCORE_ALREADY_EXISTS`) rather than updated. In the ordinary flow this is
+unreachable — §22.5 already blocks the row before an `Enrollment` exists, and a score for a student
+with no `Enrollment` on that offering is not something the ordinary product creates — but it costs one
+query to check, and the brief's instruction was "never guess, never silently overwrite," not "never
+overwrite in the cases we can think of." The check stays as a second line of defense that outlives
+whatever assumption made it seem unreachable at the time this was written.
+
+### 22.7 Rollback — no new migration needed, by design
+
+A `MIDTERM_ENROLLMENT` row's rollback (`ImportBatchService::rollbackMidtermEnrollmentRow()`) deletes
+the `GradebookComponentScore` it created and — once every score it wrote against the shared
+`Enrollment` is gone — the `Enrollment` itself, so a full rollback of the batch leaves nothing behind
+for that student (unlike `COURSE_RESULT`'s rollback, which deliberately leaves the shadow
+`Course`/`CourseOffering` behind as shared infrastructure, §21.4 — there is no "shared infrastructure"
+concept here to preserve, since the offering was never this import's to create in the first place).
+
+Rollback is refused, per row, on either of two conditions — decision #7, and the task brief's own
+suggested pair:
+
+1. **The enrollment's `grade_status` has moved past `IN_PROGRESS`.** `submitGrades()`/`lockGrades()`
+   are the only two code paths that ever change it, and both are instructor actions — grading has
+   moved forward since import, and reversing underneath that would be exactly the kind of silent
+   clobber this phase exists to prevent.
+2. **This exact score's `updated_by_id` no longer equals the actor who committed this import.**
+   `gradebook_component_scores.updated_by_id` already records who last wrote a score — the same column
+   `GradebookService::setCellScore()` writes when an instructor edits a cell by hand — so comparing it
+   against `import_batches.committed_by_id` is a direct, existing signal that someone other than the
+   import itself has touched this specific score since. No new column was needed.
+
+Both checks reuse a column that already existed before this phase (`enrollments.grade_status`,
+`gradebook_component_scores.updated_by_id`) rather than adding a `source_system` marker to
+`gradebook_component_scores` to track "did the import write this." That is why **this phase shipped
+with no new migration at all** — CLAUDE.md's hard rule 5 note that migrations are additive-only was
+satisfied by finding nothing that needed adding, not by adding nothing carelessly; both
+`enrollments.source_system`/`grade_status` and `gradebook_component_scores.updated_by_id` were already
+in place from earlier phases (§4.2, and the base gradebook migration respectively) and this phase
+checked for a gap before writing one, per the task brief's own instruction to "check."
+
+### 22.8 Identity resolution — reused exactly, rung 1 only
+
+`legacy_id` resolves through the same `import_links` lookup `COURSE_RESULT` already uses — a legacy id
+not already linked by a committed `STUDENT` batch is `E_UNKNOWN_STUDENT`, a hard error, exactly as
+§18's rung 1. No new identity-matching code was written for this phase, per the task brief's explicit
+instruction not to reinvent it.
+
+### 22.9 Permissions — reused exactly, nothing new
+
+`MIDTERM_ENROLLMENT` batches go through the same `import.stage` / `import.commit` / `import.rollback`
+keys every other entity type does — no new permission key, no change to `config/permissions.php`,
+`config/permission_scopes.php`, or `docs/role-matrix.md`. Two additions were considered and rejected:
+
+- **An additional `finance.manage`-style gate**, mirroring `BALANCE`'s extra check (§20.5). Rejected:
+  this entity type never touches money, so there is nothing for a second financial sign-off to guard.
+- **A per-offering `gradebook.configure` check**, since writing `GradebookComponentScore` rows is
+  otherwise something only staff with that offering-scoped permission can do (`GradebookService::
+  setCellScore()`). Rejected: a single mid-term cutover file legitimately spans many offerings across
+  many instructors, and the registrar running the import is not expected to hold `gradebook.configure`
+  on every one of them. The bulk-import authority is already gated at the school-wide `import.commit`
+  key, same as every other entity type; the safety net here is the refuse-never-overwrite row rules
+  above, not a second, narrower permission check that would make a routine cutover impossible to run
+  in one pass.
+
+### 22.10 What shipped, and what stayed out of scope
+
+Shipped: the `MIDTERM_ENROLLMENT` entity type end to end — mapping, validate, dry run (executes the
+real commit path inside a transaction that is always rolled back, exactly like every other entity
+type), commit, rollback, the wizard's create/dry-run screens, and full ar/en/fr localisation including
+every new error code. Twelve tests in `tests/Feature/Import/ImportMidtermEnrollmentTest.php` cover the
+happy path (a live `Enrollment` + `GradebookComponentScore` are created, never a shadow anything),
+`E_OFFERING_NOT_FOUND`, `E_OFFERING_AMBIGUOUS` with the `offering_id` escape hatch resolving it,
+`E_UNKNOWN_COMPONENT`, `E_UNKNOWN_STUDENT`, `E_ENROLLMENT_ALREADY_EXISTS` refusing rather than
+overwriting, a dry run writing nothing, a successful rollback that cleans up both the score and the
+now-empty enrollment, rollback refused once an instructor has edited the score, rollback refused once
+grading has moved past `IN_PROGRESS`, the audit-log entry, and that a commit sends no mail. The
+pre-existing suite (now 1,300+ tests across the whole app) passes unmodified alongside them.
+
+Left out of scope, deliberately:
+
+- **A wide-to-long Canvas gradebook reshape helper.** §22.4 — the registrar's/admin's job for now, as
+  the task brief allowed.
+- **A batch-level "STUDENT must already be committed" gate at `commit()`**, the kind `E_CANVAS_BEFORE_
+  POPULI` enforces for `STUDENT`/LMS batches (§18.2). Not added, matching `COURSE_RESULT`'s own
+  precedent: `E_UNKNOWN_STUDENT` already blocks each offending row individually, and a batch-level gate
+  would only save a registrar from discovering that at the row level instead of the batch level.
+- **Legacy credentials, AI-assisted mapping (L8)** — unrelated to this phase; see §23, which shipped
+  alongside this one.
+
+---
+
+## 23. L8 design notes — legacy credentials and AI-assisted mapping
+
+L8's two independent halves — legacy credentials (Part A) and AI-assisted mapping (Part B) — shipped
+on top of §17-§21. This section records the design decisions made while building them, additively;
+§17-§21 stay exactly as they were. L8 was optional and never blocked go-live (§13); both halves ship
+together on one branch.
+
+### 23.1 Part A — a legacy credential is a fact about a document, not a fresh issuance
+
+The acceptance bar was stated precisely: *"a migrated diploma verifies as historical and cannot be
+reissued under a SPIMS serial."* Two design choices make that true by construction rather than by a
+rule someone could forget to check.
+
+**The serial never touches the counter, and the database backstops it.** `CredentialService::nextSerial()`
+mints `SPIMS-CRED-{year}-{n}` from a `settings` row counter. A `CREDENTIAL` batch's `applyCredentialRows()`
+never calls it — the source's own serial (a Populi diploma number, say) is written verbatim into the
+existing `serial` column, which is unrelated code entirely from the counter's own read-lock-increment-save
+cycle. There is consequently no code path by which a legacy import could consume from or collide with the
+counter, which `ImportCredentialTest::a_legacy_credential_never_touches_the_spims_serial_counter` asserts
+two ways: the `settings` row for `credentials.serial_counter` stays absent (never created) across a legacy
+commit, and a native `issueTranscript()` call immediately afterward still starts at `00001` — proof the
+counter was never incremented by the import. `credentials.serial` already carries a database-level unique
+constraint (the original credentials migration), which is what actually prevents two rows from ever sharing
+one serial; `validateCredentialRows()`'s own `E_DUPLICATE_SERIAL` check exists only to turn that constraint
+violation into a readable, row-level validation message instead of a 500 at commit time.
+
+**A serial re-imported from the *same* source is a correction, not a duplicate.** The natural next question
+is what happens when a registrar re-exports the same diploma after fixing a typo in Populi. `E_DUPLICATE_SERIAL`
+only fires when an existing credential with that serial belongs to a *different* `source_system` (including
+`null`, i.e. native) — a serial that already belongs to *this* batch's own source is treated as the same D6
+"fix-and-re-import cycle" every other entity type gets: `applyCredentialRows()` finds the existing row by
+serial and updates it in place (`ImportRowAction::Update`) rather than creating a second row that would
+collide on the unique constraint anyway.
+
+**`regenerate()` refuses at the top, before anything else runs.** `CredentialService::regenerate()` checks
+`$credential->isLegacy()` (`source_system !== null`) as its very first line, before the existing revoke-then-
+reissue transaction begins, and throws `ValidationException::withMessages(['credential' => [__('credentials.legacy_no_reissue')]])`
+— the same exception class and per-field-key shape every other user-facing refusal in `CredentialService`
+already uses (see `issueProgramCertificate()`'s `not_in_program`/`requirements_incomplete` checks), rather
+than inventing a new error convention for this one case. Refusing before the transaction opens means a
+legacy credential's `revoked_at` is never touched by a failed `regenerate()` call — `ImportCredentialTest`
+asserts this directly, not just that the call throws.
+
+**`/verify` tells the two states apart with different copy, not a footnote.** A legacy credential still
+renders `isValid()`'s ordinary true/false — a revoked historical record is still "revoked" — but a valid one
+gets a distinct `alert-info` block (`credentials.historical_valid` / `historical_note`) instead of the normal
+`alert-success`, naming the source system, rather than the same "This credential is valid" copy a SPIMS-issued
+one gets. This is the one place in the feature where the distinction has to reach an end user (a third party
+checking a diploma) rather than just a registrar, so it gets its own sentence rather than a badge alone.
+
+**Rollback stays open until the batch seals, like `STUDENT`'s own window — with one blocking condition.**
+§7's `COURSE_RESULT` rollback blocks on "promoted to transfer credit" because that is the one action that
+puts a legacy record to genuine native use. A `CREDENTIAL` row has no analogous downstream dependent — no
+enrollment, no fulfilment, no payment can reference a `Credential` row the way they can an `AcademicRecord`
+or a `User` — so the reasoning that motivated `STUDENT`'s and `COURSE_RESULT`'s *extra* blocking conditions
+doesn't produce one here. The one state change that *can* happen to a credential after import is revocation,
+so `rollbackCredentialRow()` blocks on exactly that (`revoked_at !== null`) and nothing else: a stray or
+duplicate legacy import is reversible for the full 30-day window, matching `STUDENT`, and the only way to
+lose that reversibility is a deliberate revocation having already happened. (As shipped, nothing in the admin
+UI can revoke a credential outside of `regenerate()`, which is now refused for a legacy one — so in practice
+today a `CREDENTIAL` row's rollback window is simply "until sealed." The check is left in place rather than
+removed, both as a direct answer to the task's "make a reasonable call, document your reasoning" and as
+forward compatibility for a future standalone revoke action, which is a foreseeable and small addition.)
+
+**`credential_type` maps onto the existing `CredentialType` enum rather than growing a new case.** The task
+brief allowed either. `ImportCredentialFields` asks the source file to name one of SPIMS's own four types
+(`TRANSCRIPT`, `PROGRAM_CERTIFICATE`, `STANDALONE_CERTIFICATE`, `OFFERING_COMPLETION`) per row —
+`validateCredentialRows()` resolves it with `CredentialType::tryFrom()` and rejects anything else with
+`E_UNKNOWN_CREDENTIAL_TYPE` — rather than inventing a fifth, generic "legacy diploma" case. A registrar doing
+the Populi export already knows whether a given historical record was a transcript, a program diploma, or a
+course certificate; asking them to say so costs one mapped column and keeps every downstream consumer of
+`CredentialType` (the `/verify` badge, the transcript's credentials list, any future reporting) working
+unchanged for a legacy row, instead of needing a special case for one enum value that means "look at
+`source_system` to find out what this actually is."
+
+### 23.2 Part A — what stayed out of scope
+
+`offering_id` is never populated by a `CREDENTIAL` import — the task named only "optionally a program
+reference," and a legacy `STANDALONE_CERTIFICATE`/`OFFERING_COMPLETION` row would need to resolve against a
+live `CourseOffering` the same "exact match only, never invent" way `program_code` does, which is a real
+but separate piece of work with its own warning code. `download()` (PDF/HTML rendering via
+`CertificateTemplateService`) is also untouched: a legacy credential that has never been downloaded still
+renders on demand through the normal SPIMS certificate template the first time someone asks for a file,
+which is arguably a second place a historical record could look SPIMS-issued. This is flagged here rather
+than silently left as a possible follow-up gap: the task's acceptance bar was specifically about `/verify`
+and `regenerate()`, both of which are unambiguously closed; a distinct "this rendered file is a reproduction,
+not the original" watermark on the legacy download path is a reasonable next increment, not a defect in
+this one.
+
+### 23.3 Part B — the masking payload is minimal by construction, not by redaction
+
+The task named this the single most important test in the phase, and the design choice behind it is what
+makes that test simple rather than merely thorough: `ImportAiMasking::samplesForType()` never receives a
+real sample value at all. It takes only the column's *inferred type* (`email`, `date`, `integer`, `decimal`,
+`boolean`, or the `text`/`unknown` default) and returns a **fixed, canonical placeholder pair** for that
+type — `a***@g***.com` for `email`, `Xxxx Xxxx` for `text`, `3.4_` for `decimal`, and so on. There is no
+redaction routine sitting between a real value and the outbound payload that could have a bug in it, because
+the real values (`$profile[...]['samples']`) are simply never passed into the masking function's argument
+list in the first place. `ImportAiMappingTest::the_outbound_schema_never_contains_a_raw_sample_value_and_matches_the_exact_allowlist`
+proves this the way the task asked — not by checking one example input, but by building a profile carrying
+real-looking PII (an actual email, an actual name, an actual GPA-shaped decimal) in its `samples` arrays,
+capturing the exact schema `ImportAiMappingSuggester::buildSchema()` hands to the `AiClient`, asserting the
+top-level and per-column key sets match a hard allowlist exactly (`['source', 'target_fields', 'columns']`
+and `['column', 'type', 'empty_percent', 'distinct_count', 'masked_samples']` — nothing else may ride along),
+and then searching the whole serialized payload for every one of the raw PII strings and asserting none of
+them appear. `empty_percent` and `distinct_count` do travel as real, column-level statistics (per §5.5's
+own text) — they describe the *shape* of a column, not any one person's data, and are exactly the kind of
+signal a distinct-value-count or null-rate heuristic already uses in tier 3 (§5.2) without controversy.
+
+**Off unless explicitly switched on, with no path to a silent call.** `import.ai_mapping_enabled` is a
+`config/import.php` key (`env('IMPORT_AI_MAPPING_ENABLED', false)`), following that file's own established
+convention for this feature's settings (`claim_send_chunk_size` and friends are the same shape) rather than
+a `settings`-table row — this feature has no settings-management UI to put a runtime toggle in, and building
+one was explicitly out of scope per the task brief's "doesn't need a settings-management UI if one doesn't
+already exist." The check is deliberately duplicated in two places rather than trusted to one: the mapping
+screen only renders an active "AI suggest" button when the setting is on (an explanatory tooltip otherwise,
+with the masking policy stated above it so an admin reads it before ever finding a way to turn the setting
+on); the `aiSuggest()` controller action re-checks the same config key before calling anything, so a stale
+page, a replayed request, or a direct POST can never reach the AI-calling code path while the setting is
+off; and `ImportAiMappingSuggester::fillGaps()` checks it a third time as its first line, before building a
+schema or touching the injected `AiClient` at all — the layer the "never calls the AI client" test actually
+exercises, with a spy `AiClient` that records whether it was invoked. Three checks sounds redundant, but
+each one guards a different caller (a human clicking, a replayed request, and a future second caller of the
+service that might forget the controller's own check exists) — cheap insurance for a control the task
+explicitly called non-negotiable.
+
+### 23.4 Part B — AI fills gaps because a cheaper, more precise signal always wins when one exists
+
+`fillGaps()` only ever considers a column already sitting at `None` confidence after the three deterministic
+tiers have run, and never rewrites a column already carrying `High`, `Medium`, or `Low`. This isn't a
+policy bolted on top of an otherwise-general "suggest a mapping" method — it's the reason the method is
+named `fillGaps()` rather than `suggest()`. A tier-1 synonym-dictionary hit or a tier-2 normalised-header
+match is a deterministic fact about the column header text; even tier 3's value-shape heuristic is a
+majority-vote over every real value in the column. An LLM's guess, working only from a header string, an
+inferred type, and a fixed placeholder shape (§23.3), is strictly less informed than any of the three — it
+never sees a real value at all, by design. Letting it override a confident deterministic match would trade
+a stronger signal for a weaker one for no reason; `ImportAiMappingTest::ai_suggestions_never_override_an_existing_confident_deterministic_match`
+proves this directly by handing a fake `AiClient` that *tries* to hijack an already-`High`-confidence column
+and asserting the attempt is silently ignored. §5.5's honest framing — "AI mapping earns its place on the
+messy files... not the clean ones" — is exactly this rule stated as a design principle: on a clean Populi or
+Canvas export, tier 1 alone maps almost everything, so `fillGaps()` has almost nothing to do; on a
+registrar's hand-maintained spreadsheet of old diplomas, where headers are inconsistent and undocumented,
+most columns land at `None` and this tier does real work. The same "never override" boundary is also why a
+malformed or `null` AI response is safe to simply discard (`ImportAiMappingTest::a_malformed_or_null_ai_response_degrades_gracefully_...`):
+because this tier can only ever fill columns the deterministic tiers already gave up on, the worst case for a
+degraded AI call is that those columns stay unmapped exactly as they were — never a worse, or wrong, mapping
+than what existed a moment before.
+
+Every AI-sourced suggestion still lands in the same `mapping` array, JSON-serialized on the batch, that the
+registrar edits through the ordinary mapping form — `origin: 'AI'` and `rationale` are just two more fields
+on that array's entries, read by the Blade view to render the distinct badge and tooltip described in §11.5's
+original mock, and carried forward across an ordinary form re-save (`ImportBatchController::updateMap()`) so
+fixing one other column doesn't silently erase which suggestions came from where. Nothing about this tier
+changes how a mapping gets applied: `updateMap()` still requires every column mapped or explicitly ignored,
+and Continue still runs the same `validate()` path regardless of whether a given row's `target_field` came
+from a synonym dictionary or an AI guess — constraint 1 ("a proposal, never a commit") holds because the
+approval gate that already existed for tiers 1-3 was never bypassed for tier 4, not because a special case
+was added to preserve it.

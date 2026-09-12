@@ -1253,6 +1253,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/imports/{batch}/save-profile', [ImportBatchController::class, 'saveProfile'])
             ->middleware('permission:import.stage')
             ->name('imports.save-profile');
+        // L8, Part B — "AI suggest" on the mapping screen (§5.5, §22.3). Gated on
+        // import.ai_mapping_enabled inside the controller, not on a separate
+        // permission key — reuses import.stage like the rest of the mapping flow.
+        Route::post('/imports/{batch}/map/ai-suggest', [ImportBatchController::class, 'aiSuggest'])
+            ->middleware('permission:import.stage')
+            ->name('imports.map.ai-suggest');
         Route::get('/imports/{batch}/dry-run', [ImportBatchController::class, 'dryRunReport'])
             ->middleware('permission:import.stage')
             ->name('imports.dry-run');

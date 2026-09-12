@@ -27,6 +27,8 @@ return [
     'entity_STUDENT' => 'Étudiants',
     'entity_COURSE_RESULT' => 'Résultats de cours',
     'entity_BALANCE' => 'Soldes d\'ouverture financiers',
+    'entity_MIDTERM_ENROLLMENT' => 'Inscriptions en cours de semestre (carnet de notes réel)',
+    'entity_CREDENTIAL' => 'Diplômes historiques',
     'population_ALUMNI' => 'Anciens étudiants',
     'population_ACTIVE' => 'Actuellement inscrits',
 
@@ -74,6 +76,8 @@ return [
     'field_entity_type' => 'Que contient ce fichier ?',
     'field_entity_type_help' => 'Étudiants crée ou associe des personnes. Résultats de cours enregistre notes et crédits dans le catalogue fantôme pour des étudiants déjà importés en tant qu\'étudiants.',
     'course_result_help' => 'Chaque ligne doit référencer un étudiant déjà importé. Les lettres historiques se convertissent via la correspondance de notes de cette source — une lettre non associée bloque la ligne (E_UNMAPPED_GRADE). Aucun compte du portail ni programme n\'est affecté.',
+    'midterm_enrollment_help' => 'Uniquement pour un basculement en cours de semestre. Chaque ligne est une note pour un triplet (étudiant, session réelle, composant du carnet de notes) — la session et ses composants doivent déjà exister dans SPIMS, créés par un responsable de scolarité de la manière habituelle. Une ligne ne peut jamais créer de cours ou de session fantôme, et elle est refusée plutôt qu\'appliquée si l\'étudiant a déjà une inscription sur cette session. Remettez en forme un export de carnet de notes Canvas large en une ligne par composant avant de le téléverser.',
+    'credential_help' => 'Chaque ligne doit référencer un étudiant déjà importé, et indiquer à quel type de diplôme propre à SPIMS le dossier correspond. Le numéro de série ou de diplôme de la source est conservé exactement tel quel — il ne devient jamais un numéro au format SPIMS, et le diplôme obtenu se vérifie comme un dossier historique, non éligible à une réémission via SPIMS.',
     'field_population' => 'Qui figure dans ce fichier ?',
     'population_alumni_help' => 'Pas de connexion au portail. Les dossiers sont importés uniquement pour le relevé de notes.',
     'population_active_help' => 'Crée un compte en attente que l\'étudiant peut activer. Chaque ligne doit avoir une adresse e-mail réelle.',
@@ -131,6 +135,15 @@ return [
     'back_to_upload' => '← Recommencer',
     'transform_help' => 'Changez la transformation pour voir la valeur produite se mettre à jour instantanément ci-dessous.',
 
+    // L8, partie B — mappage assisté par IA (§5.5, §22.3)
+    'ai_suggest_title' => 'Suggestion IA',
+    'ai_suggest_button' => '✨ Suggérer avec l\'IA',
+    'ai_suggest_masking_policy' => 'Complète les colonnes que les règles ci-dessus n\'ont pas pu associer. Seuls les en-têtes de colonnes, les types déduits et des exemples génériques fixes (jamais un vrai nom, e-mail ou valeur de votre fichier) sont envoyés au fournisseur d\'IA. Chaque suggestion nécessite toujours votre validation avant de continuer.',
+    'ai_suggest_disabled_tooltip' => 'Le mappage assisté par IA est désactivé pour cette école. Un administrateur peut l\'activer après avoir consulté la politique de masquage ci-dessus.',
+    'ai_origin_badge' => 'IA',
+    'ai_disabled' => 'Le mappage assisté par IA est désactivé — aucune suggestion n\'a été demandée.',
+    'ai_suggestions_applied' => 'Suggestions IA ajoutées pour les colonnes non mappées — vérifiez chacune ci-dessous avant de continuer.',
+
     // Batch show / receipt
     'batch_title' => 'Lot d\'import',
     'stat_valid' => 'Valides',
@@ -183,6 +196,8 @@ return [
     'report_noop' => 'Aucun solde (sans effet)',
     'report_shadow_courses' => 'Cours fantômes créés',
     'report_shadow_offerings' => 'Offres fantômes créées',
+    'report_enrollments_created' => 'Inscriptions créées (sur des sessions réelles)',
+    'report_scores_created' => 'Notes du carnet de notes importées',
     'control_totals_title' => 'Totaux de contrôle',
     'control_totals_declared' => 'Lignes dans le fichier',
     'control_totals_computed' => 'Sera importé',
@@ -240,6 +255,17 @@ return [
         'E_BAD_MONEY' => 'La colonne « :column » n\'a pas pu être lue comme un montant : « :value ».',
         'E_UNMAPPED_GRADE' => 'La lettre historique « :legacy_letter » n\'a pas de correspondance de note pour cette source. Ajoutez-en une sous Configurer les sources → Conversion des notes.',
         'W_CREDIT_HOURS_DIFFER' => 'Le fichier indique :sheet crédits ; le cours SPIMS associé en indique :course. L\'enregistrement conserve la valeur du fichier.',
+        'E_OFFERING_NOT_FOUND' => 'Aucune session réelle ne correspond au cours ":course_code" pour le semestre ":semester_name" (ni à l\'identifiant de session donné). Elle doit déjà exister dans SPIMS, créée par un responsable de scolarité — cet import n\'en crée jamais.',
+        'E_OFFERING_AMBIGUOUS' => 'Plusieurs sessions réelles correspondent au cours ":course_code" pour le semestre ":semester_name". Ajoutez l\'identifiant de session SPIMS à cette ligne pour indiquer précisément laquelle.',
+        'W_OFFERING_ID_MISMATCH' => 'L\'identifiant de session donné ne correspond pas au code de cours ou au nom de semestre également donnés sur cette ligne. L\'identifiant de session a été utilisé ; l\'incohérence mérite d\'être vérifiée.',
+        'E_UNKNOWN_COMPONENT' => 'Aucun composant du carnet de notes nommé ":component_name" n\'existe sur la session correspondante.',
+        'E_AMBIGUOUS_COMPONENT' => 'Plusieurs composants du carnet de notes nommés ":component_name" existent sur la session correspondante — impossible à résoudre automatiquement.',
+        'E_BAD_SCORE' => 'La note ":value" n\'est pas un nombre.',
+        'E_SCORE_RANGE' => 'La note ":value" est en dehors de la plage 0-100.',
+        'E_ENROLLMENT_ALREADY_EXISTS' => 'Cet étudiant a déjà une inscription sur la session correspondante (cours ":course_code"). Cet import n\'écrase jamais une inscription existante — annulez d\'abord le lot qui l\'a créée si elle doit être corrigée.',
+        'E_SCORE_ALREADY_EXISTS' => 'Une note pour le composant ":component_name" existe déjà pour cet étudiant. Cet import n\'écrase jamais une note existante.',
+        'E_UNKNOWN_CREDENTIAL_TYPE' => 'Le type de diplôme « :credential_type » n\'est ni TRANSCRIPT, ni PROGRAM_CERTIFICATE, ni STANDALONE_CERTIFICATE, ni OFFERING_COMPLETION.',
+        'E_DUPLICATE_SERIAL' => 'Le numéro de série « :serial » appartient déjà à un autre diplôme (natif, ou importé d\'une autre source).',
     ],
 
     // L5 — activation des comptes (écran 13)
