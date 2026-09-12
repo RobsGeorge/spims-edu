@@ -1028,22 +1028,15 @@ Everything below is real, tested, and in production — not aspirational.
 
 ### Not built yet (traces to later phases in §13)
 
-As of §20 (L6), L2 (identity ladder + merge queue), L5 (account-claim invitations) and L6 (finance
-opening balances) have all shipped — see §18, §19 and §20 respectively for their design notes. What
-remains:
+As of §21, every phase through L6 has shipped: L2 (identity ladder + merge queue), L3/L4 (course
+results, GPA isolation, shadow catalog, transcript surfacing), L5 (account-claim invitations) and L6
+(finance opening balances) — see §18, §21, §19 and §20 respectively for their design notes. What
+remains is only what was always conditional/optional in the phase plan:
 
-- **L3 — course results, GPA and the shadow catalog.** No `academic_records`, no
-  `legacy_academic_summaries`, no `counts_toward_gpa` filter on `GradebookService::refreshGpa()`,
-  no shadow `course_offerings`. Identity and program membership only, so far.
-- **L4 — transcript surfacing.** No "Prior study" section yet; there is nothing to show until L3
-  lands.
-- **L7 — mid-term cutover**, **L8 — legacy credentials and AI-assisted mapping.** Untouched; both
-  were always conditional/optional in the phase plan.
+- **L7 — mid-term cutover.**
+- **L8 — legacy credentials and AI-assisted mapping.**
 
-Recommended next slice: **L3+L4 together**, because it's what makes this a *transcript* import rather
-than an account import, and because the `counts_toward_gpa` filter is the one change to existing code
-the whole plan hinges on — it should land under the same scrutiny as every prior slice, proven by the
-same "existing suite passes unmodified" bar.
+Neither is scheduled; both stay here as future options rather than committed next work.
 
 ---
 
@@ -1217,3 +1210,70 @@ commit additionally requires `finance.manage` — held by `FINANCIAL_ADMIN`, not
 `ADMINISTRATIVE_ADMIN`. A registrar who can stage and validate a finance batch still cannot commit
 real money into the ledger on their own signature; a financial admin's sign-off is a second, separate
 gate, exactly as the plan's permission table (§12) describes.
+
+---
+
+## 21. L3/L4 design notes — course results, GPA isolation, shadow catalog, transcript surfacing
+
+Screens for a third entity type, `COURSE_RESULT`, and the transcript's "Prior study" section shipped
+on top of §17-§20. This section records the design decisions made while building them, additively.
+
+### 21.1 GPA isolation is enforced at write time, not read time
+
+The plan's central acceptance criterion for L3 — a legacy course result must never move a student's
+live GPA on import — is enforced the simplest possible way: every `AcademicRecord` a `COURSE_RESULT`
+commit writes sets `counts_toward_gpa = false` unconditionally, regardless of what the grade mapping
+itself says about the grade. `GradebookService::refreshGpa()` filters on this column, so a freshly
+imported record is invisible to the live GPA calculation from the moment it exists — there is no
+separate "hide legacy records from GPA" pass to keep in sync, and no way for the filter and the import
+path to drift apart, because the filter is the only thing that ever reads the column.
+
+A registrar moves one record into the live GPA deliberately, one at a time, via
+`GradebookService::promoteToTransferCredit()` — the only code path that ever flips
+`counts_toward_gpa` to `true`. This is D7 from §7: transfer credit is a human decision made per
+record, never a side effect of the import itself.
+
+### 21.2 The shadow catalog is find-or-create, keyed loosely on purpose
+
+A `COURSE_RESULT` row's `course_code` reuses an existing live course on an exact code match; anything
+else find-or-creates a shadow `Course` (`active = false`, `source_system` set) and, per (course,
+`legacy_term`) pair, a shadow `CourseOffering` (`status = Archived`, `semester_id = null`,
+`legacy_term` carrying the source's own term string verbatim — §14 Q5's default: no attempt to map a
+legacy term onto a real `semesters` row). "Loosely keyed" here means `legacy_term` is free text, not a
+foreign key into anything — two files that spell the same term differently create two shadow
+offerings, which is an acceptable, correctable-later outcome rather than a blocking validation error,
+consistent with the plan's general bias toward "import now, tidy later" for anything that isn't
+identity or money.
+
+Every native-facing surface that lists courses or offerings — the public catalog, the admin offerings
+index, the enrollment roster picker, the live gradebook grid, headcount/grade reports — filters on
+`active = true` / a real `semester_id`, so a shadow record is structurally invisible everywhere a
+registrar or student would otherwise stumble onto it, without needing a bespoke "is this legacy"
+check bolted onto each of those surfaces. `ImportCatalogIsolationTest` asserts this for every listed
+surface directly, rather than trusting the pattern by inspection.
+
+### 21.3 `legacy_academic_summaries` is a fact, not an input
+
+The source system's own attested GPA, credits, and standing figures — §4.1 — are stored verbatim in
+`legacy_academic_summaries`, on their own reported scale (`gpa_scale`, never converted or rescaled to
+SPIMS's), and rendered on the transcript beside the live SPIMS GPA. The two numbers are never
+combined, averaged, or reconciled against each other: the legacy figure is a historical fact about
+what the source system once said, not an input to any SPIMS calculation, matching D3's "never merged
+into" rule from §17.
+
+### 21.4 Rollback is per-record, not per-course
+
+A `COURSE_RESULT` row's rollback (`ImportBatchService::rollbackCourseResultRow()`) deletes its
+`AcademicRecord`, any `ProgramRequirementFulfillment` it created, and the `Enrollment` it was posted
+against — but leaves the shadow `Course`/`CourseOffering` in place. They are idempotent
+find-or-create infrastructure that other rows, or a later batch, may already be sharing; deleting them
+on one row's rollback would either orphan those other rows or require tracking cross-row references
+that don't otherwise exist. Leaving them behind is harmless — §21.2's isolation makes them invisible
+regardless of whether anything still points at them.
+
+Rollback is refused per-record once that record has been promoted to transfer credit
+(`counts_toward_gpa = true`): a promotion is a human decision that has already taken effect in the
+live GPA, and reversing the import underneath it would silently move that GPA back without anyone
+having decided to. This mirrors the `STUDENT` rollback's own rule (§17) that a record already put to
+native use blocks its own reversal — same principle, applied to `COURSE_RESULT`'s specific kind of
+"native use."
