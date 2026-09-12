@@ -614,7 +614,12 @@ class ImportBatchService
             }
         }
 
-        if ($best !== null && $bestPercent >= 60.0) {
+        // 60% let unrelated short names collide by chance ("Karim Saad" vs "Mariam
+        // Samuel" scores 61%) — a bulk import of thirty genuinely distinct people found
+        // pairs above 60% with room to spare, up to 64%. 80% still catches what this
+        // signal exists for — a typo or a transliteration variant of the same name —
+        // without flagging ordinary unrelated people for human review.
+        if ($best !== null && $bestPercent >= 80.0) {
             return [$best, ['name_similarity'], round($bestPercent / 100, 2)];
         }
 

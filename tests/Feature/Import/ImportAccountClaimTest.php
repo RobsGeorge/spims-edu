@@ -184,9 +184,23 @@ class ImportAccountClaimTest extends TestCase
         Mail::fake();
         config(['import.claim_send_chunk_size' => 10, 'import.claim_send_chunk_delay_ms' => 0]);
 
+        // Thirty genuinely distinct names, not a numbered template — "Bulk0, Person0" vs
+        // "Bulk1, Person1" still scores well above the identity ladder's rung-6
+        // similarity floor (differs by one digit in thirteen characters), which queues
+        // every row after the first for human review instead of creating it outright.
+        // That is correct ladder behavior; this test needs real bulk-shaped data.
+        $names = [
+            'Boutros, Mina', 'Samuel, Mariam', 'Fahmy, Andrew', 'Nagy, Sarah', 'Habib, Peter',
+            'Iskander, Rania', 'Gerges, Dina', 'Tadros, Youssef', 'Wahba, Nour', 'Saad, Karim',
+            'Zaki, Marina', 'Adly, Bishoy', 'Hanna, Christine', 'Sedky, Amir', 'Bassily, Hoda',
+            'Shenouda, Ramy', 'Malak, Gina', 'Farag, Michael', 'Kamel, Yara', 'Salib, Paul',
+            'Yacoub, Lara', 'Ghali, Sameh', 'Abdo, Mirna', 'Melika, Fady', 'Ayad, Carol',
+            'Rizk, Wael', 'Naguib, Alia', 'Basta, Emad', 'Fanous, Sylvia', 'Latif, Noel',
+        ];
+
         $actor = $this->admin();
         for ($i = 0; $i < 30; $i++) {
-            $this->commitActiveBatch($actor, (string) (9100 + $i), "bulk{$i}@example.org");
+            $this->commitActiveBatch($actor, (string) (9100 + $i), "bulk{$i}@example.org", $names[$i]);
         }
 
         $claims = ImportAccountClaim::query()->where('status', ImportAccountClaimStatus::Queued)->get();
