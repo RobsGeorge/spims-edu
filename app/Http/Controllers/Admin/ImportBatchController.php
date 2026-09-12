@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\ImportBatchStatus;
+use App\Enums\ImportEntityType;
 use App\Enums\ImportPopulation;
 use App\Http\Controllers\Controller;
 use App\Models\ImportBatch;
 use App\Models\ImportMappingProfile;
 use App\Models\ImportRow;
 use App\Models\ImportSource;
+use App\Services\Import\ImportBalanceFields;
 use App\Services\Import\ImportBatchService;
 use App\Services\Import\ImportStudentFields;
 use App\Services\Import\ImportTransformService;
@@ -39,20 +41,42 @@ class ImportBatchController extends Controller
     {
         return view('admin.imports.create', [
             'sources' => ImportSource::query()->where('active', true)->orderBy('precedence')->get(),
+            'entityTypes' => ImportEntityType::cases(),
         ]);
     }
 
     public function store(Request $request, ImportBatchService $imports, AuthorizeService $authorize): RedirectResponse
     {
+        $entityTypeValues = implode(',', array_map(fn (ImportEntityType $e) => $e->value, ImportEntityType::cases()));
+
         $data = $request->validate([
             'source_id' => ['required', 'exists:import_sources,id'],
-            'population' => ['required', 'in:ALUMNI,ACTIVE'],
+            // Defaults to STUDENT when omitted — the selector is new in L6; every
+            // upload before it implicitly meant STUDENT, so an old client/form posting
+            // no entity_type at all keeps working exactly as before.
+            'entity_type' => ['nullable', "in:{$entityTypeValues}"],
+            'population' => ['required_if:entity_type,STUDENT', 'nullable', 'in:ALUMNI,ACTIVE'],
             'sheet_name' => ['nullable', 'string', 'max:120'],
             'header_row' => ['nullable', 'integer', 'min:1', 'max:20'],
             'file' => ['required', 'file', 'mimes:csv,txt,xlsx,xls', 'max:20480'],
+            // BALANCE only — the registrar's independently-computed declared control
+            // totals (§8's hard gate) and the cutover date every carried-forward record
+            // is dated at (§14 Q13: one date, the source's).
+            'as_of' => ['required_if:entity_type,BALANCE', 'nullable', 'date'],
+            'declared_owed_EGP' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'declared_credit_EGP' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'declared_owed_USD' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'declared_credit_USD' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
         ]);
 
-        $population = ImportPopulation::from($data['population']);
+        $entityType = ImportEntityType::from($data['entity_type'] ?? ImportEntityType::Student->value);
+        $population = isset($data['population']) ? ImportPopulation::from($data['population']) : null;
+
+        if ($entityType === ImportEntityType::Student && $population === null) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'population' => [__('validation.required', ['attribute' => 'population'])],
+            ]);
+        }
 
         // A batch that will create login-capable accounts is a bigger action than a
         // historical import — require users.manage in addition to import.stage.
@@ -72,7 +96,24 @@ class ImportBatchController extends Controller
             $population,
             $data['sheet_name'] ?? null,
             (int) ($data['header_row'] ?? 1),
+            $entityType,
         );
+
+        if ($entityType === ImportEntityType::Balance) {
+            $transforms = new ImportTransformService;
+            $toMinor = fn (?string $raw): int => (int) ($transforms->parseMoneyToMinor($raw)['value'] ?? 0);
+
+            $imports->setFinanceControlTotals($batch, $data['as_of'], [
+                'EGP' => [
+                    'owed_minor' => $toMinor($data['declared_owed_EGP'] ?? null),
+                    'credit_minor' => $toMinor($data['declared_credit_EGP'] ?? null),
+                ],
+                'USD' => [
+                    'owed_minor' => $toMinor($data['declared_owed_USD'] ?? null),
+                    'credit_minor' => $toMinor($data['declared_credit_USD'] ?? null),
+                ],
+            ]);
+        }
 
         $redirect = redirect()->route('admin.imports.map', $batch);
         if ($duplicate !== null) {
@@ -82,14 +123,38 @@ class ImportBatchController extends Controller
         return $redirect->with('status', __('import.upload_success', ['count' => $batch->row_count]));
     }
 
+    /**
+     * The mapping screen is driven entirely by whichever field-catalog class the
+     * batch's entity type resolves to, so both the required-field guard and the
+     * validator agree on what "required" means. Adding a further entity type is one
+     * more arm here.
+     *
+     * @return array{fields: array<string, string>, required: array<int, string>}
+     */
+    private function fieldCatalogFor(ImportBatch $batch): array
+    {
+        return match ($batch->entity_type) {
+            ImportEntityType::Student => [
+                'fields' => ImportStudentFields::catalog(),
+                'required' => ImportStudentFields::requiredFor($batch->population),
+            ],
+            ImportEntityType::Balance => [
+                'fields' => ImportBalanceFields::catalog(),
+                'required' => ImportBalanceFields::requiredFor($batch->population),
+            ],
+            default => throw new \RuntimeException("No field catalog registered for import entity type {$batch->entity_type->value}."),
+        };
+    }
+
     public function map(ImportBatch $batch): View
     {
         $mapping = $batch->mapping ?? [];
+        $catalog = $this->fieldCatalogFor($batch);
 
         return view('admin.imports.map', [
             'batch' => $batch,
-            'fields' => ImportStudentFields::catalog(),
-            'required' => ImportStudentFields::requiredFor($batch->population),
+            'fields' => $catalog['fields'],
+            'required' => $catalog['required'],
             'transforms' => (new ImportTransformService)->available(),
             'profiles' => ImportMappingProfile::query()
                 ->where('source_id', $batch->source_id)
@@ -111,7 +176,7 @@ class ImportBatchController extends Controller
             'ignored' => ['sometimes', 'array'],
         ]);
 
-        $validTargets = array_keys(ImportStudentFields::catalog());
+        $validTargets = array_keys($this->fieldCatalogFor($batch)['fields']);
         $previousConfidence = collect($batch->mapping ?? [])->keyBy('column')->map(fn ($m) => $m['confidence'] ?? 'None');
 
         $mapping = [];
@@ -199,6 +264,13 @@ class ImportBatchController extends Controller
             $authorize->authorize($request->user(), 'users.manage');
         }
 
+        // A BALANCE-entity commit writes real money — additionally require
+        // finance.manage on top of import.commit, exactly as the ACTIVE-population
+        // check above additionally requires users.manage. See §12.
+        if ($batch->entity_type === ImportEntityType::Balance) {
+            $authorize->authorize($request->user(), 'finance.manage');
+        }
+
         try {
             $imports->commit($request->user(), $batch);
         } catch (\RuntimeException $e) {
@@ -232,7 +304,7 @@ class ImportBatchController extends Controller
     private function missingRequiredFields(array $mapping, ImportBatch $batch): array
     {
         $produced = collect($mapping)->pluck('target_field')->filter()->unique()->all();
-        $required = ImportStudentFields::requiredFor($batch->population);
+        $required = $this->fieldCatalogFor($batch)['required'];
 
         return array_values(array_diff($required, $produced));
     }

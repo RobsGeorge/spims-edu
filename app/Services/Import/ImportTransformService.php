@@ -27,12 +27,13 @@ class ImportTransformService
             'name_part_last' => 'Extract last name from a full-name column',
             'normalize_arabic' => 'Normalize Arabic (strip tashkeel)',
             'constant' => 'Fixed value for every row',
+            'money_to_minor' => 'Parse money (decimal string -> integer minor units)',
         ];
     }
 
     /**
      * @param  array<string, mixed>  $options
-     * @return array{value: ?string, ok: bool, note: ?string}
+     * @return array{value: mixed, ok: bool, note: ?string, code?: string}
      */
     public function apply(string $transform, ?string $raw, array $options = []): array
     {
@@ -48,8 +49,57 @@ class ImportTransformService
             'name_part_last' => $this->namePart($value, (string) ($options['format'] ?? 'last_first'), 'last'),
             'normalize_arabic' => ['value' => $value !== null ? $this->normalizeArabic($value) : null, 'ok' => true, 'note' => null],
             'constant' => ['value' => isset($options['value']) ? (string) $options['value'] : null, 'ok' => true, 'note' => null],
+            'money_to_minor' => $this->parseMoneyToMinor($value),
             default => ['value' => $value, 'ok' => true, 'note' => null],
         };
+    }
+
+    /**
+     * Parses a decimal **string** into an integer minor-unit amount by integer
+     * arithmetic only — never a float cast (hard rule 3). Thousands separators
+     * (commas) are stripped before parsing. More than two decimal places in the
+     * source value is a hard error (`E_MONEY_PRECISION`) — rejected, never rounded.
+     * See docs/legacy-data-import-plan.md §5.3.
+     *
+     * @return array{value: ?int, ok: bool, note: ?string, code?: string}
+     */
+    public function parseMoneyToMinor(?string $value): array
+    {
+        if ($value === null || $value === '') {
+            return ['value' => null, 'ok' => true, 'note' => null];
+        }
+
+        // Thousands separators only — this is not a locale-aware parser. "1,234.50".
+        $stripped = str_replace(',', '', $value);
+
+        if (! preg_match('/^(-?)(\d+)(?:\.(\d+))?$/', $stripped, $matches)) {
+            return [
+                'value' => null,
+                'ok' => false,
+                'note' => "\"{$value}\" is not a valid amount.",
+                'code' => 'E_BAD_MONEY',
+            ];
+        }
+
+        [, $sign, $intPart, $fracPart] = $matches + [3 => ''];
+
+        if (strlen($fracPart) > 2) {
+            return [
+                'value' => null,
+                'ok' => false,
+                'note' => "\"{$value}\" has more than two decimal places.",
+                'code' => 'E_MONEY_PRECISION',
+            ];
+        }
+
+        $fracMinor = (int) str_pad($fracPart, 2, '0', STR_PAD_RIGHT);
+        $minor = ((int) $intPart) * 100 + $fracMinor;
+
+        if ($sign === '-') {
+            $minor = -$minor;
+        }
+
+        return ['value' => $minor, 'ok' => true, 'note' => null];
     }
 
     /**

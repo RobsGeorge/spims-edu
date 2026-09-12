@@ -2,20 +2,27 @@
 
 namespace App\Services\Import;
 
+use App\Enums\Currency;
 use App\Enums\ImportBatchStatus;
 use App\Enums\ImportEntityType;
 use App\Enums\ImportPopulation;
 use App\Enums\ImportRowAction;
 use App\Enums\ImportRowStatus;
+use App\Enums\InvoiceStatus;
+use App\Enums\LedgerReason;
 use App\Enums\StudentProgramStatus;
 use App\Enums\UserStatus;
+use App\Enums\WalletKind;
 use App\Models\ImportBatch;
 use App\Models\ImportLink;
 use App\Models\ImportRow;
 use App\Models\ImportSource;
+use App\Models\Invoice;
+use App\Models\InvoiceLine;
 use App\Models\Program;
 use App\Models\StudentProgram;
 use App\Models\User;
+use App\Services\Finance\WalletService;
 use App\Services\Storage\ObjectStorageService;
 use App\Support\AuditLogWriter;
 use Illuminate\Database\Eloquent\Collection;
@@ -24,15 +31,22 @@ use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 /**
- * Orchestrates the whole batch pipeline for the STUDENT entity type:
- * upload -> profile -> map -> validate -> dry run -> commit -> (rollback).
- * See docs/legacy-data-import-plan.md §10.
+ * Orchestrates the whole batch pipeline: upload -> profile -> map -> validate -> dry
+ * run -> commit -> (rollback). See docs/legacy-data-import-plan.md §10.
  *
- * v1 scope: identity + program linkage only (rungs 1 and 3 of the matching ladder —
- * import_links and exact email). Course results, finance and credentials are not yet
- * implemented; a `program_code` mapping links only to a program that already exists
- * in the live catalog (the "exact code match" half of D2) and never creates a shadow
- * program.
+ * Two entity types are implemented:
+ * - STUDENT (L0/L1): identity + program linkage. Rungs 1 and 3 of the matching ladder
+ *   (import_links and exact email). Course results, credentials are not yet
+ *   implemented; a `program_code` mapping links only to a program that already exists
+ *   in the live catalog (the "exact code match" half of D2) and never creates a shadow
+ *   program.
+ * - BALANCE (L6): finance opening balances. One carried-forward invoice (owed) and/or
+ *   one wallet credit (in hand) per student per currency, gated by an exact
+ *   control-total match with no acknowledge override — see §8.
+ *
+ * Every public entry point (`validate`, `dryRun`, `commit`) dispatches on
+ * `$batch->entity_type` to the entity-specific private methods below, so adding a
+ * further entity type is a matter of adding one more arm to each `match`.
  */
 class ImportBatchService
 {
@@ -42,6 +56,7 @@ class ImportBatchService
         private readonly ImportMappingSuggestionService $suggester,
         private readonly ImportTransformService $transforms,
         private readonly ObjectStorageService $storage,
+        private readonly WalletService $wallets,
         private readonly AuditLogWriter $audit,
     ) {}
 
@@ -49,9 +64,10 @@ class ImportBatchService
         User $actor,
         ImportSource $source,
         UploadedFile $file,
-        ImportPopulation $population,
+        ?ImportPopulation $population,
         ?string $sheetName = null,
         int $headerRow = 1,
+        ImportEntityType $entityType = ImportEntityType::Student,
     ): ImportBatch {
         $extension = strtolower($file->getClientOriginalExtension());
         if (! in_array($extension, ['csv', 'xlsx', 'xls'], true)) {
@@ -71,7 +87,7 @@ class ImportBatchService
 
         return ImportBatch::query()->create([
             'source_id' => $source->id,
-            'entity_type' => ImportEntityType::Student,
+            'entity_type' => $entityType,
             'population' => $population,
             'status' => ImportBatchStatus::Draft,
             'file_name' => $file->getClientOriginalName(),
@@ -142,12 +158,50 @@ class ImportBatchService
     }
 
     /**
+     * Records the registrar's declared control totals for a BALANCE batch — the
+     * amounts they independently computed from the source system, entered before the
+     * dry run so the hard gate in §8 has something authoritative to compare against.
+     * Stored inside `control_totals` alongside the computed half the dry run later
+     * fills in, so the one JSON field keeps the same "declared vs computed" shape the
+     * STUDENT entity already uses it for.
+     *
+     * @param  array<string, array{owed_minor?: int, credit_minor?: int}>  $declared  keyed by currency code, e.g. ['EGP' => ['owed_minor' => 50000, 'credit_minor' => 0]]
+     */
+    public function setFinanceControlTotals(ImportBatch $batch, string $asOf, array $declared): ImportBatch
+    {
+        $normalized = [];
+        foreach (ImportBalanceFields::SUPPORTED_CURRENCIES as $code) {
+            $normalized[$code] = [
+                'owed_minor' => (int) ($declared[$code]['owed_minor'] ?? 0),
+                'credit_minor' => (int) ($declared[$code]['credit_minor'] ?? 0),
+            ];
+        }
+
+        $batch->update([
+            'control_totals' => [
+                'as_of' => $asOf,
+                'declared' => $normalized,
+            ],
+        ]);
+
+        return $batch->fresh();
+    }
+
+    /**
      * Re-reads the staged file, applies the mapping, and writes one ImportRow per data
      * row with validation messages. Nothing outside `import_rows` is written here.
+     * Dispatches on entity type — see the class docblock.
      */
     public function validate(ImportBatch $batch): ImportBatch
     {
-        $source = $batch->source;
+        return match ($batch->entity_type) {
+            ImportEntityType::Student => $this->validateStudentRows($batch),
+            ImportEntityType::Balance => $this->validateBalanceRows($batch),
+        };
+    }
+
+    private function validateStudentRows(ImportBatch $batch): ImportBatch
+    {
         $disk = $this->storage->diskName();
         $parsed = $this->reader->read($disk, $batch->file_path, $batch->sheet_name, $batch->header_row);
         $mapping = collect($batch->mapping ?? [])->filter(fn ($m) => ! empty($m['target_field']));
@@ -278,16 +332,158 @@ class ImportBatchService
     }
 
     /**
+     * L6 — finance opening balances. Per row: legacy_id and currency are required
+     * (E_REQUIRED_FIELD_MISSING); currency must be exactly EGP or USD
+     * (E_UNSUPPORTED_CURRENCY — the importer will not invent an FX rate, §14 Q14); the
+     * legacy id must already be linked to a user via a committed STUDENT batch
+     * (E_UNKNOWN_STUDENT); owed_minor/credit_minor come through the money_to_minor
+     * transform, whose failures surface as E_BAD_MONEY or E_MONEY_PRECISION. A row
+     * with neither amount is a no-op, not an error — §8: "no empty invoices".
+     */
+    private function validateBalanceRows(ImportBatch $batch): ImportBatch
+    {
+        $disk = $this->storage->diskName();
+        $parsed = $this->reader->read($disk, $batch->file_path, $batch->sheet_name, $batch->header_row);
+        $mapping = collect($batch->mapping ?? [])->filter(fn ($m) => ! empty($m['target_field']));
+
+        $headerIndex = array_flip($parsed['headers']);
+        $seenKeys = [];
+        $errorCount = 0;
+        $warningCount = 0;
+
+        DB::transaction(function () use ($batch, $parsed, $mapping, $headerIndex, &$seenKeys, &$errorCount, &$warningCount) {
+            ImportRow::query()->where('batch_id', $batch->id)->delete();
+
+            foreach ($parsed['rows'] as $i => $row) {
+                $normalized = [];
+                $rowMessages = [];
+
+                foreach ($mapping as $m) {
+                    $colIndex = $headerIndex[$m['column']] ?? null;
+                    $raw = $colIndex !== null ? ($row[$colIndex] ?? null) : null;
+                    $result = $this->transforms->apply($m['transform'], $raw, $m['options'] ?? []);
+
+                    if (! $result['ok'] && $raw !== null && trim((string) $raw) !== '') {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => $result['code'] ?? 'E_BAD_MONEY',
+                            'field' => $m['target_field'],
+                            'params' => ['column' => $m['column'], 'value' => $raw],
+                        ];
+                    }
+
+                    if (! isset($normalized[$m['target_field']]) || $normalized[$m['target_field']] === null) {
+                        $normalized[$m['target_field']] = $result['value'];
+                    }
+                }
+
+                $legacyId = $normalized['legacy_id'] ?? null;
+                $hasLegacyId = $legacyId !== null && $legacyId !== '';
+                $currency = $normalized['currency'] ?? null;
+                $currency = is_string($currency) ? strtoupper(trim($currency)) : $currency;
+                $hasCurrency = $currency !== null && $currency !== '';
+
+                $baseKey = $hasLegacyId ? ($legacyId.($hasCurrency ? ':'.$currency : '')) : null;
+                $naturalKey = match (true) {
+                    $baseKey === null => 'row-'.($i + 1),
+                    isset($seenKeys[$baseKey]) => $baseKey.'#dup-'.($i + 1),
+                    default => $baseKey,
+                };
+
+                foreach (ImportBalanceFields::alwaysRequired() as $required) {
+                    if (empty($normalized[$required])) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_REQUIRED_FIELD_MISSING',
+                            'field' => $required,
+                            'params' => ['field' => $required],
+                        ];
+                    }
+                }
+
+                if ($hasCurrency && ! in_array($currency, ImportBalanceFields::SUPPORTED_CURRENCIES, true)) {
+                    $rowMessages[] = [
+                        'level' => 'error',
+                        'code' => 'E_UNSUPPORTED_CURRENCY',
+                        'field' => 'currency',
+                        'params' => ['currency' => $currency],
+                    ];
+                }
+
+                if ($hasLegacyId) {
+                    if (isset($seenKeys[$baseKey])) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_DUPLICATE_NATURAL_KEY',
+                            'field' => 'legacy_id',
+                            'params' => ['legacy_id' => $legacyId],
+                        ];
+                    }
+                    $seenKeys[$baseKey] = true;
+
+                    $linked = ImportLink::query()
+                        ->where('source_id', $batch->source_id)
+                        ->where('entity_type', 'user')
+                        ->where('legacy_id', $legacyId)
+                        ->exists();
+
+                    if (! $linked) {
+                        $rowMessages[] = [
+                            'level' => 'error',
+                            'code' => 'E_UNKNOWN_STUDENT',
+                            'field' => 'legacy_id',
+                            'params' => ['legacy_id' => $legacyId],
+                        ];
+                    }
+                }
+
+                $owed = (int) ($normalized['owed_minor'] ?? 0);
+                $credit = (int) ($normalized['credit_minor'] ?? 0);
+                $normalized['owed_minor'] = $owed;
+                $normalized['credit_minor'] = $credit;
+
+                $hasError = collect($rowMessages)->contains(fn ($m) => $m['level'] === 'error');
+                $hasWarning = collect($rowMessages)->contains(fn ($m) => $m['level'] === 'warning');
+                if ($hasError) {
+                    $errorCount++;
+                } elseif ($hasWarning) {
+                    $warningCount++;
+                }
+
+                ImportRow::query()->create([
+                    'batch_id' => $batch->id,
+                    'row_number' => $i + 1,
+                    'natural_key' => $naturalKey,
+                    'payload' => array_combine($parsed['headers'], array_pad($row, count($parsed['headers']), null)),
+                    'normalized' => $normalized,
+                    'action' => ($owed <= 0 && $credit <= 0) ? ImportRowAction::Noop : null,
+                    'status' => $hasError ? ImportRowStatus::Error : ($hasWarning ? ImportRowStatus::Warn : ImportRowStatus::Valid),
+                    'messages' => $rowMessages,
+                ]);
+            }
+        });
+
+        $batch->update([
+            'error_count' => $errorCount,
+            'warning_count' => $warningCount,
+            'row_count' => count($parsed['rows']),
+            'status' => ImportBatchStatus::Validated,
+            'validated_at' => now(),
+        ]);
+
+        return $batch->fresh();
+    }
+
+    /**
      * Runs the full commit path inside a transaction that is always rolled back, and
-     * reports what would happen. Nothing is written — verified by ImportDryRunTest,
-     * which asserts the row counts are identical before and after.
+     * reports what would happen. Nothing is written — verified by ImportDryRunTest /
+     * ImportBatchServiceTest, which assert the row counts are identical before and
+     * after. Dispatches on entity type for both the report and the control totals.
      *
-     * @return array{create: int, link: int, skip: int, distinct_students: int}
+     * @return array<string, int>
      */
     public function dryRun(ImportBatch $batch): array
     {
-        $report = ['create' => 0, 'link' => 0, 'skip' => 0, 'distinct_students' => 0];
-
         DB::beginTransaction();
         try {
             $report = $this->applyRows($batch, persist: true);
@@ -308,9 +504,20 @@ class ImportBatchService
     }
 
     /**
-     * @return array{declared_rows: int, computed_rows: int, distinct_students: int}
+     * @return array<string, mixed>
      */
     private function controlTotals(ImportBatch $batch): array
+    {
+        return match ($batch->entity_type) {
+            ImportEntityType::Student => $this->studentControlTotals($batch),
+            ImportEntityType::Balance => $this->balanceControlTotals($batch),
+        };
+    }
+
+    /**
+     * @return array{declared_rows: int, computed_rows: int, distinct_students: int}
+     */
+    private function studentControlTotals(ImportBatch $batch): array
     {
         $valid = ImportRow::query()->where('batch_id', $batch->id)
             ->whereIn('status', [ImportRowStatus::Valid, ImportRowStatus::Warn])
@@ -323,15 +530,99 @@ class ImportBatchService
         ];
     }
 
+    /**
+     * Merges the registrar's already-declared totals (§8's control-total gate input,
+     * stored by `setFinanceControlTotals()`) with what this dry run actually computed,
+     * so the dry-run screen can show both side by side. This computed half is
+     * recomputed independently at commit time by `assertFinanceTotalsMatchExactly()`
+     * rather than trusted from here — a stale dry run must not be able to wave through
+     * a bad commit.
+     *
+     * @return array{as_of: ?string, declared: array<string, array{owed_minor: int, credit_minor: int}>, computed: array<string, array{owed_minor: int, credit_minor: int}>, matches: bool}
+     */
+    private function balanceControlTotals(ImportBatch $batch): array
+    {
+        $existing = $batch->control_totals ?? [];
+        $declared = $existing['declared'] ?? [];
+        $computed = $this->financeComputedTotals($batch);
+
+        return [
+            'as_of' => $existing['as_of'] ?? null,
+            'declared' => $declared,
+            'computed' => $computed,
+            'matches' => $this->financeTotalsMatch($declared, $computed),
+        ];
+    }
+
+    /**
+     * Sums normalized owed_minor / credit_minor across every row this dry run (or
+     * commit) would actually write — i.e. VALID and WARN rows — grouped by currency.
+     * Integer arithmetic throughout; nothing here ever touches a float.
+     *
+     * @return array<string, array{owed_minor: int, credit_minor: int}>
+     */
+    private function financeComputedTotals(ImportBatch $batch): array
+    {
+        $totals = [];
+        foreach (ImportBalanceFields::SUPPORTED_CURRENCIES as $code) {
+            $totals[$code] = ['owed_minor' => 0, 'credit_minor' => 0];
+        }
+
+        ImportRow::query()->where('batch_id', $batch->id)
+            ->whereIn('status', [ImportRowStatus::Valid, ImportRowStatus::Warn])
+            ->get(['normalized'])
+            ->each(function (ImportRow $row) use (&$totals) {
+                $normalized = $row->normalized ?? [];
+                $currency = $normalized['currency'] ?? null;
+                if (! is_string($currency) || ! isset($totals[$currency])) {
+                    return;
+                }
+
+                $totals[$currency]['owed_minor'] += (int) ($normalized['owed_minor'] ?? 0);
+                $totals[$currency]['credit_minor'] += (int) ($normalized['credit_minor'] ?? 0);
+            });
+
+        return $totals;
+    }
+
+    /**
+     * @param  array<string, array{owed_minor?: int, credit_minor?: int}>  $declared
+     * @param  array<string, array{owed_minor?: int, credit_minor?: int}>  $computed
+     */
+    private function financeTotalsMatch(array $declared, array $computed): bool
+    {
+        foreach (ImportBalanceFields::SUPPORTED_CURRENCIES as $code) {
+            $declaredOwed = (int) ($declared[$code]['owed_minor'] ?? 0);
+            $declaredCredit = (int) ($declared[$code]['credit_minor'] ?? 0);
+            $computedOwed = (int) ($computed[$code]['owed_minor'] ?? 0);
+            $computedCredit = (int) ($computed[$code]['credit_minor'] ?? 0);
+
+            if ($declaredOwed !== $computedOwed || $declaredCredit !== $computedCredit) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function commit(User $actor, ImportBatch $batch): ImportBatch
     {
         if (! in_array($batch->status, [ImportBatchStatus::DryRun, ImportBatchStatus::Validated], true)) {
             throw new RuntimeException('Batch must be validated before it can be committed.');
         }
 
+        // The hard control-total gate (§8) — enforced here, not only on the dry-run
+        // screen, so a direct POST to the commit route without ever viewing that
+        // screen is refused exactly the same way. Recomputed fresh from the current
+        // row state rather than trusting a possibly-stale cached dry-run report, and
+        // checked before anything is written: on a mismatch, zero rows are touched.
+        if ($batch->entity_type === ImportEntityType::Balance) {
+            $this->assertFinanceTotalsMatchExactly($batch);
+        }
+
         $this->audit->withAudit($actor, 'import.batch_commit', function () use ($batch, $actor) {
-            DB::transaction(function () use ($batch) {
-                $this->applyRows($batch, persist: true);
+            DB::transaction(function () use ($batch, $actor) {
+                $this->applyRows($batch, persist: true, actor: $actor);
             });
 
             $batch->update([
@@ -348,15 +639,46 @@ class ImportBatchService
     }
 
     /**
-     * The single code path behind both the dry run and the real commit. Row-level
-     * identity resolution: rung 1 (an existing import_links row) then rung 3 (exact
-     * normalised email match). Anything else is created new. See §6 of the plan for the
-     * full ladder — rungs 2, 4-6 (Canvas crosswalk, student number, DOB triple, and the
-     * human merge queue) are not yet implemented.
+     * The single most important acceptance criterion of L6: a control-total mismatch
+     * of even one minor unit, in any currency, refuses commit outright — no
+     * acknowledge override exists for money, unlike the STUDENT entity's row-count
+     * mismatch. A currency the registrar never declared a total for is compared
+     * against zero, so an un-declared currency with real money in the file still
+     * fails loudly rather than committing silently.
+     */
+    private function assertFinanceTotalsMatchExactly(ImportBatch $batch): void
+    {
+        $declared = $batch->control_totals['declared'] ?? [];
+        $computed = $this->financeComputedTotals($batch);
+
+        if (! $this->financeTotalsMatch($declared, $computed)) {
+            throw new RuntimeException(__('import.finance_mismatch_refused'));
+        }
+    }
+
+    /**
+     * The single code path behind both the dry run and the real commit — dispatches
+     * on entity type. See the per-entity methods below for row-level logic.
+     *
+     * @return array<string, int>
+     */
+    private function applyRows(ImportBatch $batch, bool $persist, ?User $actor = null): array
+    {
+        return match ($batch->entity_type) {
+            ImportEntityType::Student => $this->applyStudentRows($batch, $persist),
+            ImportEntityType::Balance => $this->applyBalanceRows($batch, $persist, $actor),
+        };
+    }
+
+    /**
+     * Row-level identity resolution: rung 1 (an existing import_links row) then rung 3
+     * (exact normalised email match). Anything else is created new. See §6 of the plan
+     * for the full ladder — rungs 2, 4-6 (Canvas crosswalk, student number, DOB triple,
+     * and the human merge queue) are not yet implemented.
      *
      * @return array{create: int, link: int, skip: int, distinct_students: int}
      */
-    private function applyRows(ImportBatch $batch, bool $persist): array
+    private function applyStudentRows(ImportBatch $batch, bool $persist): array
     {
         $create = 0;
         $link = 0;
@@ -446,6 +768,146 @@ class ImportBatchService
     }
 
     /**
+     * L6 commit logic. Per valid row: `owed_minor > 0` creates exactly one Invoice
+     * (source_system set, status Open, one InvoiceLine, offering_id null) and
+     * `credit_minor > 0` creates exactly one WalletTransaction (kind Money, direction
+     * Credit, reason LegacyCarryForward) against the student's wallet (created if
+     * absent). Both may apply to the same row — handled independently. A legacy id
+     * that no longer resolves to a linked user (e.g. the link was removed between
+     * validate and commit) is skipped defensively rather than fatally erroring, since
+     * validation already blocks this case for any row reaching here in the ordinary
+     * flow.
+     *
+     * @return array{invoices_created: int, wallet_credits_created: int, noop: int, skip: int, distinct_students: int}
+     */
+    private function applyBalanceRows(ImportBatch $batch, bool $persist, ?User $actor = null): array
+    {
+        $invoicesCreated = 0;
+        $walletCreditsCreated = 0;
+        $noop = 0;
+        $skip = 0;
+        $studentIds = [];
+
+        /** @var Collection<int, ImportRow> $rows */
+        $rows = ImportRow::query()->where('batch_id', $batch->id)
+            ->whereIn('status', [ImportRowStatus::Valid, ImportRowStatus::Warn])
+            ->orderBy('row_number')
+            ->get();
+
+        foreach ($rows as $row) {
+            $normalized = $row->normalized ?? [];
+            $legacyId = $normalized['legacy_id'] ?? null;
+            $currencyCode = $normalized['currency'] ?? null;
+            $owed = (int) ($normalized['owed_minor'] ?? 0);
+            $credit = (int) ($normalized['credit_minor'] ?? 0);
+
+            if ($owed <= 0 && $credit <= 0) {
+                $noop++;
+                if ($persist) {
+                    $row->update(['action' => ImportRowAction::Noop, 'status' => ImportRowStatus::Applied]);
+                }
+
+                continue;
+            }
+
+            $link = ImportLink::query()
+                ->where('source_id', $batch->source_id)
+                ->where('entity_type', 'user')
+                ->where('legacy_id', $legacyId)
+                ->first();
+
+            $student = $link !== null ? User::query()->find($link->target_id) : null;
+            if ($student === null || ! is_string($currencyCode) || Currency::tryFrom($currencyCode) === null) {
+                $skip++;
+
+                continue;
+            }
+
+            $studentIds[$student->id] = true;
+            $currency = Currency::from($currencyCode);
+            $target = null;
+
+            if ($owed > 0) {
+                $invoicesCreated++;
+                if ($persist) {
+                    $invoice = $this->createLegacyInvoice($batch, $student, $currency, $owed);
+                    $target = ['type' => Invoice::class, 'id' => $invoice->id];
+                }
+            }
+
+            if ($credit > 0) {
+                $walletCreditsCreated++;
+                if ($persist) {
+                    $note = sprintf(
+                        'Legacy balance carried forward from %s as of %s',
+                        $batch->source->name,
+                        $batch->control_totals['as_of'] ?? now()->toDateString(),
+                    );
+                    $tx = $this->wallets->credit(
+                        $student,
+                        $currency,
+                        WalletKind::Money,
+                        $credit,
+                        LedgerReason::LegacyCarryForward,
+                        actor: $actor,
+                        note: $note,
+                    );
+                    $target ??= ['type' => \App\Models\WalletTransaction::class, 'id' => $tx->id];
+                }
+            }
+
+            if ($persist) {
+                $row->update([
+                    'action' => ImportRowAction::Create,
+                    'target_type' => $target['type'] ?? null,
+                    'target_id' => $target['id'] ?? null,
+                    'status' => ImportRowStatus::Applied,
+                ]);
+            }
+        }
+
+        return [
+            'invoices_created' => $invoicesCreated,
+            'wallet_credits_created' => $walletCreditsCreated,
+            'noop' => $noop,
+            'skip' => $skip,
+            'distinct_students' => count($studentIds),
+        ];
+    }
+
+    /**
+     * One synthetic invoice, one line — D4. The description is plain factual data text
+     * (source name + cutover date), matching how every other InvoiceLine description
+     * in this app is written (see InvoiceService::createForEnrollment's
+     * "{course code} — {course title}"): never a hardcoded English sentence baked in
+     * as if it were the student's UI, just a record of what happened, in the language
+     * this app's finance records have always been written in. The student-facing
+     * transcript/statement screens are responsible for wrapping any UI copy around it.
+     */
+    private function createLegacyInvoice(ImportBatch $batch, User $student, Currency $currency, int $owedMinor): Invoice
+    {
+        $asOf = $batch->control_totals['as_of'] ?? now()->toDateString();
+
+        $invoice = Invoice::query()->create([
+            'student_id' => $student->id,
+            'currency' => $currency,
+            'total_minor' => $owedMinor,
+            'status' => InvoiceStatus::Open,
+            'due_date' => null,
+            'source_system' => $batch->source->code,
+        ]);
+
+        InvoiceLine::query()->create([
+            'invoice_id' => $invoice->id,
+            'description' => sprintf('Balance carried forward from %s as of %s', $batch->source->name, $asOf),
+            'offering_id' => null,
+            'amount_minor' => $owedMinor,
+        ]);
+
+        return $invoice->fresh('lines');
+    }
+
+    /**
      * @param  array<string, mixed>  $normalized
      */
     private function createUser(ImportBatch $batch, array $normalized, string $legacyId): User
@@ -509,6 +971,13 @@ class ImportBatchService
      * assignment, an enrollment, a payment) — the rollback names exactly what blocks it
      * rather than failing vaguely.
      *
+     * Scope note: only the STUDENT entity is reversible today. A BALANCE batch's
+     * invoices and wallet credits are real financial records the moment they commit —
+     * reversing them safely (crediting back a wallet that may already have been spent
+     * from, voiding an invoice that may already carry a payment) is a distinct feature
+     * with its own rules, not a copy of the STUDENT rollback's user-deletion logic, and
+     * is out of scope for this phase.
+     *
      * @return array{rolled_back: int, blocked: array<int, array{row: int, reason: string}>}
      */
     public function rollback(User $actor, ImportBatch $batch): array
@@ -518,6 +987,9 @@ class ImportBatchService
         }
         if ($batch->isSealed()) {
             throw new RuntimeException('This batch was sealed on '.$batch->sealed_at->toDateString().' and can no longer be rolled back.');
+        }
+        if ($batch->entity_type !== ImportEntityType::Student) {
+            throw new RuntimeException(__('import.rollback_unsupported_entity'));
         }
 
         $blocked = [];
