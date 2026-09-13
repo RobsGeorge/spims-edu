@@ -17,6 +17,51 @@
     <span class="spims-status-badge spims-status-neutral">{{ __('import.step_validate') }}</span>
 </div>
 
+<x-card variant="quiet" class="mb-4">
+    <h2 class="h6 page-title mb-1">{{ __('import.order_title') }}</h2>
+    <p class="small spims-text-dim mb-3">{{ __('import.order_lead') }}</p>
+    <ol class="list-unstyled mb-0 d-flex flex-column gap-3">
+        <li class="d-flex align-items-start gap-3">
+            <x-status-badge status="info" label="1" />
+            <div>
+                <span class="fw-semibold d-block">{{ __('import.entity_STUDENT') }}</span>
+                <span class="small spims-text-dim">{{ __('import.order_step_student_body') }}</span>
+            </div>
+        </li>
+        <li class="d-flex align-items-start gap-3">
+            <x-status-badge status="info" label="2" />
+            <div>
+                <span class="fw-semibold d-block">{{ __('import.entity_COURSE_RESULT') }}</span>
+                <span class="small spims-text-dim">{{ __('import.order_step_course_result_body') }}</span>
+            </div>
+        </li>
+        <li class="d-flex align-items-start gap-3">
+            <x-status-badge status="warning" label="3" />
+            <div>
+                <span class="fw-semibold d-block">
+                    {{ __('import.entity_BALANCE') }}
+                    <x-status-badge status="warning" :label="__('import.order_role_financial_admin')" class="ms-2" />
+                </span>
+                <span class="small spims-text-dim">{{ __('import.order_step_balance_body') }}</span>
+            </div>
+        </li>
+        <li class="d-flex align-items-start gap-3">
+            <x-status-badge status="info" label="4" />
+            <div>
+                <span class="fw-semibold d-block">{{ __('import.entity_CREDENTIAL') }}</span>
+                <span class="small spims-text-dim">{{ __('import.order_step_credential_body') }}</span>
+            </div>
+        </li>
+        <li class="d-flex align-items-start gap-3">
+            <x-status-badge status="success" label="5" />
+            <div>
+                <span class="fw-semibold d-block">{{ __('import.entity_MIDTERM_ENROLLMENT') }}</span>
+                <span class="small spims-text-dim">{{ __('import.order_step_midterm_body') }}</span>
+            </div>
+        </li>
+    </ol>
+</x-card>
+
 @if($errors->any())
     <div class="alert alert-danger">
         <ul class="mb-0">

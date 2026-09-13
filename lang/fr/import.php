@@ -97,6 +97,16 @@ return [
     'upload_help_body' => 'CSV ou Excel (.xlsx), jusqu\'à 20 Mo. La première ligne (ou la ligne d\'en-tête choisie) doit contenir les noms de colonnes — vous les ferez correspondre aux champs SPIMS à l\'écran suivant. Rien n\'est encore écrit dans les registres de l\'école à cette étape.',
     'upload_button' => 'Téléverser et continuer',
 
+    // Upload (create) — ordre conseillé des types de données
+    'order_title' => 'Ordre conseillé',
+    'order_lead' => "Chaque autre type de données ci-dessous fait référence à un étudiant : importez d'abord les identités. Au sein d'une même source, suivez cet ordre :",
+    'order_step_student_body' => "Crée ou relie les personnes auxquelles tout le reste de cette liste fait référence. Importez les anciens élèves et les étudiants actuels comme des fichiers distincts si vous avez les deux.",
+    'order_step_course_result_body' => "Nécessite que les étudiants de l'étape 1 existent déjà — une ligne pour un identifiant hérité inconnu est refusée (E_UNKNOWN_STUDENT).",
+    'order_step_balance_body' => "Nécessite les étudiants de l'étape 1. La validation est refusée sauf si les totaux du fichier correspondent exactement aux totaux de contrôle déclarés, jusqu'à l'unité mineure.",
+    'order_step_credential_body' => "Nécessite les étudiants de l'étape 1. Le numéro de série de la source est conservé tel quel et n'est jamais réémis via SPIMS.",
+    'order_step_midterm_body' => "Nécessite les étudiants actuellement inscrits de l'étape 1, ainsi qu'une session en cours déjà créée par un responsable de la scolarité — cet import n'en crée jamais.",
+    'order_role_financial_admin' => 'Responsable financier',
+
     // Map
     'map_title' => 'Faire correspondre les colonnes',
     'map_lead' => 'Chaque colonne ci-dessous est soit associée à un champ SPIMS, soit explicitement ignorée. Rien n\'est écarté sans que vous ne le décidiez.',
