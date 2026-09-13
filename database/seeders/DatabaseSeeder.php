@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             HelpSeeder::class,
             SampleDataSeeder::class,
             DemoDataSeeder::class,
+            LegacyImportDemoSeeder::class,
         ]);
     }
 }
