@@ -97,6 +97,16 @@ return [
     'upload_help_body' => 'CSV or Excel (.xlsx), up to 20 MB. The first row (or the header row you choose) must contain column names — you will match them to SPIMS fields on the next screen. Nothing is written to the school\'s records at this step.',
     'upload_button' => 'Upload and continue',
 
+    // Upload (create) — suggested entity-type order
+    'order_title' => 'Suggested order',
+    'order_lead' => 'Every other entity type below references a student, so import identities first. Within one source, commit in this order:',
+    'order_step_student_body' => 'Creates or links the people everything else in this list refers to. Import alumni and currently-studying students as separate files if you have both.',
+    'order_step_course_result_body' => "Needs the students from step 1 to already exist — a row for an unknown legacy id is refused (E_UNKNOWN_STUDENT).",
+    'order_step_balance_body' => "Needs the students from step 1. Commit is refused unless the file's totals match your declared control totals exactly, to the minor unit.",
+    'order_step_credential_body' => "Needs the students from step 1. The source's serial is kept exactly as given and is never reissued through SPIMS.",
+    'order_step_midterm_body' => 'Needs the currently-studying students from step 1, and a live current-term offering a registrar has already built — this import never creates one.',
+    'order_role_financial_admin' => 'Financial Admin',
+
     // Map
     'map_title' => 'Map the columns',
     'map_lead' => 'Every column below is either mapped to a SPIMS field or explicitly ignored. Nothing is dropped without you saying so.',
