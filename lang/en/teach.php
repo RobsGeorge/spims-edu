@@ -111,4 +111,9 @@ return array (
   'open_discussion_grades' => 'Grade threads',
   'discussions_workspace' => 'Discussion grades',
   'discussions_workspace_sub' => 'Score enrolled students on discussion threads.',
+  'stat_enrolled' => ':count enrolled',
+  'stat_weeks' => 'Weeks',
+  'stat_items' => 'Learning items',
+  'stat_gradebook' => 'Gradebook',
+  'stat_progress' => 'Progress',
 );

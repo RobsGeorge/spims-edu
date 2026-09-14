@@ -145,11 +145,19 @@
         <h3 class="h6">{{ __('teach.students') }}</h3>
         @forelse($roster as $enrollment)
             <div class="d-flex justify-content-between align-items-center border rounded-3 p-2 mb-2">
-                <div>
-                    <strong>{{ $enrollment->student->first_name }} {{ $enrollment->student->last_name }}</strong>
+                <div class="me-3">
+                    <strong>{{ $enrollment->student->displayName() }}</strong>
                     <div class="small spims-text-dim">{{ $enrollment->student->email }}</div>
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                        <div class="progress" style="width:80px;height:5px" role="progressbar"
+                             aria-valuenow="{{ (int)($enrollment->progress_percent ?? 0) }}"
+                             aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar" style="width:{{ (int)($enrollment->progress_percent ?? 0) }}%"></div>
+                        </div>
+                        <span class="small spims-text-dim">{{ (int)($enrollment->progress_percent ?? 0) }}%</span>
+                    </div>
                 </div>
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
                     <a class="btn btn-sm btn-outline-primary" href="{{ route('teach.students.show', [$offering, $enrollment->student]) }}">{{ __('teach.view_dossier') }}</a>
                     <a class="btn btn-sm btn-outline-secondary" href="{{ route('teach.completion.show', ['offering' => $offering, 'student_id' => $enrollment->student_id]) }}">{{ __('completion.notes') }}</a>
                     <x-status-badge :status="$enrollment->status->value" :label="$enrollment->status->value" />
@@ -164,6 +172,35 @@
         </div>
     @else
         <x-page-header :title="__('teach.tab_content')" :subtitle="__('teach.tab_content_help')" />
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="academic-card p-3 text-center h-100">
+                    <div class="h3 mb-0 spims-title">{{ $rosterCount }}</div>
+                    <div class="small spims-text-dim mt-1">{{ __('teach.stat_enrolled') }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="academic-card p-3 text-center h-100">
+                    <div class="h3 mb-0 spims-title">{{ $weeksCount }}</div>
+                    <div class="small spims-text-dim mt-1">{{ __('teach.stat_weeks') }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="academic-card p-3 text-center h-100">
+                    <div class="h3 mb-0 spims-title">{{ $itemsCount }}</div>
+                    <div class="small spims-text-dim mt-1">{{ __('teach.stat_items') }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="academic-card p-3 text-center h-100">
+                    <x-status-badge
+                        :status="$gradebookLocked ? 'LOCKED' : 'OPEN'"
+                        :label="$gradebookLocked ? __('teach.gradebook_locked') : __('teach.gradebook_open')"
+                    />
+                    <div class="small spims-text-dim mt-1">{{ __('teach.stat_gradebook') }}</div>
+                </div>
+            </div>
+        </div>
         <div class="d-flex flex-wrap gap-2 mb-3">
             <a class="btn btn-outline-primary btn-sm" href="{{ route('admin.offerings.show', $offering) }}">{{ __('teach.edit_content') }}</a>
             <form method="POST" action="{{ route('offerings.preview.student', $offering) }}">

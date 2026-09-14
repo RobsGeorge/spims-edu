@@ -28,28 +28,88 @@
     <div class="row">
         @include('learn.partials.week-nav')
         <div class="col-lg-9">
-            @if($activeWeek)
-                <x-card variant="panel">
-                    <h2 class="h5 spims-title">{{ __('learn.week', ['number' => $activeWeek->number]) }}: {{ $activeWeek->title }}</h2>
-                    <p class="spims-text-dim">{{ __('learn.items') }}</p>
-                    <ul class="list-group list-group-flush">
-                        @forelse($activeWeek->items as $item)
-                            @php $done = in_array($item->id, $completedItemIds, true); @endphp
-                            <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                <a href="{{ route('learn.item', [$offering, $item]) }}">
-                                    <x-badge :value="$item->type" class="me-1" />
-                                    {{ $item->title }}
-                                </a>
-                                @if($done)<span class="badge text-bg-success">{{ __('learn.completed') }}</span>@endif
-                            </li>
-                        @empty
-                            <li class="list-group-item px-0 spims-text-dim">{{ __('learn.no_items') }}</li>
-                        @endforelse
-                    </ul>
-                    <a class="btn btn-primary mt-3" href="{{ route('learn.week', [$offering, $activeWeek]) }}">{{ __('learn.week', ['number' => $activeWeek->number]) }}</a>
-                </x-card>
-            @else
+            @if($weeks->isEmpty())
                 <div class="alert alert-info academic-alert mb-0">{{ __('learn.no_weeks') }}</div>
+            @else
+                <div class="accordion" id="weekAccordion">
+                    @foreach($weeks as $week)
+                        @php
+                            $unlocked = $enrollment
+                                ? $progress->isWeekUnlocked($enrollment, $offering, $week)
+                                : app(\App\Services\Offerings\ContentGatingService::class)
+                                    ->isWeekUnlocked($offering, $week, enrolled: true, completedWeekNumbers: $completedWeekNumbers ?? []);
+                            $done = $enrollment ? $progress->isWeekComplete($enrollment, $week) : false;
+                            $isActive = $activeWeek && $activeWeek->id === $week->id;
+                            $weekItemIds = $week->items->pluck('id')->toArray();
+                            $weekTotal = count($weekItemIds);
+                            $weekCompleted = count(array_intersect($weekItemIds, $completedItemIds));
+                        @endphp
+                        <div class="accordion-item mb-2 border rounded-3 {{ $done ? 'border-success' : ($isActive ? 'border-primary' : '') }}">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button rounded-3 {{ $isActive ? '' : 'collapsed' }}"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#week-{{ $week->id }}"
+                                        aria-expanded="{{ $isActive ? 'true' : 'false' }}"
+                                        aria-controls="week-{{ $week->id }}"
+                                        @if(!$unlocked) aria-disabled="true" style="cursor:default;" @endif>
+                                    <span class="d-flex align-items-center gap-2 w-100 flex-wrap">
+                                        <span class="fw-semibold">
+                                            {{ __('learn.week', ['number' => $week->number]) }}: {{ $week->title }}
+                                        </span>
+                                        <span class="ms-auto d-flex align-items-center gap-2 flex-shrink-0">
+                                            @if($done)
+                                                <span class="badge text-bg-success"><i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>{{ __('learn.completed') }}</span>
+                                            @elseif(!$unlocked)
+                                                <span class="badge text-bg-info">{{ __('learn.locked') }}</span>
+                                            @else
+                                                <span class="badge text-bg-info">{{ $weekCompleted }}/{{ $weekTotal }}</span>
+                                            @endif
+                                        </span>
+                                    </span>
+                                </button>
+                            </h2>
+                            <div id="week-{{ $week->id }}" class="accordion-collapse collapse {{ $isActive ? 'show' : '' }}">
+                                <div class="accordion-body p-0">
+                                    @if(!$unlocked)
+                                        <div class="alert alert-warning academic-alert m-3 mb-3">
+                                            @if($offering->mode->value === 'COHORT' && $week->unlock_date)
+                                                {{ __('learn.unlock_on_date', ['date' => $week->unlock_date->format('d M Y')]) }}
+                                            @else
+                                                {{ __('learn.unlock_after_prior') }}
+                                            @endif
+                                        </div>
+                                    @elseif($week->items->isEmpty())
+                                        <p class="px-3 py-3 spims-text-dim mb-0 small">{{ __('learn.no_items') }}</p>
+                                    @else
+                                        <ul class="list-group list-group-flush">
+                                            @foreach($week->items as $item)
+                                                @php $itemDone = in_array($item->id, $completedItemIds, true); @endphp
+                                                <li class="list-group-item px-3 py-2 d-flex align-items-center gap-2">
+                                                    <a href="{{ route('learn.item', [$offering, $item]) }}"
+                                                       class="flex-grow-1 text-decoration-none text-body d-flex align-items-center gap-2">
+                                                        <x-badge :value="$item->type" class="flex-shrink-0" />
+                                                        <span>{{ $item->title }}</span>
+                                                    </a>
+                                                    @if($itemDone)
+                                                        <span class="badge text-bg-success flex-shrink-0">
+                                                            <i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>{{ __('learn.done') }}
+                                                        </span>
+                                                    @endif
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                        <div class="p-3 pt-2">
+                                            <a href="{{ route('learn.week', [$offering, $week]) }}" class="btn btn-primary btn-sm">
+                                                {{ __('learn.open_week') }}
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             @endif
         </div>
     </div>

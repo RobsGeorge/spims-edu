@@ -35,4 +35,6 @@ return [
     'complete' => 'complete',
     'prev_item' => '← Previous',
     'next_item' => 'Next →',
+    'done' => 'Done',
+    'open_week' => 'Enter week',
 ];

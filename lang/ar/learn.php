@@ -35,4 +35,6 @@ return [
     'complete' => 'مكتمل',
     'prev_item' => '→ السابق',
     'next_item' => 'التالي ←',
+    'done' => 'تم',
+    'open_week' => 'الدخول إلى الأسبوع',
 ];
