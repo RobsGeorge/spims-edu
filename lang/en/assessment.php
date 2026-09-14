@@ -41,6 +41,8 @@ return [
     'submit_grades' => 'Submit grades',
     'lock_grades' => 'Lock',
     'reopen_grades' => 'Reopen',
+    'guide_seed_body' => "Adds the school's default assessment components (or the first template if none is marked default) as a starting point — edit the names and weights below afterward.",
+    'guide_submit_body' => 'Computes every enrolled student\'s final percent, letter and GPA points from the components below and marks their grade as submitted. This does not lock editing — use Lock, further along, once no more corrections are expected.',
     'component' => 'Component',
     'student' => 'Student',
     'letter' => 'Letter',

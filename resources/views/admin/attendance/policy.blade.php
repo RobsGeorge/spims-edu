@@ -7,6 +7,23 @@
     <div class="alert alert-success">{{ session('status') }}</div>
 @endif
 
+<x-card variant="quiet" class="mb-3">
+    <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="info" :label="__('attendance.global_policy')" />
+            <span class="small spims-text-dim">{{ __('attendance.guide_scope_body') }}</span>
+        </li>
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="warning" :label="__('attendance.min_percentage')" />
+            <span class="small spims-text-dim">{{ __('attendance.guide_min_body') }}</span>
+        </li>
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="info" :label="__('attendance.late_grade_percentage')" />
+            <span class="small spims-text-dim">{{ __('attendance.guide_late_body') }}</span>
+        </li>
+    </ul>
+</x-card>
+
 <form method="GET" class="row g-2 mb-4">
     <div class="col-md-6">
         <select name="offering_id" class="form-select" onchange="this.form.submit()">

@@ -24,6 +24,21 @@
 </div>
 @endif
 
+@unless($offering->gradebook_locked_at)
+<x-card variant="quiet" class="mb-3">
+    <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="info" :label="__('assessment.seed_template')" />
+            <span class="small spims-text-dim">{{ __('assessment.guide_seed_body') }}</span>
+        </li>
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="warning" :label="__('assessment.submit_grades')" />
+            <span class="small spims-text-dim">{{ __('assessment.guide_submit_body') }}</span>
+        </li>
+    </ul>
+</x-card>
+@endunless
+
 <div class="d-flex gap-2 mb-3 flex-wrap">
     @unless($offering->gradebook_locked_at)
         <form method="POST" action="{{ route('admin.gradebook.seed', $offering) }}">@csrf<button class="btn btn-sm btn-outline-primary">{{ __('assessment.seed_template') }}</button></form>

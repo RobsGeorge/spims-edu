@@ -2,9 +2,32 @@
 @section('title', __('finance.admin_title'))
 @section('content')
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-    <h1 class="spims-title mb-0">{{ __('finance.admin_title') }}</h1>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <h1 class="spims-title mb-0">{{ __('finance.admin_title') }}</h1>
+        <x-status-badge status="warning" :label="__('finance.admin_role_badge')" />
+    </div>
     <a class="small" href="{{ route('help.show', 'minor-units-explained') }}">{{ __('help.learn_more') }}</a>
 </div>
+
+<x-card variant="quiet" class="mb-3">
+    <h2 class="h6 page-title mb-2">{{ __('finance.guide_title') }}</h2>
+    <ul class="list-unstyled mb-2 d-flex flex-column gap-2">
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="info" :label="__('finance.create_invoice')" />
+            <span class="small spims-text-dim">{{ __('finance.guide_invoice_body') }}</span>
+        </li>
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="success" :label="__('finance.grant_points')" />
+            <span class="small spims-text-dim">{{ __('finance.guide_points_body') }}</span>
+        </li>
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="info" :label="__('finance.top_up')" />
+            <span class="small spims-text-dim">{{ __('finance.guide_topup_body') }}</span>
+        </li>
+    </ul>
+    <p class="small spims-text-dim mb-0">{{ __('finance.guide_verify_refund_note') }}</p>
+</x-card>
+
 @if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
 
 @php
