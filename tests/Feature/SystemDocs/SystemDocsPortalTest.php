@@ -154,6 +154,26 @@ class SystemDocsPortalTest extends TestCase
     }
 
     #[Test]
+    public function legacy_import_use_cases_page_renders_for_signed_in_user(): void
+    {
+        $admin = User::factory()->withRole(RoleType::AdministrativeAdmin)->create();
+
+        $page = $this->actingAs($admin)->get(route('system-docs.show', 'legacy-import-use-cases'));
+        $page->assertOk();
+        $page->assertSee(__('system_docs.pages.legacy-import-use-cases.title'));
+        $page->assertSee('<table class="help-article-table"', false);
+        $page->assertSee('UC-S1', false);
+        $page->assertSee('E_ACTIVE_NO_EMAIL', false);
+    }
+
+    #[Test]
+    public function legacy_import_use_cases_page_is_hidden_from_guests(): void
+    {
+        // Technical-audience page: never guest-readable, even when guest publish is on.
+        $this->get(route('system-docs.show', 'legacy-import-use-cases'))->assertNotFound();
+    }
+
+    #[Test]
     public function unknown_slug_returns_404_for_signed_in_user(): void
     {
         $student = User::factory()->withRole(RoleType::Student)->create();
