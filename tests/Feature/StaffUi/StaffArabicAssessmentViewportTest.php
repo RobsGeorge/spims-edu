@@ -28,6 +28,6 @@ class StaffArabicAssessmentViewportTest extends TestCase
             ->assertSee('announceResultsModal', false)
             ->assertSee('modal-dialog-scrollable', false)
             ->assertSee('spims-staff-row', false)
-            ->assertSee($bundle['student']->first_name, false);
+            ->assertSee($bundle['student']->first_name);
     }
 }
