@@ -97,5 +97,12 @@ return [
             'sort' => 170,
             'icon' => 'bi-shield-check',
         ],
+        [
+            'slug' => 'legacy-import-use-cases',
+            'audience' => 'technical',
+            'guest_eligible' => false,
+            'sort' => 180,
+            'icon' => 'bi-clipboard-data',
+        ],
     ],
 ];

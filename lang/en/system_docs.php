@@ -83,5 +83,9 @@ return [
             'title' => 'Roles & permissions matrix',
             'summary' => 'Role types, permission keys, offering scopes, and Roles Hub overrides.',
         ],
+        'legacy-import-use-cases' => [
+            'title' => 'Legacy import — use cases & expected results',
+            'summary' => 'Worked import scenarios for old and new students, diplomas, and courses — each with its expected outcome and any known issue, verified against a freshly seeded system.',
+        ],
     ],
 ];

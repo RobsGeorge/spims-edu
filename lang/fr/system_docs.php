@@ -83,5 +83,9 @@ return [
             'title' => 'Matrice rôles et permissions',
             'summary' => 'Types de rôles, clés de permission, portées d’offering et overrides Roles Hub.',
         ],
+        'legacy-import-use-cases' => [
+            'title' => 'Import hérité — cas d’usage et résultats attendus',
+            'summary' => 'Scénarios d’import détaillés pour anciens et nouveaux étudiants, diplômes et cours — chacun avec son résultat attendu et tout problème connu, vérifiés sur un système fraîchement initialisé.',
+        ],
     ],
 ];
