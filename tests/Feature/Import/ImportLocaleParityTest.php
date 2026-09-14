@@ -101,6 +101,9 @@ class ImportLocaleParityTest extends TestCase
             // L8 — legacy credentials.
             'E_UNKNOWN_CREDENTIAL_TYPE',
             'E_DUPLICATE_SERIAL',
+            // Fix: findings from use-case dry-run.
+            'E_OFFERING_GRADEBOOK_LOCKED',
+            'W_SEMESTER_NAME_NOT_YEAR_QUALIFIED',
         ];
 
         foreach (['ar', 'en', 'fr'] as $locale) {

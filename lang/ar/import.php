@@ -174,6 +174,8 @@ return [
     'view_dry_run' => 'عرض تقرير تجربة التنفيذ',
     'next_step_COMMITTED_title' => 'تم الاعتماد',
     'committed_by' => 'اعتمده :name بتاريخ :date',
+    'merge_queue_reminder_title' => 'راجع قائمة انتظار التحقق من الهوية',
+    'merge_queue_reminder_body' => 'أي شخص وارد يشترك في اللقب مع مستخدم موجود بالفعل تم إرساله إلى قائمة الدمج بدلاً من إنشائه تلقائياً — هذا سلوك متوقع وليس خطأ. افحص قائمة التحقق من الهوية لإتمام هذه الاستيرادات؛ فأي شخص لم تُراجعه هناك لم يُستورد.',
     'rolled_back_title' => 'تم التراجع',
     'rolled_back_by' => 'تراجع عنه :name بتاريخ :date',
     'rollback_button' => 'التراجع عن هذا الاستيراد',
@@ -276,6 +278,8 @@ return [
         'E_SCORE_ALREADY_EXISTS' => 'توجد بالفعل درجة للعنصر ":component_name" لهذا الطالب. هذا الاستيراد لا يستبدل درجة موجودة أبدًا.',
         'E_UNKNOWN_CREDENTIAL_TYPE' => 'نوع الشهادة ":credential_type" ليس أحد TRANSCRIPT أو PROGRAM_CERTIFICATE أو STANDALONE_CERTIFICATE أو OFFERING_COMPLETION.',
         'E_DUPLICATE_SERIAL' => 'الرقم التسلسلي ":serial" يخصّ بالفعل شهادة أخرى (أصلية، أو مستوردة من مصدر مختلف).',
+        'E_OFFERING_GRADEBOOK_LOCKED' => 'دفتر العلامات للمقرر ":course_code" / ":semester_name" مقفل. لا يمكن تسجيل طلاب منتصف الفصل إلا في مقرر لا يزال دفتر علاماته مفتوحاً.',
+        'W_SEMESTER_NAME_NOT_YEAR_QUALIFIED' => 'الفصل الدراسي ":semester_name" موجود في أكثر من سنة أكاديمية. تمّ التعرف على صف واحد فقط الآن، لذا جرى الحل بصورة صحيحة — لكن حال تكرار هذا المقرر في فصل بالاسم ذاته سيصبح الأمر غامضاً. يُنصح بتزويد عمود offering_id بدلاً من الاعتماد على اسم الفصل.',
     ],
 
     // L5 — تفعيل الحسابات (الشاشة ١٣)

@@ -114,6 +114,17 @@
                 {{ __('import.committed_by', ['name' => $batch->committedBy?->displayName() ?? '—', 'date' => $batch->committed_at?->format('Y-m-d H:i')]) }}
             </p>
 
+            @if($batch->entity_type?->value === 'STUDENT')
+                <div class="alert alert-info d-flex align-items-start gap-2 mb-3">
+                    <i class="bi bi-people-fill mt-1 flex-shrink-0"></i>
+                    <div>
+                        <strong>{{ __('import.merge_queue_reminder_title') }}</strong>
+                        <p class="small mb-1">{{ __('import.merge_queue_reminder_body') }}</p>
+                        <a href="{{ route('admin.imports.merges') }}" class="btn btn-outline-primary btn-sm">{{ __('import.review_merges') }}</a>
+                    </div>
+                </div>
+            @endif
+
             @if(session('rollback_blocked'))
                 <div class="alert alert-warning">
                     <h3 class="h6">{{ __('import.rollback_blocked_title') }}</h3>

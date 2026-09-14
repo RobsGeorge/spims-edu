@@ -654,6 +654,19 @@ class ImportBatchService
                 }
                 $offering = $resolved['offering'];
 
+                if ($offering !== null && $offering->gradebook_locked_at !== null) {
+                    $rowMessages[] = [
+                        'level' => 'error',
+                        'code' => 'E_OFFERING_GRADEBOOK_LOCKED',
+                        'field' => 'course_code',
+                        'params' => [
+                            'course_code' => (string) ($normalized['course_code'] ?? ''),
+                            'semester_name' => (string) ($normalized['semester_name'] ?? ''),
+                        ],
+                    ];
+                    $offering = null;
+                }
+
                 $component = null;
                 if ($offering !== null && $componentName !== null && $componentName !== '') {
                     $componentResolution = $this->resolveGradebookComponent($offering, $componentName);
@@ -1853,6 +1866,21 @@ class ImportBatchService
             $errors[] = ['code' => 'E_OFFERING_AMBIGUOUS', 'field' => 'course_code', 'params' => ['course_code' => $courseCode, 'semester_name' => $semesterName]];
 
             return ['offering' => null, 'errors' => $errors, 'warnings' => $warnings];
+        }
+
+        // Exactly one offering matched — but if the semester name is shared by
+        // semesters in multiple academic years, a future offering for the same course
+        // would make this row ambiguous. Warn so the admin considers supplying
+        // offering_id instead (Issue #2).
+        $semesterNameCount = \App\Models\Semester::query()
+            ->whereRaw('LOWER(name) = ?', [mb_strtolower($semesterName)])
+            ->count();
+        if ($semesterNameCount > 1) {
+            $warnings[] = [
+                'code' => 'W_SEMESTER_NAME_NOT_YEAR_QUALIFIED',
+                'field' => 'semester_name',
+                'params' => ['semester_name' => $semesterName],
+            ];
         }
 
         return ['offering' => $matches->first(), 'errors' => $errors, 'warnings' => $warnings];

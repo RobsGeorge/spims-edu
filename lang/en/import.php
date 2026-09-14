@@ -174,6 +174,8 @@ return [
     'view_dry_run' => 'View dry run report',
     'next_step_COMMITTED_title' => 'Committed',
     'committed_by' => 'Committed by :name on :date',
+    'merge_queue_reminder_title' => 'Check the Identity review queue',
+    'merge_queue_reminder_body' => 'Any incoming person who shares a surname with an existing user was sent to the merge queue rather than created automatically — this is expected behaviour, not an error. Work the Identity review queue to complete those imports; any person not reviewed there was not imported.',
     'rolled_back_title' => 'Rolled back',
     'rolled_back_by' => 'Rolled back by :name on :date',
     'rollback_button' => 'Roll back this import',
@@ -276,6 +278,8 @@ return [
         'E_SCORE_ALREADY_EXISTS' => 'A score for component ":component_name" already exists for this student. This import never overwrites an existing score.',
         'E_UNKNOWN_CREDENTIAL_TYPE' => 'Credential type ":credential_type" is not one of TRANSCRIPT, PROGRAM_CERTIFICATE, STANDALONE_CERTIFICATE, or OFFERING_COMPLETION.',
         'E_DUPLICATE_SERIAL' => 'Serial ":serial" already belongs to a different credential (native, or imported from a different source).',
+        'E_OFFERING_GRADEBOOK_LOCKED' => 'The gradebook for course ":course_code" / ":semester_name" is locked. Mid-term enrolments can only land on an offering whose gradebook is still open.',
+        'W_SEMESTER_NAME_NOT_YEAR_QUALIFIED' => 'Semester ":semester_name" exists in more than one academic year. Only one live offering matched today, so this row resolved correctly — but once this course runs again in a semester with the same name it will become ambiguous. Provide the SPIMS offering_id column instead of relying on the semester name.',
     ],
 
     // L5 — account activation (screen 13)

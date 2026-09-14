@@ -453,6 +453,92 @@ class ImportMidtermEnrollmentTest extends TestCase
     }
 
     #[Test]
+    public function validate_blocks_row_when_offering_gradebook_is_locked(): void
+    {
+        $source = $this->populi();
+        $actor = $this->admin();
+        $service = $this->service();
+        $this->linkedStudent($source, '5099');
+        $semester = $this->semester();
+        $offering = $this->liveOffering($semester);
+
+        // Lock the gradebook as if finalised.
+        $offering->update(['gradebook_locked_at' => now()]);
+
+        $csv = $this->csv("LegacyID,Course,Semester,Component,Score\n5099,BIB201,Fall 2026,Midterm Exam,75\n");
+        $batch = $service->createFromUpload($actor, $source, $csv, null, entityType: ImportEntityType::MidtermEnrollment);
+        $batch = $service->updateMapping($batch, $this->mapping());
+        $batch = $service->validate($batch);
+
+        $this->assertSame(1, $batch->error_count, 'A locked gradebook must produce an error row.');
+        $row = ImportRow::query()->where('batch_id', $batch->id)->first();
+        $this->assertTrue(collect($row->messages)->pluck('code')->contains('E_OFFERING_GRADEBOOK_LOCKED'));
+
+        // Commit must be refused (no rows to write).
+        $enrollmentsBefore = Enrollment::query()->count();
+        $service->commit($actor, $batch->fresh());
+        $this->assertSame($enrollmentsBefore, Enrollment::query()->count(), 'A locked-gradebook row must not create an enrolment.');
+    }
+
+    #[Test]
+    public function validate_warns_when_semester_name_is_shared_across_academic_years(): void
+    {
+        $source = $this->populi();
+        $actor = $this->admin();
+        $service = $this->service();
+        $this->linkedStudent($source, '5098');
+
+        // Create two semesters with the same name in different academic years.
+        $year1 = AcademicYear::query()->create([
+            'name' => '2025/2026',
+            'start_date' => now()->subYears(1)->subMonths(6),
+            'end_date' => now()->subMonths(1),
+        ]);
+        $pastSemester = Semester::query()->create([
+            'academic_year_id' => $year1->id,
+            'name' => 'Fall',
+            'start_date' => now()->subYears(1)->subMonths(2),
+            'end_date' => now()->subYears(1)->addMonths(2),
+            'registration_start' => now()->subYears(1)->subMonths(3),
+            'registration_end' => now()->subYears(1)->subMonths(2)->addDays(5),
+            'add_drop_end_week' => 4,
+            'last_withdrawal_week' => 10,
+            'withdrawal_refund_percent' => 50,
+        ]);
+
+        $year2 = AcademicYear::query()->create([
+            'name' => '2026/2027',
+            'start_date' => now()->subMonths(1),
+            'end_date' => now()->addMonths(8),
+        ]);
+        $currentSemester = Semester::query()->create([
+            'academic_year_id' => $year2->id,
+            'name' => 'Fall',
+            'start_date' => now()->subWeeks(1),
+            'end_date' => now()->addMonths(3),
+            'registration_start' => now()->subDays(10),
+            'registration_end' => now()->addDays(10),
+            'add_drop_end_week' => 4,
+            'last_withdrawal_week' => 10,
+            'withdrawal_refund_percent' => 50,
+        ]);
+
+        // Only the current semester has a live offering for BIB201.
+        $this->liveOffering($currentSemester, 'BIB201');
+
+        $csv = $this->csv("LegacyID,Course,Semester,Component,Score\n5098,BIB201,Fall,Midterm Exam,88\n");
+        $batch = $service->createFromUpload($actor, $source, $csv, null, entityType: ImportEntityType::MidtermEnrollment);
+        $batch = $service->updateMapping($batch, $this->mapping());
+        $batch = $service->validate($batch);
+
+        // Row resolves successfully (1 match) but gets a warning.
+        $this->assertSame(0, $batch->error_count, 'Row should resolve, not error.');
+        $this->assertSame(1, $batch->warning_count, 'Row should warn about ambiguous semester name.');
+        $row = ImportRow::query()->where('batch_id', $batch->id)->first();
+        $this->assertTrue(collect($row->messages)->pluck('code')->contains('W_SEMESTER_NAME_NOT_YEAR_QUALIFIED'));
+    }
+
+    #[Test]
     public function committing_a_midterm_enrollment_batch_sends_no_mail(): void
     {
         \Illuminate\Support\Facades\Mail::fake();

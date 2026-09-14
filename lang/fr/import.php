@@ -174,6 +174,8 @@ return [
     'view_dry_run' => 'Voir le rapport de l\'essai à blanc',
     'next_step_COMMITTED_title' => 'Validé définitivement',
     'committed_by' => 'Confirmé par :name le :date',
+    'merge_queue_reminder_title' => 'Vérifiez la file de révision des identités',
+    'merge_queue_reminder_body' => 'Toute personne entrante partageant le même nom de famille qu\'un utilisateur existant a été envoyée dans la file de fusion plutôt que créée automatiquement — c\'est un comportement attendu, pas une erreur. Traitez la file de révision des identités pour finaliser ces importations ; toute personne non révisée là-bas n\'a pas été importée.',
     'rolled_back_title' => 'Annulé',
     'rolled_back_by' => 'Annulé par :name le :date',
     'rollback_button' => 'Annuler cet import',
@@ -276,6 +278,8 @@ return [
         'E_SCORE_ALREADY_EXISTS' => 'Une note pour le composant ":component_name" existe déjà pour cet étudiant. Cet import n\'écrase jamais une note existante.',
         'E_UNKNOWN_CREDENTIAL_TYPE' => 'Le type de diplôme « :credential_type » n\'est ni TRANSCRIPT, ni PROGRAM_CERTIFICATE, ni STANDALONE_CERTIFICATE, ni OFFERING_COMPLETION.',
         'E_DUPLICATE_SERIAL' => 'Le numéro de série « :serial » appartient déjà à un autre diplôme (natif, ou importé d\'une autre source).',
+        'E_OFFERING_GRADEBOOK_LOCKED' => 'Le carnet de notes du cours « :course_code » / « :semester_name » est verrouillé. Les inscriptions en milieu de semestre ne peuvent être enregistrées que sur une offre dont le carnet est encore ouvert.',
+        'W_SEMESTER_NAME_NOT_YEAR_QUALIFIED' => 'Le semestre « :semester_name » existe dans plusieurs années académiques. Aujourd\'hui une seule offre correspond, donc la ligne a été résolue correctement — mais si ce cours est de nouveau proposé lors d\'un semestre portant le même nom, la ligne deviendra ambiguë. Fournissez la colonne offering_id plutôt que de vous fier au nom du semestre.',
     ],
 
     // L5 — activation des comptes (écran 13)
