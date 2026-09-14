@@ -65,6 +65,11 @@ class CourseOffering extends Model
         return $this->hasMany(Week::class, 'offering_id')->orderBy('order');
     }
 
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class, 'offering_id');
+    }
+
     public function projectAssessments(): HasMany
     {
         return $this->hasMany(ProjectAssessment::class, 'offering_id');

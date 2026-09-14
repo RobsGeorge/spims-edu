@@ -111,4 +111,9 @@ return array (
   'open_discussion_grades' => 'Noter les fils',
   'discussions_workspace' => 'Notes de discussion',
   'discussions_workspace_sub' => 'Noter les étudiants inscrits sur les fils de discussion.',
+  'stat_enrolled' => ':count inscrits',
+  'stat_weeks' => 'Semaines',
+  'stat_items' => 'Éléments pédagogiques',
+  'stat_gradebook' => 'Carnet de notes',
+  'stat_progress' => 'Progression',
 );

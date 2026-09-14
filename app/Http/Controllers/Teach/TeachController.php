@@ -35,8 +35,10 @@ class TeachController extends Controller
         $user = $request->user();
         abort_unless($this->teachAccess->canTeach($user), 403);
 
+        $offerings = $this->teachAccess->offeringsFor($user)->loadCount('enrollments');
+
         return view('teach.index', [
-            'offerings' => $this->teachAccess->offeringsFor($user),
+            'offerings' => $offerings,
         ]);
     }
 
@@ -54,11 +56,16 @@ class TeachController extends Controller
             ->orderBy('enrolled_at')
             ->get();
 
+        $weeksCount = $offering->weeks->count();
+        $itemsCount = $offering->weeks->sum(fn ($w) => $w->items->count());
+
         return view('teach.show', [
             'offering' => $offering,
             'tab' => $tab,
             'roster' => $roster,
             'rosterCount' => $roster->count(),
+            'weeksCount' => $weeksCount,
+            'itemsCount' => $itemsCount,
             'assessments' => Assessment::query()
                 ->where('offering_id', $offering->id)
                 ->withCount('attempts')

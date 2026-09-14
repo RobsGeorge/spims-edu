@@ -25,11 +25,15 @@
                                 <x-status-badge :status="$offering->status->value" :label="$offering->status->value" />
                             </div>
                             <h2 class="h6 spims-title mb-1">{{ $offering->course->title }}</h2>
-                            <p class="small spims-text-dim mb-0">
+                            <p class="small spims-text-dim mb-1">
                                 <x-badge :value="$offering->mode" />
                                 @if($offering->semester)
                                     · {{ $offering->semester->name }}
                                 @endif
+                            </p>
+                            <p class="small mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-people-fill spims-text-dim" aria-hidden="true"></i>
+                                <span class="spims-text-dim">{{ __('teach.stat_enrolled', ['count' => $offering->enrollments_count ?? 0]) }}</span>
                             </p>
                         </div>
                     </a>

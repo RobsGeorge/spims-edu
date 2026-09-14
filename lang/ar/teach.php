@@ -111,4 +111,9 @@ return array (
   'open_discussion_grades' => 'تصحيح المواضيع',
   'discussions_workspace' => 'درجات النقاش',
   'discussions_workspace_sub' => 'تصحيح الطلاب المسجّلين في مواضيع النقاش.',
+  'stat_enrolled' => ':count مسجّل',
+  'stat_weeks' => 'أسابيع',
+  'stat_items' => 'عناصر التعلم',
+  'stat_gradebook' => 'سجل الدرجات',
+  'stat_progress' => 'التقدّم',
 );
