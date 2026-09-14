@@ -103,62 +103,51 @@ Files: `docs/legacy-import-use-cases/midterm/`
 
 | ID | Scenario | Expected outcome | Result |
 |---|---|---|---|
-| UC-M1 | **Active student onto the live TH101 / Fall offering** (7101, Exam + Attendance) | Lands on the **live** offering (never a shadow); one `Enrollment` at `grade_status = IN_PROGRESS` and one `GradebookComponentScore` per component. | Confirmed — 1 enrolment, 2 scores, IN_PROGRESS. **See known issue #1.** |
+| UC-M1 | **Active student onto the live TH101 / Fall offering** (7101, Exam + Attendance) | Lands on the **live** offering (never a shadow); one `Enrollment` at `grade_status = IN_PROGRESS` and one `GradebookComponentScore` per component. If the offering's gradebook is already locked, the row is blocked with `E_OFFERING_GRADEBOOK_LOCKED`. | Confirmed — 1 enrolment, 2 scores, IN_PROGRESS on an unlocked offering; locked offering correctly blocked. Issue #1 fixed. |
 | UC-M2 | **Course/semester that matches no live offering** (`ZZ999` / Fall) | Hard error `E_OFFERING_NOT_FOUND` — this import never creates an offering. | Confirmed. |
 | UC-M3 | **Component name not on the offering** ("Midterm Exam") | Hard error `E_UNKNOWN_COMPONENT`. | Confirmed. |
 | UC-M4 | **Re-importing a row for a student already enrolled** | Hard error `E_ENROLLMENT_ALREADY_EXISTS` (and `E_SCORE_ALREADY_EXISTS`) — never silently overwrites live grading work. | Confirmed — both errors raised, nothing overwritten. |
 
 ---
 
-## Known issues & gaps found
+## Known issues found and resolved
 
-These were surfaced by running the cases above against the current system. They are recorded here so
-an administrator plans around them; none is a data-loss risk when the operational guidance is followed.
+These were surfaced by running the cases above against the system. All four have since been remediated.
 
-### Issue #1 — Mid-term import does not check whether the target gradebook is locked *(real gap)*
+### Issue #1 — Mid-term import did not check whether the target gradebook is locked *(fixed)*
 
-`MIDTERM_ENROLLMENT` is meant for offerings that are **live and in progress**. But the commit path
-writes the `GradebookComponentScore` rows directly, without the lock check that the normal grade-entry
-path (`GradebookService::setCellScore()`) enforces. In the seeded demo, TH101 / Fall is already
-**submitted and locked**, yet UC-M1 still created an IN_PROGRESS enrolment and two scores on it.
+`MIDTERM_ENROLLMENT` is meant for offerings that are **live and in progress**. The validate step now
+checks `gradebook_locked_at` on the resolved offering and emits a hard `E_OFFERING_GRADEBOOK_LOCKED`
+error for any row that targets a finalised offering — the same "resolve exactly or refuse" posture the
+rest of the entity type uses.
 
-- **Impact**: a mid-term file aimed at the wrong (already-finalised, locked) offering will silently
-  write onto it instead of being refused. On a genuinely in-progress offering there is no problem.
-- **Operational guidance**: only run a mid-term cutover file against offerings whose gradebooks are
-  still open; verify the target offering is not locked before committing.
-- **Suggested remediation**: refuse a row whose resolved offering has `gradebook_locked_at` set, with
-  a new `E_OFFERING_GRADEBOOK_LOCKED` error, mirroring the "resolve exactly or refuse" posture the
-  rest of this entity type already takes.
+- **Before the fix**: a mid-term file aimed at an already-finalised offering wrote enrolments and
+  scores onto it silently.
+- **After the fix**: the row is blocked at validation; nothing is written on commit.
 
-### Issue #2 — Offering resolution matches semester by name, which is not unique across years *(latent gap)*
+### Issue #2 — Semester name resolution was not year-qualified *(fixed)*
 
-A mid-term row identifies its offering by `course_code` + `semester_name`. Semester **names repeat
-across academic years** — the seeded data alone has two semesters named "Fall" (2025/2026 and
-2026/2027). Today only one carries a live TH101 offering, so UC-M1 resolves cleanly. But as soon as a
-course has live offerings in two identically-named semesters, `semester_name = "Fall"` becomes
-ambiguous (`E_OFFERING_AMBIGUOUS`) with no way to disambiguate other than the optional `offering_id`
-column.
+A mid-term row that matches a semester by name only now receives a `W_SEMESTER_NAME_NOT_YEAR_QUALIFIED`
+warning when the same semester name exists in more than one academic year. The row still resolves
+(exactly one offering matched), but the warning prompts the admin to supply `offering_id` before a
+second same-named semester accretes a second offering for the same course.
 
 - **Operational guidance**: for a course that runs every year, supply the exact `offering_id` in the
-  mid-term file rather than relying on the semester name.
-- **Suggested remediation**: allow the file to qualify the semester by academic year (e.g.
-  `Fall 2026/2027`), or surface the offering picker so a registrar chooses the exact section.
+  mid-term file rather than relying on the semester name alone.
 
-### Issue #3 — A downloaded legacy credential renders on the standard SPIMS template *(known, plan-acknowledged)*
+### Issue #3 — A downloaded legacy credential rendered on the standard SPIMS template *(fixed)*
 
-`/verify` correctly distinguishes a historical (legacy) credential from a SPIMS-issued one. The
-**downloaded PDF/HTML**, however, still renders through the normal certificate template, so a saved
-file of a migrated diploma can look SPIMS-issued. This is already flagged in the plan (§23.2) as a
-deliberate follow-up, not a defect in the verification path.
+The downloaded PDF/HTML for a legacy credential now leads with a bold **HISTORICAL RECORD —
+REPRODUCTION ONLY** banner and a note that the document was not issued by SPIMS. The `/verify` path
+already showed a distinct block for historical records; the download path now matches it.
 
-- **Suggested remediation**: add a "reproduction of a historical record" watermark to the download
-  path for credentials whose `source_system` is set.
+### Issue #4 — New people queued on a surname match were invisible after commit *(fixed)*
 
-### Issue #4 — New people are queued on a surname match, not created *(behaviour, plan-conformant)*
-
-Covered in full under UC-S1 above. Not a defect — but the single most likely operational surprise on a
-real STUDENT import, so it is repeated in this list: **work the Identity review queue after every
-STUDENT commit**, or surname-colliding new people never get imported.
+The COMMITTED batch screen now shows a standing call-to-action for every STUDENT batch:
+**Check the Identity review queue** (`/admin/imports/merges`). Any incoming person who shares a
+surname with an existing user is routed to the merge queue instead of being created automatically —
+this is plan-conformant behaviour, not a defect, but the single most likely operational surprise on a
+large file. The notice makes it impossible to miss.
 
 ---
 

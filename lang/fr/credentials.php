@@ -65,4 +65,6 @@ return [
     'legacy_no_reissue' => 'Ceci est un dossier historique importé d\'un système précédent. Il ne peut pas être régénéré sous un nouveau numéro de série SPIMS — le document original est le registre d\'émission, pas ce système.',
     'historical_valid' => 'Dossier historique — non éligible à une réémission',
     'historical_note' => 'Importé depuis :source. Ce diplôme n\'a pas été émis par SPIMS ; il représente un dossier de l\'ancien système de l\'école, conservé uniquement à des fins de vérification.',
+    'historical_download_banner' => 'DOCUMENT HISTORIQUE — REPRODUCTION UNIQUEMENT',
+    'historical_download_notice' => 'Ce document n\'a pas été émis par SPIMS. Il s\'agit de la reproduction d\'un dossier importé d\'un système antérieur, fourni à titre de référence seulement.',
 ];

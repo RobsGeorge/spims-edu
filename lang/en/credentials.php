@@ -65,4 +65,6 @@ return [
     'legacy_no_reissue' => 'This is a historical record imported from a previous system. It cannot be regenerated under a new SPIMS serial — the original document is the record of issuance, not this system.',
     'historical_valid' => 'Historical record — not eligible for reissue',
     'historical_note' => 'Imported from :source. This credential was not issued by SPIMS; it represents a record from the school\'s previous system, kept for verification only.',
+    'historical_download_banner' => 'HISTORICAL RECORD — REPRODUCTION ONLY',
+    'historical_download_notice' => 'This document was not issued by SPIMS. It is a reproduction of a record imported from a predecessor system and is provided for reference only.',
 ];

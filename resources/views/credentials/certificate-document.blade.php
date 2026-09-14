@@ -4,6 +4,7 @@
     $verifyUrl = $credential?->verifyUrl();
     $signatoryName = $credential?->signatory_name;
     $signatoryTitle = $credential?->signatory_title;
+    $isLegacy = $credential?->isLegacy() ?? false;
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
@@ -19,9 +20,15 @@
         dl { display: grid; grid-template-columns: 10rem 1fr; gap: 0.35rem 1rem; margin-top: 1.5rem; text-align: {{ $isRtl ? 'right' : 'left' }}; }
         dt { font-weight: 600; }
         dd { margin: 0; }
+        .historical-banner { background: #7a5230; color: #fff; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem 1rem; margin-bottom: 1.5rem; text-align: center; }
+        .historical-notice { border: 1px solid #7a5230; color: #5a3a10; background: #fdf3e7; font-size: 0.8rem; padding: 0.6rem 1rem; margin-bottom: 1.5rem; text-align: {{ $isRtl ? 'right' : 'left' }}; }
     </style>
 </head>
 <body>
+    @if($isLegacy)
+        <div class="historical-banner">{{ __('credentials.historical_download_banner', [], $locale) }}</div>
+        <div class="historical-notice">{{ __('credentials.historical_download_notice', [], $locale) }}</div>
+    @endif
     <div class="certificate">
         <h1>{{ $title }}</h1>
         <p class="body-text">{{ $body }}</p>
