@@ -22,6 +22,8 @@ return [
     'admin_title' => 'Credentials',
     'issue' => 'Issue',
     'regenerate' => 'Regenerate',
+    'guide_issue_body' => 'Creates the credential and its verification QR immediately — it is publicly visible at /verify as soon as you submit.',
+    'guide_regenerate_body' => 'Issues a new serial and QR immediately — the old QR stops verifying. Refused for a credential imported from a legacy system; its original serial is the record of issuance.',
     'issued' => 'Issued :serial',
     'regenerated' => 'Regenerated as :serial',
     'not_in_program' => 'Student is not in that program.',

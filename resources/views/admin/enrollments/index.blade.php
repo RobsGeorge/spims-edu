@@ -10,6 +10,23 @@
     <div class="alert alert-danger">{{ $errors->first() }}</div>
 @endif
 
+<x-card variant="quiet" class="mb-3">
+    <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="warning" :label="__('enrollment.override_register')" />
+            <span class="small spims-text-dim">{{ __('enrollment.guide_override_body') }}</span>
+        </li>
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="info" :label="__('enrollment.audit_registration')" />
+            <span class="small spims-text-dim">{{ __('enrollment.guide_audit_body') }}</span>
+        </li>
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="danger" :label="__('enrollment.financial_hold_label')" />
+            <span class="small spims-text-dim">{{ __('enrollment.guide_hold_body') }}</span>
+        </li>
+    </ul>
+</x-card>
+
 <div class="row g-3">
     <div class="col-lg-6">
         <x-card variant="panel" class="h-100">

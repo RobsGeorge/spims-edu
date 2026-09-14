@@ -4,6 +4,19 @@
 <h1 class="spims-title mb-3">{{ __('credentials.admin_title') }}</h1>
 @if(session('status'))<div class="alert alert-success" role="status">{{ session('status') }}</div>@endif
 
+<x-card variant="quiet" class="mb-3">
+    <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="info" :label="__('credentials.issue')" />
+            <span class="small spims-text-dim">{{ __('credentials.guide_issue_body') }}</span>
+        </li>
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="warning" :label="__('credentials.regenerate')" />
+            <span class="small spims-text-dim">{{ __('credentials.guide_regenerate_body') }}</span>
+        </li>
+    </ul>
+</x-card>
+
 <x-card variant="panel" tag="form" method="POST" action="{{ route('admin.credentials.store') }}" class="mb-4">
     @csrf
     <div class="row g-2">

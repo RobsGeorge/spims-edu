@@ -2,6 +2,24 @@
 @section('title', __('offerings.create_offering'))
 @section('content')
 <h1 class="spims-title mb-3">{{ __('offerings.create_offering') }}</h1>
+
+<x-card variant="quiet" class="mb-3">
+    <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="info" :label="__('offerings.mode')" />
+            <span class="small spims-text-dim">{{ __('offerings.guide_mode_body') }}</span>
+        </li>
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="info" :label="__('offerings.clone_week1')" />
+            <span class="small spims-text-dim">{{ __('offerings.guide_clone_body') }}</span>
+        </li>
+        <li class="d-flex align-items-start gap-2">
+            <x-status-badge status="warning" :label="__('offerings.attendance_threshold')" />
+            <span class="small spims-text-dim">{{ __('offerings.guide_threshold_body') }}</span>
+        </li>
+    </ul>
+</x-card>
+
 <x-card variant="panel" tag="form" method="POST" action="{{ route('admin.offerings.store') }}">
     @csrf
     <div class="row g-3">

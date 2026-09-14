@@ -22,6 +22,8 @@ return [
     'admin_title' => 'Diplômes',
     'issue' => 'Émettre',
     'regenerate' => 'Régénérer',
+    'guide_issue_body' => "Crée le diplôme et son QR de vérification immédiatement — visible publiquement sur /verify dès la soumission.",
+    'guide_regenerate_body' => "Émet immédiatement un nouveau numéro de série et QR — l'ancien QR cesse de vérifier. Refusé pour un diplôme importé d'un système hérité ; son numéro de série d'origine est le registre d'émission.",
     'issued' => 'Émis :serial',
     'regenerated' => 'Régénéré :serial',
     'not_in_program' => 'L’étudiant n’est pas dans ce programme.',

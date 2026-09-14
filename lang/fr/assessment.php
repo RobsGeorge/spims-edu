@@ -41,6 +41,8 @@ return [
     'submit_grades' => 'Soumettre',
     'lock_grades' => 'Verrouiller',
     'reopen_grades' => 'Rouvrir',
+    'guide_seed_body' => "Ajoute les composants d'évaluation par défaut de l'école (ou le premier modèle si aucun n'est marqué par défaut) comme point de départ — modifiez ensuite les noms et pondérations ci-dessous.",
+    'guide_submit_body' => "Calcule le pourcentage final, la lettre et les points GPA de chaque étudiant inscrit à partir des composants ci-dessous, et marque sa note comme soumise. Cela ne verrouille pas l'édition — utilisez Verrouiller, plus bas, une fois qu'aucune correction n'est plus attendue.",
     'component' => 'Composante',
     'student' => 'Étudiant',
     'letter' => 'Lettre',
